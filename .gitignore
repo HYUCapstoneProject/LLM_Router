@@ -8,11 +8,11 @@
 Thumbs.db
 
 # ── Frontend (Vite / Node) ───────────────────────────────────────────
-front/node_modules/
-front/dist/
-front/.env
-front/.env.local
-front/.env.*.local
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
 
 # ── Backend (Spring Boot / Gradle) ───────────────────────────────────
 backend/.gradle/
