@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RouterService {
 
-    public enum ModelTier { LIGHT, HEAVY }
+    public enum ModelTier { LIGHT, MEDIUM, HEAVY }
 
     /**
      * @return LIGHT → haiku, HEAVY → sonnet
@@ -27,7 +27,8 @@ public class RouterService {
     public String resolveModelName(ModelTier tier) {
         return switch (tier) {
             case LIGHT -> "haiku";
-            case HEAVY -> "sonnet";
+            case MEDIUM -> "sonnet";
+            case HEAVY -> "opus";
         };
     }
 }

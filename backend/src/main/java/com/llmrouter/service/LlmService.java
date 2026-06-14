@@ -17,7 +17,7 @@ public class LlmService {
     /**
      * 지정된 모델로 LLM API를 호출한다.
      *
-     * @param model "haiku" 또는 "sonnet"
+     * @param model "haiku", "sonnet", "opus"
      * @param message 사용자 질문
      * @return LLM 응답 텍스트
      */
