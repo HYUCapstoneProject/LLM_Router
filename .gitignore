@@ -1,0 +1,26 @@
+# ── IDE ──────────────────────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+
+# ── OS ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Frontend (Vite / Node) ───────────────────────────────────────────
+front/node_modules/
+front/dist/
+front/.env
+front/.env.local
+front/.env.*.local
+
+# ── Backend (Spring Boot / Gradle) ───────────────────────────────────
+backend/.gradle/
+backend/build/
+backend/out/
+backend/.env
+
+# Gradle wrapper (선택: 팀 공유 시 아래 두 줄 주석 처리)
+!backend/gradle/
+!backend/gradlew
+!backend/gradlew.bat
