@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-router-labeling"
+version = "0.1.0"
+description = "RouterBench training data and RouterArena routing evaluation tools"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "numpy>=2.0,<3.0",
+  "pandas>=2.2,<3.0",
+  "pyarrow>=17,<22",
+]
+
+[project.optional-dependencies]
+model-evaluation = [
+  "torch>=2.4,<3.0",
+  "transformers>=4.48,<6.0",
+]
+
+[project.scripts]
+routerbench-labeling = "llm_router_labeling.training.routerbench_cli:main"
+routerarena-preprocessing = "llm_router_labeling.evaluation.routerarena_cli:main"
+routerarena-evaluate = "llm_router_labeling.evaluation.routerarena_evaluation_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

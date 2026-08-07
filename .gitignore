@@ -24,3 +24,16 @@ backend/.env
 !backend/gradle/
 !backend/gradlew
 !backend/gradlew.bat
+
+# ── Local project memory state ───────────────────────────────────────
+.memorize/
+
+# ── ML / Python ──────────────────────────────────────────────────────
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+ml/data/
+ml/artifacts/

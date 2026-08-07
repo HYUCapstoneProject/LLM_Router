@@ -1,0 +1,15 @@
+{
+  "evaluation_version": "routerarena-routing-evaluation-v2",
+  "label_semantics": "routerarena-three-class-alignment",
+  "label_order": ["easy", "medium", "hard"],
+  "route_mapping": {
+    "easy": "haiku",
+    "medium": "sonnet",
+    "hard": "opus"
+  },
+  "inference": {
+    "batch_size": 8,
+    "max_length": 8192,
+    "device": "auto"
+  }
+}
