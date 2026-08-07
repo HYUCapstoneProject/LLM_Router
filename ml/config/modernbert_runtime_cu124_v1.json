@@ -1,0 +1,13 @@
+{
+  "runtime_version": "modernbert-runtime-cu124-v1",
+  "allowed_python_minors": [
+    "3.11",
+    "3.12"
+  ],
+  "torch_version": "2.5.1",
+  "transformers_version": "4.48.3",
+  "numpy_version": "2.1.2",
+  "pandas_version": "2.3.3",
+  "pyarrow_version": "21.0.0",
+  "cuda_version": "12.4"
+}

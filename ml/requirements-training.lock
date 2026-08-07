@@ -1,0 +1,11 @@
+numpy==2.1.2
+pandas==2.3.3
+pyarrow==21.0.0
+python-dateutil==2.9.0.post0
+pytz==2026.3.post1
+six==1.17.0
+tzdata==2026.3
+huggingface-hub==0.36.2
+safetensors==0.8.0
+tokenizers==0.21.4
+transformers==4.48.3

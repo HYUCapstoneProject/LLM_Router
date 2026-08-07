@@ -11,7 +11,9 @@ src/llm_router_labeling/
 ├── training/
 │   ├── routerbench_labeling.py       # RouterBench 모델 성능 → 난이도 라벨
 │   ├── routerbench_preprocessing.py  # 라벨 데이터 → 학습 Parquet
-│   └── routerbench_cli.py            # routerbench-labeling 명령
+│   ├── routerbench_cli.py            # routerbench-labeling 명령
+│   ├── modernbert_training.py        # 로컬/Kubeflow 공통 학습 코어
+│   └── modernbert_training_cli.py    # modernbert-train 명령
 ├── evaluation/
 │   ├── routerarena_preprocessing.py  # RouterArena → 평가 Parquet
 │   ├── routerarena_cli.py            # routerarena-preprocessing 명령
@@ -129,6 +131,68 @@ ml/artifacts/routerbench-training/
 `training.parquet`은 `sample_id`, `model_input_text`, `difficulty_label`,
 `sample_weight`, `split`, `duplicate_group_id`만 포함한다. tokenizer 기반 길이 제한과
 truncation은 모델 tokenizer가 확정되는 학습 컴포넌트에서 수행한다.
+
+## ModernBERT 로컬 학습 smoke
+
+로컬과 향후 Kubeflow component는 같은 `modernbert-train` CLI를 사용한다. 차이는
+데이터·출력 경로와 device/resource config뿐이다. 설계 근거와 계약은
+`docs/modernbert-training-spec.md`에 기록한다.
+
+```bash
+python3.12 -m venv .venv-training
+.venv-training/bin/pip install -r ml/requirements-training-macos.txt
+.venv-training/bin/pip install -r ml/requirements-training.lock
+.venv-training/bin/pip install --no-deps -e ml
+
+HF_HOME=ml/.cache/huggingface .venv-training/bin/modernbert-train \
+  --config ml/config/modernbert_smoke.json \
+  --runtime-contract ml/config/modernbert_runtime_cu124_v1.json \
+  --training-path ml/artifacts/routerbench-preprocessed-smoke-100/training.parquet \
+  --output-dir ml/artifacts/modernbert-smoke
+```
+
+smoke config는 `answerdotai/ModernBERT-base`의 immutable revision, 512 token,
+`easy=0, medium=1, hard=2`, FP32와 2 optimizer step을 고정한다. 학습은 Parquet의
+`sample_weight`를 cross-entropy에 반영한다. 출력에는 Hugging Face model/tokenizer,
+`metrics.json`, `training_config.json`이 포함되며 저장 직후 checkpoint를 재로딩해
+라벨 순서와 1행 추론을 다시 검증한다. 실제 Python/PyTorch/CUDA/Transformers/data
+library 버전도 `metrics.json.runtime`에 기록하며 계약과 다르면 학습을 시작하지 않는다.
+
+T4 전체 학습은 `ml/config/modernbert_t4_full.json`을 사용한다. native 8,192 token,
+FP16, batch 1, gradient accumulation 8과 gradient checkpointing을 고정한다.
+
+로컬 GPU가 없으면 VS Code에 설치된 공식 `google.colab` 확장과
+`ml/notebooks/modernbert_smoke_colab.ipynb`를 사용한다. notebook 실행 전에 현재
+소스/config와 smoke Parquet을 묶은 아래 archive를 Colab `/content`로 업로드한다.
+
+```text
+ml/artifacts/modernbert-colab-smoke-input.tar.gz
+```
+
+archive는 아래 명령으로 현재 source/config/runtime lock에서 다시 만든다.
+
+```bash
+./ml/scripts/build-modernbert-colab-smoke-archive.sh
+```
+
+## ModernBERT 학습 Docker image
+
+Kubeflow/GKE에서는 Colab과 같은 `modernbert-train`을 entrypoint로 제공하는 T4용
+linux/amd64 image를 사용한다. 데이터와 checkpoint는 image에 넣지 않고 Artifact로
+마운트한다.
+
+```bash
+./ml/scripts/build-modernbert-training-image.sh
+
+docker run --rm \
+  llm-router-modernbert-training:cu124-v1 \
+  --help
+```
+
+base image는 PyTorch 2.5.1, CUDA 12.4, cuDNN 9 runtime digest로 고정되어 있다. 로컬
+Mac이 arm64여도 build script의 기본 target은 GKE용 `linux/amd64`다. image에는
+ModernBERT 학습 코드와 runtime 검사만 포함하며 RouterBench CPU 라벨링 및 RouterArena
+평가 코드는 포함하지 않는다.
 
 ## RouterArena 평가 전처리
 

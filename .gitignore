@@ -30,6 +30,7 @@ backend/.env
 
 # ── ML / Python ──────────────────────────────────────────────────────
 .venv/
+.venv-training/
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -37,3 +38,4 @@ __pycache__/
 .ruff_cache/
 ml/data/
 ml/artifacts/
+ml/.cache/

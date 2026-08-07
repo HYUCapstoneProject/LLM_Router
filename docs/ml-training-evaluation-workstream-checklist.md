@@ -121,7 +121,7 @@ component에서 호출하고, Kubeflow는 artifact 전달, cache, retry, resourc
 
 ### 4-4. 검증과 저장소 위생
 
-- [x] 현재 ML 단위·통합 테스트 31개가 통과한다.
+- [x] 현재 ML 단위·통합 테스트 40개가 통과한다.
 - [x] `ml/data/`, `ml/artifacts/`, virtualenv, bytecode와 egg-info를 Git에서 제외한다.
 - [x] training/evaluation/shared 소스 디렉터리를 분리했다.
 - [x] 실행 방법과 데이터 계약을 `ml/README.md` 및 세부 명세에 기록했다.
@@ -132,10 +132,10 @@ component에서 호출하고, Kubeflow는 artifact 전달, cache, retry, resourc
 
 - [x] 브랜치가 `feat/data-labeling-training`인지 확인한다.
 - [x] 원본 Pickle, Parquet artifact, virtualenv, bytecode가 staging 대상이 아님을 확인한다.
-- [x] Python compile과 31개 테스트를 통과한다.
+- [x] Python compile과 당시 31개 테스트를 통과한다.
 - [x] staged diff의 secret, 대용량 바이너리, 임시 경로를 마지막으로 검사한다.
 - [x] commit message를 `[FEAT] RouterBench 전체 라벨링 및 전처리 기반 구현`으로 확정한다.
-- [ ] commit 후 commit hash를 기준선 기록에 남긴다.
+- [x] 첫 기준선 commit hash `b467dcb`를 기록한다.
 
 ### B. 전체 RouterBench 라벨링·전처리
 
@@ -163,19 +163,23 @@ routerbench-training/<data-version>__<rule-version>__<preprocess-version>/metric
 
 ### C. ModernBERT 로컬 학습 smoke
 
-- [ ] base model identifier와 revision을 고정한다.
-- [ ] `label2id={easy:0, medium:1, hard:2}`와 역방향 `id2label`을 명시한다.
-- [ ] tokenizer max length와 truncation 정책을 config로 분리한다.
-- [ ] sample weight를 loss에 반영하는 trainer를 구현한다.
-- [ ] seed, epoch, batch size, learning rate, warmup, weight decay를 config에 기록한다.
-- [ ] CPU 또는 사용 가능한 로컬 accelerator로 100행 forward/backward를 통과한다.
-- [ ] train/validation loss와 3-class metric을 생성한다.
-- [ ] `save_pretrained()` checkpoint와 tokenizer를 저장한다.
-- [ ] checkpoint 재로딩 후 동일 입력 예측 smoke를 통과한다.
-- [ ] `config.json`의 `id2label`이 `0=easy, 1=medium, 2=hard`인지 자동 검증한다.
+- [x] 로컬과 Kubeflow가 같은 학습 코어·CLI를 사용한다는 결정과 근거를 문서화한다.
+- [x] base model identifier와 revision을 고정한다.
+- [x] `label2id={easy:0, medium:1, hard:2}`와 역방향 `id2label`을 명시한다.
+- [x] tokenizer max length와 truncation 정책을 config로 분리한다.
+- [x] sample weight를 loss에 반영하는 trainer를 구현한다.
+- [x] seed, epoch, batch size, learning rate, warmup, weight decay를 config에 기록한다.
+- [x] Colab CUDA에서 100행 artifact의 제한된 forward/backward를 통과한다.
+- [x] train/validation loss와 3-class metric을 생성한다.
+- [x] `save_pretrained()` checkpoint와 tokenizer를 저장한다.
+- [x] checkpoint 재로딩 후 동일 입력 예측 smoke를 통과한다.
+- [x] `config.json`의 `id2label`이 `0=easy, 1=medium, 2=hard`인지 자동 검증한다.
+- [x] Docker·Colab·로컬 공통 runtime 버전 계약과 fail-fast 검사를 구현한다.
+- [x] runtime 버전을 `metrics.json`에 기록한다.
 
 ### D. 전체 학습과 평가
 
+- [x] T4 전체 학습용 8,192 token/FP16/gradient-checkpointing config를 만든다.
 - [ ] 전체 train split으로 ModernBERT base baseline을 학습한다.
 - [ ] validation으로 early stopping과 최종 checkpoint를 선택한다.
 - [ ] RouterBench test에서 accuracy, macro-F1, under/over-routing과 class metric을 계산한다.
@@ -229,6 +233,10 @@ response: label, confidence, model_version, latency_ms
 ### G. Kubeflow component와 pipeline
 
 - [ ] component 입출력을 파일 artifact와 scalar parameter로 구분한다.
+- [x] 공통 `modernbert-train` entrypoint를 가진 T4용 linux/amd64 image를 정의한다.
+- [x] GPU image에서 CPU 라벨링·평가 코드와 CLI를 제외한다.
+- [x] `llm-router-modernbert-training:cu124-v1` image를 로컬에 빌드하고 설정을 검사한다.
+- [x] 완성 image에서 `modernbert-train --help` runtime smoke를 통과한다.
 - [ ] RouterBench ingest component를 만든다.
 - [ ] canonicalize/relabel CPU component를 만든다.
 - [ ] training-preprocess/split CPU component를 만든다.
@@ -354,6 +362,7 @@ router_model_version
 - `docs/routerbench-data-labeling-spec.md`
 - `docs/routerarena-evaluation-preprocessing-spec.md`
 - `docs/routerarena-routing-evaluation-spec.md`
+- `docs/modernbert-training-spec.md`
 - `docs/mvp-scope-and-checklist.md`
 - `docs/졸업프로젝트 개요.md`
 - `ml/README.md`

@@ -321,7 +321,7 @@ ml/artifacts/routerbench-training/
 - [ ] `model_tiers.json`에 생성 코드 commit을 기록한다.
 - [ ] 전체 split의 크기·라벨·도메인 편차에 대한 자동 승인 기준을 추가한다.
 - [ ] 확정 tokenizer로 길이/truncation 통계와 긴 입력 보존 검사를 실행한다.
-- [ ] ModernBERT 로컬 training smoke test를 수행한다.
+- [x] ModernBERT Colab CUDA training smoke test를 수행한다.
 - [ ] Claude Haiku/Sonnet/Opus 표본 검증으로 프록시 라벨을 보정한다.
 - [ ] 동일 config로 GCS/Kubeflow/GKE 학습 파이프라인을 연결한다.
 

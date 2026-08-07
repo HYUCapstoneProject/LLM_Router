@@ -15,14 +15,19 @@ dependencies = [
 
 [project.optional-dependencies]
 model-evaluation = [
-  "torch>=2.4,<3.0",
-  "transformers>=4.48,<6.0",
+  "torch==2.5.1",
+  "transformers==4.48.3",
+]
+model-training = [
+  "torch==2.5.1",
+  "transformers==4.48.3",
 ]
 
 [project.scripts]
 routerbench-labeling = "llm_router_labeling.training.routerbench_cli:main"
 routerarena-preprocessing = "llm_router_labeling.evaluation.routerarena_cli:main"
 routerarena-evaluate = "llm_router_labeling.evaluation.routerarena_evaluation_cli:main"
+modernbert-train = "llm_router_labeling.training.modernbert_training_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

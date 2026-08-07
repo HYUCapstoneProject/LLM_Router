@@ -1,0 +1,4 @@
+# PyTorch publishes the macOS wheel on the default Python package index.
+torch==2.5.1
+torchvision==0.20.1
+torchaudio==2.5.1

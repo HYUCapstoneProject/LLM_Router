@@ -268,7 +268,7 @@ artifact는 downstream 학습에서 재사용하며 학습 Pod 내부에서 다�
 - [x] tier consensus 기반 easy/medium/hard 라벨링과 confidence/reason 산출을 구현한다.
 - [x] 라벨 산출물을 Parquet과 metric JSON으로 저장하고 버전을 추적한다.
 - [x] `sample_id` group 및 난이도×도메인 stratified split을 구현한다.
-- [ ] ModernBERT base 로컬 fine-tuning smoke test를 만든다.
+- [x] ModernBERT base Colab CUDA fine-tuning smoke test를 만든다.
 - [ ] 클래스·도메인별 Claude 샘플 검증으로 프록시 라벨을 보정한다.
 - [x] RouterArena 전용 전처리기와 평가 projection을 만든다.
 - [x] RouterArena checkpoint 추론·라벨 비교 평가기를 만든다.
@@ -280,7 +280,9 @@ artifact는 downstream 학습에서 재사용하며 학습 Pod 내부에서 다�
 
 - [ ] KFP skeleton을 만든다: ingest -> canonicalize -> relabel -> train -> evaluate -> upload.
 - [ ] CPU 라벨링 컴포넌트와 GPU ModernBERT 학습 컴포넌트를 분리한다.
-- [ ] 로컬 smoke test와 GKE 학습이 동일한 config/schema를 사용하도록 만든다.
+- [x] Colab smoke와 GKE 학습이 동일한 CLI/config/schema를 사용하도록 만든다.
+- [x] Docker·Colab·로컬의 핵심 학습 dependency 계약을 고정하고 자동 검증한다.
+- [x] GPU 학습 image에서 CPU 라벨링·평가 CLI를 제외한다.
 - [ ] GCS artifact path 규칙을 정한다.
 - [ ] model version, data version, metric json 저장 형식을 정한다.
 - [ ] 배포 게이트 조건을 정한다.
