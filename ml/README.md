@@ -12,6 +12,8 @@ src/llm_router_labeling/
 │   ├── routerbench_labeling.py       # RouterBench 모델 성능 → 난이도 라벨
 │   ├── routerbench_preprocessing.py  # 라벨 데이터 → 학습 Parquet
 │   ├── routerbench_cli.py            # routerbench-labeling 명령
+│   ├── feedback_retraining_preprocessing.py # 피드백 검증·canonical 변환·병합
+│   ├── feedback_retraining_cli.py    # escalation-feedback-preprocessing 명령
 │   ├── modernbert_training.py        # 로컬/Kubeflow 공통 학습 코어
 │   └── modernbert_training_cli.py    # modernbert-train 명령
 ├── evaluation/
@@ -193,6 +195,130 @@ base image는 PyTorch 2.5.1, CUDA 12.4, cuDNN 9 runtime digest로 고정되어 �
 Mac이 arm64여도 build script의 기본 target은 GKE용 `linux/amd64`다. image에는
 ModernBERT 학습 코드와 runtime 검사만 포함하며 RouterBench CPU 라벨링 및 RouterArena
 평가 코드는 포함하지 않는다.
+
+## Kubeflow ModernBERT GPU 학습 component
+
+KFP SDK는 `ml/requirements-kubeflow.txt`에서 `2.17.0`으로 고정한다. 학습 component는
+기존 GPU image의 `modernbert-train` entrypoint를 그대로 호출하고 모델 코드를 다시
+구현하지 않는다.
+
+```bash
+python3.12 -m venv .venv-kubeflow
+.venv-kubeflow/bin/pip install -r ml/requirements-kubeflow.txt
+
+.venv-kubeflow/bin/python -m ml.kubeflow.compile_modernbert_training \
+  --output-dir ml/artifacts/kubeflow/modernbert-training
+```
+
+생성되는 IR YAML은 Git에서 제외되는 로컬 artifact다.
+
+```text
+modernbert-training-component.yaml
+modernbert-training-pipeline.yaml
+```
+
+component 계약:
+
+```text
+Input[Dataset] training_dataset   # canonical training.parquet
+Input[Artifact] training_config   # modernbert_t4_full.json 또는 smoke config
+Output[Model] trained_model       # checkpoint, tokenizer, metrics.json
+```
+
+단일 학습 pipeline은 GCS의 dataset/config URI를 Importer로 가져와 GPU task에 연결한다.
+task는 `nvidia.com/gpu=1`, CPU request/limit `4/8`, memory request/limit `24Gi/32Gi`,
+retry 2회와 cache 활성화를 선언한다. `training_image` parameter에는 GKE가 pull할 수 있는
+Artifact Registry의 immutable image URI를 실행 시 전달해야 한다. 기본 로컬 tag는
+IR compile test용이며 클러스터에서 그대로 사용할 수 없다.
+
+현재는 GPU 종류와 무관한 `nvidia.com/gpu=1`만 선언한다. T4 node pool label, taint와
+toleration은 실제 GKE 구성이 확정된 뒤 platform-specific 설정으로 추가한다. dataset과
+config URI는 같은 경로의 내용을 덮어쓰지 않는 immutable version 경로여야 KFP cache와
+계보를 안전하게 사용할 수 있다.
+
+## CPU 데이터 처리 Docker image
+
+초기 RouterBench 라벨링·학습 전처리, RouterArena 평가 데이터 전처리와 운영
+에스컬레이션 피드백의 검증·병합은 GPU 학습 image와 분리한 공통 CPU 전용 image에서
+실행한다. 이 image에는 PyTorch, Transformers, checkpoint 추론용
+`routerarena-evaluate`를 넣지 않는다.
+
+```bash
+./ml/scripts/build-data-processing-image.sh
+
+docker run --rm \
+  llm-router-data-processing:py312-v2 \
+  routerbench-labeling --help
+
+docker run --rm \
+  llm-router-data-processing:py312-v2 \
+  routerarena-preprocessing --help
+
+docker run --rm \
+  llm-router-data-processing:py312-v2 \
+  escalation-feedback-preprocessing --help
+```
+
+기본 target은 GKE CPU node와 맞춘 `linux/amd64`다. 데이터는 image layer에 넣지 않고
+Kubeflow Dataset Artifact 또는 로컬 read-only volume으로 전달한다. container는
+UID/GID `10001`의 non-root 사용자로 실행되며 출력 경로만 쓰기 가능하게 제공해야 한다.
+
+RouterArena의 checkpoint 추론·metric 계산은 PyTorch/Transformers가 필요한 별도 평가
+component로 유지한다. 따라서 이 CPU 데이터 image의 RouterArena 범위는 공식 데이터
+검증, 입력 조립, 중복·누수 제거와 evaluation Parquet 생성까지다.
+
+에스컬레이션 피드백은 두 단계로 처리한다.
+
+```bash
+escalation-feedback-preprocessing prepare \
+  --manifest-path /input/manifest.json \
+  --events-path /input/events.parquet \
+  --output-dir /output/feedback
+
+escalation-feedback-preprocessing merge \
+  --base-training-path /input/routerbench/training.parquet \
+  --feedback-training-path /input/feedback/feedback_training.parquet \
+  --output-dir /output/retraining
+```
+
+로컬 검증이나 단일 Kubeflow component로 두 단계를 묶을 때는 `build` 명령에 manifest,
+events와 base training 경로를 한 번에 전달할 수 있다.
+
+`prepare`는 schema version, checksum, 행 수와 정정 라벨 채택 조건을 검사하고
+`feedback_training.parquet`, 전체 event 감사용 metadata, metrics와 manifest를 만든다.
+`merge`는 validation/test와 겹치는 피드백을 제외하고, train의 정확히 같은 질문에 더
+높은 피드백 라벨이 있으면 정확히 겹치는 기존 train 행만 교체하고 duplicate group은
+이어받는다. 실제 운영 schema 합의 전에는
+`ml/tests/fixtures/feedback_v0_1`의 합성 batch로 이 계약을 검증한다.
+
+v1 이미지의 2026-08-08 로컬 smoke 기준선:
+
+| 항목 | 결과 |
+| --- | --- |
+| image tag | `llm-router-routerbench-routerarena-data:py312-v1` |
+| target | `linux/amd64` |
+| image ID | `sha256:34b043ea2007a4e6f67df6362f2537754b1eae3ddda0405d18b847b176a8307d` |
+| build-time CLI 검사 | `routerbench-labeling`, `routerarena-preprocessing` 통과 |
+| RouterBench smoke | 기존 labeled 100행 → train 80 / validation 10 / test 10 |
+| RouterArena smoke | `sub_10`에서 3행 evaluation artifact 생성 |
+
+Apple Silicon에서는 `linux/amd64` emulation 경고가 출력되지만 두 command 모두 exit
+code 0으로 완료됐다. 실제 데이터와 생성 artifact는 image layer에 포함하지 않았다.
+
+v2 이미지의 2026-08-08 구현 결과:
+
+| 항목 | 결과 |
+| --- | --- |
+| image tag | `llm-router-data-processing:py312-v2` |
+| target | `linux/amd64` |
+| image ID | `sha256:ddfabf9d54934999e1f88676590f3967a2e9c5ab6e615e39e468816868d3bdb7` |
+| build-time CLI 검사 | RouterBench, RouterArena, feedback 3개 명령 통과 |
+| feedback prepare | 합성 8 event → 채택 3 event → 학습 2행 |
+| full merge | RouterBench 34,764행 + feedback 2행 → 34,766행 |
+| holdout 보존 | validation 3,478 / test 3,478 유지 |
+
+v2의 실제 feedback 로직은 로컬 CLI와 단위 테스트로 통과했고, Docker 안에서 세 데이터
+흐름을 다시 실행하는 통합 smoke는 아직 남아 있다.
 
 ## RouterArena 평가 전처리
 

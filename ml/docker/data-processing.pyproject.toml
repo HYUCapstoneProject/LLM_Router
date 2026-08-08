@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-router-data-processing"
+version = "0.2.0"
+description = "CPU-only initial and feedback retraining data runtime"
+requires-python = ">=3.11,<3.13"
+dependencies = []
+
+[project.scripts]
+routerbench-labeling = "llm_router_labeling.training.routerbench_cli:main"
+routerarena-preprocessing = "llm_router_labeling.evaluation.routerarena_cli:main"
+escalation-feedback-preprocessing = "llm_router_labeling.training.feedback_retraining_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

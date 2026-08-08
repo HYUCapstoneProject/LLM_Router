@@ -1,0 +1,21 @@
+{
+  "schema_version": "feedback-export-v0.1",
+  "adapter_version": "feedback-retraining-adapter-v0.1",
+  "merge_version": "feedback-routerbench-merge-v0.1",
+  "label_order": ["easy", "medium", "hard"],
+  "acceptance": {
+    "require_pii_redacted": true,
+    "require_user_satisfied": true,
+    "minimum_escalation_count": 1,
+    "require_strict_tier_increase": true
+  },
+  "sample_weight": {
+    "base": 1.0,
+    "repeat_increment": 0.25,
+    "maximum": 2.0
+  },
+  "merge": {
+    "base_train_conflict_policy": "replace_exact_train_rows",
+    "base_holdout_overlap_policy": "exclude_feedback"
+  }
+}

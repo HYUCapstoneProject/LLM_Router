@@ -133,13 +133,15 @@ runtime을 계약과 비교하고 하나라도 다르면 model download 전에 �
 - [x] model/tokenizer를 Hugging Face checkpoint로 저장한다.
 - [x] 저장한 checkpoint를 재로딩해 동일 라벨 계약과 추론을 확인한다.
 
-## 7. 이후 Kubeflow component에서 추가할 것
+## 7. Kubeflow component
 
-- input/output Artifact 선언
-- T4 GPU, CPU, memory request/limit
-- retry, timeout과 cache key
-- GCS pipeline root와 MLMD model/data/execution 계보
-- Spot 중단 시 checkpoint resume 정책
+- [x] Dataset/config 입력과 Model 출력 Artifact를 선언한다.
+- [x] GPU 1개, CPU와 memory request/limit을 IR에 기록한다.
+- [x] retry 2회와 task cache를 설정한다.
+- [x] GCS URI Importer를 사용하는 단일 학습 pipeline을 컴파일한다.
+- [ ] GCS pipeline root와 실제 MLMD model/data/execution 계보를 검증한다.
+- [ ] T4 node selector, taint/toleration과 task timeout을 클러스터 설정에 맞춘다.
+- [ ] Spot 중단 시 checkpoint resume 정책을 구현한다.
 
 이 항목들은 공통 학습 코어를 변경하는 이유가 아니다. 동일 CLI를 container entrypoint로
 호출하는 방식으로 추가한다.
@@ -192,6 +194,43 @@ docker run --rm \
 Apple Silicon 로컬 Docker에서 amd64 emulation으로 image metadata, process 실행과 설치
 module 목록을 확인했다. 실제 CUDA 가용성과 8,192 token 메모리는 GKE T4 100행 cloud
 smoke에서 검증한다.
+
+### 7-3. KFP v2 학습 component 계약
+
+KFP SDK는 `2.17.0`으로 고정한다. component는 GPU image를 재구현하지 않고 다음 명령을
+Artifact path placeholder와 함께 실행한다.
+
+```text
+modernbert-train
+  --config <Input[Artifact].path>
+  --training-path <Input[Dataset].path>
+  --runtime-contract /opt/llm-router/config/modernbert_runtime_cu124_v1.json
+  --output-dir <Output[Model].path>
+  --device cuda
+```
+
+파일 위치:
+
+```text
+ml/kubeflow/components/modernbert_training.py
+ml/kubeflow/pipelines/modernbert_training.py
+ml/kubeflow/compile_modernbert_training.py
+ml/requirements-kubeflow.txt
+```
+
+단일 학습 pipeline은 GCS URI 두 개를 Importer로 `Dataset`과 config `Artifact`로 등록한
+뒤 학습 component에 연결한다. 출력 Model에는 Hugging Face checkpoint, tokenizer,
+`training_config.json`과 `metrics.json`이 함께 저장된다. 이 단계의 metrics는 학습
+기록이며 최종 배포 gate metric은 이후 별도 평가 component가 만든다.
+
+task resource는 GPU 1개(`nvidia.com/gpu`), CPU request/limit 4/8, memory request/limit
+24Gi/32Gi로 시작한다. retry는 2회, cache는 활성화한다. cache 오판을 피하려면 dataset,
+config와 image URI를 immutable version/digest로 전달해야 한다.
+
+현재 파이프라인의 `training_image` 기본값은 로컬 compile용 tag다. 서버 확보 후 실제
+Artifact Registry URI를 전달하고, T4 node pool이 여러 GPU node와 섞여 있다면 GKE
+node selector와 toleration을 추가한다. platform-specific 설정은 공통 학습 component의
+파일 계약을 변경하지 않는다.
 
 ## 8. VS Code Colab GPU smoke
 

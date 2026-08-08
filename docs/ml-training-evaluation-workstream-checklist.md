@@ -16,6 +16,20 @@
 - `[ ]`: 아직 완료되지 않은 항목
 - 완료 여부는 구현 존재만이 아니라 재현 가능한 실행 명령과 검증 결과까지 포함한다.
 
+### 1-1. 진행 상황 점검 규칙
+
+앞으로 ML 작업을 시작하거나 마칠 때 이 문서를 기준으로 진행 상황을 점검한다.
+
+- 작업 시작 전 `7. 바로 이어서 할 순서`와 해당 세부 체크리스트를 확인한다.
+- 구현만 존재하는 상태는 완료로 표시하지 않는다. 로컬 테스트, container smoke 또는
+  pipeline compile 중 해당 단계에 맞는 검증 증거가 있어야 `[x]`로 바꾼다.
+- 체크 상태를 바꿀 때 관련 명령, artifact version, commit 또는 실행 결과를 가까운
+  명세 문서나 commit에 함께 남긴다.
+- 클러스터에서만 검증할 수 있는 항목은 로컬 구현이 끝나도 `[ ]`로 유지하고,
+  `서버 확보 후` 항목에서 별도로 확인한다.
+- 온라인 팀과 합의가 필요한 계약은
+  `docs/online-ml-handoff-contract.md`를 먼저 갱신한 뒤 코드에 반영한다.
+
 ## 2. 담당 범위와 경계
 
 ### 2-1. 직접 담당
@@ -74,6 +88,34 @@ RouterBench 원본
 Kubeflow는 데이터 의미론을 다시 구현하지 않는다. 저장소의 같은 Python 함수를
 component에서 호출하고, Kubeflow는 artifact 전달, cache, retry, resource, MLMD 계보와
 단계 실행을 담당한다.
+
+### 3-1. 현재 제약과 구현 원칙
+
+현재 Kubeflow 서버가 없고 에스컬레이션 원본 schema도 팀 합의 전이다. 이 제약은
+로컬 component 작성과 pipeline 컴파일을 막지 않는다. 다음 세 경계를 유지한다.
+
+1. Kubeflow component는 DB 컬럼을 직접 입력받지 않고 `Dataset`/`Model` 같은 파일
+   artifact와 scalar parameter만 주고받는다.
+2. 온라인 팀의 원본 export는 schema adapter에서 ML 내부 표준 schema로 변환한다.
+   원본 컬럼이 바뀌면 adapter만 바꾸고 전처리·학습 DAG는 유지한다.
+3. 클러스터 의존 값인 project, region, bucket, namespace, service account, image URI와
+   GPU node selector는 코드에 고정하지 않고 parameter나 배포 설정으로 둔다.
+
+ML 내부 학습 표준 schema는 다음 필드로 유지한다.
+
+```text
+sample_id, model_input_text, difficulty_label
+sample_weight, split, duplicate_group_id
+```
+
+현재 작업 가능 범위는 다음과 같이 구분한다.
+
+| 구분 | 지금 진행할 작업 | 완료 판단 |
+| --- | --- | --- |
+| 서버 없이 완성 가능 | CPU 데이터 image, component wrapper, 초기 pipeline, artifact/manifest 계약 | 로컬 container smoke, 단위 테스트, IR YAML compile |
+| schema adapter 골격 | 합성 feedback fixture, validation, dedup, merge, 재학습 pipeline 골격 | fixture 기반 계약 테스트와 IR YAML compile |
+| 팀 합의 후 확정 | 실제 feedback row mapping, PII/retention, trigger owner와 누적 임계값 | 양 팀 contract fixture 통과 |
+| 서버 확보 후 검증 | Registry/GCS/IAM, CPU·GPU Pod, cache, MLMD, cloud smoke와 전체 학습 | Kubeflow run과 저장된 artifact 확인 |
 
 ## 4. 현재 완료 기준선
 
@@ -240,7 +282,7 @@ response: label, confidence, model_version, latency_ms
 - [ ] RouterBench ingest component를 만든다.
 - [ ] canonicalize/relabel CPU component를 만든다.
 - [ ] training-preprocess/split CPU component를 만든다.
-- [ ] ModernBERT tokenizer/train T4 GPU component를 만든다.
+- [x] ModernBERT tokenizer/train 단일 GPU component를 만든다.
 - [ ] RouterBench evaluate CPU/GPU component를 만든다.
 - [ ] RouterArena full/robustness 평가 component를 분리한다.
 - [ ] QQP threshold 평가 component를 만든다.
@@ -249,6 +291,29 @@ response: label, confidence, model_version, latency_ms
 - [ ] 입력 checksum+parameter 기반 cache key가 동작하는지 검증한다.
 - [ ] retry, timeout, CPU/memory/GPU request와 limit을 명시한다.
 - [ ] local component test와 pipeline compile test를 CI에서 실행한다.
+
+서버 없이 먼저 완료할 항목:
+
+- [x] 초기 로컬 처리와 피드백 재학습 명령을 포함하는 범용 CPU 데이터 image v2를
+  빌드한다.
+- [ ] CPU image v2에서 RouterBench 100행, RouterArena 3행과 합성 feedback
+  prepare/merge smoke를 통과한다.
+- [x] KFP SDK를 `2.17.0`으로 lock하고 KFP v2 Artifact schema로 컴파일한다.
+- [ ] 각 component가 받는 Artifact path와 scalar parameter 계약을 문서화한다.
+- [ ] 로컬 image tag를 parameter로 받는 CPU/GPU component wrapper를 작성한다.
+- [x] GPU image tag/Artifact Registry URI를 parameter로 받는 학습 wrapper를 작성한다.
+- [x] GPU component와 단일 학습 pipeline IR YAML compile test를 통과한다.
+- [ ] 초기 학습 pipeline을 IR YAML로 컴파일하고 정적 타입 검사를 통과한다.
+- [ ] 합성 feedback fixture를 사용하는 재학습 pipeline 골격을 IR YAML로 컴파일한다.
+- [ ] 실제 DB, GCS와 Kubeflow endpoint 없이 실행되는 계약 테스트를 CI에 추가한다.
+
+서버 확보 후에만 완료할 항목:
+
+- [ ] 실제 registry image URI와 immutable digest를 pipeline에 주입한다.
+- [ ] KFP backend에 pipeline을 제출하고 CPU/GPU Pod 분리를 확인한다.
+- [ ] GCS Artifact 전달과 Workload Identity 권한을 확인한다.
+- [ ] cache hit/miss, retry, timeout과 MLMD lineage를 실제 실행에서 검증한다.
+- [ ] 100행 cloud smoke를 통과한 뒤 전체 학습 실행을 승인한다.
 
 권장 DAG:
 
@@ -281,6 +346,8 @@ ingest
 ```text
 gs://<bucket>/datasets/routerbench/<version>/
 gs://<bucket>/datasets/routerarena/<version>/
+gs://<bucket>/datasets/feedback/<batch-id>/
+gs://<bucket>/datasets/retraining/<dataset-version>/
 gs://<bucket>/models/router-modernbert/<model-version>/candidate/
 gs://<bucket>/models/router-modernbert/<model-version>/approved/
 gs://<bucket>/evaluations/<model-version>/<evaluation-version>/
@@ -300,14 +367,22 @@ gs://<bucket>/evaluations/<model-version>/<evaluation-version>/
 
 ### J. 에스컬레이션 정정 라벨 재학습
 
-- [ ] 온라인 팀과 escalation event schema를 확정한다.
+- [x] 온라인/ML 책임 경계와 제안 계약을 `docs/online-ml-handoff-contract.md`에 분리했다.
+- [ ] 온라인 팀과 escalation event/export manifest schema를 확정한다.
 - [ ] 최소 필드에 event/request id, question, initial/final tier, 만족 여부와 시간을 둔다.
+- [ ] batch id, schema version, URI, checksum과 export watermark를 합의한다.
 - [ ] 개인정보·민감정보 제거 정책과 retention 기간을 정한다.
+- [x] v0.1 합성 event와 checksum manifest fixture를 저장소에 추가한다.
+- [x] schema version, checksum, 행 수와 필수 필드를 검사하는 feedback validator를 만든다.
+- [x] 원본 export를 ML 내부 표준 6필드 schema로 바꾸는 versioned adapter를 만든다.
 - [ ] 중복 event와 반복 질문을 group 단위로 묶는다.
 - [ ] 최종 만족 tier를 정정 라벨로 사용하는 조건을 명시한다.
-- [ ] 모순·저신뢰 event를 자동 학습에서 제외하고 검토 queue로 보낸다.
+- [x] 합성 계약 기준의 중복 event, 반복 질문 집계와 label 충돌 제외를 구현한다.
+- [x] validation/test 정확 일치 누수를 막고 충돌하는 기존 train 행만 교체하는 merge를
+  구현한다.
+- [x] 모순·저신뢰 event를 자동 학습 projection에서 제외하고 metadata에 사유를 남긴다.
 - [ ] RouterBench 원본과 정정 라벨의 sampling/weight 정책을 정한다.
-- [ ] 정정 라벨 dataset version과 source lineage를 기록한다.
+- [x] 정정 라벨 dataset version, source checksum과 병합 lineage manifest를 기록한다.
 - [ ] 누적 N건 또는 성능 drift 기반 재학습 trigger를 실험값으로 관리한다.
 - [ ] 재학습 모델도 같은 평가·배포 게이트를 통과시킨다.
 
@@ -319,6 +394,11 @@ initial_label, initial_model, final_label, final_model
 user_satisfied, escalation_count, created_at
 router_model_version
 ```
+
+Kubeflow는 PostgreSQL table을 직접 읽지 않는다. 온라인 팀이 versioned batch를
+export하고, ML schema adapter가 이를 canonical feedback dataset으로 변환한다. 실제
+schema가 확정되기 전에는 합성 fixture로 validator, dedup, merge와 pipeline 연결만
+검증한다.
 
 ### K. 실험 결과와 최종 제출
 
@@ -346,16 +426,16 @@ router_model_version
 
 ## 7. 바로 이어서 할 순서
 
-1. 전체 라벨링·전처리 기준선을 첫 commit으로 고정한다.
-2. ModernBERT 로컬 100행 training smoke와 checkpoint 계약을 만든다.
-3. RouterArena 예측 그룹 분포 및 시각화를 구현한다.
-4. threshold sensitivity와 RAG 포함/제외 실험으로 라벨 기준을 보강한다.
-5. 모델 package manifest와 Router API contract를 확정한다.
-6. Kubeflow component skeleton을 만든다.
-7. GCP 100행 cloud smoke 후 전체 학습을 실행한다.
-8. RouterBench/RouterArena/QQP 평가를 deploy gate에 연결한다.
-9. approved model을 온라인 Router에서 불러오는 통합 smoke를 수행한다.
-10. 에스컬레이션 정정 라벨 ingestion을 재학습 루프에 연결한다.
+1. [ ] 초기 처리와 feedback 재학습 CLI를 담는 CPU 데이터 image v2를 검증한다.
+2. [ ] 온라인 팀 전달 계약을 검토받고 미확정 schema·trigger·PII 항목을 합의한다.
+3. [x] feedback export manifest와 합성 event fixture를 작성한다.
+4. [ ] KFP CPU/GPU component wrapper와 artifact 계약을 구현한다.
+5. [ ] 초기 학습 pipeline을 작성하고 로컬에서 IR YAML compile test를 통과한다.
+6. [x] feedback validator·adapter·dedup·RouterBench merge core를 구현한다.
+7. [ ] 재학습 pipeline 골격을 작성하고 합성 fixture로 compile/contract test를 통과한다.
+8. [ ] RouterArena 예측 그룹 분포 시각화와 모델 package/deploy gate를 구현한다.
+9. [ ] 서버 확보 후 registry/GCS/IAM을 연결하고 100행 cloud smoke를 수행한다.
+10. [ ] cloud smoke 통과 후 전체 학습·평가·승격과 온라인 Router 통합을 실행한다.
 
 ## 8. 관련 문서
 
@@ -363,6 +443,7 @@ router_model_version
 - `docs/routerarena-evaluation-preprocessing-spec.md`
 - `docs/routerarena-routing-evaluation-spec.md`
 - `docs/modernbert-training-spec.md`
+- `docs/online-ml-handoff-contract.md`
 - `docs/mvp-scope-and-checklist.md`
 - `docs/졸업프로젝트 개요.md`
 - `ml/README.md`
