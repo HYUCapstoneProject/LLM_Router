@@ -4,11 +4,14 @@ from ml.kubeflow.components.modernbert_training import (
     DEFAULT_TRAINING_IMAGE,
     modernbert_training_component,
 )
+from ml.kubeflow.task_config import configure_gpu_training_task
 
 
 @dsl.pipeline(
-    name="modernbert-router-training",
-    description="Import a canonical router dataset and train ModernBERT on one GPU.",
+    name="modernbert-router-initial-training",
+    description=(
+        "Import a locally prepared canonical dataset and train ModernBERT on one GPU."
+    ),
 )
 def modernbert_training_pipeline(
     training_dataset_uri: str = "gs://replace-me/datasets/router/training.parquet",
@@ -39,20 +42,8 @@ def modernbert_training_pipeline(
     training_task = modernbert_training_component(
         training_dataset=dataset_importer.output,
         training_config=config_importer.output,
+        training_path_suffix="",
     )
     training_task.set_display_name("Train ModernBERT router")
-    training_task.set_container_image(training_image)
-    training_task.set_accelerator_type("nvidia.com/gpu")
-    training_task.set_accelerator_limit(1)
-    training_task.set_cpu_request("4")
-    training_task.set_cpu_limit("8")
-    training_task.set_memory_request("24Gi")
-    training_task.set_memory_limit("32Gi")
-    training_task.set_retry(
-        num_retries=2,
-        backoff_duration="60s",
-        backoff_factor=2.0,
-        backoff_max_duration="600s",
-    )
-    training_task.set_caching_options(enable_caching=True)
+    configure_gpu_training_task(training_task, image=training_image)
     return training_task.outputs["trained_model"]

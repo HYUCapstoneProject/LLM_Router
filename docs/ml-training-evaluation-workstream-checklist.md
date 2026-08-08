@@ -274,7 +274,7 @@ response: label, confidence, model_version, latency_ms
 
 ### G. Kubeflow component와 pipeline
 
-- [ ] component 입출력을 파일 artifact와 scalar parameter로 구분한다.
+- [x] component 입출력을 파일 artifact와 scalar parameter로 구분한다.
 - [x] 공통 `modernbert-train` entrypoint를 가진 T4용 linux/amd64 image를 정의한다.
 - [x] GPU image에서 CPU 라벨링·평가 코드와 CLI를 제외한다.
 - [x] `llm-router-modernbert-training:cu124-v1` image를 로컬에 빌드하고 설정을 검사한다.
@@ -292,6 +292,11 @@ response: label, confidence, model_version, latency_ms
 - [ ] retry, timeout, CPU/memory/GPU request와 limit을 명시한다.
 - [ ] local component test와 pipeline compile test를 CI에서 실행한다.
 
+위 RouterBench CPU component 세 항목은 서버에서 초기 데이터를 재생성해야 할 때만
+구현하는 선택 항목이다. 현재 기본 초기 학습 pipeline은 로컬 검증·전처리가 끝난
+`training.parquet`를 Importer로 받아 GPU 학습부터 시작한다. 반면 feedback `prepare`와
+`merge`는 재학습 때 서버에서 실행되므로 별도 CPU component로 구현한다.
+
 서버 없이 먼저 완료할 항목:
 
 - [x] 초기 로컬 처리와 피드백 재학습 명령을 포함하는 범용 CPU 데이터 image v2를
@@ -299,12 +304,13 @@ response: label, confidence, model_version, latency_ms
 - [ ] CPU image v2에서 RouterBench 100행, RouterArena 3행과 합성 feedback
   prepare/merge smoke를 통과한다.
 - [x] KFP SDK를 `2.17.0`으로 lock하고 KFP v2 Artifact schema로 컴파일한다.
-- [ ] 각 component가 받는 Artifact path와 scalar parameter 계약을 문서화한다.
-- [ ] 로컬 image tag를 parameter로 받는 CPU/GPU component wrapper를 작성한다.
+- [x] 각 component가 받는 Artifact path와 scalar parameter 계약을 문서화한다.
+- [x] 로컬 image tag를 parameter로 받는 CPU/GPU component wrapper를 작성한다.
 - [x] GPU image tag/Artifact Registry URI를 parameter로 받는 학습 wrapper를 작성한다.
 - [x] GPU component와 단일 학습 pipeline IR YAML compile test를 통과한다.
-- [ ] 초기 학습 pipeline을 IR YAML로 컴파일하고 정적 타입 검사를 통과한다.
-- [ ] 합성 feedback fixture를 사용하는 재학습 pipeline 골격을 IR YAML로 컴파일한다.
+- [x] 초기 학습 pipeline을 IR YAML로 컴파일하고 정적 타입 검사를 통과한다.
+- [x] 합성 feedback fixture 계약을 통과한 prepare/merge를 연결한 재학습 pipeline을 IR
+  YAML로 컴파일한다.
 - [ ] 실제 DB, GCS와 Kubeflow endpoint 없이 실행되는 계약 테스트를 CI에 추가한다.
 
 서버 확보 후에만 완료할 항목:
@@ -429,10 +435,10 @@ schema가 확정되기 전에는 합성 fixture로 validator, dedup, merge와 pi
 1. [ ] 초기 처리와 feedback 재학습 CLI를 담는 CPU 데이터 image v2를 검증한다.
 2. [ ] 온라인 팀 전달 계약을 검토받고 미확정 schema·trigger·PII 항목을 합의한다.
 3. [x] feedback export manifest와 합성 event fixture를 작성한다.
-4. [ ] KFP CPU/GPU component wrapper와 artifact 계약을 구현한다.
-5. [ ] 초기 학습 pipeline을 작성하고 로컬에서 IR YAML compile test를 통과한다.
+4. [x] KFP CPU/GPU component wrapper와 artifact 계약을 구현한다.
+5. [x] 초기 학습 pipeline을 작성하고 로컬에서 IR YAML compile test를 통과한다.
 6. [x] feedback validator·adapter·dedup·RouterBench merge core를 구현한다.
-7. [ ] 재학습 pipeline 골격을 작성하고 합성 fixture로 compile/contract test를 통과한다.
+7. [x] 재학습 pipeline 골격을 작성하고 합성 fixture로 compile/contract test를 통과한다.
 8. [ ] RouterArena 예측 그룹 분포 시각화와 모델 package/deploy gate를 구현한다.
 9. [ ] 서버 확보 후 registry/GCS/IAM을 연결하고 100행 cloud smoke를 수행한다.
 10. [ ] cloud smoke 통과 후 전체 학습·평가·승격과 온라인 Router 통합을 실행한다.

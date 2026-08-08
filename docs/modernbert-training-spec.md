@@ -203,7 +203,7 @@ Artifact path placeholder와 함께 실행한다.
 ```text
 modernbert-train
   --config <Input[Artifact].path>
-  --training-path <Input[Dataset].path>
+  --training-path <Input[Dataset].path><training_path_suffix>
   --runtime-contract /opt/llm-router/config/modernbert_runtime_cu124_v1.json
   --output-dir <Output[Model].path>
   --device cuda
@@ -214,14 +214,22 @@ modernbert-train
 ```text
 ml/kubeflow/components/modernbert_training.py
 ml/kubeflow/pipelines/modernbert_training.py
+ml/kubeflow/pipelines/modernbert_retraining.py
+ml/kubeflow/compile_training_workflows.py
 ml/kubeflow/compile_modernbert_training.py
 ml/requirements-kubeflow.txt
 ```
 
-단일 학습 pipeline은 GCS URI 두 개를 Importer로 `Dataset`과 config `Artifact`로 등록한
-뒤 학습 component에 연결한다. 출력 Model에는 Hugging Face checkpoint, tokenizer,
-`training_config.json`과 `metrics.json`이 함께 저장된다. 이 단계의 metrics는 학습
-기록이며 최종 배포 gate metric은 이후 별도 평가 component가 만든다.
+`training_path_suffix`는 초기 학습의 direct Parquet에는 빈 문자열, 재학습 merge bundle에는
+`/training.parquet`를 사용한다. 따라서 기존 GPU image와 `modernbert-train` 파일 입력
+계약을 바꾸지 않고 두 artifact 형태를 모두 연결한다.
+
+초기 학습 pipeline은 GCS URI 두 개를 Importer로 `Dataset`과 config `Artifact`로 등록한
+뒤 학습 component에 연결한다. 재학습 pipeline은 같은 GPU component 앞에 동일 CPU
+image를 사용하는 feedback `prepare`와 `merge` component를 각각 둔다. 출력 Model에는
+Hugging Face checkpoint, tokenizer, `training_config.json`과 `metrics.json`이 함께 저장된다.
+이 단계의 metrics는 학습 기록이며 최종 배포 gate metric은 이후 별도 평가 component가
+만든다.
 
 task resource는 GPU 1개(`nvidia.com/gpu`), CPU request/limit 4/8, memory request/limit
 24Gi/32Gi로 시작한다. retry는 2회, cache는 활성화한다. cache 오판을 피하려면 dataset,
@@ -231,6 +239,13 @@ config와 image URI를 immutable version/digest로 전달해야 한다.
 Artifact Registry URI를 전달하고, T4 node pool이 여러 GPU node와 섞여 있다면 GKE
 node selector와 toleration을 추가한다. platform-specific 설정은 공통 학습 component의
 파일 계약을 변경하지 않는다.
+
+두 workflow 전체를 컴파일하는 명령은 다음과 같다.
+
+```bash
+.venv/bin/python -m ml.kubeflow.compile_training_workflows \
+  --output-dir ml/artifacts/kubeflow/training-workflows
+```
 
 ## 8. VS Code Colab GPU smoke
 

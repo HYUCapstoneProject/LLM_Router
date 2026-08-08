@@ -25,6 +25,7 @@ class KubeflowModernBertTrainingTest(unittest.TestCase):
         self.assertIn("llm-router-modernbert-training:cu124-v1", component_yaml)
         self.assertIn("training_dataset", component_yaml)
         self.assertIn("training_config", component_yaml)
+        self.assertIn("training_path_suffix", component_yaml)
         self.assertIn("trained_model", component_yaml)
         self.assertIn("modernbert_runtime_cu124_v1.json", component_yaml)
         self.assertIn("cuda", component_yaml)

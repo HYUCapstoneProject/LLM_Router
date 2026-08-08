@@ -206,15 +206,18 @@ KFP SDK는 `ml/requirements-kubeflow.txt`에서 `2.17.0`으로 고정한다. 학
 python3.12 -m venv .venv-kubeflow
 .venv-kubeflow/bin/pip install -r ml/requirements-kubeflow.txt
 
-.venv-kubeflow/bin/python -m ml.kubeflow.compile_modernbert_training \
-  --output-dir ml/artifacts/kubeflow/modernbert-training
+.venv-kubeflow/bin/python -m ml.kubeflow.compile_training_workflows \
+  --output-dir ml/artifacts/kubeflow/training-workflows
 ```
 
 생성되는 IR YAML은 Git에서 제외되는 로컬 artifact다.
 
 ```text
+feedback-prepare-component.yaml
+feedback-merge-component.yaml
 modernbert-training-component.yaml
-modernbert-training-pipeline.yaml
+initial-training-pipeline.yaml
+feedback-retraining-pipeline.yaml
 ```
 
 component 계약:
@@ -222,14 +225,19 @@ component 계약:
 ```text
 Input[Dataset] training_dataset   # canonical training.parquet
 Input[Artifact] training_config   # modernbert_t4_full.json 또는 smoke config
+str training_path_suffix          # direct file은 "", bundle은 "/training.parquet"
 Output[Model] trained_model       # checkpoint, tokenizer, metrics.json
 ```
 
-단일 학습 pipeline은 GCS의 dataset/config URI를 Importer로 가져와 GPU task에 연결한다.
-task는 `nvidia.com/gpu=1`, CPU request/limit `4/8`, memory request/limit `24Gi/32Gi`,
-retry 2회와 cache 활성화를 선언한다. `training_image` parameter에는 GKE가 pull할 수 있는
-Artifact Registry의 immutable image URI를 실행 시 전달해야 한다. 기본 로컬 tag는
-IR compile test용이며 클러스터에서 그대로 사용할 수 없다.
+초기 학습 pipeline은 로컬에서 검증·전처리가 끝난 `training.parquet`와 config의 GCS URI를
+Importer로 가져와 바로 GPU task에 연결한다. RouterBench 라벨링·전처리를 서버에서 다시
+실행하지 않는다. 재학습 pipeline은 feedback manifest/events/config와 기존 학습 artifact를
+가져와 `prepare(CPU) → merge(CPU) → train(GPU)`로 실행한다.
+
+GPU task는 `nvidia.com/gpu=1`, CPU request/limit `4/8`, memory request/limit
+`24Gi/32Gi`, retry 2회와 cache 활성화를 선언한다. `training_image` parameter에는 GKE가
+pull할 수 있는 Artifact Registry의 immutable image URI를 실행 시 전달해야 한다. 기본
+로컬 tag는 IR compile test용이며 클러스터에서 그대로 사용할 수 없다.
 
 현재는 GPU 종류와 무관한 `nvidia.com/gpu=1`만 선언한다. T4 node pool label, taint와
 toleration은 실제 GKE 구성이 확정된 뒤 platform-specific 설정으로 추가한다. dataset과
@@ -281,8 +289,9 @@ escalation-feedback-preprocessing merge \
   --output-dir /output/retraining
 ```
 
-로컬 검증이나 단일 Kubeflow component로 두 단계를 묶을 때는 `build` 명령에 manifest,
-events와 base training 경로를 한 번에 전달할 수 있다.
+로컬 통합 검증에서는 `build` 명령에 manifest, events와 base training 경로를 한 번에
+전달할 수 있다. Kubeflow에서는 캐시·재시도·계보를 단계별로 남기기 위해 `prepare`와
+`merge`를 반드시 별도 component로 실행한다.
 
 `prepare`는 schema version, checksum, 행 수와 정정 라벨 채택 조건을 검사하고
 `feedback_training.parquet`, 전체 event 감사용 metadata, metrics와 manifest를 만든다.
@@ -290,6 +299,37 @@ events와 base training 경로를 한 번에 전달할 수 있다.
 높은 피드백 라벨이 있으면 정확히 겹치는 기존 train 행만 교체하고 duplicate group은
 이어받는다. 실제 운영 schema 합의 전에는
 `ml/tests/fixtures/feedback_v0_1`의 합성 batch로 이 계약을 검증한다.
+
+Kubeflow CPU component 계약은 다음과 같다. 두 component는 동일한
+`llm-router-data-processing:py312-v2` image를 사용하지만 서로 다른 command와 resource,
+cache 단위를 갖는다.
+
+```text
+feedback_prepare_component
+  Input[Artifact] feedback_manifest
+  Input[Dataset]  feedback_events
+  Input[Artifact] preprocessing_config
+  Output[Dataset] prepared_feedback/
+    ├── feedback_training.parquet
+    ├── feedback_metadata.parquet
+    ├── metrics.json
+    └── manifest.json
+
+feedback_merge_component
+  Input[Dataset]  base_training_dataset        # direct training.parquet
+  Input[Dataset]  prepared_feedback/           # 위 bundle
+  Input[Artifact] preprocessing_config
+  Output[Dataset] merged_training_dataset/
+    ├── training.parquet
+    ├── merge_metadata.parquet
+    ├── metrics.json
+    └── manifest.json
+```
+
+`prepare`는 CPU request/limit `1/2`, memory `2Gi/4Gi`, `merge`는 CPU `2/4`, memory
+`4Gi/8Gi`로 시작한다. 두 task 모두 retry 2회와 cache를 사용하며 GPU resource를 요청하지
+않는다. 재학습 GPU component에는 merged bundle의 `/training.parquet` suffix를 명시해
+기존 GPU image의 파일 기반 CLI 계약을 그대로 유지한다.
 
 v1 이미지의 2026-08-08 로컬 smoke 기준선:
 
