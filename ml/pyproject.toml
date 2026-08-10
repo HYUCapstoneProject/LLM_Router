@@ -29,6 +29,8 @@ routerarena-preprocessing = "llm_router_labeling.evaluation.routerarena_cli:main
 routerarena-evaluate = "llm_router_labeling.evaluation.routerarena_evaluation_cli:main"
 escalation-feedback-preprocessing = "llm_router_labeling.training.feedback_retraining_cli:main"
 modernbert-train = "llm_router_labeling.training.modernbert_training_cli:main"
+modernbert-package = "llm_router_labeling.deployment.model_package_cli:main"
+modernbert-deploy-gate = "llm_router_labeling.deployment.deploy_gate_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

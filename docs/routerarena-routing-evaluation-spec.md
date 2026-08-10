@@ -180,9 +180,9 @@ PyTorch는 CPU/CUDA 이미지별 배포 방식이 달라 기본 전처리 의존
 - [x] prediction/metric/model-info artifact writer를 구현했다.
 - [x] synthetic predictor 기반 단위·통합 테스트를 통과했다.
 - [x] 공식 공개 라벨을 별도 변환 없이 `easy/medium/hard`로 비교하기로 확정했다.
-- [ ] 예측 그룹별 RouterArena 라벨 count/비율과 전체 분포 대비 차이를 metric으로
+- [x] 예측 그룹별 RouterArena 라벨 count/비율과 전체 분포 대비 차이를 metric으로
   생성한다.
-- [ ] 100% 누적 막대그래프와 행 정규화 3×3 히트맵을 artifact로 생성한다.
+- [x] 100% 누적 막대그래프와 행 정규화 3×3 히트맵을 SVG artifact로 생성한다.
 - [x] evaluation semantics를 `routerarena-three-class-alignment`로 확정하고
   RouterArena 라벨을 `routerarena_label`로 명시한다.
 - [ ] 실제 RouterBench checkpoint 경로를 확정한다.

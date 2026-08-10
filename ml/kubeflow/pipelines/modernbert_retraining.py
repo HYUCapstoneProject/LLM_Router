@@ -13,12 +13,17 @@ from ml.kubeflow.task_config import (
     configure_cpu_task,
     configure_gpu_training_task,
 )
+from ml.kubeflow.components.model_evaluation_promotion import (
+    DEFAULT_EVALUATION_IMAGE,
+    DEFAULT_PROMOTION_IMAGE,
+)
+from ml.kubeflow.pipelines.model_qualification import add_model_qualification_tasks
 
 
 @dsl.pipeline(
     name="modernbert-router-feedback-retraining",
     description=(
-        "Validate and merge escalation feedback, then retrain the ModernBERT router."
+        "Prepare feedback, retrain ModernBERT, and enforce the shared qualification gate."
     ),
 )
 def modernbert_retraining_pipeline(
@@ -35,10 +40,19 @@ def modernbert_retraining_pipeline(
         "gs://replace-me/config/feedback_retraining_preprocessing.json"
     ),
     training_config_uri: str = "gs://replace-me/config/modernbert_t4_full.json",
+    routerarena_dataset_uri: str = "gs://replace-me/datasets/routerarena/version/evaluation.parquet",
+    evaluation_config_uri: str = "gs://replace-me/config/routerarena_evaluation.json",
+    package_metadata_uri: str = "gs://replace-me/config/package_metadata.json",
+    baseline_metrics_uri: str = "gs://replace-me/evaluations/baseline/metrics.json",
+    gate_rules_uri: str = "gs://replace-me/config/deploy_gate_rules.json",
+    candidate_model_version: str = "replace-candidate-version",
+    baseline_model_version: str = "replace-baseline-version",
     data_processing_image: str = DEFAULT_DATA_PROCESSING_IMAGE,
     training_image: str = DEFAULT_TRAINING_IMAGE,
-) -> dsl.Model:
-    """Run the server-side feedback preparation, merge, and GPU retraining DAG."""
+    evaluation_image: str = DEFAULT_EVALUATION_IMAGE,
+    promotion_image: str = DEFAULT_PROMOTION_IMAGE,
+) -> dsl.Artifact:
+    """Run feedback preparation, GPU retraining, evaluation, package, and gate."""
     base_dataset_importer = dsl.importer(
         artifact_uri=base_training_dataset_uri,
         artifact_class=dsl.Dataset,
@@ -102,4 +116,16 @@ def modernbert_retraining_pipeline(
     )
     training_task.set_display_name("Retrain ModernBERT router")
     configure_gpu_training_task(training_task, image=training_image)
-    return training_task.outputs["trained_model"]
+    gate_task = add_model_qualification_tasks(
+        trained_model=training_task.outputs["trained_model"],
+        routerarena_dataset_uri=routerarena_dataset_uri,
+        evaluation_config_uri=evaluation_config_uri,
+        package_metadata_uri=package_metadata_uri,
+        baseline_metrics_uri=baseline_metrics_uri,
+        gate_rules_uri=gate_rules_uri,
+        candidate_model_version=candidate_model_version,
+        baseline_model_version=baseline_model_version,
+        evaluation_image=evaluation_image,
+        promotion_image=promotion_image,
+    )
+    return gate_task.outputs["gate_result"]

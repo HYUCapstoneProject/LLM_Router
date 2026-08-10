@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-router-model-promotion"
+version = "0.1.0"
+description = "CPU-only model package validation and deploy gate runtime"
+requires-python = ">=3.11,<3.13"
+dependencies = []
+
+[project.scripts]
+modernbert-package = "llm_router_labeling.deployment.model_package_cli:main"
+modernbert-deploy-gate = "llm_router_labeling.deployment.deploy_gate_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

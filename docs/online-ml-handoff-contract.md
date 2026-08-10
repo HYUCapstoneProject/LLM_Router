@@ -2,7 +2,7 @@
 
 상태: **Draft v0.1 — 팀 합의 전 제안안**
 
-기준일: 2026-08-08
+기준일: 2026-08-10
 
 대상: Spring/API·Gateway·DB 담당자와 ML/Kubeflow 담당자
 
@@ -29,7 +29,7 @@ contract prototype이다.
 | 재학습 trigger | 누적량 집계와 호출 주체 합의 | pipeline parameter와 idempotency 검사, 실행 결과 제공 |
 | 모델 전달 | 승인 manifest를 읽고 새 모델 적용·rollback | checkpoint 평가, gate, package와 manifest 게시 |
 | 온라인 추론 | timeout/fallback, 실제 Claude model ID와 route 정책 | `easy/medium/hard` 예측과 confidence 제공 |
-| cache threshold | bge/pgvector 조회와 운영 적용 | QQP 평가로 threshold artifact 제공 |
+| cache threshold | QQP 평가, bge/pgvector 조회와 운영 적용 | ML 학습/Kubeflow 범위에서 제외 |
 
 ML 파이프라인은 PostgreSQL table을 직접 조회하지 않는다. 온라인 팀은 파일 batch를
 export하고, ML 팀은 해당 version의 adapter를 통해 내부 표준 schema로 변환한다.
@@ -150,24 +150,27 @@ ML 팀은 checkpoint 경로만 전달하지 않고 다음 파일을 하나의 �
 ```text
 approved/<model-version>/
 ├── config.json
-├── tokenizer files
+├── tokenizer.json
+├── tokenizer_config.json
 ├── model weights
 ├── metrics.json
-└── manifest.json
+├── training_config.json
+└── model_manifest.json
 ```
 
 manifest 최소 필드 제안:
 
 ```text
-model_version, base_model, checkpoint_sha256
+model_version, base_model, files
 dataset_version, preprocessing_version, label_rule_version
 id2label, tokenizer_max_length
-evaluation_version, gate_status, created_at, code_commit
+training_version, evaluation_version, gate_status, created_at, code_commit
 ```
 
 필수 계약은 `id2label={0: easy, 1: medium, 2: hard}`이며, `gate_status=approved`와
-checksum 검증에 성공한 package만 온라인에 적용한다. 온라인 팀은 새 모델 로딩 실패 시
-이전 승인 version으로 되돌릴 수 있어야 한다.
+`files`의 파일별 SHA-256 검증에 성공한 package만 온라인에 적용한다. 현재
+`model-package-v1` 생성기·검증기는 ML 저장소에 구현돼 있다. 온라인 팀은 새 모델 로딩
+실패 시 이전 승인 version으로 되돌릴 수 있어야 한다.
 
 ## 6. 온라인 Router API 계약 제안
 
@@ -216,9 +219,12 @@ base_dataset_version, current_model_version, requested_at
 누적 임계값 `N`, 최대 재학습 주기, 수동 승인 여부는 실험값이며 현재 확정하지 않는다.
 이미 처리한 `batch_id`를 다시 받아도 동일 데이터가 중복 학습되지 않아야 한다.
 
-## 8. cache threshold 전달
+## 8. cache threshold 역할 경계
 
-ML 팀은 QQP 평가 후 다음 내용을 포함한 versioned threshold artifact를 제공한다.
+온라인 서빙·캐시 팀이 QQP 평가와 versioned threshold artifact를 생성하고
+Spring/pgvector에 적용한다. ML 팀은 이 artifact를 학습 데이터나 Kubeflow
+component 입력으로 소비하지 않는다. 최종 프로젝트 보고를 위해 공유할 때는
+다음 필드를 권장한다.
 
 ```text
 embedding_model, embedding_dimension, normalization
@@ -227,10 +233,13 @@ precision, recall, false_hit_rate, created_at, code_commit
 ```
 
 온라인 팀은 bge-large-en-v1.5의 1024차원, normalization과 cosine similarity 설정이
-평가 환경과 동일한지 contract test로 확인한다.
+평가 환경과 동일한지 해당 팀의 contract test로 확인한다.
 
 ## 9. 팀 회의에서 확정할 체크리스트
 
+- [ ] 대상 Google Cloud project가 `project-763753da-fa8f-4afd-b31`인지 재확인한다.
+- [ ] region, GCS bucket, Artifact Registry repository와 GKE cluster 이름을 정한다.
+- [ ] 예산·quota, CPU/GPU node pool, namespace와 Workload Identity 계정을 정한다.
 - [ ] 운영 export 포맷과 object storage 위치를 정한다.
 - [ ] manifest와 event row의 필수/선택 필드를 확정한다.
 - [ ] UTC timestamp, ID 생성과 export watermark 규칙을 확정한다.
@@ -241,6 +250,8 @@ precision, recall, false_hit_rate, created_at, code_commit
 - [ ] 공통 label 명칭과 Claude model mapping을 정한다.
 - [ ] Router API timeout/fallback/rollback 계약을 정한다.
 - [ ] model·threshold artifact의 위치, 권한과 version 전환 방식을 정한다.
+- [ ] QQP threshold는 온라인 서빙·캐시 팀 범위이며 ML/Kubeflow DAG에 넣지 않음을
+  재확인한다.
 - [ ] 양 팀이 공유할 작은 contract fixture와 통합 smoke 명령을 확정한다.
 
 ## 10. 변경 관리

@@ -249,6 +249,46 @@ def _group_metrics(
     return output
 
 
+def _conditional_label_distribution(
+    predictions: pd.DataFrame,
+    *,
+    group_column: str,
+    label_column: str,
+    groups: Sequence[str],
+    labels: Sequence[str],
+) -> dict[str, Any]:
+    overall_counts = predictions[label_column].value_counts()
+    overall_total = len(predictions)
+    overall_ratios = {
+        label: _safe_divide(int(overall_counts.get(label, 0)), overall_total)
+        for label in labels
+    }
+    output: dict[str, Any] = {}
+    for group in groups:
+        rows = predictions[predictions[group_column].eq(group)]
+        counts = rows[label_column].value_counts()
+        ratios = {
+            label: _safe_divide(int(counts.get(label, 0)), len(rows))
+            for label in labels
+        }
+        output[group] = {
+            "row_count": len(rows),
+            "counts": {label: int(counts.get(label, 0)) for label in labels},
+            "ratios": ratios,
+            "overall_percentage_point_difference": {
+                label: (ratios[label] - overall_ratios[label]) * 100.0
+                for label in labels
+            },
+        }
+    return {
+        "overall_counts": {
+            label: int(overall_counts.get(label, 0)) for label in labels
+        },
+        "overall_ratios": overall_ratios,
+        "groups": output,
+    }
+
+
 def evaluate_routerarena_predictions(
     evaluation: pd.DataFrame,
     prediction_output: pd.DataFrame,
@@ -380,6 +420,24 @@ def evaluate_routerarena_predictions(
         "predicted_route_distribution": predictions["predicted_route"]
         .value_counts()
         .to_dict(),
+        "routerarena_labels_within_predicted_groups": (
+            _conditional_label_distribution(
+                predictions,
+                group_column="predicted_label",
+                label_column="routerarena_label",
+                groups=labels,
+                labels=labels,
+            )
+        ),
+        "predicted_groups_within_routerarena_labels": (
+            _conditional_label_distribution(
+                predictions,
+                group_column="routerarena_label",
+                label_column="predicted_label",
+                groups=labels,
+                labels=labels,
+            )
+        ),
         "per_domain": _group_metrics(predictions, "domain", labels),
         "per_source_dataset": _group_metrics(
             predictions, "source_dataset", labels

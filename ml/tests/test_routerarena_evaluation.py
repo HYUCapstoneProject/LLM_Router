@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import unittest
+import tempfile
+from pathlib import Path
 
 import pandas as pd
 
@@ -9,6 +11,9 @@ from llm_router_labeling.evaluation.routerarena_routing_evaluator import (
     evaluate_routerarena_predictions,
     resolve_model_label_order,
     run_routerarena_routing_evaluation,
+)
+from llm_router_labeling.evaluation.routerarena_visualization import (
+    write_routerarena_distribution_charts,
 )
 
 
@@ -119,6 +124,22 @@ class RouterArenaRoutingEvaluationTest(unittest.TestCase):
         )
         self.assertIn("science", result.metrics["per_domain"])
         self.assertEqual(result.metrics["model"]["model_path"], "synthetic-checkpoint")
+        predicted_groups = result.metrics[
+            "routerarena_labels_within_predicted_groups"
+        ]
+        self.assertEqual(
+            predicted_groups["groups"]["easy"]["counts"],
+            {"easy": 1, "medium": 1, "hard": 1},
+        )
+        self.assertAlmostEqual(
+            predicted_groups["groups"]["easy"]["ratios"]["hard"], 1 / 3
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            stacked, heatmap = write_routerarena_distribution_charts(
+                result.metrics, Path(directory)
+            )
+            self.assertIn("RouterArena labels", stacked.read_text(encoding="utf-8"))
+            self.assertIn("heatmap", heatmap.read_text(encoding="utf-8"))
 
     def test_rejects_invalid_prediction_label(self) -> None:
         output = pd.DataFrame(

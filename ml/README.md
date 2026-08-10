@@ -357,8 +357,19 @@ v2 이미지의 2026-08-08 구현 결과:
 | full merge | RouterBench 34,764행 + feedback 2행 → 34,766행 |
 | holdout 보존 | validation 3,478 / test 3,478 유지 |
 
-v2의 실제 feedback 로직은 로컬 CLI와 단위 테스트로 통과했고, Docker 안에서 세 데이터
-흐름을 다시 실행하는 통합 smoke는 아직 남아 있다.
+v2 Docker 통합 smoke는 2026-08-10에 `linux/amd64` image로 통과했다.
+
+| 흐름 | 결과 |
+| --- | --- |
+| RouterBench preprocess | 100행 → train 80 / validation 10 / test 10 |
+| RouterArena preprocess | `sub_10` 809행 중 seed 42로 3행 artifact 생성 |
+| feedback prepare | 8 event → 채택 3 event → 학습 2행 |
+| feedback merge | RouterBench smoke 100행 + feedback 2행 → 102행 |
+| holdout 보존 | validation 10 / test 10 유지 |
+
+네 명령은 모두 non-root UID/GID `10001`로 실행했고, 입력은 read-only
+volume, 출력은 별도 writable volume으로 전달했다. 실제 운영 feedback schema는
+온라인 팀 합의 전이므로 합성 `feedback-export-v0.1` fixture 결과만 검증한다.
 
 ## RouterArena 평가 전처리
 
@@ -401,6 +412,48 @@ RouterBench로 학습한 Hugging Face 호환 3-class checkpoint를 RouterArena�
 
 `predictions.parquet`, `metrics.json`, `model_info.json`을 생성하며 accuracy, macro-F1,
 confusion matrix, under/over-routing, domain/source dataset별 결과와 truncation/latency를
-기록한다. 예측 그룹별 RouterArena 라벨 비율과 시각화는 명세됐지만 아직 자동 생성
-기능을 구현하지 않았다. 상세 계약은 `docs/routerarena-routing-evaluation-spec.md`를
-따른다.
+기록한다. 또한 예측 easy/medium/hard 그룹별 RouterArena 공식 라벨 count·비율·전체
+분포 대비 %p 차이와 `predicted_group_distribution.svg`,
+`predicted_group_heatmap.svg`를 자동 생성한다. 상세 계약은
+`docs/routerarena-routing-evaluation-spec.md`를 따른다.
+
+## 모델 패키지와 deploy gate
+
+학습 checkpoint에 평가·학습 metadata를 결합한 `model-package-v1` manifest를 만들고
+필수 파일, `easy=0/medium=1/hard=2` 순서와 파일별 SHA-256을 검증한다.
+
+```bash
+.venv/bin/modernbert-package create \
+  --package-dir /path/to/checkpoint \
+  --metadata /path/to/package-metadata.json
+
+.venv/bin/modernbert-package validate \
+  --package-dir /path/to/checkpoint
+```
+
+`modernbert-deploy-gate`는 후보 metric의 절대 최소·최대 기준과 기존 승인 모델 대비
+delta를 규칙 JSON으로 검사한다. 실패 시 결과 JSON을 먼저 저장하고 exit code 2로
+종료하므로 Kubeflow 승격 단계를 차단할 수 있다. 실제 metric 임계값과 온라인 배포
+호출은 기준 모델 및 백엔드 계약이 확정된 뒤 설정한다.
+
+최초 모델처럼 비교할 기존 승인 모델이 없다면 gate 규칙의 `minimum_delta`와
+`maximum_delta`를 비우고, `baseline_metrics_uri`에는 빈 JSON 객체 파일을 전달한다.
+이 경우 절대 최소·최대 기준과 package 무결성만 검사한다.
+
+Kubeflow 실행 이미지는 역할별로 분리한다.
+
+| image | 자원 | 역할 | 2026-08-10 로컬 build |
+| --- | --- | --- | --- |
+| `llm-router-data-processing:py312-v2` | CPU | 초기 데이터와 feedback prepare/merge | 통과 |
+| `llm-router-modernbert-training:cu124-v1` | GPU | ModernBERT 학습·checkpoint 저장 | 통과 |
+| `llm-router-modernbert-evaluation:cu124-v1` | GPU | RouterArena 추론·metric·SVG | `c854108b...`, 통과 |
+| `llm-router-model-promotion:py312-v1` | CPU | package/checksum/deploy gate | `66f21b23...`, 통과 |
+
+평가와 승격 두 image는 모두 `linux/amd64`, UID/GID `10001`로 빌드했으며 컨테이너
+내부 CLI smoke를 통과했다. 초기학습과 feedback 재학습 pipeline은 학습 뒤에
+RouterArena 평가 → candidate package → deploy gate를 직접 실행한다. 이미 저장된
+checkpoint만 다시 검증할 때는 독립 `model_qualification_pipeline`을 사용한다.
+
+이 gate는 온라인 서비스에 모델을 직접 배포하지 않는다. 통과 여부와 candidate
+package를 생성하는 데까지만 ML 책임이며, GCS `approved/` 승격 방식과 FastAPI process
+교체·health check·rollback 호출 계약은 온라인 팀과 확정한 뒤 연결한다.

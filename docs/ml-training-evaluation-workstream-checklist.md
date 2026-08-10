@@ -1,6 +1,6 @@
 # ML 학습·평가·배포 작업 총괄 체크리스트
 
-기준일: 2026-08-08
+기준일: 2026-08-10
 담당 영역: 아키텍처의 오른쪽 **오프라인 학습·평가 경로**와 왼쪽 온라인 경로의 ML 연동 경계
 작업 브랜치: `feat/data-labeling-training`
 
@@ -38,7 +38,6 @@
 - RouterBench 학습 projection, 중복 제거, group-aware split과 데이터 품질 검증
 - ModernBERT 로컬 smoke 학습, 전체 학습, checkpoint 패키징
 - RouterArena 일반화 평가와 RouterBench holdout 평가
-- QQP 기반 semantic-cache threshold 평가
 - Kubeflow CPU/GPU component와 pipeline 구성
 - GCS 데이터·모델·평가 artifact 저장 규칙
 - MLMD 실행·데이터·모델 계보
@@ -52,7 +51,7 @@
 | 모델 전달 | checkpoint 패키지, checksum, `id2label`, model manifest | 승인 버전 다운로드, 프로세스 교체와 rollback |
 | Router API | 요청/응답 schema, Python reference predictor, contract test | FastAPI 배포, Spring 호출, timeout/fallback |
 | tier 매핑 | `easy/medium/hard` 출력과 권장 route mapping | 실제 Claude 모델 ID와 운영 정책 적용 |
-| cache threshold | QQP 실험 결과와 승인 threshold artifact | bge 임베딩, pgvector 조회·저장, threshold 적용 |
+| cache threshold | ML 학습/Kubeflow 범위에서 제외 | QQP 실험, bge 임베딩, pgvector 조회·저장과 threshold 적용 |
 | 정정 라벨 | event schema 검증, dedup, dataset version 생성 | 사용자 에스컬레이션 수집과 DB 저장 |
 | 관측성 | model/data version과 평가 metric 제공 | request id, latency, token, cost와 오류 로그 |
 
@@ -74,7 +73,7 @@ RouterBench 원본
   -> training projection / duplicate group split
   -> local ModernBERT smoke train
   -> GKE T4 full train
-  -> RouterBench holdout + RouterArena + QQP evaluation
+  -> RouterBench holdout + RouterArena evaluation
   -> deploy gate
   -> GCS approved model manifest
   -> online FastAPI Router가 승인 모델 로드
@@ -91,7 +90,7 @@ component에서 호출하고, Kubeflow는 artifact 전달, cache, retry, resourc
 
 ### 3-1. 현재 제약과 구현 원칙
 
-현재 Kubeflow 서버가 없고 에스컬레이션 원본 schema도 팀 합의 전이다. 이 제약은
+에스컬레이션 원본 schema와 온라인 배포 계약은 팀 합의 전이다. 이 제약은
 로컬 component 작성과 pipeline 컴파일을 막지 않는다. 다음 세 경계를 유지한다.
 
 1. Kubeflow component는 DB 컬럼을 직접 입력받지 않고 `Dataset`/`Model` 같은 파일
@@ -116,6 +115,46 @@ sample_weight, split, duplicate_group_id
 | schema adapter 골격 | 합성 feedback fixture, validation, dedup, merge, 재학습 pipeline 골격 | fixture 기반 계약 테스트와 IR YAML compile |
 | 팀 합의 후 확정 | 실제 feedback row mapping, PII/retention, trigger owner와 누적 임계값 | 양 팀 contract fixture 통과 |
 | 서버 확보 후 검증 | Registry/GCS/IAM, CPU·GPU Pod, cache, MLMD, cloud smoke와 전체 학습 | Kubeflow run과 저장된 artifact 확인 |
+
+### 3-2. 2026-08-10 클라우드 실측과 회의 전 작업 경계
+
+인증 계정 `myday2day@hanyang.ac.kr`에서 접근 가능한 Google Cloud project는
+`project-763753da-fa8f-4afd-b31`(`HYUCapstone`) 하나다. 로컬 전용 Google Cloud CLI와
+config는 Git에서 제외한 `.tools/` 아래에 두었다.
+
+사용 가능하다는 구두 상태와 별개로 API로 직접 확인한 현재 상태는 다음과 같다.
+
+| 항목 | 실측 상태 | 다음 조치 |
+| --- | --- | --- |
+| GCS bucket | project 내 bucket 0개 | bucket 이름·region 확정 후 생성 |
+| GKE | Kubernetes Engine API 비활성 | 비용·region·cluster 이름 승인 후 API 활성화와 생성 |
+| Artifact Registry | API 비활성, repository 없음 | repository 이름·region 확정 후 생성 |
+| kubectl context | 없음 | cluster 생성과 credential 발급 후 설정 |
+
+따라서 현재 project는 **계정과 project만 준비된 상태**이며, GCS bucket과 GKE cluster가
+실제로 provision된 상태는 아니다. API 활성화, cluster·bucket·registry 생성은 과금과
+외부 상태 변경을 수반하므로 회의 전 임의로 수행하지 않는다.
+
+회의 전 독립적으로 완료할 목록:
+
+- [x] QQP cache threshold 구현을 ML/Kubeflow 범위에서 제외한다.
+- [x] CPU 데이터 image v2의 RouterBench·RouterArena·feedback 통합 smoke를 통과한다.
+- [x] RouterArena 예측 그룹 분포 metric과 SVG 시각화를 구현한다.
+- [x] 모델 package manifest 생성기와 label/file/checksum 검증기를 구현한다.
+- [x] 절대 metric과 기준 모델 대비 delta를 검사하는 deploy gate core를 구현한다.
+- [x] 합성 fixture 기반 전체 단위·계약 테스트를 통과한다.
+- [x] 평가·패키징·gate 실행용 image와 Kubeflow component를 작성한다.
+- [x] 초기학습·재학습과 독립 자격검증 pipeline IR에 평가·package·gate 단계를
+  연결한다.
+
+회의 또는 명시적 인프라 승인 뒤 확정할 목록:
+
+- [ ] GCS bucket, region, Artifact Registry repository와 GKE cluster 이름
+- [ ] 비용 예산, GPU quota/node pool, namespace와 Workload Identity service account
+- [ ] feedback 운영 export schema, PII/retention과 재학습 trigger 주체
+- [ ] 온라인 Router의 모델 package 다운로드, health check, 전환과 rollback 방식
+- [ ] 온라인 API label 명칭, 실제 모델 route mapping, timeout/fallback
+- [ ] 운영 기준 모델과 deploy gate 수치 임계값
 
 ## 4. 현재 완료 기준선
 
@@ -225,29 +264,30 @@ routerbench-training/<data-version>__<rule-version>__<preprocess-version>/metric
 - [ ] 전체 train split으로 ModernBERT base baseline을 학습한다.
 - [ ] validation으로 early stopping과 최종 checkpoint를 선택한다.
 - [ ] RouterBench test에서 accuracy, macro-F1, under/over-routing과 class metric을 계산한다.
-- [ ] RouterArena full에서 예측 그룹별 공식 라벨 count와 행 정규화 비율을 계산한다.
-- [ ] RouterArena 전체 분포 대비 예측 그룹별 라벨 증감(%p)을 계산한다.
-- [ ] RouterArena 100% 누적 막대그래프와 정규화 히트맵을 생성한다.
+- [x] RouterArena full에서 예측 그룹별 공식 라벨 count와 행 정규화 비율을 계산하는
+  evaluator를 구현한다.
+- [x] RouterArena 전체 분포 대비 예측 그룹별 라벨 증감(%p)을 계산하는 evaluator를
+  구현한다.
+- [x] RouterArena 100% 누적 막대그래프와 정규화 히트맵을 SVG로 생성한다.
 - [ ] RouterArena robustness에서 원본/변형 예측 일관성을 계산한다.
 - [ ] domain/source dataset별 성능과 truncation 편향을 분석한다.
 - [ ] 실패·저신뢰·severe mismatch 표본을 수동 검토 목록으로 저장한다.
 - [ ] Claude Haiku/Sonnet/Opus 소규모 표본으로 RouterBench proxy 라벨을 검증한다.
 
-### E. QQP cache threshold 평가
+### E. 범위 외: QQP cache threshold 평가
 
-- [ ] QQP 공식 데이터 revision, schema와 split을 고정한다.
-- [ ] 질문쌍을 bge-large-en-v1.5, 1024차원으로 임베딩한다.
-- [ ] 온라인 경로와 동일한 normalization 및 cosine similarity를 사용한다.
-- [ ] 0.60~0.90 threshold sweep을 실행한다.
-- [ ] threshold별 hit rate, false-hit rate, precision, recall을 계산한다.
-- [ ] 추천 threshold와 근거 metric을 versioned JSON으로 저장한다.
-- [ ] Spring/pgvector 설정이 이 artifact의 threshold를 소비하는 contract test를 만든다.
+QQP 실험과 온라인 threshold 적용은 `졸업프로젝트 개요.md`의 `서빙·캐시 축`
+담당이다. ML 축에서는 QQP 다운로드, 임베딩, threshold sweep, Kubeflow
+component와 threshold artifact를 구현하지 않는다. 최종 보고서에서 온라인 팀이
+제공한 cache 결과를 RouterBench/RouterArena 라우터 결과와 섞지 않도록 구분해
+해석하는 것만 공동 확인한다.
 
 ### F. 모델 artifact와 온라인 Router 연동
 
-- [ ] 모델 패키지 manifest schema를 확정한다.
-- [ ] manifest에 model/data/preprocessing/label/evaluation version과 checksum을 넣는다.
-- [ ] checkpoint, tokenizer, config, metrics, manifest의 필수 파일 검증기를 만든다.
+- [x] 모델 패키지 `model-package-v1` manifest schema를 코드로 고정한다.
+- [x] manifest에 model/data/preprocessing/label/evaluation version과 파일별 checksum을
+  넣는다.
+- [x] checkpoint, tokenizer, config, metrics, manifest의 필수 파일 검증기를 만든다.
 - [ ] Python reference predictor가 package directory 하나만 받아 예측하도록 만든다.
 - [ ] Router 요청/응답 계약을 문서화한다.
 - [ ] FastAPI Router 최소 endpoint 또는 contract fixture를 제공한다.
@@ -259,11 +299,16 @@ routerbench-training/<data-version>__<rule-version>__<preprocess-version>/metric
 권장 모델 manifest 최소 필드:
 
 ```text
-model_version, base_model, checkpoint_sha256
+model_version, base_model, files
 dataset_version, preprocessing_version, label_rule_version
 id2label, tokenizer_max_length
-evaluation_version, gate_status, created_at, code_commit
+training_version, evaluation_version, gate_status, created_at, code_commit
 ```
+
+실제 `model-package-v1`은 단일 `checkpoint_sha256` 대신 `files` 객체에
+`config.json`, `tokenizer.json`, `tokenizer_config.json`, `training_config.json`,
+`metrics.json`, weight 파일 각각의 SHA-256을 기록한다. manifest 파일명은
+`model_manifest.json`으로 통일한다.
 
 권장 Router 계약 최소 필드:
 
@@ -284,12 +329,13 @@ response: label, confidence, model_version, latency_ms
 - [ ] training-preprocess/split CPU component를 만든다.
 - [x] ModernBERT tokenizer/train 단일 GPU component를 만든다.
 - [ ] RouterBench evaluate CPU/GPU component를 만든다.
-- [ ] RouterArena full/robustness 평가 component를 분리한다.
-- [ ] QQP threshold 평가 component를 만든다.
-- [ ] model package/upload component를 만든다.
-- [ ] deploy-gate component를 만든다.
+- [x] RouterArena full 평가용 단일 GPU component와 전용 image를 만든다.
+- [ ] RouterArena robustness 원본/변형 일관성 평가 component를 만든다.
+- [x] candidate model package component와 전용 CPU image를 만든다.
+- [x] deploy-gate Kubeflow component를 만들고 실패 시 task를 차단한다.
 - [ ] 입력 checksum+parameter 기반 cache key가 동작하는지 검증한다.
-- [ ] retry, timeout, CPU/memory/GPU request와 limit을 명시한다.
+- [x] CPU/memory/GPU request와 limit, cache와 retry를 component task에 명시한다.
+- [ ] 실제 cluster 관측값으로 timeout을 확정한다.
 - [ ] local component test와 pipeline compile test를 CI에서 실행한다.
 
 위 RouterBench CPU component 세 항목은 서버에서 초기 데이터를 재생성해야 할 때만
@@ -301,7 +347,7 @@ response: label, confidence, model_version, latency_ms
 
 - [x] 초기 로컬 처리와 피드백 재학습 명령을 포함하는 범용 CPU 데이터 image v2를
   빌드한다.
-- [ ] CPU image v2에서 RouterBench 100행, RouterArena 3행과 합성 feedback
+- [x] CPU image v2에서 RouterBench 100행, RouterArena 3행과 합성 feedback
   prepare/merge smoke를 통과한다.
 - [x] KFP SDK를 `2.17.0`으로 lock하고 KFP v2 Artifact schema로 컴파일한다.
 - [x] 각 component가 받는 Artifact path와 scalar parameter 계약을 문서화한다.
@@ -311,6 +357,14 @@ response: label, confidence, model_version, latency_ms
 - [x] 초기 학습 pipeline을 IR YAML로 컴파일하고 정적 타입 검사를 통과한다.
 - [x] 합성 feedback fixture 계약을 통과한 prepare/merge를 연결한 재학습 pipeline을 IR
   YAML로 컴파일한다.
+- [x] `llm-router-modernbert-evaluation:cu124-v1` image를 linux/amd64·non-root로
+  빌드하고 CLI smoke를 통과한다.
+- [x] `llm-router-model-promotion:py312-v1` CPU image를 linux/amd64·non-root로
+  빌드하고 CLI smoke를 통과한다.
+- [x] 초기학습·재학습 pipeline 뒤에 RouterArena 평가, candidate package와 deploy gate를
+  연결하고 IR YAML compile test를 통과한다.
+- [x] 이미 생성된 checkpoint만 다시 자격검증할 독립 qualification pipeline을
+  컴파일한다.
 - [ ] 실제 DB, GCS와 Kubeflow endpoint 없이 실행되는 계약 테스트를 CI에 추가한다.
 
 서버 확보 후에만 완료할 항목:
@@ -329,7 +383,7 @@ ingest
   -> relabel
   -> training_preprocess
   -> train
-  -> [routerbench_eval, routerarena_eval, qqp_eval]
+  -> [routerbench_eval, routerarena_eval]
   -> deploy_gate
   -> publish_approved_model
 ```
@@ -367,6 +421,8 @@ gs://<bucket>/evaluations/<model-version>/<evaluation-version>/
 - [ ] RouterArena alignment 악화 허용 범위를 정한다.
 - [ ] latency, artifact 무결성, label order 검증을 필수 gate로 둔다.
 - [ ] gate 결과에 metric, threshold, pass/fail reason을 저장한다.
+- [x] 절대 최소·최대 metric과 기준 모델 대비 delta를 규칙 JSON으로 검사하고 각
+  actual/threshold/pass-fail을 보존하는 gate core를 구현한다.
 - [ ] 통과한 후보만 `approved/` prefix와 approved manifest로 승격한다.
 - [ ] 온라인 Router가 manifest 기준으로 새 모델을 로드하도록 한다.
 - [ ] 이전 approved model을 보존하고 rollback 절차를 검증한다.
@@ -390,7 +446,8 @@ gs://<bucket>/evaluations/<model-version>/<evaluation-version>/
 - [ ] RouterBench 원본과 정정 라벨의 sampling/weight 정책을 정한다.
 - [x] 정정 라벨 dataset version, source checksum과 병합 lineage manifest를 기록한다.
 - [ ] 누적 N건 또는 성능 drift 기반 재학습 trigger를 실험값으로 관리한다.
-- [ ] 재학습 모델도 같은 평가·배포 게이트를 통과시킨다.
+- [x] 재학습 pipeline에도 초기학습과 같은 평가·패키지·배포 gate DAG를 연결한다.
+- [ ] 실제 재학습 모델로 gate 실행을 통과시킨다.
 
 권장 escalation event 최소 필드:
 
@@ -411,7 +468,8 @@ schema가 확정되기 전에는 합성 fixture로 validator, dedup, merge와 pi
 - [ ] 모든 표·그래프에 model/data/code/evaluation version을 표시한다.
 - [ ] always-Opus 대비 비용·품질 결과를 계산한다.
 - [ ] cache 적용 전후 비용과 latency를 분리해 보고한다.
-- [ ] RouterBench, RouterArena, QQP 결과를 서로 다른 의미로 해석한다.
+- [ ] RouterBench·RouterArena 라우터 결과와 온라인 팀의 cache 결과를
+  서로 다른 의미로 해석한다.
 - [ ] 반복 실행 seed와 평균·분산 또는 신뢰구간을 기록한다.
 - [ ] 최종 model card와 data card를 작성한다.
 - [ ] 로컬 smoke, cloud train, 평가, rollback runbook을 작성한다.
@@ -423,7 +481,7 @@ schema가 확정되기 전에는 합성 fixture로 validator, dedup, merge와 pi
 | --- | --- |
 | M1 Data Baseline | 전체 RouterBench 라벨·split artifact와 품질 검사가 승인됨 |
 | M2 Local Model | 로컬 smoke checkpoint를 재로딩해 3-class 예측 성공 |
-| M3 Evaluation | RouterBench holdout, RouterArena 분포 분석, QQP threshold 결과 생성 |
+| M3 Evaluation | RouterBench holdout과 RouterArena 분포 분석 결과 생성 |
 | M4 Cloud Train | GKE T4 학습과 MLMD/GCS 계보가 재현됨 |
 | M5 Promotion | 후보 모델이 gate를 통과해 approved manifest로 승격됨 |
 | M6 Online Link | Spring→FastAPI→ModernBERT 계약 smoke와 rollback 통과 |

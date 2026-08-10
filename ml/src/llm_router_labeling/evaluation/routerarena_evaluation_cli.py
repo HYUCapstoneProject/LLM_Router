@@ -11,6 +11,7 @@ from .routerarena_routing_evaluator import (
     HuggingFaceRouterPredictor,
     run_routerarena_routing_evaluation,
 )
+from .routerarena_visualization import write_routerarena_distribution_charts
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -78,4 +79,5 @@ def main() -> None:
     result.predictions.to_parquet(args.output_dir / "predictions.parquet", index=False)
     write_json(args.output_dir / "metrics.json", result.metrics)
     write_json(args.output_dir / "model_info.json", predictor.info())
+    write_routerarena_distribution_charts(result.metrics, args.output_dir)
     print(json.dumps(result.metrics, ensure_ascii=False, indent=2, sort_keys=True))

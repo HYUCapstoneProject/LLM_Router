@@ -10,6 +10,12 @@ from ml.kubeflow.components.feedback_retraining import (
     feedback_prepare_component,
 )
 from ml.kubeflow.components.modernbert_training import modernbert_training_component
+from ml.kubeflow.components.model_evaluation_promotion import (
+    deploy_gate_component,
+    model_package_component,
+    routerarena_evaluation_component,
+)
+from ml.kubeflow.pipelines.model_qualification import model_qualification_pipeline
 from ml.kubeflow.pipelines.modernbert_retraining import (
     modernbert_retraining_pipeline,
 )
@@ -43,6 +49,18 @@ def compile_workflows(output_dir: Path) -> dict[str, Path]:
             modernbert_training_component,
             output_dir / "modernbert-training-component.yaml",
         ),
+        "routerarena_evaluation_component": (
+            routerarena_evaluation_component,
+            output_dir / "routerarena-evaluation-component.yaml",
+        ),
+        "model_package_component": (
+            model_package_component,
+            output_dir / "model-package-component.yaml",
+        ),
+        "deploy_gate_component": (
+            deploy_gate_component,
+            output_dir / "deploy-gate-component.yaml",
+        ),
         "initial_training_pipeline": (
             modernbert_training_pipeline,
             output_dir / "initial-training-pipeline.yaml",
@@ -50,6 +68,10 @@ def compile_workflows(output_dir: Path) -> dict[str, Path]:
         "feedback_retraining_pipeline": (
             modernbert_retraining_pipeline,
             output_dir / "feedback-retraining-pipeline.yaml",
+        ),
+        "model_qualification_pipeline": (
+            model_qualification_pipeline,
+            output_dir / "model-qualification-pipeline.yaml",
         ),
     }
     paths: dict[str, Path] = {}
