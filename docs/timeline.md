@@ -162,7 +162,7 @@ LLM_Router/
 | Repo | 역할 | 포함 범위 |
 | --- | --- | --- |
 | `LLM_Router` | 제품/demo runtime | React 채팅 UI, Spring Gateway, FastAPI router serving, API 계약, 로컬 통합 실행, demo docs |
-| `LLM_Router_MLOps` | 학습·평가·실험 | RouterBench 재라벨링, RouterArena/QQP 평가, ModernBERT fine-tuning, KFP pipeline, model artifact upload, 최종 실험 그래프/표 생성 |
+| `LLM_Router_MLOps` | 학습·평가·실험 | RouterBench 재라벨링, RouterArena 평가, ModernBERT fine-tuning, KFP pipeline, model artifact upload, 최종 라우터 실험 그래프/표 생성. QQP 평가는 온라인 cache 축 담당 |
 | `LLM_Router_Infra` | GCP 배포·운영 | GCE 배포, Cloud Run 배포, GKE/Kubeflow 셋업, GCS/IAM/secret template, budget alert, 운영 runbook |
 
 FastAPI 라우터 서빙은 별도 repo로 빼지 않고 `LLM_Router` 안에 둔다. Spring Gateway와 API 계약을 자주 맞춰야 하고, 8월 말까지 통합 데모를 만드는 것이 더 중요하기 때문이다. 단, Python serving 담당자가 완전히 분리되고 변경 충돌이 커지면 나중에 `LLM_Router_RouterServing`으로 분리할 수 있다.

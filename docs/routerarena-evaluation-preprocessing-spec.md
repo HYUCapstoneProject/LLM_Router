@@ -151,22 +151,10 @@ Kubeflow Pipeline은 다음만 담당한다.
 
 RouterArena 전처리는 RouterBench 학습 전처리 component와 별도 component로 유지한다.
 
-## 8. 구현 체크리스트
+## 8. 진행 상태 관리
 
-- [x] 공식 revision, 파일 크기, checksum, row count를 고정한다.
-- [x] 공식 질문별 라벨이 `easy/medium/hard` 3단계임을 확인하고 identity mapping으로
-  사용한다.
-- [x] Context/Question/Options 입력 조립기를 구현한다.
-- [x] 공식 `easy/medium/hard` difficulty 라벨 검증을 구현한다.
-- [x] robustness-full ID join과 원 질문 보존을 구현한다.
-- [x] missing/refusal/embedded-answer/source-duplicate 필터를 구현한다.
-- [x] RouterBench exact training overlap 검사를 구현한다.
-- [x] evaluation/metadata projection을 분리한다.
-- [x] 100행 generalization/robustness smoke를 실행한다.
-- [ ] 전체 RouterBench 학습 artifact로 overlap 검사를 다시 실행한다.
-- [x] label source를 `routerarena_official_difficulty` 계열로 명명한다.
-- [ ] ModernBERT checkpoint를 연결해 transfer accuracy/macro-F1을 계산한다.
-- [ ] robustness 원본-변형 prediction consistency를 계산한다.
+이 문서는 RouterArena 입력·제외·projection 규칙만 관리한다. 완료 상태와 남은 작업은
+`docs/ml-training-evaluation-workstream-checklist.md`의 단일 체크리스트에서 관리한다.
 
 ## 9. 실제 전처리 결과
 

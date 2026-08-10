@@ -1,8 +1,11 @@
-# LLM Router MVP Scope and Checklist
+# LLM Router MVP Scope — Historical Baseline
 
 기준일: 2026-07-08
 
-이 문서는 현재 레포의 stub 상태를 기준으로 MVP와 최종 목표를 분리하고, 평가 지표와 구현 체크리스트 초안을 정리한다. 상세 일정은 `docs/timeline.md`, 배경 설계는 `docs/졸업프로젝트 개요.md`를 기준으로 한다.
+이 문서는 2026-07-08 당시 stub 상태를 기준으로 MVP와 최종 목표를 구분한 과거 범위
+초안이다. 현행 ML 구조, 백엔드 협의 사항과 작업 상태는
+`docs/ml-training-evaluation-workstream-checklist.md`를 유일한 기준으로 사용한다.
+상세 일정은 `docs/timeline.md`, 배경 설계는 `docs/졸업프로젝트 개요.md`를 기준으로 한다.
 
 ## 1. 현재 stub 목록
 
@@ -225,84 +228,12 @@ Kubeflow는 전처리 규칙 자체를 소유하지 않는다. 동일한 Python 
 retry, CPU/GPU resource 분리, GCS 경로와 parameterized 실험을 담당한다. 생성된 split
 artifact는 downstream 학습에서 재사용하며 학습 Pod 내부에서 다시 만들지 않는다.
 
-## 6. 구현 체크리스트 목표 초안
+## 6. 현행 작업 추적
 
-### A. API 계약
-
-- [ ] `/api/chat` 요청/응답 필드 확정: `message`, `conversationId`, `response`, `model`, `cacheHit`, `latency`.
-- [ ] 내부 로그 필드 확정: request id, cache similarity, routed tier, model, token usage, estimated cost, error code.
-- [ ] 에스컬레이션 API 초안 작성: 원 질문, 이전 응답 id, 이전 모델, 요청 상위 모델, 최종 만족 여부.
-- [ ] backend/frontend 타입 이름을 `haiku | sonnet | opus` 기준으로 통일한다.
-
-### B. Backend Gateway
-
-- [ ] Anthropic API key 설정 방식을 `application.yml` 또는 환경변수로 정리한다.
-- [ ] `LlmService`를 실제 Claude Messages API 호출로 교체한다.
-- [ ] 모델별 timeout, retry, fallback 정책을 둔다.
-- [ ] `ChatService`에 cache hit/miss, router result, LLM usage 로그를 추가한다.
-- [ ] 통합 테스트용 mock LLM profile을 둔다.
-
-### C. Semantic Cache
-
-- [ ] PostgreSQL + pgvector 로컬 실행 방법을 정한다.
-- [ ] cache table schema를 만든다: question, answer, embedding, model, similarity metadata, hit_count, timestamps.
-- [ ] bge-large-en-v1.5 embedding 생성 위치를 정한다.
-- [ ] cosine similarity 기반 top-k 검색을 구현한다.
-- [ ] MVP 임계값을 0.80으로 시작하고 설정값으로 분리한다.
-- [ ] cache put/update 경로를 구현한다.
-
-### D. Router Serving
-
-- [ ] Spring Gateway와 FastAPI 라우터 간 요청/응답 스키마를 정한다.
-- [ ] MVP용 mock/rule router를 먼저 구현한다.
-- [ ] ModernBERT inference endpoint를 같은 스키마로 교체 가능하게 만든다.
-- [ ] 라우터 장애 시 기본 모델 fallback을 정한다.
-- [ ] tier와 Claude model mapping을 문서화한다.
-
-### E. ML/Data
-
-- [x] RouterBench 샘플 스키마를 확인한다.
-- [x] 0-shot/5-shot canonicalization과 query text 추출을 구현한다.
-- [x] 데이터셋별 performance 및 모델 capability를 계산하고 `model_tiers.json`을 생성한다.
-- [x] solve rate와 cheapest-correct tier 계산 스크립트를 만든다.
-- [x] tier consensus 기반 easy/medium/hard 라벨링과 confidence/reason 산출을 구현한다.
-- [x] 라벨 산출물을 Parquet과 metric JSON으로 저장하고 버전을 추적한다.
-- [x] `sample_id` group 및 난이도×도메인 stratified split을 구현한다.
-- [x] ModernBERT base Colab CUDA fine-tuning smoke test를 만든다.
-- [ ] 클래스·도메인별 Claude 샘플 검증으로 프록시 라벨을 보정한다.
-- [x] RouterArena 전용 전처리기와 평가 projection을 만든다.
-- [x] RouterArena checkpoint 추론·라벨 비교 평가기를 만든다.
-- [ ] 예측 easy/medium/hard 집단별 RouterArena 라벨 count·비율과 정규화
-  히트맵/누적 막대그래프를 생성한다.
-- [ ] 실제 checkpoint로 RouterArena 평가를 실행하고 QQP 평가 스크립트를 만든다.
-
-### F. Kubeflow/MLOps
-
-- [ ] KFP skeleton을 만든다: ingest -> canonicalize -> relabel -> train -> evaluate -> upload.
-- [ ] CPU 라벨링 컴포넌트와 GPU ModernBERT 학습 컴포넌트를 분리한다.
-- [x] Colab smoke와 GKE 학습이 동일한 CLI/config/schema를 사용하도록 만든다.
-- [x] Docker·Colab·로컬의 핵심 학습 dependency 계약을 고정하고 자동 검증한다.
-- [x] GPU 학습 image에서 CPU 라벨링·평가 CLI를 제외한다.
-- [ ] GCS artifact path 규칙을 정한다.
-- [ ] model version, data version, metric json 저장 형식을 정한다.
-- [ ] 배포 게이트 조건을 정한다.
-- [ ] 에스컬레이션 정정 라벨 누적 N 기준을 실험값으로 남긴다.
-
-### G. Frontend
-
-- [ ] 백엔드 오류 상태를 사용자에게 안정적으로 표시한다.
-- [ ] 모델 badge가 `haiku`, `sonnet`, `opus`, `cache` 상태를 명확히 보여준다.
-- [ ] latency/cache hit 표시가 실제 응답 메타데이터와 연결되어 있다.
-- [ ] 에스컬레이션 버튼의 위치와 disabled 조건을 정한다.
-- [ ] 데모용 대화 초기화/재시도 흐름을 정리한다.
-
-### H. 배포/운영
-
-- [ ] 로컬 `docker-compose` 대상 서비스를 정한다.
-- [ ] GCE Gateway/pgvector 배포 절차 초안을 만든다.
-- [ ] FastAPI Router GCE 배포 절차 초안을 만든다.
-- [ ] Cloud Run Frontend 배포 절차 초안을 만든다.
-- [ ] Anthropic/GCP 비용 제한과 budget alert를 설정한다.
+이 절에 있던 구현 체크리스트는 2026-07 시점의 초안이라 현재 코드와 크게 달라졌다.
+ML 진행 상태와 온라인 팀 협의 agenda는
+`docs/ml-training-evaluation-workstream-checklist.md`로 통합했다. 팀 전체의 frontend,
+backend와 배포 일정은 GitHub issue/milestone에서 관리한다.
 
 ## 7. MVP 완료 기준
 

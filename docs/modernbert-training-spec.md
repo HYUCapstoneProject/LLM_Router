@@ -121,27 +121,19 @@ lock을 사용한다. CUDA 유무와 build suffix만 장치에 따라 다르다.
 runtime을 계약과 비교하고 하나라도 다르면 model download 전에 실패한다. 통과한 버전은
 `metrics.json.runtime`에 저장한다.
 
-## 6. smoke 완료 기준
+## 6. smoke 검증 계약
 
-- [x] base model identifier와 immutable revision을 config에 고정한다.
-- [x] `easy=0`, `medium=1`, `hard=2` 라벨 계약을 코드와 config에 고정한다.
-- [x] tokenizer max length와 truncation을 config로 분리한다.
-- [x] RouterBench `sample_weight`가 cross-entropy loss에 반영된다.
-- [x] seed, batch, learning rate, weight decay, warmup과 최대 step을 기록한다.
-- [x] 실제 100행 artifact에서 CUDA forward/backward를 수행한다.
-- [x] validation accuracy, macro-F1과 loss를 생성한다.
-- [x] model/tokenizer를 Hugging Face checkpoint로 저장한다.
-- [x] 저장한 checkpoint를 재로딩해 동일 라벨 계약과 추론을 확인한다.
+smoke는 immutable base revision, `easy=0/medium=1/hard=2`, tokenizer 설정,
+sample-weighted loss와 학습 hyperparameter 기록을 검사한다. 실제 100행에서 CUDA
+forward/backward, validation metric, checkpoint 저장과 재로딩이 모두 성공해야 한다.
+진행 상태는 `docs/ml-training-evaluation-workstream-checklist.md`에서만 관리한다.
 
 ## 7. Kubeflow component
 
-- [x] Dataset/config 입력과 Model 출력 Artifact를 선언한다.
-- [x] GPU 1개, CPU와 memory request/limit을 IR에 기록한다.
-- [x] retry 2회와 task cache를 설정한다.
-- [x] GCS URI Importer를 사용하는 단일 학습 pipeline을 컴파일한다.
-- [ ] GCS pipeline root와 실제 MLMD model/data/execution 계보를 검증한다.
-- [ ] T4 node selector, taint/toleration과 task timeout을 클러스터 설정에 맞춘다.
-- [ ] Spot 중단 시 checkpoint resume 정책을 구현한다.
+학습 component는 Dataset/config 입력, Model 출력, GPU 1개, CPU·memory request/limit,
+retry 2회와 task cache를 선언한다. GCS URI Importer를 사용하는 pipeline IR은 컴파일돼
+있다. 실제 MLMD 계보, node selector, taint/toleration, timeout과 Spot resume는 cluster
+설정 뒤 검증한다. 체크 상태는 총괄 문서에서만 관리한다.
 
 이 항목들은 공통 학습 코어를 변경하는 이유가 아니다. 동일 CLI를 container entrypoint로
 호출하는 방식으로 추가한다.

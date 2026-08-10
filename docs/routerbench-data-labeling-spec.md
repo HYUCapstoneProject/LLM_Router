@@ -278,52 +278,10 @@ ml/artifacts/routerbench-training/
 - 클래스, eval, confidence, reason 분포가 `metrics.json`에 기록된다.
 - 원본 Pickle과 생성 artifact는 Git 추적 대상이 아니다.
 
-## 9. 실행 체크리스트
+## 9. 진행 상태 관리
 
-### A. 명세와 안전성
-
-- [x] 라벨 의미와 3-class 판정식을 문서화한다.
-- [x] 공식 파일 URL, 크기, checksum을 고정한다.
-- [x] Pickle 신뢰 경계를 명시한다.
-- [x] smoke 승인 기준을 정한다.
-
-### B. 구현
-
-- [x] Python ML 패키지와 의존성 파일을 추가한다.
-- [x] checksum 검증 및 중단 재개 downloader를 구현한다.
-- [x] wide schema/model column detector를 구현한다.
-- [x] 0-shot/5-shot canonicalizer와 target query extractor를 구현한다.
-- [x] capability tier calibration을 구현한다.
-- [x] tier-consensus labeler와 confidence 산정을 구현한다.
-- [x] Parquet/JSON writer를 구현한다.
-- [x] synthetic unit test를 작성한다.
-- [x] benchmark wrapper 정제와 `model_input_text` 생성을 구현한다.
-- [x] exact/near duplicate grouping과 group-aware split을 구현한다.
-- [x] confidence weight/filter와 학습 projection 분리를 구현한다.
-- [x] 전처리 CLI와 synthetic unit test를 작성한다.
-
-### C. 100행 smoke
-
-- [x] 공식 0-shot/5-shot 파일을 다운로드하고 checksum을 확인한다.
-- [x] 실제 eval/model/schema 분포를 확인한다.
-- [x] 고정 seed로 100행을 라벨링한다.
-- [x] smoke 승인 검사를 통과한다.
-- [x] 분포와 이상치를 검토하고 이 문서에 결과를 기록한다.
-
-### D. 전체 데이터와 다음 단계
-
-- [x] smoke 전용이 아닌 전체 데이터 라벨링 CLI와 versioned 출력 경로를 추가한다.
-- [x] 전체 데이터의 현재 threshold 기준 라벨 분포를 계산하고 검토한다.
-- [ ] continuous threshold sensitivity를 계산한다.
-- [x] domain/label을 고려한 train/validation/test group split을 구현한다.
-- [x] 전체 라벨 산출물에 전처리를 실행하고 split 분포를 승인한다.
-- [ ] eval별 acceptance threshold override와 최종 threshold를 확정한다.
-- [ ] `model_tiers.json`에 생성 코드 commit을 기록한다.
-- [ ] 전체 split의 크기·라벨·도메인 편차에 대한 자동 승인 기준을 추가한다.
-- [ ] 확정 tokenizer로 길이/truncation 통계와 긴 입력 보존 검사를 실행한다.
-- [x] ModernBERT Colab CUDA training smoke test를 수행한다.
-- [ ] Claude Haiku/Sonnet/Opus 표본 검증으로 프록시 라벨을 보정한다.
-- [ ] 동일 config로 GCS/Kubeflow/GKE 학습 파이프라인을 연결한다.
+이 문서는 라벨 판정식과 전처리 근거만 관리한다. 완료 상태와 남은 작업은
+`docs/ml-training-evaluation-workstream-checklist.md`의 단일 체크리스트에서 관리한다.
 
 ## 10. 미확정 사항
 

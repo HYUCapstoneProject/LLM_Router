@@ -170,22 +170,7 @@ PyTorch는 CPU/CUDA 이미지별 배포 방식이 달라 기본 전처리 의존
 - 현재 배포 모델과 후보 모델 metric 비교
 - 승인된 gate 기준에 따른 배포 또는 보류
 
-## 8. 현재 검증 상태와 남은 결정
+## 8. 진행 상태 관리
 
-- [x] Hugging Face 3-class checkpoint predictor를 구현했다.
-- [x] label mapping 검증을 구현했다.
-- [x] accuracy/macro-F1/confusion matrix를 구현했다.
-- [x] under/over/severe under-routing metric을 구현했다.
-- [x] domain/source dataset별 metric을 구현했다.
-- [x] prediction/metric/model-info artifact writer를 구현했다.
-- [x] synthetic predictor 기반 단위·통합 테스트를 통과했다.
-- [x] 공식 공개 라벨을 별도 변환 없이 `easy/medium/hard`로 비교하기로 확정했다.
-- [x] 예측 그룹별 RouterArena 라벨 count/비율과 전체 분포 대비 차이를 metric으로
-  생성한다.
-- [x] 100% 누적 막대그래프와 행 정규화 3×3 히트맵을 SVG artifact로 생성한다.
-- [x] evaluation semantics를 `routerarena-three-class-alignment`로 확정하고
-  RouterArena 라벨을 `routerarena_label`로 명시한다.
-- [ ] 실제 RouterBench checkpoint 경로를 확정한다.
-- [ ] 실제 checkpoint의 `id2label`을 확인한다.
-- [ ] T4 기준 batch size/max length를 smoke로 확정한다.
-- [ ] 후보 모델과 기존 모델을 비교할 deploy gate 임계값을 확정한다.
+이 문서는 평가 metric의 의미와 artifact 계약만 관리한다. 완료 상태와 남은 작업은
+`docs/ml-training-evaluation-workstream-checklist.md`의 단일 체크리스트에서 관리한다.

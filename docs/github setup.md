@@ -49,7 +49,7 @@
 | ---: | --- | --- | --- | --- | --- |
 | #1 | GCP/T4 quota와 budget alert 준비 | LLM Router Delivery | M1 Infra/Data Ready | `area:infra`, `priority:p0` | https://github.com/HYUCapstoneProject/LLM_Router/issues/1 |
 | #2 | RouterBench easy/medium/hard 재라벨링 구현 | LLM Router Experiments | M2 Router v0 | `area:ml-training`, `priority:p0` | https://github.com/HYUCapstoneProject/LLM_Router/issues/2 |
-| #3 | RouterBench/RouterArena/QQP 접근 및 샘플 스키마 검증 | LLM Router Experiments | M1 Infra/Data Ready | `area:ml-training`, `priority:p0` | https://github.com/HYUCapstoneProject/LLM_Router/issues/3 |
+| #3 | RouterBench/RouterArena 접근 및 샘플 스키마 검증. QQP는 cache 담당에서 별도 관리 | LLM Router Experiments | M1 Infra/Data Ready | `area:ml-training`, `priority:p0` | https://github.com/HYUCapstoneProject/LLM_Router/issues/3 |
 | #4 | KFP skeleton과 GCS artifact 경로 설계 | LLM Router Delivery | M1 Infra/Data Ready | `area:kubeflow`, `priority:p0` | https://github.com/HYUCapstoneProject/LLM_Router/issues/4 |
 | #5 | ModernBERT base baseline 학습 | LLM Router Experiments | M2 Router v0 | `area:ml-training`, `area:evaluation`, `priority:p0` | https://github.com/HYUCapstoneProject/LLM_Router/issues/5 |
 | #6 | 라우터 평가 및 cutoff 민감도 분석 | LLM Router Experiments | M2 Router v0 | `area:ml-training`, `area:evaluation`, `priority:p1` | https://github.com/HYUCapstoneProject/LLM_Router/issues/6 |

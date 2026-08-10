@@ -1,6 +1,6 @@
 # RouterBench Labeling
 
-RouterBench 0-shot/5-shot 배포본을 검증하고, 최소 충분 모델 성능 티어 기준으로 `easy`, `medium`, `hard` 라벨을 생성한다. 상세 계약과 체크리스트는 `docs/routerbench-data-labeling-spec.md`를 따른다.
+RouterBench 0-shot/5-shot 배포본을 검증하고, 최소 충분 모델 성능 티어 기준으로 `easy`, `medium`, `hard` 라벨을 생성한다. 라벨 판정 근거는 `docs/routerbench-data-labeling-spec.md`, 현행 ML 구조와 단일 체크리스트는 `docs/ml-training-evaluation-workstream-checklist.md`를 따른다.
 
 ## 소스 구조
 
