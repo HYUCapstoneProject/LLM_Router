@@ -126,7 +126,7 @@ runtime을 계약과 비교하고 하나라도 다르면 model download 전에 �
 smoke는 immutable base revision, `easy=0/medium=1/hard=2`, tokenizer 설정,
 sample-weighted loss와 학습 hyperparameter 기록을 검사한다. 실제 100행에서 CUDA
 forward/backward, validation metric, checkpoint 저장과 재로딩이 모두 성공해야 한다.
-진행 상태는 `docs/ml-training-evaluation-workstream-checklist.md`에서만 관리한다.
+진행 상태는 `docs/ml/workstream-checklist.md`에서만 관리한다.
 
 ## 7. Kubeflow component
 

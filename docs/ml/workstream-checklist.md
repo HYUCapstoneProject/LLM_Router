@@ -10,15 +10,20 @@
 
 ## 1. 문서 목적과 관리 원칙
 
-이 문서는 다음 세 가지를 한 곳에서 관리한다.
+이 문서는 다음 세 가지의 현행 구조와 진행 상태를 한 곳에서 관리한다.
 
 1. 현재 `ml/` 코드의 구조, 역할, 입출력과 실행 흐름
-2. Spring/API·Gateway·DB 담당자와 합의해야 하는 온라인↔ML 계약
+2. Spring/API·Gateway·DB 및 인프라 담당자와 맞닿는 책임 경계
 3. 로컬 작업부터 GCS·GCP·GKE 학습과 모델 승격까지의 단일 체크리스트
 
 ML 작업 상태를 나타내는 체크박스는 **이 문서에만 둔다**. RouterBench, RouterArena,
 ModernBERT 세부 명세는 설계 근거와 데이터 규칙을 설명하는 참고 문서이며 진행 상태를
 관리하지 않는다. 과거 MVP 문서의 체크리스트도 현행 ML 상태로 해석하지 않는다.
+
+팀 회의에서 값을 확정할 계약과 인프라 항목은
+`docs/ml/backend-infrastructure-agreement.md`, 개발 중 질문과 선택 근거는
+`docs/ml/development-questions-and-decisions.md`에 별도로 기록한다. 두 문서는 설명과
+결정 기록이며 작업 체크박스는 두지 않는다.
 
 체크 표시는 다음 뜻이다.
 
@@ -393,56 +398,21 @@ node selector, taint/toleration과 Spot 정책은 cluster를 확인한 뒤 확�
 컴파일한다. 현재는 로컬 compile test까지만 통과했으며 실제 Kubeflow backend 제출,
 GCS Artifact 전달과 MLMD 계보는 아직 검증하지 않았다.
 
-## 9. 백엔드 팀 회의에서 합의할 사항
+## 9. 팀 협의 문서
 
-아래 표를 회의 agenda와 결정 기록으로 사용한다. 각 행은 결정값, 담당자와 반영할
-contract fixture까지 확정해야 완료다.
+백엔드·온라인 계약과 GCP/GKE 인프라 결정은
+`docs/ml/backend-infrastructure-agreement.md`에서 관리한다. 해당 문서는 다음 내용을
+회의 단위로 분리한다.
 
-### 9-1. 반드시 합의해야 하는 항목
+- MVP·졸업프로젝트 개요와 현행 ML 설계의 충돌 및 문서 정정 기준
+- Router API, 실제 Claude mapping, timeout/fallback과 idempotency
+- feedback export 보증 범위, 학습 라벨 채택, trigger N과 실행 주체
+- model package, deploy gate, 승인·serving 전환·health check·rollback
+- 공통 관측성과 최종 실험 결과 결합 방식
+- project, region, GCS, Artifact Registry, GKE/Kubeflow, IAM과 비용
 
-| 주제 | 회의에서 결정할 질문 | 현재 ML 제안 | 결정 후 반영 위치 |
-| --- | --- | --- | --- |
-| 공통 label | API가 `easy/medium/hard`를 그대로 쓸지, Spring에서 `LIGHT/MEDIUM/HEAVY`로 바꿀지 | 경계에서는 `easy/medium/hard` 유지 | API fixture, Spring enum/adapter |
-| 실제 모델 mapping | 각 label이 어느 Claude model ID를 가리키는가 | easy→Haiku, medium→Sonnet, hard→Opus | 온라인 설정 한 곳 |
-| 라우터 장애 | timeout, 연결 실패, unknown label일 때 어느 모델로 보낼 것인가 | 품질 보호를 위한 상위 tier fallback 권장 | Spring/FastAPI contract test |
-| API idempotency | 같은 `request_id` 재시도를 어떻게 처리할 것인가 | request 추적 ID 유지 | 요청/응답 schema와 로그 |
-| feedback export | DB를 누가 언제 Parquet+manifest로 export하는가 | 온라인 exporter가 versioned batch 생성 | exporter와 v0.1 fixture |
-| feedback 필드 | manifest/event 필수·선택 필드와 enum은 무엇인가 | 6-4의 v0.1 제안 | adapter config/test fixture |
-| PII·retention | 비식별 처리 주체, 재검사, 보관·삭제 기간은? | 온라인 1차 제거, ML 2차 격리 | 운영 정책과 validator |
-| 정정 라벨 | 최종 만족 tier를 언제 정답으로 채택하고 충돌을 어떻게 처리할까 | 만족+실제 escalation+엄격한 tier 상승 | preprocessing config |
-| sample weight | 반복 횟수와 source별 weight·RouterBench 혼합 비율은? | 1.0 + 반복당 0.25, 최대 2.0은 실험값 | versioned config |
-| 재학습 trigger | 온라인 scheduler와 ML scheduler 중 누가 시작하며 N/주기는? | 준비된 manifest 기반 idempotent 실행 | trigger contract |
-| 모델 승격 | gate 통과 후 누가 candidate를 approved로 바꾸는가 | ML gate 후 별도 승인 단계 | GCS prefix/manifest 정책 |
-| 모델 적용 | 온라인이 새 package를 어떻게 받아 health check·교체·rollback하는가 | 이전 approved version 보존 | serving runbook |
-| 관측성 | 양쪽에서 공유할 request/model/data version과 metric은? | 공통 request ID와 model version 필수 | 로그·dashboard schema |
-| QQP/cache | QQP와 threshold가 ML DAG 밖이라는 데 동의하는가 | 온라인 cache 팀 전담 | 온라인 cache 문서 |
-
-### 9-2. 회의에서 전달할 ML 측 준비물
-
-- `feedback-export-v0.1` 합성 manifest와 event fixture
-- feedback validator·dedup·merge 동작과 제외 사유 예시
-- `model-package-v1` 필드와 SHA-256 검증 결과 예시
-- Router API 요청/응답 최소 제안
-- 초기학습·재학습 pipeline DAG와 image/Pod 자원 표
-- 현재 cloud project 실측과 생성이 필요한 resource 목록
-
-### 9-3. 회의 결과로 받아야 하는 산출물
-
-- 합의된 feedback manifest/event fixture 한 세트
-- 확정된 Router API fixture와 label/model mapping
-- timeout/fallback/rollback 정책
-- 재학습 trigger 주체와 첫 실험용 threshold
-- GCS prefix 접근 주체와 승인 모델 적용 방식
-- 결정자·결정일·schema version이 표시된 회의 기록
-
-### 9-4. 계약 변경 규칙
-
-- 필드 의미·타입·필수 여부가 호환되지 않게 바뀌면 `schema_version`을 올린다.
-- 이미 export된 batch를 재현할 수 있도록 기존 version adapter를 즉시 삭제하지 않는다.
-- 계약 변경 PR에는 manifest/event/API fixture와 양쪽 contract test를 함께 갱신한다.
-- 합의되지 않은 DB table, bucket, namespace, service account, 실제 model ID를 ML core에
-  고정하지 않는다.
-- 회의 제안값과 운영 승인값을 구분하고, 운영값에는 결정자·결정일·근거 실험을 남긴다.
+회의 결과로 확정된 schema/config/fixture는 코드와 contract test에 반영하고, 완료 여부는
+이 문서 11장의 체크리스트에서만 갱신한다.
 
 ## 10. GCP·GCS·GKE 착수 전 상태
 
@@ -499,13 +469,14 @@ gs://<bucket>/pipeline-root/
 - [x] 전체 ML 단위·계약·compile test 56개를 통과했다.
 - [x] QQP ML 요소를 제거하고 온라인 cache 책임으로 문서화했다.
 
-### C. 백엔드 회의 전 문서 검토
+### C. 백엔드·인프라 협의 전 문서 검토
 
 - [x] ML 코드 구조·역할·artifact·pipeline을 이 문서에 통합했다.
 - [x] 흩어진 ML 체크리스트를 이 문서 하나로 통합했다.
-- [x] 백엔드 협의 agenda와 필요한 산출물을 정리했다.
+- [x] 백엔드·인프라 협의 명세와 필요한 산출물을 별도 문서로 정리했다.
 - [ ] 사용자가 이 문서의 구조·책임 경계·미구현 항목을 검토한다.
-- [ ] 백엔드 팀에 9장의 agenda와 fixture를 전달한다.
+- [ ] MVP·졸업프로젝트 개요와 현행 ML 설계의 충돌별 채택 기준을 팀이 확정한다.
+- [ ] 백엔드·인프라 담당자에게 협의 명세와 fixture를 전달한다.
 - [ ] 회의 결과를 이 문서와 contract fixture에 반영한다.
 
 ### D. 현재 코드에서 남은 구현·실험
@@ -519,7 +490,7 @@ gs://<bucket>/pipeline-root/
 - [ ] 통과 후보를 `approved/`로 승격하는 주체·코드·감사 기록을 확정한다.
 - [ ] package directory만 받는 온라인용 reference predictor/contract fixture를 제공한다.
 - [ ] Claude Haiku/Sonnet/Opus 표본으로 RouterBench proxy 라벨을 검증한다.
-- [ ] continuous threshold와 RAG 포함 여부 sensitivity를 실행한다.
+- [ ] continuous threshold와 RouterBench RAG eval-family 포함 여부 sensitivity를 실행한다.
 
 ### E. GCP/GCS/GKE 설정 전 결정
 
@@ -586,9 +557,11 @@ gs://<bucket>/pipeline-root/
 아래 문서는 진행 체크리스트가 아니라 설계 근거와 실행 세부사항이다.
 
 - `docs/졸업프로젝트 개요.md`: 전체 프로젝트 기준과 역할 축
-- `docs/routerbench-data-labeling-spec.md`: 라벨링 판정식·전처리 근거
-- `docs/routerarena-evaluation-preprocessing-spec.md`: RouterArena 입력·제외 규칙
-- `docs/routerarena-routing-evaluation-spec.md`: 평가 metric 의미
-- `docs/modernbert-training-spec.md`: 학습·runtime 설계 근거
+- `docs/ml/routerbench-data-labeling-spec.md`: 라벨링 판정식·전처리 근거
+- `docs/ml/routerarena-evaluation-preprocessing-spec.md`: RouterArena 입력·제외 규칙
+- `docs/ml/routerarena-routing-evaluation-spec.md`: 평가 metric 의미
+- `docs/ml/modernbert-training-spec.md`: 학습·runtime 설계 근거
+- `docs/ml/backend-infrastructure-agreement.md`: 백엔드·온라인·인프라 회의 안건과 계약
+- `docs/ml/development-questions-and-decisions.md`: 개발 질문, 선택 근거와 미해결 고민
 - `docs/mvp-scope-and-checklist.md`: 2026-07 시점의 프로젝트 범위 초안
 - `ml/README.md`: 실제 로컬 CLI와 Docker 실행 명령

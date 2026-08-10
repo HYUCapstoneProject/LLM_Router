@@ -1,6 +1,6 @@
 # RouterBench Labeling
 
-RouterBench 0-shot/5-shot 배포본을 검증하고, 최소 충분 모델 성능 티어 기준으로 `easy`, `medium`, `hard` 라벨을 생성한다. 라벨 판정 근거는 `docs/routerbench-data-labeling-spec.md`, 현행 ML 구조와 단일 체크리스트는 `docs/ml-training-evaluation-workstream-checklist.md`를 따른다.
+RouterBench 0-shot/5-shot 배포본을 검증하고, 최소 충분 모델 성능 티어 기준으로 `easy`, `medium`, `hard` 라벨을 생성한다. 라벨 판정 근거는 `docs/ml/routerbench-data-labeling-spec.md`, 현행 ML 구조와 단일 체크리스트는 `docs/ml/workstream-checklist.md`를 따른다.
 
 ## 소스 구조
 
@@ -138,7 +138,7 @@ truncation은 모델 tokenizer가 확정되는 학습 컴포넌트에서 수행�
 
 로컬과 향후 Kubeflow component는 같은 `modernbert-train` CLI를 사용한다. 차이는
 데이터·출력 경로와 device/resource config뿐이다. 설계 근거와 계약은
-`docs/modernbert-training-spec.md`에 기록한다.
+`docs/ml/modernbert-training-spec.md`에 기록한다.
 
 ```bash
 python3.12 -m venv .venv-training
@@ -393,7 +393,7 @@ RouterArena는 RouterBench 학습 데이터와 합치지 않고 일반화·강�
 
 `evaluation.parquet`에는 모델 입력, 난이도 정답과 평가 식별자만 들어간다. 원문
 context/question/options/answer, 제외 사유와 robustness 원 질문은 `metadata.parquet`에
-분리한다. 상세 계약은 `docs/routerarena-evaluation-preprocessing-spec.md`를 따른다.
+분리한다. 상세 계약은 `docs/ml/routerarena-evaluation-preprocessing-spec.md`를 따른다.
 
 ## RouterArena routing 평가
 
@@ -415,7 +415,7 @@ confusion matrix, under/over-routing, domain/source dataset별 결과와 truncat
 기록한다. 또한 예측 easy/medium/hard 그룹별 RouterArena 공식 라벨 count·비율·전체
 분포 대비 %p 차이와 `predicted_group_distribution.svg`,
 `predicted_group_heatmap.svg`를 자동 생성한다. 상세 계약은
-`docs/routerarena-routing-evaluation-spec.md`를 따른다.
+`docs/ml/routerarena-routing-evaluation-spec.md`를 따른다.
 
 ## 모델 패키지와 deploy gate
 

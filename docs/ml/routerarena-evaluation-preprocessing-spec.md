@@ -154,7 +154,7 @@ RouterArena 전처리는 RouterBench 학습 전처리 component와 별도 compon
 ## 8. 진행 상태 관리
 
 이 문서는 RouterArena 입력·제외·projection 규칙만 관리한다. 완료 상태와 남은 작업은
-`docs/ml-training-evaluation-workstream-checklist.md`의 단일 체크리스트에서 관리한다.
+`docs/ml/workstream-checklist.md`의 단일 체크리스트에서 관리한다.
 
 ## 9. 실제 전처리 결과
 

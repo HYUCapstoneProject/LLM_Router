@@ -173,4 +173,4 @@ PyTorch는 CPU/CUDA 이미지별 배포 방식이 달라 기본 전처리 의존
 ## 8. 진행 상태 관리
 
 이 문서는 평가 metric의 의미와 artifact 계약만 관리한다. 완료 상태와 남은 작업은
-`docs/ml-training-evaluation-workstream-checklist.md`의 단일 체크리스트에서 관리한다.
+`docs/ml/workstream-checklist.md`의 단일 체크리스트에서 관리한다.

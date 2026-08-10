@@ -281,7 +281,7 @@ ml/artifacts/routerbench-training/
 ## 9. 진행 상태 관리
 
 이 문서는 라벨 판정식과 전처리 근거만 관리한다. 완료 상태와 남은 작업은
-`docs/ml-training-evaluation-workstream-checklist.md`의 단일 체크리스트에서 관리한다.
+`docs/ml/workstream-checklist.md`의 단일 체크리스트에서 관리한다.
 
 ## 10. 미확정 사항
 

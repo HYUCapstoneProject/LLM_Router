@@ -4,7 +4,7 @@
 
 이 문서는 2026-07-08 당시 stub 상태를 기준으로 MVP와 최종 목표를 구분한 과거 범위
 초안이다. 현행 ML 구조, 백엔드 협의 사항과 작업 상태는
-`docs/ml-training-evaluation-workstream-checklist.md`를 유일한 기준으로 사용한다.
+`docs/ml/workstream-checklist.md`를 유일한 기준으로 사용한다.
 상세 일정은 `docs/timeline.md`, 배경 설계는 `docs/졸업프로젝트 개요.md`를 기준으로 한다.
 
 ## 1. 현재 stub 목록
@@ -232,7 +232,7 @@ artifact는 downstream 학습에서 재사용하며 학습 Pod 내부에서 다�
 
 이 절에 있던 구현 체크리스트는 2026-07 시점의 초안이라 현재 코드와 크게 달라졌다.
 ML 진행 상태와 온라인 팀 협의 agenda는
-`docs/ml-training-evaluation-workstream-checklist.md`로 통합했다. 팀 전체의 frontend,
+`docs/ml/workstream-checklist.md`로 통합했다. 팀 전체의 frontend,
 backend와 배포 일정은 GitHub issue/milestone에서 관리한다.
 
 ## 7. MVP 완료 기준
