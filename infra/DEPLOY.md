@@ -108,13 +108,19 @@ docker exec -i llmrouter-postgres psql -U llmrouter -d llmrouter < 01-schema.sql
 # 게이트웨이
 docker run -d --name llm-gateway --restart unless-stopped \
   --network host \
+  -e SPRING_PROFILES_ACTIVE=prod \
   -e ANTHROPIC_API_KEY=<KEY> \
   -e POSTGRES_PASSWORD=<DB_PASSWORD> \
   -e GATEWAY_KEY=<공유 시크릿> \
   $REPO/gateway:v1
 ```
 
-> `GATEWAY_KEY` 를 빼먹으면 검증이 비활성화되어 8080 이 무방비로 열린다.
+> `SPRING_PROFILES_ACTIVE=prod` 를 반드시 넣는다.
+> 이 프로파일에서 `GATEWAY_KEY` 가 비어 있으면 **기동 자체가 실패한다.**
+> 키 미설정은 "검증 통과"로 동작하므로(fail-open), 이 장치가 없으면
+> 환경변수를 빠뜨렸을 때 경고 없이 8080 이 무방비로 열린다.
+>
+> 컨테이너가 바로 죽는다면 `docker logs llm-gateway` 로 확인할 것.
 
 ### 2-5. 확인
 
@@ -149,9 +155,11 @@ gcloud run deploy llm-router-frontend \
 
 - [ ] Cloud Run URL 접속 → 채팅 UI 표시
 - [ ] 질문 전송 → 답변 + 모델 배지 + 토큰 표시
+- [ ] 같은 질문 재전송 → 캐시 히트 (토큰 0, 지연시간 급감)
 - [ ] VM 8080 직접 호출 → 401
 - [ ] 빠르게 연속 요청 → 429 (nginx rate limit, 20r/m)
 - [ ] `request_log` 에 행이 쌓이는지 확인
+- [ ] `GATEWAY_KEY` 없이 기동 시도 → 컨테이너가 죽는지 확인 (fail-fast 동작 검증)
 
 ---
 
