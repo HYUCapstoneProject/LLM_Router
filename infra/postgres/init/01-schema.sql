@@ -1,0 +1,126 @@
+-- LLM Router 스키마 (로컬 개발용 초기화)
+-- 컨테이너의 데이터 볼륨이 비어 있을 때 1회만 실행된다.
+
+CREATE EXTENSION IF NOT EXISTS vector;
+
+-- ─────────────────────────────────────────────────────────────
+-- 1. 시맨틱 캐시
+-- ─────────────────────────────────────────────────────────────
+CREATE TABLE cache_entry (
+    id                  BIGSERIAL PRIMARY KEY,
+    question            TEXT         NOT NULL,
+    embedding           vector(1024) NOT NULL,
+    response            TEXT         NOT NULL,
+
+    -- 이 답을 처음 만들 때 쓴 티어/모델. 캐시 히트 시 비용은 0이지만
+    -- 어느 모델의 답이 재사용되는지는 캐시 품질 분석에 필요하다.
+    tier                VARCHAR(10)  NOT NULL,   -- easy | medium | hard
+    model_id            VARCHAR(64)  NOT NULL,   -- claude-sonnet-4-6
+
+    -- 임베딩 모델을 교체하면 기존 벡터와 비교가 불가능하므로 버전을 남긴다.
+    embed_model_version VARCHAR(64)  NOT NULL,
+
+    -- 이 항목을 재사용하기 위해 요구하는 최소 유사도.
+    -- 저장 시점에 이 항목의 tier 로부터 결정된다(application.yml).
+    --
+    -- 왜 항목별로 두는가:
+    --   들어온 질문의 tier 는 캐시 조회 시점에 아직 없다.
+    --   classify 는 cache miss 일 때만 호출하기 때문이다.
+    --   대신 "이 캐시 항목이 어떤 난이도의 답인가"를 기준으로 삼는다 —
+    --   hard 질문의 답은 재사용에 더 높은 유사도를 요구한다.
+    --
+    -- 초기값은 전 티어 동일(= 고정 임계값)이며,
+    -- EXP-003 에서 QQP 로 티어별 곡선을 측정한 뒤 값을 벌린다.
+    threshold           REAL         NOT NULL DEFAULT 0.80,
+
+    hit_count           INTEGER      NOT NULL DEFAULT 0,
+    created_at          TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_at          TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+
+-- 코사인 거리 기준 ANN 인덱스.
+-- FastAPI 가 L2 정규화된 벡터를 반환한다는 전제이며(04 API Contract),
+-- 그 경우 `유사도 = 1 - (a <=> b)` 가 그대로 성립한다.
+CREATE INDEX idx_cache_entry_embedding
+    ON cache_entry USING hnsw (embedding vector_cosine_ops);
+
+-- 조회 쿼리 형태 (Gateway 가 이 모양으로 질의한다):
+--
+--   SELECT * FROM (
+--       SELECT *, 1 - (embedding <=> $1) AS similarity
+--       FROM cache_entry
+--       ORDER BY embedding <=> $1     -- 여기서 HNSW 인덱스 사용
+--       LIMIT 5
+--   ) t
+--   WHERE t.similarity >= t.threshold  -- 항목별 임계값은 바깥에서 적용
+--   ORDER BY t.similarity DESC
+--   LIMIT 1;
+--
+-- threshold 를 안쪽 WHERE 에 직접 걸면 인덱스를 타지 못하고 전수 스캔이 된다.
+
+-- ─────────────────────────────────────────────────────────────
+-- 2. 요청 로그  ← 비용 그래프의 원천 데이터
+-- ─────────────────────────────────────────────────────────────
+-- 최종 보고서 필수 그림 "Router vs always-Opus 비용/정확도"를 그리려면
+-- 요청 단위 토큰이 집계 가능한 형태로 쌓여 있어야 한다.
+-- 콘솔 로그를 나중에 파싱하는 방식은 재현성이 없어 M7 freeze 때 숫자를 다시 못 만든다.
+CREATE TABLE request_log (
+    id                   BIGSERIAL PRIMARY KEY,
+    request_id           UUID         NOT NULL UNIQUE,
+    question             TEXT         NOT NULL,
+
+    tier                 VARCHAR(10),
+    model_id             VARCHAR(64),
+
+    -- 재학습 전후 비교에 필수. 어느 모델 버전이 내린 판정인지 알아야 한다.
+    router_model_version VARCHAR(128),
+    embed_model_version  VARCHAR(64),
+
+    cache_hit            BOOLEAN      NOT NULL,
+    similarity           REAL,                     -- 캐시 조회 시 최고 유사도 (임계값 튜닝용)
+
+    -- 캐시 히트면 0. LLM 호출이 없었으므로 비용도 0이다.
+    input_tokens         INTEGER      NOT NULL DEFAULT 0,
+    output_tokens        INTEGER      NOT NULL DEFAULT 0,
+
+    latency_ms           INTEGER      NOT NULL,
+
+    -- NULL 이면 정상 라우팅. 값이 있으면 FastAPI 장애로 폴백된 요청이므로
+    -- 라우터 정확도 집계에서 제외한다 (04 API Contract / Failure Handling).
+    fallback_reason      VARCHAR(32),
+
+    created_at           TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_request_log_created_at ON request_log (created_at);
+CREATE INDEX idx_request_log_tier       ON request_log (tier);
+CREATE INDEX idx_request_log_cache_hit  ON request_log (cache_hit);
+
+-- ─────────────────────────────────────────────────────────────
+-- 3. 에스컬레이션 로그  ← 재학습의 정정 라벨
+-- ─────────────────────────────────────────────────────────────
+-- 사용자가 만족한 티어가 그 질문의 실제 필요 수준이다 (기획서 4-1).
+-- 이 기록이 N건 이상 쌓이면 Kubeflow 재학습을 트리거한다.
+CREATE TABLE escalation_log (
+    id              BIGSERIAL PRIMARY KEY,
+    request_id      UUID         NOT NULL,
+    question        TEXT         NOT NULL,
+    embedding       vector(1024),
+
+    initial_tier    VARCHAR(10)  NOT NULL,   -- 라우터의 최초 판정
+    escalation_path TEXT[]       NOT NULL,   -- {haiku,sonnet}
+    final_tier      VARCHAR(10)  NOT NULL,   -- 사용자가 만족한 티어 = 정정 라벨
+
+    -- 불만족한 답이 캐시에서 나온 것인가.
+    -- true 면 라우터의 과소 라우팅이 아니라 캐시의 false hit 증거다.
+    -- 두 신호를 섞으면 재학습 라벨이 오염되므로 반드시 구분한다.
+    -- (적응형 임계값 Level 3 의 검증 신호이기도 하다)
+    was_cache_hit   BOOLEAN      NOT NULL DEFAULT false,
+    cache_entry_id  BIGINT       REFERENCES cache_entry(id) ON DELETE SET NULL,
+    similarity      REAL,                    -- 그때 매칭된 유사도
+
+    created_at      TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_escalation_log_created_at ON escalation_log (created_at);
+CREATE INDEX idx_escalation_log_request_id ON escalation_log (request_id);

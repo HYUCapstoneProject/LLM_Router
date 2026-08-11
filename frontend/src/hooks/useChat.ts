@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import type { Conversation, Message } from '../types'
-import { sendMessage } from '../api/chatApi'
+import { ApiError, sendMessage } from '../api/chatApi'
 
 function makeConversation(firstMessage?: string): Conversation {
   const now = Date.now()
@@ -87,17 +87,35 @@ export function useChat() {
           ...c,
           messages: c.messages.map((m) =>
             m.id === assistantMsgId
-              ? { ...m, isStreaming: false, model: meta.model, cacheHit: meta.cacheHit, latency: meta.latency }
+              ? {
+                  ...m,
+                  isStreaming: false,
+                  requestId: meta.requestId,
+                  model: meta.model,
+                  tier: meta.tier,
+                  cacheHit: meta.cacheHit,
+                  inputTokens: meta.inputTokens,
+                  outputTokens: meta.outputTokens,
+                  latency: meta.latency,
+                }
               : m,
           ),
           updatedAt: Date.now(),
         }))
       } catch (err) {
+        // 백엔드가 내려준 메시지를 그대로 보여준다.
+        // "크레딧 소진"과 "네트워크 오류"를 사용자가 구분할 수 있어야 한다.
+        const detail =
+          err instanceof ApiError
+            ? err.message
+            : '서버에 연결할 수 없습니다. 백엔드가 실행 중인지 확인해주세요.'
+        const requestId = err instanceof ApiError ? err.requestId : undefined
+
         updateConversation(activeId, (c) => ({
           ...c,
           messages: c.messages.map((m) =>
             m.id === assistantMsgId
-              ? { ...m, content: '오류가 발생했습니다. 다시 시도해주세요.', isStreaming: false }
+              ? { ...m, content: detail, isStreaming: false, error: true, requestId }
               : m,
           ),
         }))

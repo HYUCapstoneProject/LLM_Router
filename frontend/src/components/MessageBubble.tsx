@@ -25,14 +25,31 @@ export function MessageBubble({ message }: Props) {
           AI
         </div>
         <div>
-          <div className="bg-gray-800 text-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap">
+          <div
+            className={`rounded-2xl rounded-tl-sm px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
+              message.error
+                ? 'bg-red-950 text-red-200 border border-red-800'
+                : 'bg-gray-800 text-gray-100'
+            }`}
+          >
             {message.content}
             {message.isStreaming && (
               <span className="inline-block w-2 h-4 bg-gray-400 ml-0.5 animate-pulse rounded-sm" />
             )}
           </div>
+          {message.error && message.requestId && (
+            <div className="mt-1 text-xs text-gray-600 font-mono">
+              requestId: {message.requestId}
+            </div>
+          )}
           {!message.isStreaming && message.model && (
-            <ModelBadge model={message.model} cacheHit={message.cacheHit} latency={message.latency} />
+            <ModelBadge
+              model={message.model}
+              cacheHit={message.cacheHit}
+              inputTokens={message.inputTokens}
+              outputTokens={message.outputTokens}
+              latency={message.latency}
+            />
           )}
         </div>
       </div>

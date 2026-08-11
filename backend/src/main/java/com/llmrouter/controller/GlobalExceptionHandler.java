@@ -1,0 +1,115 @@
+package com.llmrouter.controller;
+
+import com.anthropic.errors.AnthropicIoException;
+import com.anthropic.errors.AnthropicServiceException;
+import com.anthropic.errors.BadRequestException;
+import com.anthropic.errors.InternalServerException;
+import com.anthropic.errors.RateLimitException;
+import com.anthropic.errors.UnauthorizedException;
+import com.llmrouter.config.RequestIdFilter;
+import com.llmrouter.dto.ErrorResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+/**
+ * 04 API Contract 의 에러 포맷으로 통일한다.
+ *
+ * 원칙: 사용자에게는 행동으로 이어지는 메시지를, 로그에는 원인 전부를 남긴다.
+ * Anthropic 이 내려주는 원문 메시지를 그대로 사용자에게 노출하지 않는다
+ * (내부 과금 상태나 계정 정보가 섞여 나올 수 있음).
+ */
+@Slf4j
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    /** 요청 본문 검증 실패 (@NotBlank 등) */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException e) {
+        String detail = e.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(f -> f.getField() + ": " + f.getDefaultMessage())
+                .orElse("잘못된 요청입니다.");
+
+        log.warn("요청 검증 실패 - {}", detail);
+        return build(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", detail);
+    }
+
+    /** Claude API rate limit */
+    @ExceptionHandler(RateLimitException.class)
+    public ResponseEntity<ErrorResponse> handleRateLimit(RateLimitException e) {
+        log.warn("Claude API rate limit", e);
+        return build(HttpStatus.TOO_MANY_REQUESTS, "LLM_RATE_LIMITED",
+                "요청이 몰리고 있습니다. 잠시 후 다시 시도해주세요.");
+    }
+
+    /** API 키 문제 — 사용자 잘못이 아니라 서버 설정 문제다 */
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorized(UnauthorizedException e) {
+        log.error("Claude API 인증 실패 - ANTHROPIC_API_KEY 를 확인하세요", e);
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "LLM_AUTH_FAILED",
+                "서버 설정 오류로 응답할 수 없습니다.");
+    }
+
+    /** Anthropic 5xx */
+    @ExceptionHandler(InternalServerException.class)
+    public ResponseEntity<ErrorResponse> handleUpstream5xx(InternalServerException e) {
+        log.error("Claude API 서버 오류", e);
+        return build(HttpStatus.SERVICE_UNAVAILABLE, "LLM_UNAVAILABLE",
+                "LLM 서비스가 일시적으로 불안정합니다. 잠시 후 다시 시도해주세요.");
+    }
+
+    /** 네트워크 단절 등 응답 자체를 못 받은 경우 */
+    @ExceptionHandler(AnthropicIoException.class)
+    public ResponseEntity<ErrorResponse> handleIo(AnthropicIoException e) {
+        log.error("Claude API 연결 실패", e);
+        return build(HttpStatus.SERVICE_UNAVAILABLE, "LLM_UNAVAILABLE",
+                "LLM 서비스에 연결할 수 없습니다.");
+    }
+
+    /** 400 — 크레딧 부족이 여기로 들어온다 */
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException e) {
+        String message = String.valueOf(e.getMessage());
+
+        // Anthropic 은 크레딧 부족도 400/invalid_request_error 로 내려준다.
+        // 타입만으로는 구분이 안 돼 메시지를 본다. 문구가 바뀌면 아래 분기는 깨지고
+        // LLM_ERROR 로 떨어지므로, 동작이 멈추지는 않는다.
+        if (message.contains("credit balance")) {
+            log.error("Claude API 크레딧 부족 - Console 의 Plans & Billing 에서 충전 필요", e);
+            return build(HttpStatus.PAYMENT_REQUIRED, "LLM_QUOTA_EXCEEDED",
+                    "LLM 사용 한도가 소진되었습니다. 관리자에게 문의해주세요.");
+        }
+
+        log.error("Claude API 요청 오류 type={}", e.errorType().orElse(null), e);
+        return build(HttpStatus.BAD_GATEWAY, "LLM_ERROR", "LLM 요청 처리에 실패했습니다.");
+    }
+
+    /** 그 외 Anthropic 오류 (403, 404, 422 등) */
+    @ExceptionHandler(AnthropicServiceException.class)
+    public ResponseEntity<ErrorResponse> handleAnthropic(AnthropicServiceException e) {
+        log.error("Claude API 오류 type={}", e.errorType().orElse(null), e);
+        return build(HttpStatus.BAD_GATEWAY, "LLM_ERROR", "LLM 요청 처리에 실패했습니다.");
+    }
+
+    /** 최후의 방어선 */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleUnexpected(Exception e) {
+        log.error("처리되지 않은 예외", e);
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR",
+                "일시적인 오류가 발생했습니다.");
+    }
+
+    private ResponseEntity<ErrorResponse> build(HttpStatus status, String code, String message) {
+        return ResponseEntity.status(status).body(
+                ErrorResponse.builder()
+                        .error(message)
+                        .code(code)
+                        .requestId(MDC.get(RequestIdFilter.REQUEST_ID))
+                        .build());
+    }
+}

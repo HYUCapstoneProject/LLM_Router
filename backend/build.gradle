@@ -22,6 +22,14 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation "io.jsonwebtoken:jjwt-api:0.11.5"
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation "com.anthropic:anthropic-java:2.34.0"
+
+    // JPA 가 아니라 JDBC 를 쓰는 이유:
+    //   pgvector 의 vector(1024) 는 표준 JPA 타입이 아니라 엔티티 매핑이 번거롭고,
+    //   우리가 필요한 질의(<=> 연산자, 서브쿼리 + 항목별 threshold)가 어차피 네이티브다.
+    //   Hibernate dialect 를 우회하는 것보다 JdbcTemplate 이 단순하다.
+    implementation "org.springframework.boot:spring-boot-starter-jdbc"
+    runtimeOnly "org.postgresql:postgresql"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     compileOnly "org.projectlombok:lombok"
