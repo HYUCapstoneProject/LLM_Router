@@ -1,0 +1,55 @@
+# Cloud Run 프론트엔드 + /api 리버스 프록시
+#
+# 컨테이너 시작 시 envsubst 가 ${PORT} ${BACKEND_URL} ${GATEWAY_KEY} 를 치환한다.
+# nginx 자체 변수($host, $remote_addr 등)는 같은 이름의 환경변수가 없으면 그대로 남는다.
+
+# IP 당 요청 제한. Claude 크레딧이 뒤에 있으므로 필수다.
+# 데모에서 사람이 질문을 던지는 속도는 분당 몇 회 수준이라 20r/m 이면 충분하다.
+limit_req_zone $binary_remote_addr zone=api_limit:10m rate=20r/m;
+
+server {
+    listen ${PORT};
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # 백엔드 IP 를 브라우저에 노출하지 않기 위해 여기서 프록시한다.
+    # 브라우저는 Cloud Run 도메인만 보므로 same-origin 이 되어 CORS 도 불필요하다.
+    location /api/ {
+        limit_req zone=api_limit burst=5 nodelay;
+        limit_req_status 429;
+
+        proxy_pass ${BACKEND_URL};
+
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # 공유 시크릿. 브라우저에는 나가지 않고 여기서만 붙는다.
+        # 백엔드는 이 헤더가 없으면 거부하므로, GCE 8080 이 열려 있어도
+        # 아무나 우리 Claude 크레딧을 쓸 수 없다.
+        proxy_set_header X-Gateway-Key     "${GATEWAY_KEY}";
+
+        # Opus 응답이 길면 30초를 넘길 수 있다. 기본 60초로는 부족할 때가 있다.
+        proxy_connect_timeout 10s;
+        proxy_send_timeout   120s;
+        proxy_read_timeout   120s;
+    }
+
+    # SPA 라우팅 — 없는 경로는 index.html 로 넘긴다
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # 정적 자산은 해시가 붙으므로 길게 캐시해도 안전하다
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+    gzip_min_length 1024;
+}
