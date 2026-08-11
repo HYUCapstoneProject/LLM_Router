@@ -5,8 +5,46 @@ spring:
   application:
     name: llm-router
 
+  # 로컬은 docker-compose 의 pgvector 컨테이너.
+  # 배포(M5) 때는 게이트웨이와 같은 GCE VM 에 두므로 host 는 localhost 그대로다.
+  datasource:
+    url: jdbc:postgresql://localhost:5432/llmrouter
+    username: llmrouter
+    password: ${POSTGRES_PASSWORD:localdev}
+    hikari:
+      maximum-pool-size: 10
+
+logging:
+  pattern:
+    # %X{requestId} — RequestIdFilter 가 MDC 에 넣은 값.
+    # 한 요청의 라우팅·캐시·LLM 로그를 이 값으로 묶어서 볼 수 있다.
+    console: "%d{HH:mm:ss.SSS} %-5level [%X{requestId:-no-request}] %logger{30} - %msg%n"
+
 llm:
-  router:
-    routing-threshold: 0.7
+  gateway:
+    # 프론트 nginx 가 X-Gateway-Key 헤더로 보내는 공유 시크릿.
+    # 비워두면 검증을 건너뛴다(로컬 개발).
+    # 배포 시에는 반드시 환경변수로 설정한다 — 안 하면 GCE 8080 이 무방비로 열린다.
+    key: ${GATEWAY_KEY:}
+
+  # 티어 → Claude 모델 매핑 (기획서 2장 기술 스택)
+  # 실험 중 재컴파일 없이 바꿀 수 있도록 설정으로 뺌
+  models:
+    easy: claude-haiku-4-5
+    medium: claude-sonnet-4-6
+    hard: claude-opus-4-8
+  max-tokens: 4096
   cache:
-    similarity-threshold: 0.8
+    # 티어별 캐시 임계값 (적응형 임계값 Level 2).
+    #
+    # 저장 시점에 해당 항목의 tier 로 threshold 를 정해 cache_entry 에 박아둔다.
+    # 조회 시점에는 들어온 질문의 tier 를 알 수 없기 때문이다 —
+    # classify 는 cache miss 일 때만 호출한다.
+    #
+    # 지금은 세 값이 같아서 고정 임계값(Level 1)과 동일하게 동작한다.
+    # EXP-003 에서 QQP 로 티어별 hit/false-hit 곡선을 측정한 뒤 값을 벌린다.
+    # 코드 변경 없이 설정만으로 Level 1 <-> Level 2 A/B 비교가 된다.
+    thresholds:
+      easy: 0.80
+      medium: 0.80
+      hard: 0.80
