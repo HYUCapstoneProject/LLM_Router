@@ -39,6 +39,19 @@ async function mockStreamResponse(
   }
 }
 
+// ── 에러 ─────────────────────────────────────────────────────────
+/** 백엔드 ErrorResponse(04 API Contract)를 담아 UI 까지 전달한다 */
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    readonly code: string,
+    readonly requestId?: string,
+  ) {
+    super(message)
+    this.name = 'ApiError'
+  }
+}
+
 // ── 실제 API 호출 ────────────────────────────────────────────────
 async function realSendMessage(req: ChatRequest): Promise<ChatResponse> {
   const res = await fetch('/api/chat', {
@@ -46,7 +59,18 @@ async function realSendMessage(req: ChatRequest): Promise<ChatResponse> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(req),
   })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+
+  if (!res.ok) {
+    // 백엔드가 항상 ErrorResponse 를 주지만, 프록시 오류 등으로
+    // JSON 이 아닐 수 있으므로 파싱 실패도 처리한다
+    const body = await res.json().catch(() => null)
+    throw new ApiError(
+      body?.error ?? `서버 오류가 발생했습니다. (HTTP ${res.status})`,
+      body?.code ?? 'UNKNOWN',
+      body?.requestId,
+    )
+  }
+
   return res.json() as Promise<ChatResponse>
 }
 
@@ -61,8 +85,13 @@ export async function sendMessage(
     const start = Date.now()
     await mockStreamResponse(mock.text, onChunk)
     return {
+      requestId: `mock-${mockIndex}`,
       model: mock.model,
+      tier: 'medium',
+      modelId: `mock-${mock.model}`,
       cacheHit: mock.cacheHit,
+      inputTokens: mock.cacheHit ? 0 : 128,
+      outputTokens: mock.cacheHit ? 0 : mock.text.length,
       latency: Date.now() - start,
     }
   }
@@ -70,5 +99,14 @@ export async function sendMessage(
   // 실제 백엔드 연동 시: 스트리밍 미지원이면 전체 응답을 한 번에 emit
   const data = await realSendMessage(req)
   onChunk(data.response)
-  return { model: data.model, cacheHit: data.cacheHit, latency: data.latency }
+  return {
+    requestId: data.requestId,
+    model: data.model,
+    tier: data.tier,
+    modelId: data.modelId,
+    cacheHit: data.cacheHit,
+    inputTokens: data.inputTokens,
+    outputTokens: data.outputTokens,
+    latency: data.latency,
+  }
 }
