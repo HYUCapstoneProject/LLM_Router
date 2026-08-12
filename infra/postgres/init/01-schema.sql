@@ -89,12 +89,19 @@ CREATE TABLE request_log (
     -- 라우터 정확도 집계에서 제외한다 (04 API Contract / Failure Handling).
     fallback_reason      VARCHAR(32),
 
+    -- 실패한 요청도 남긴다. 성공만 기록하면 "전체 중 몇 %가 실패했나",
+    -- "지연시간 분포" 같은 지표를 낼 수 없다.
+    -- success | llm_error | db_error | internal_error
+    status               VARCHAR(20)  NOT NULL DEFAULT 'success',
+    error_type           VARCHAR(64),   -- 예외 클래스명. 실패 원인 분류용
+
     created_at           TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 
 CREATE INDEX idx_request_log_created_at ON request_log (created_at);
 CREATE INDEX idx_request_log_tier       ON request_log (tier);
 CREATE INDEX idx_request_log_cache_hit  ON request_log (cache_hit);
+CREATE INDEX idx_request_log_status     ON request_log (status);
 
 -- ─────────────────────────────────────────────────────────────
 -- 3. 에스컬레이션 로그  ← 재학습의 정정 라벨
