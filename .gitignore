@@ -16,6 +16,7 @@ PLAN.md
 # ── Frontend (Vite / Node) ───────────────────────────────────────────
 frontend/node_modules/
 frontend/dist/
+frontend/coverage/
 frontend/.env
 frontend/.env.local
 frontend/.env.*.local
@@ -24,7 +25,12 @@ frontend/.env.*.local
 backend/.gradle/
 backend/build/
 backend/out/
+backend/hs_err_pid*.log
+backend/replay_pid*.log
 backend/.env
+
+# Local Codex Gradle cache
+.gradle-codex/
 
 # Gradle wrapper (선택: 팀 공유 시 아래 두 줄 주석 처리)
 !backend/gradle/
