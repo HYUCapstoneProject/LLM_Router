@@ -61,6 +61,24 @@ public class CacheService {
             INSERT INTO cache_entry
                 (question, embedding, response, tier, model_id, embed_model_version, threshold)
             VALUES (?, ?::vector, ?, ?, ?, ?, ?)
+            RETURNING id
+            """;
+
+    /**
+     * 에스컬레이션으로 더 나은 답을 얻었을 때 기존 항목을 갱신한다 (기획서 4-3).
+     *
+     * hit_count 를 0 으로 되돌리는 이유: 누적된 카운트는 방금 "불만족"으로
+     * 판정된 답이 벌어들인 것이다. 그대로 두면 캐시 효과 지표가 부풀려진다.
+     */
+    private static final String REFRESH_SQL = """
+            UPDATE cache_entry
+               SET response   = ?,
+                   tier       = ?,
+                   model_id   = ?,
+                   threshold  = ?,
+                   hit_count  = 0,
+                   updated_at = now()
+             WHERE id = ?
             """;
 
     public Optional<CachedResponse> get(float[] embedding) {
@@ -87,9 +105,15 @@ public class CacheService {
         return Optional.of(hit);
     }
 
-    public void put(String message, float[] embedding, LlmResult result) {
-        jdbc.update(INSERT_SQL,
-                message,
+    /**
+     * @param question 개인정보가 마스킹된 질문. 임베딩도 같은 문자열로 만든 것이어야 한다 —
+     *                 저장 시점과 조회 시점의 마스킹이 다르면 같은 질문인데 유사도가 떨어진다.
+     * @return 생성된 행의 id. request_log.cache_entry_id 에 남겨
+     *         나중에 /api/escalate 가 이 행을 정확히 지목해 갱신할 수 있게 한다.
+     */
+    public long put(String question, float[] embedding, LlmResult result) {
+        Long id = jdbc.queryForObject(INSERT_SQL, Long.class,
+                question,
                 toVectorLiteral(embedding),
                 result.text(),
                 result.tier(),
@@ -97,7 +121,30 @@ public class CacheService {
                 routerClient.embedModelVersion(),
                 thresholdFor(result.tier()));
 
-        log.info("캐시 저장 tier={} model={}", result.tier(), result.modelId());
+        log.info("캐시 저장 id={} tier={} model={}", id, result.tier(), result.modelId());
+        return id;
+    }
+
+    /**
+     * 에스컬레이션으로 만족한 답을 얻으면 해당 캐시 항목을 그 답으로 갱신한다 (기획서 4-3).
+     * 갱신하지 않으면 이후 유사 질문에 불만족스러웠던 답이 다시 나간다.
+     *
+     * 질문과 임베딩은 건드리지 않는다 — 갱신 대상은 "답"이지 "질문"이 아니다.
+     */
+    public void refresh(long cacheEntryId, LlmResult result) {
+        int updated = jdbc.update(REFRESH_SQL,
+                result.text(),
+                result.tier(),
+                result.modelId(),
+                thresholdFor(result.tier()),
+                cacheEntryId);
+
+        if (updated == 0) {
+            // 그 사이 캐시 행이 지워졌을 수 있다. 에스컬레이션 자체는 성공했으므로 실패시키지 않는다.
+            log.warn("캐시 갱신 대상 없음 id={}", cacheEntryId);
+            return;
+        }
+        log.info("캐시 갱신 id={} tier={} model={}", cacheEntryId, result.tier(), result.modelId());
     }
 
     /**
