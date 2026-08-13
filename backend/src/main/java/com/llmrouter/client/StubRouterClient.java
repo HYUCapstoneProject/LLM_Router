@@ -17,6 +17,9 @@ import java.util.Random;
  *
  * 캐시 히트율이나 임계값을 이 구현으로 측정하면 안 된다.
  * bge-large 가 붙기 전까지 나오는 숫자는 전부 무의미하다.
+ *
+ * 아래 embed() 알고리즘은 tools/local-testing/StubVec.java 에 복제되어 있다
+ * (캐시를 미리 심어 히트 경로만 검증하는 용도). 여기를 고치면 그쪽도 같이 고쳐야 한다.
  */
 @Component
 public class StubRouterClient implements RouterClient {
