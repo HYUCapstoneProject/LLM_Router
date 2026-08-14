@@ -309,6 +309,356 @@ def _distribution(dataframe: pd.DataFrame, columns: list[str]) -> dict[str, int]
     }
 
 
+def _take_groups_up_to(
+    groups: pd.DataFrame,
+    row_target: int,
+    *,
+    seed: int,
+    label: str,
+    hard_strong_threshold: float,
+) -> tuple[list[str], int]:
+    if row_target <= 0 or groups.empty:
+        return [], 0
+
+    def priority(group_id: object) -> tuple[float, float, float]:
+        row = groups.loc[group_id]
+        success_rate = float(row["high_success_rate"])
+        strong_priority = (
+            0.0
+            if label == "hard" and success_rate >= hard_strong_threshold
+            else 1.0
+        )
+        success_priority = -success_rate if label == "hard" else 0.0
+        return (
+            strong_priority,
+            success_priority,
+            _stable_fraction(str(group_id), seed),
+        )
+
+    selected: list[str] = []
+    selected_rows = 0
+    for group_id in sorted(groups.index, key=priority):
+        group_size = int(groups.at[group_id, "row_count"])
+        if selected_rows + group_size > row_target:
+            continue
+        selected.append(str(group_id))
+        selected_rows += group_size
+        if selected_rows == row_target:
+            break
+    return selected, selected_rows
+
+
+def select_stratified_balanced_train_groups(
+    train: pd.DataFrame,
+    balance_config: Mapping[str, Any],
+    *,
+    seed: int,
+) -> tuple[pd.Series, dict[str, Any]]:
+    """Balance labels inside each stratum instead of only across the whole train split.
+
+    Global balancing leaves each topic internally skewed, so the model can use topic
+    as a proxy for difficulty. Balancing within a stratum breaks that correlation.
+    Duplicate groups stay atomic, so a stratum reaches at most its per-label target.
+    """
+    labels = tuple(str(label) for label in balance_config["label_order"])
+    if set(labels) != {"easy", "medium", "hard"} or len(labels) != 3:
+        raise RouterBenchError(
+            "balanced_train.label_order must contain easy, medium, hard exactly once"
+        )
+    stratify_by = str(balance_config.get("stratify_by", "eval_name"))
+    if stratify_by not in train.columns:
+        raise RouterBenchError(
+            f"balanced_train.stratify_by column is missing: {stratify_by}"
+        )
+    min_stratum_rows = int(balance_config.get("min_stratum_rows", 0))
+    if min_stratum_rows < 0:
+        raise RouterBenchError("balanced_train.min_stratum_rows must not be negative")
+    hard_strong_threshold = float(
+        balance_config.get("hard_strong_success_rate_threshold", 2.0 / 3.0)
+    )
+
+    working = train.copy()
+    if "high_success_rate" not in working:
+        working["high_success_rate"] = 0.0
+    working["_stratum"] = working[stratify_by].astype(str)
+    group_summary = working.groupby("duplicate_group_id", sort=True).agg(
+        row_count=("sample_id", "size"),
+        label_count=("difficulty_label", "nunique"),
+        difficulty_label=("difficulty_label", "first"),
+        stratum_count=("_stratum", "nunique"),
+        stratum=("_stratum", "first"),
+        high_success_rate=("high_success_rate", "min"),
+    )
+    mixed_label_groups = int(group_summary["label_count"].gt(1).sum())
+    mixed_stratum_groups = int(group_summary["stratum_count"].gt(1).sum())
+    homogeneous = group_summary.loc[
+        group_summary["label_count"].eq(1) & group_summary["stratum_count"].eq(1)
+    ].copy()
+
+    selected_groups: set[str] = set()
+    per_stratum: dict[str, Any] = {}
+    dropped_small: list[str] = []
+    for stratum in sorted(homogeneous["stratum"].astype(str).unique()):
+        candidates = homogeneous.loc[homogeneous["stratum"].astype(str).eq(stratum)]
+        available = {
+            label: int(
+                candidates.loc[
+                    candidates["difficulty_label"].astype(str).eq(label), "row_count"
+                ].sum()
+            )
+            for label in labels
+        }
+        target = min(available.values())
+        if target == 0 or sum(available.values()) < min_stratum_rows:
+            dropped_small.append(stratum)
+            continue
+        achieved: dict[str, int] = {}
+        for label_offset, label in enumerate(labels):
+            label_groups = candidates.loc[
+                candidates["difficulty_label"].astype(str).eq(label)
+            ]
+            group_ids, row_count = _take_groups_up_to(
+                label_groups,
+                target,
+                seed=seed + label_offset,
+                label=label,
+                hard_strong_threshold=hard_strong_threshold,
+            )
+            selected_groups.update(group_ids)
+            achieved[label] = row_count
+        per_stratum[stratum] = {
+            "available": available,
+            "target_per_class": target,
+            "selected": achieved,
+        }
+
+    selected = pd.Series(False, index=train.index, dtype=bool)
+    selected.loc[train["duplicate_group_id"].astype(str).isin(selected_groups)] = True
+    selected_frame = train.loc[selected]
+    group_selection_counts = selected_frame.groupby("duplicate_group_id").size()
+    original_group_counts = train.groupby("duplicate_group_id").size()
+    if not group_selection_counts.eq(
+        original_group_counts.loc[group_selection_counts.index]
+    ).all():
+        raise RouterBenchError("Stratified selection split a duplicate group")
+
+    class_counts = {
+        label: int(selected_frame["difficulty_label"].astype(str).eq(label).sum())
+        for label in labels
+    }
+    return selected, {
+        "enabled": True,
+        "strategy": "stratified",
+        "stratify_by": stratify_by,
+        "min_stratum_rows": min_stratum_rows,
+        "selected_row_count": int(len(selected_frame)),
+        "selected_by_label": class_counts,
+        "selected_by_label_domain": _distribution(
+            selected_frame, ["difficulty_label", "domain"]
+        ),
+        "stratum_count_used": len(per_stratum),
+        "stratum_count_dropped": len(dropped_small),
+        "strata_dropped": sorted(dropped_small),
+        "mixed_label_group_count_excluded_from_selection": mixed_label_groups,
+        "mixed_stratum_group_count_excluded_from_selection": mixed_stratum_groups,
+        "hard_strong_success_rate_threshold": hard_strong_threshold,
+        "per_stratum": per_stratum,
+    }
+
+
+def select_balanced_train_groups(
+    train: pd.DataFrame,
+    balance_config: Mapping[str, Any],
+    *,
+    seed: int,
+) -> tuple[pd.Series, dict[str, Any]]:
+    """Select an exact, deterministic class target without splitting duplicate groups."""
+    selected = pd.Series(False, index=train.index, dtype=bool)
+    if not bool(balance_config.get("enabled", False)):
+        selected.loc[:] = True
+        return selected, {"enabled": False}
+
+    if str(balance_config.get("strategy", "global")) == "stratified":
+        return select_stratified_balanced_train_groups(
+            train, balance_config, seed=seed
+        )
+
+    labels = tuple(str(label) for label in balance_config["label_order"])
+    if set(labels) != {"easy", "medium", "hard"} or len(labels) != 3:
+        raise RouterBenchError(
+            "balanced_train.label_order must contain easy, medium, hard exactly once"
+        )
+    target_per_class = int(balance_config["target_per_class"])
+    if target_per_class <= 0:
+        raise RouterBenchError("balanced_train.target_per_class must be positive")
+    rare_domains = {
+        str(domain) for domain in balance_config.get("rare_domains", [])
+    }
+    hard_strong_threshold = float(
+        balance_config.get("hard_strong_success_rate_threshold", 2.0 / 3.0)
+    )
+
+    working = train.copy()
+    if "high_success_rate" not in working:
+        working["high_success_rate"] = 0.0
+    group_summary = working.groupby("duplicate_group_id", sort=True).agg(
+        row_count=("sample_id", "size"),
+        label_count=("difficulty_label", "nunique"),
+        difficulty_label=("difficulty_label", "first"),
+        domain_count=("domain", "nunique"),
+        domain=("domain", "first"),
+        high_success_rate=("high_success_rate", "min"),
+    )
+    mixed_label_groups = group_summary.index[group_summary["label_count"].gt(1)]
+    homogeneous = group_summary.loc[group_summary["label_count"].eq(1)].copy()
+    homogeneous.loc[homogeneous["domain_count"].gt(1), "domain"] = "__mixed__"
+
+    mixed_rare_groups = {
+        str(group_id)
+        for group_id in mixed_label_groups
+        if set(
+            working.loc[
+                working["duplicate_group_id"].astype(str).eq(str(group_id)),
+                "domain",
+            ].astype(str)
+        ).issubset(rare_domains)
+    }
+    mixed_rare_rows = working.loc[
+        working["duplicate_group_id"].astype(str).isin(mixed_rare_groups)
+    ]
+    mixed_rare_label_counts = Counter(
+        mixed_rare_rows["difficulty_label"].astype(str).tolist()
+    )
+    if any(mixed_rare_label_counts[label] > target_per_class for label in labels):
+        raise RouterBenchError(
+            "Rare mixed-label duplicate groups exceed the per-class target"
+        )
+
+    selected_groups: set[str] = set(mixed_rare_groups)
+    selected_by_label_domain: dict[str, int] = {}
+    available_by_label: dict[str, int] = {}
+    for label_offset, label in enumerate(labels):
+        candidates = homogeneous.loc[
+            homogeneous["difficulty_label"].astype(str).eq(label)
+        ].copy()
+        available_rows = int(
+            working["difficulty_label"].astype(str).eq(label).sum()
+        )
+        available_by_label[label] = available_rows
+        selectable_rows = int(candidates["row_count"].sum()) + int(
+            mixed_rare_label_counts[label]
+        )
+        if selectable_rows < target_per_class:
+            raise RouterBenchError(
+                f"balanced_train needs {target_per_class} {label} rows, "
+                f"but only {selectable_rows} selectable group-atomic rows are available"
+            )
+
+        label_selected: set[str] = set()
+        selected_rows = int(mixed_rare_label_counts[label])
+        rare = candidates.loc[candidates["domain"].astype(str).isin(rare_domains)]
+        rare_rows = int(rare["row_count"].sum())
+        if rare_rows > target_per_class:
+            rare_ids, rare_selected_rows = _take_groups_up_to(
+                rare,
+                target_per_class,
+                seed=seed + label_offset,
+                label=label,
+                hard_strong_threshold=hard_strong_threshold,
+            )
+        else:
+            rare_ids = [str(group_id) for group_id in rare.index]
+            rare_selected_rows = rare_rows
+        label_selected.update(rare_ids)
+        selected_rows += rare_selected_rows
+
+        non_rare = candidates.loc[~candidates.index.astype(str).isin(label_selected)]
+        remaining_target = target_per_class - selected_rows
+        domain_counts = non_rare.groupby("domain")["row_count"].sum().astype(int)
+        quotas: dict[str, int] = {}
+        if remaining_target and int(domain_counts.sum()):
+            raw_quotas = remaining_target * domain_counts / int(domain_counts.sum())
+            quotas = raw_quotas.map(math.floor).astype(int).to_dict()
+            leftover = remaining_target - sum(quotas.values())
+            remainder_order = sorted(
+                domain_counts.index.astype(str),
+                key=lambda domain: (
+                    -(float(raw_quotas.loc[domain]) - quotas[domain]),
+                    _stable_fraction(f"{label}:{domain}", seed),
+                ),
+            )
+            for domain in remainder_order[:leftover]:
+                quotas[domain] += 1
+
+        for domain in sorted(quotas):
+            domain_groups = non_rare.loc[
+                non_rare["domain"].astype(str).eq(domain)
+                & ~non_rare.index.astype(str).isin(label_selected)
+            ]
+            group_ids, row_count = _take_groups_up_to(
+                domain_groups,
+                quotas[domain],
+                seed=seed + label_offset,
+                label=label,
+                hard_strong_threshold=hard_strong_threshold,
+            )
+            label_selected.update(group_ids)
+            selected_rows += row_count
+
+        if selected_rows < target_per_class:
+            remaining = candidates.loc[
+                ~candidates.index.astype(str).isin(label_selected)
+            ]
+            group_ids, row_count = _take_groups_up_to(
+                remaining,
+                target_per_class - selected_rows,
+                seed=seed + label_offset,
+                label=label,
+                hard_strong_threshold=hard_strong_threshold,
+            )
+            label_selected.update(group_ids)
+            selected_rows += row_count
+        if selected_rows != target_per_class:
+            raise RouterBenchError(
+                f"Could not select exactly {target_per_class} {label} rows "
+                "without splitting a duplicate group"
+            )
+        selected_groups.update(label_selected)
+
+    selected.loc[
+        train["duplicate_group_id"].astype(str).isin(selected_groups)
+    ] = True
+    selected_frame = train.loc[selected]
+    class_counts = selected_frame["difficulty_label"].value_counts().to_dict()
+    expected_counts = {label: target_per_class for label in labels}
+    if class_counts != expected_counts:
+        raise RouterBenchError(
+            f"Balanced train class counts must be {expected_counts}, got {class_counts}"
+        )
+    group_selection_counts = selected_frame.groupby("duplicate_group_id").size()
+    original_group_counts = train.groupby("duplicate_group_id").size()
+    if not group_selection_counts.eq(
+        original_group_counts.loc[group_selection_counts.index]
+    ).all():
+        raise RouterBenchError("Balanced selection split a duplicate group")
+    selected_by_label_domain = _distribution(
+        selected_frame, ["difficulty_label", "domain"]
+    )
+    return selected, {
+        "enabled": True,
+        "target_per_class": target_per_class,
+        "available_by_label": available_by_label,
+        "selected_by_label": class_counts,
+        "selected_by_label_domain": selected_by_label_domain,
+        "mixed_label_group_count_selected": len(mixed_rare_groups),
+        "mixed_label_group_count_excluded_from_selection": int(
+            len(mixed_label_groups) - len(mixed_rare_groups)
+        ),
+        "rare_domains_preserved": sorted(rare_domains),
+        "hard_strong_success_rate_threshold": hard_strong_threshold,
+    }
+
+
 def prepare_training_dataset(
     labeled: pd.DataFrame,
     preprocessing_config: Mapping[str, Any],
@@ -399,26 +749,56 @@ def prepare_training_dataset(
     metadata.loc[metadata["sample_weight"].le(0), "exclusion_reason"] = (
         "non_positive_confidence_weight"
     )
+    excluded_labels = {
+        str(label)
+        for label in preprocessing_config.get("excluded_difficulty_labels", [])
+    }
+    if excluded_labels:
+        excluded_label_rows = metadata["difficulty_label"].astype(str).isin(
+            excluded_labels
+        )
+        metadata.loc[excluded_label_rows, "exclusion_reason"] = (
+            "excluded_difficulty_label"
+        )
     if not bool(preprocessing_config.get("include_retrieval", True)):
-        retrieval = metadata["needs_retrieval"].astype(bool)
+        retrieval = metadata["needs_retrieval"].astype(bool) & metadata[
+            "exclusion_reason"
+        ].eq("")
         metadata.loc[retrieval, "exclusion_reason"] = "retrieval_excluded"
-    metadata["included_in_training"] = metadata["exclusion_reason"].eq("")
 
-    included = metadata.loc[metadata["included_in_training"]].copy()
-    if included.empty:
+    eligible = metadata.loc[metadata["exclusion_reason"].eq("")].copy()
+    if eligible.empty:
         raise RouterBenchError("Preprocessing excluded every labeled row")
     effective_seed = int(preprocessing_config["seed"]) if seed is None else int(seed)
-    included["split"] = assign_group_splits(
-        included,
+    eligible["split"] = assign_group_splits(
+        eligible,
         preprocessing_config["split_fractions"],
         effective_seed,
     )
     metadata["split"] = metadata["sample_id"].map(
-        included.set_index("sample_id")["split"]
+        eligible.set_index("sample_id")["split"]
     )
+    natural_split_distribution = _distribution(eligible, ["split"])
+    natural_split_label_distribution = _distribution(
+        eligible, ["split", "difficulty_label"]
+    )
+
+    selected = pd.Series(True, index=eligible.index, dtype=bool)
+    train_mask = eligible["split"].eq("train")
+    train_selected, balance_metrics = select_balanced_train_groups(
+        eligible.loc[train_mask],
+        preprocessing_config.get("balanced_train", {"enabled": False}),
+        seed=effective_seed,
+    )
+    selected.loc[train_mask] = train_selected
+    unselected_train_ids = eligible.loc[train_mask & ~selected, "sample_id"]
+    metadata.loc[
+        metadata["sample_id"].isin(unselected_train_ids), "exclusion_reason"
+    ] = "train_balance_not_selected"
+    metadata["included_in_training"] = metadata["exclusion_reason"].eq("")
     metadata["preprocessing_version"] = preprocessing_version
 
-    training = included.loc[:, list(TRAINING_COLUMNS)].reset_index(drop=True)
+    training = eligible.loc[selected, list(TRAINING_COLUMNS)].reset_index(drop=True)
     metadata = metadata.reset_index(drop=True)
     validate_preprocessed_output(training)
     metrics: dict[str, Any] = {
@@ -437,6 +817,13 @@ def prepare_training_dataset(
         "split_domain_distribution": _distribution(
             metadata.loc[metadata["included_in_training"]], ["split", "domain"]
         ),
+        "natural_split_distribution_before_train_balance": (
+            natural_split_distribution
+        ),
+        "natural_split_label_distribution_before_train_balance": (
+            natural_split_label_distribution
+        ),
+        "balanced_train": balance_metrics,
         "confidence_distribution": _distribution(metadata, ["label_confidence"]),
         "exclusion_distribution": _distribution(
             metadata.loc[~metadata["included_in_training"]], ["exclusion_reason"]

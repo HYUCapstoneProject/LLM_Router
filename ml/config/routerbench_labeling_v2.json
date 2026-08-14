@@ -1,0 +1,101 @@
+{
+  "dataset_version": "withmartian-routerbench-2024-03-27",
+  "tier_config_version": "routerbench-capability-tier-v1",
+  "label_rule_version": "minimum-sufficient-tier-v2",
+  "preprocessing_version": "routerbench-training-preprocess-v2-balanced",
+  "sources": {
+    "0shot": {
+      "filename": "routerbench_0shot.pkl",
+      "url": "https://huggingface.co/datasets/withmartian/routerbench/resolve/main/routerbench_0shot.pkl?download=true",
+      "size_bytes": 99567659,
+      "sha256": "ba4f77f19517610a707c374e99322d7750c30fc4ae7ff5527888595a1e65d36d"
+    },
+    "5shot": {
+      "filename": "routerbench_5shot.pkl",
+      "url": "https://huggingface.co/datasets/withmartian/routerbench/resolve/main/routerbench_5shot.pkl?download=true",
+      "size_bytes": 171091324,
+      "sha256": "fbd7d3d16fba2759a18fa0ad44409d3e0e92ba80d03d90827eed1a6d084c9ffe"
+    }
+  },
+  "canonicalization": {
+    "included_eval_patterns": [
+      "mmlu",
+      "hellaswag",
+      "grade-school-math",
+      "gsm8k",
+      "arc-challenge",
+      "winogrande",
+      "mbpp",
+      "mtbench",
+      "mt_bench",
+      "mt-bench",
+      "rag"
+    ],
+    "five_shot_patterns": [
+      "mmlu",
+      "hellaswag",
+      "grade-school-math",
+      "gsm8k",
+      "arc-challenge",
+      "winogrande"
+    ],
+    "zero_shot_patterns": ["mbpp", "mt_bench", "mt-bench", "mtbench", "rag"],
+    "default_source": "0shot"
+  },
+  "acceptance": {
+    "exact_match_patterns": [
+      "mmlu",
+      "hellaswag",
+      "arc-challenge",
+      "winogrande"
+    ],
+    "continuous_patterns": [
+      "grade-school-math",
+      "gsm8k",
+      "mbpp",
+      "mt_bench",
+      "mt-bench",
+      "mtbench",
+      "rag"
+    ],
+    "exact_match_threshold": 1.0,
+    "continuous_threshold": 0.7,
+    "default_threshold": 1.0
+  },
+  "labeling": {
+    "low_consensus_threshold": 0.67,
+    "medium_consensus_threshold": 0.67,
+    "high_consensus_threshold": 0.3333333333333333,
+    "minimum_valid_models_for_confidence": 2,
+    "unresolved_label": "unresolved"
+  },
+  "preprocessing": {
+    "split_fractions": {
+      "train": 0.8,
+      "validation": 0.1,
+      "test": 0.1
+    },
+    "seed": 42,
+    "confidence_weights": {
+      "high": 1.0,
+      "medium": 0.5,
+      "low": 0.0
+    },
+    "excluded_difficulty_labels": ["unresolved"],
+    "include_retrieval": true,
+    "near_duplicate_jaccard_threshold": 0.9,
+    "near_duplicate_min_tokens": 5,
+    "near_duplicate_max_bucket_size": 200,
+    "balanced_train": {
+      "enabled": true,
+      "target_per_class": 6256,
+      "label_order": ["easy", "medium", "hard"],
+      "rare_domains": ["code", "conversation"],
+      "hard_strong_success_rate_threshold": 0.6666666666666666
+    }
+  },
+  "smoke": {
+    "sample_size": 100,
+    "seed": 42
+  }
+}

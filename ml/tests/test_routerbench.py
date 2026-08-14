@@ -12,6 +12,7 @@ from llm_router_labeling.training.routerbench_labeling import (
     calibrate_model_tiers,
     canonicalize_sources,
     detect_model_columns,
+    acceptance_thresholds,
     extract_query_text,
     filter_eval_scope,
     label_questions,
@@ -189,6 +190,132 @@ class RouterBenchLabelingTest(unittest.TestCase):
             ],
         )
 
+    def test_v2_treats_partial_gsm8k_credit_as_continuous(self) -> None:
+        dataframe = pd.DataFrame(
+            {
+                "sample_id": ["grade-school-math.1", "mmlu.1"],
+                "eval_name": ["grade-school-math", "mmlu.test"],
+            }
+        )
+        config = {
+            **self.acceptance_config,
+            "continuous_patterns": ["mbpp", "grade-school-math", "gsm8k"],
+            "exact_match_patterns": ["mmlu"],
+        }
+        self.assertEqual(acceptance_thresholds(dataframe, config).tolist(), [0.7, 1.0])
+
+    def test_v2_separates_hard_from_unresolved(self) -> None:
+        rows = []
+        for sample_id, scores in (
+            ("hard", [0, 0, 0, 0, 1, 0]),
+            ("unresolved", [0, 0, 0, 0, 0, 0]),
+        ):
+            row = {
+                "sample_id": sample_id,
+                "prompt": "question",
+                "query_text": "question",
+                "eval_name": "mmlu.test",
+                "domain": "knowledge",
+                "shot_source": "5shot",
+                "needs_retrieval": False,
+            }
+            row.update(dict(zip(MODELS, scores, strict=True)))
+            rows.append(row)
+        tiers = ModelTiers(
+            low=("model-1", "model-2"),
+            medium=("model-3", "model-4"),
+            high=("model-5", "model-6"),
+            statistics={},
+        )
+        config = {
+            **self.labeling_config,
+            "high_consensus_threshold": 1.0 / 3.0,
+            "unresolved_label": "unresolved",
+        }
+        labeled = label_questions(
+            pd.DataFrame(rows), tiers, self.acceptance_config, config
+        )
+        self.assertEqual(labeled["difficulty_label"].tolist(), ["hard", "unresolved"])
+        self.assertEqual(labeled["label_reason"].tolist(), ["strong_only", "unresolved"])
+
+    def test_v3_labels_by_overall_solve_rate(self) -> None:
+        rows = []
+        for sample_id, scores in (
+            ("easy", [1, 1, 1, 1, 0, 0]),
+            ("medium", [1, 1, 1, 0, 0, 0]),
+            ("hard", [1, 0, 0, 0, 0, 0]),
+            ("unresolved", [None, None, None, None, None, None]),
+        ):
+            row = {
+                "sample_id": sample_id,
+                "prompt": "question",
+                "query_text": "question",
+                "eval_name": "mmlu.test",
+                "domain": "knowledge",
+                "shot_source": "5shot",
+                "needs_retrieval": False,
+            }
+            row.update(dict(zip(MODELS, scores, strict=True)))
+            rows.append(row)
+        tiers = ModelTiers(
+            low=("model-1", "model-2"),
+            medium=("model-3", "model-4"),
+            high=("model-5", "model-6"),
+            statistics={},
+        )
+        config = {
+            "strategy": "overall_solve_rate",
+            "easy_min_solve_rate": 0.64,
+            "medium_min_solve_rate": 0.27,
+            "minimum_valid_models_for_confidence": 4,
+            "unresolved_label": "unresolved",
+        }
+        labeled = label_questions(
+            pd.DataFrame(rows), tiers, self.acceptance_config, config
+        )
+        self.assertEqual(
+            labeled["difficulty_label"].tolist(),
+            ["easy", "medium", "hard", "unresolved"],
+        )
+        self.assertEqual(
+            labeled["label_reason"].tolist(),
+            [
+                "overall_solve_rate_easy",
+                "overall_solve_rate_medium",
+                "overall_solve_rate_hard",
+                "unresolved",
+            ],
+        )
+        self.assertEqual(
+            labeled["label_confidence"].tolist(),
+            ["high", "high", "high", "low"],
+        )
+
+    def test_v3_rejects_reversed_solve_rate_thresholds(self) -> None:
+        dataframe = source_frame("0shot").iloc[[0]].copy()
+        dataframe["query_text"] = "question"
+        dataframe["domain"] = "knowledge"
+        dataframe["shot_source"] = "0shot"
+        dataframe["needs_retrieval"] = False
+        tiers = ModelTiers(
+            low=("model-1", "model-2"),
+            medium=("model-3", "model-4"),
+            high=("model-5", "model-6"),
+            statistics={},
+        )
+        with self.assertRaisesRegex(RouterBenchError, "solve-rate thresholds"):
+            label_questions(
+                dataframe,
+                tiers,
+                self.acceptance_config,
+                {
+                    "strategy": "overall_solve_rate",
+                    "easy_min_solve_rate": 0.27,
+                    "medium_min_solve_rate": 0.64,
+                    "minimum_valid_models_for_confidence": 4,
+                },
+            )
+
     def test_smoke_sample_is_reproducible_and_valid(self) -> None:
         canonical, _ = canonicalize_sources(
             source_frame("0shot"), source_frame("5shot"), self.canonical_config
@@ -210,6 +337,25 @@ class RouterBenchLabelingTest(unittest.TestCase):
     def test_cli_exposes_full_labeling_profile(self) -> None:
         args = build_parser().parse_args(["label", "--trust-pickle"])
         self.assertEqual(args.command, "label")
+        self.assertTrue(args.trust_pickle)
+
+    def test_cli_exposes_kubeflow_full_build_bundle(self) -> None:
+        args = build_parser().parse_args(
+            [
+                "build-full",
+                "--zero-shot-path",
+                "zero.pkl",
+                "--five-shot-path",
+                "five.pkl",
+                "--output-dir",
+                "bundle",
+                "--trust-pickle",
+            ]
+        )
+        self.assertEqual(args.command, "build-full")
+        self.assertEqual(args.zero_shot_path, Path("zero.pkl"))
+        self.assertEqual(args.five_shot_path, Path("five.pkl"))
+        self.assertEqual(args.output_dir, Path("bundle"))
         self.assertTrue(args.trust_pickle)
 
     def test_full_profile_uses_versioned_default_paths(self) -> None:

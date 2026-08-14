@@ -353,41 +353,98 @@ def label_questions(
         valid.sum(axis=1).replace(0, np.nan)
     )
 
-    low_pass = tier_rates["low"].ge(
-        float(labeling_config["low_consensus_threshold"])
-    )
-    medium_pass = tier_rates["medium"].ge(
-        float(labeling_config["medium_consensus_threshold"])
-    )
-    high_pass = tier_rates["high"].ge(
-        float(labeling_config["high_consensus_threshold"])
-    )
-    output["difficulty_label"] = np.select(
-        [low_pass, medium_pass], ["easy", "medium"], default="hard"
-    )
-    output["label_reason"] = np.select(
-        [low_pass, ~low_pass & medium_pass, ~low_pass & ~medium_pass & high_pass],
-        ["low_tier_consensus", "medium_tier_consensus", "strong_only"],
-        default="unsolved",
-    )
-
+    strategy = str(labeling_config.get("strategy", "tier_consensus"))
+    unresolved_label = str(labeling_config.get("unresolved_label", "hard"))
+    if unresolved_label not in {"hard", "unresolved"}:
+        raise RouterBenchError(
+            "labeling.unresolved_label must be 'hard' or 'unresolved'"
+        )
     minimum_valid = int(labeling_config["minimum_valid_models_for_confidence"])
-    decisive_count = np.select(
-        [low_pass, ~low_pass & medium_pass],
-        [tier_counts["low"], tier_counts["medium"]],
-        default=tier_counts["high"],
-    )
-    any_missing = pd.Series(False, index=output.index)
-    for tier_name in ("low", "medium", "high"):
-        any_missing |= tier_counts[tier_name].lt(len(getattr(tiers, tier_name)))
-    non_monotonic = tier_rates["low"].gt(tier_rates["medium"].fillna(-1)) | tier_rates[
-        "medium"
-    ].gt(tier_rates["high"].fillna(-1))
-    confidence = np.where(
-        decisive_count < minimum_valid,
-        "low",
-        np.where(any_missing | non_monotonic, "medium", "high"),
-    )
+    if strategy == "tier_consensus":
+        low_pass = tier_rates["low"].ge(
+            float(labeling_config["low_consensus_threshold"])
+        )
+        medium_pass = tier_rates["medium"].ge(
+            float(labeling_config["medium_consensus_threshold"])
+        )
+        high_pass = tier_rates["high"].ge(
+            float(labeling_config["high_consensus_threshold"])
+        )
+        output["difficulty_label"] = np.select(
+            [low_pass, medium_pass, high_pass],
+            ["easy", "medium", "hard"],
+            default=unresolved_label,
+        )
+        unresolved_reason = (
+            "unresolved" if unresolved_label == "unresolved" else "unsolved"
+        )
+        output["label_reason"] = np.select(
+            [low_pass, ~low_pass & medium_pass, ~low_pass & ~medium_pass & high_pass],
+            ["low_tier_consensus", "medium_tier_consensus", "strong_only"],
+            default=unresolved_reason,
+        )
+        decisive_count = np.select(
+            [low_pass, ~low_pass & medium_pass],
+            [tier_counts["low"], tier_counts["medium"]],
+            default=tier_counts["high"],
+        )
+        any_missing = pd.Series(False, index=output.index)
+        for tier_name in ("low", "medium", "high"):
+            any_missing |= tier_counts[tier_name].lt(len(getattr(tiers, tier_name)))
+        non_monotonic = tier_rates["low"].gt(
+            tier_rates["medium"].fillna(-1)
+        ) | tier_rates["medium"].gt(tier_rates["high"].fillna(-1))
+        confidence = np.where(
+            decisive_count < minimum_valid,
+            "low",
+            np.where(any_missing | non_monotonic, "medium", "high"),
+        )
+    elif strategy == "overall_solve_rate":
+        easy_threshold = float(labeling_config["easy_min_solve_rate"])
+        medium_threshold = float(labeling_config["medium_min_solve_rate"])
+        if not 0.0 <= medium_threshold < easy_threshold <= 1.0:
+            raise RouterBenchError(
+                "overall solve-rate thresholds must satisfy "
+                "0 <= medium_min_solve_rate < easy_min_solve_rate <= 1"
+            )
+        overall_rate = output["overall_solve_rate"]
+        overall_valid_count = valid.sum(axis=1)
+        no_valid_models = overall_valid_count.eq(0)
+        output["difficulty_label"] = np.select(
+            [
+                no_valid_models,
+                overall_rate.ge(easy_threshold),
+                overall_rate.ge(medium_threshold),
+            ],
+            [unresolved_label, "easy", "medium"],
+            default="hard",
+        )
+        unresolved_reason = (
+            "unresolved" if unresolved_label == "unresolved" else "unsolved"
+        )
+        output["label_reason"] = np.select(
+            [
+                no_valid_models,
+                overall_rate.ge(easy_threshold),
+                overall_rate.ge(medium_threshold),
+            ],
+            [
+                unresolved_reason,
+                "overall_solve_rate_easy",
+                "overall_solve_rate_medium",
+            ],
+            default="overall_solve_rate_hard",
+        )
+        any_missing = overall_valid_count.lt(len(models))
+        confidence = np.where(
+            overall_valid_count.lt(minimum_valid),
+            "low",
+            np.where(any_missing, "medium", "high"),
+        )
+    else:
+        raise RouterBenchError(
+            "labeling.strategy must be 'tier_consensus' or 'overall_solve_rate'"
+        )
     output["label_confidence"] = confidence
     output["label_weight"] = output["label_confidence"].map(
         {"high": 1.0, "medium": 0.5, "low": 0.0}
@@ -479,6 +536,9 @@ def build_metrics(
         "dataset_version": config["dataset_version"],
         "tier_config_version": config["tier_config_version"],
         "label_rule_version": config["label_rule_version"],
+        "labeling_strategy": str(
+            config.get("labeling", {}).get("strategy", "tier_consensus")
+        ),
         "canonical_row_count": int(len(canonical)),
         "labeled_row_count": int(len(labeled)),
         "model_count": len(tiers.all_models),
@@ -525,7 +585,9 @@ def validate_labeled_output(
         raise RouterBenchError("Labeled output has duplicate sample_id values")
     if labeled["query_text"].fillna("").astype(str).str.strip().eq("").any():
         raise RouterBenchError("Labeled output has an empty query_text")
-    if not labeled["difficulty_label"].isin({"easy", "medium", "hard"}).all():
+    if not labeled["difficulty_label"].isin(
+        {"easy", "medium", "hard", "unresolved"}
+    ).all():
         raise RouterBenchError("Labeled output has an invalid difficulty label")
     for column in (
         "low_success_rate",

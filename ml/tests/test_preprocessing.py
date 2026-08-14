@@ -10,6 +10,7 @@ from llm_router_labeling.training.routerbench_preprocessing import (
     assign_group_splits,
     clean_model_input_text,
     prepare_training_dataset,
+    select_balanced_train_groups,
 )
 
 
@@ -25,6 +26,95 @@ PREPROCESSING_CONFIG = {
 
 
 class RouterBenchPreprocessingTest(unittest.TestCase):
+    def test_balanced_selection_keeps_rare_mixed_label_group_atomically(self) -> None:
+        rows = [
+            {
+                "sample_id": "easy-code",
+                "duplicate_group_id": "mixed-code-group",
+                "difficulty_label": "easy",
+                "domain": "code",
+                "high_success_rate": 1.0,
+            },
+            {
+                "sample_id": "hard-code",
+                "duplicate_group_id": "mixed-code-group",
+                "difficulty_label": "hard",
+                "domain": "code",
+                "high_success_rate": 1.0,
+            },
+        ]
+        for label in ("easy", "medium", "hard"):
+            for index in range(6):
+                rows.append(
+                    {
+                        "sample_id": f"{label}-{index}",
+                        "duplicate_group_id": f"{label}-group-{index}",
+                        "difficulty_label": label,
+                        "domain": "knowledge",
+                        "high_success_rate": 1.0,
+                    }
+                )
+        train = pd.DataFrame(rows)
+        selected, metrics = select_balanced_train_groups(
+            train,
+            {
+                "enabled": True,
+                "target_per_class": 4,
+                "label_order": ["easy", "medium", "hard"],
+                "rare_domains": ["code", "conversation"],
+            },
+            seed=42,
+        )
+        chosen = train.loc[selected]
+        self.assertEqual(
+            chosen["difficulty_label"].value_counts().to_dict(),
+            {"easy": 4, "medium": 4, "hard": 4},
+        )
+        self.assertEqual(
+            set(chosen.loc[chosen["duplicate_group_id"].eq("mixed-code-group"), "sample_id"]),
+            {"easy-code", "hard-code"},
+        )
+        self.assertEqual(metrics["mixed_label_group_count_selected"], 1)
+
+    def test_balanced_selection_is_exact_and_preserves_rare_domains(self) -> None:
+        rows = []
+        for label in ("easy", "medium", "hard"):
+            for index in range(10):
+                rows.append(
+                    {
+                        "sample_id": f"{label}-{index}",
+                        "duplicate_group_id": f"{label}-group-{index}",
+                        "difficulty_label": label,
+                        "domain": "code" if index < 2 else "knowledge",
+                        "high_success_rate": 1.0 if index % 2 else 1.0 / 3.0,
+                    }
+                )
+        train = pd.DataFrame(rows)
+        selected, metrics = select_balanced_train_groups(
+            train,
+            {
+                "enabled": True,
+                "target_per_class": 6,
+                "label_order": ["easy", "medium", "hard"],
+                "rare_domains": ["code", "conversation"],
+                "hard_strong_success_rate_threshold": 2.0 / 3.0,
+            },
+            seed=42,
+        )
+        chosen = train.loc[selected]
+        self.assertEqual(
+            chosen["difficulty_label"].value_counts().to_dict(),
+            {"easy": 6, "medium": 6, "hard": 6},
+        )
+        self.assertEqual(
+            chosen.loc[chosen["domain"].eq("code")]
+            .groupby("difficulty_label")
+            .size()
+            .to_dict(),
+            {"easy": 2, "medium": 2, "hard": 2},
+        )
+        self.assertEqual(metrics["target_per_class"], 6)
+
     def test_removes_only_benchmark_choice_wrappers(self) -> None:
         query = (
             "Please answer with the letter of the correct answer.\n\n"

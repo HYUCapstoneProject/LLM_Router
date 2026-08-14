@@ -69,6 +69,19 @@ def build_parser() -> argparse.ArgumentParser:
         help="Select versioned default input/output paths when paths are omitted",
     )
     preprocess.add_argument("--seed", type=int)
+
+    build_full = subparsers.add_parser(
+        "build-full",
+        help=(
+            "Build a versioned full labeling and training bundle from two "
+            "verified RouterBench source artifacts"
+        ),
+    )
+    build_full.add_argument("--zero-shot-path", type=Path, required=True)
+    build_full.add_argument("--five-shot-path", type=Path, required=True)
+    build_full.add_argument("--output-dir", type=Path, required=True)
+    build_full.add_argument("--seed", type=int)
+    build_full.add_argument("--trust-pickle", action="store_true")
     return parser
 
 
@@ -144,6 +157,31 @@ def _load_canonical_dataset(
             path, source_config, trust_pickle
         )
 
+    canonical_all, models = canonicalize_sources(
+        source_frames["0shot"],
+        source_frames["5shot"],
+        config["canonicalization"],
+    )
+    canonical, scope_metrics = filter_eval_scope(
+        canonical_all, config["canonicalization"]
+    )
+    return canonical_all, canonical, models, scope_metrics
+
+
+def _load_canonical_source_paths(
+    zero_shot_path: Path,
+    five_shot_path: Path,
+    trust_pickle: bool,
+    config: dict[str, Any],
+) -> tuple[pd.DataFrame, pd.DataFrame, list[str], dict[str, Any]]:
+    source_frames = {
+        "0shot": load_trusted_pickle(
+            zero_shot_path, config["sources"]["0shot"], trust_pickle
+        ),
+        "5shot": load_trusted_pickle(
+            five_shot_path, config["sources"]["5shot"], trust_pickle
+        ),
+    }
     canonical_all, models = canonicalize_sources(
         source_frames["0shot"],
         source_frames["5shot"],
@@ -270,6 +308,54 @@ def command_preprocess(
     return metrics
 
 
+def command_build_full(
+    args: argparse.Namespace, config: dict[str, Any]
+) -> dict[str, Any]:
+    canonical_all, canonical, models, scope_metrics = _load_canonical_source_paths(
+        args.zero_shot_path,
+        args.five_shot_path,
+        args.trust_pickle,
+        config,
+    )
+    tiers = calibrate_model_tiers(canonical, models)
+    labeled = label_questions(
+        canonical.sort_values("sample_id", kind="stable").reset_index(drop=True),
+        tiers,
+        config["acceptance"],
+        config["labeling"],
+    )
+    validate_labeled_output(labeled, len(canonical))
+    labeling_metrics = _write_labeling_artifacts(
+        labeled,
+        canonical_all,
+        canonical,
+        tiers,
+        scope_metrics,
+        config,
+        args.output_dir / "labeling",
+        {"run_mode": "full", "sampling_strategy": "all_scoped_rows"},
+    )
+    prepared = prepare_training_dataset(
+        labeled,
+        config["preprocessing"],
+        preprocessing_version=config["preprocessing_version"],
+        seed=args.seed,
+    )
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    prepared.training.to_parquet(args.output_dir / "training.parquet", index=False)
+    prepared.metadata.to_parquet(args.output_dir / "metadata.parquet", index=False)
+    write_json(args.output_dir / "metrics.json", prepared.metrics)
+    result = {
+        "dataset_version": config["dataset_version"],
+        "label_rule_version": config["label_rule_version"],
+        "preprocessing_version": config["preprocessing_version"],
+        "labeling": labeling_metrics,
+        "preprocessing": prepared.metrics,
+    }
+    write_json(args.output_dir / "build_metrics.json", result)
+    return result
+
+
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
@@ -280,6 +366,8 @@ def main() -> None:
         result = command_smoke(args, config)
     elif args.command == "label":
         result = command_label(args, config)
-    else:
+    elif args.command == "preprocess":
         result = command_preprocess(args, config)
+    else:
+        result = command_build_full(args, config)
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
