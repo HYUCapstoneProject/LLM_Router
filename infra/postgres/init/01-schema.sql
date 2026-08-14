@@ -136,6 +136,16 @@ CREATE TABLE escalation_log (
     final_model_id  VARCHAR(64),
     escalation_seq  INTEGER      NOT NULL DEFAULT 1,
 
+    -- 상위 모델이 준 답.
+    --
+    -- NULL 이면 "예약됨, 아직 응답 없음"이다. LLM 을 부르기 전에 행을 먼저 꽂아
+    -- 유니크 인덱스로 중복 호출을 막고(이중 과금 방지), 완료 시 이 컬럼을 채운다.
+    -- 같은 요청이 다시 오면 여기 저장된 답을 그대로 돌려준다(멱등).
+    --
+    -- 보고서에서 "haiku 는 이렇게 답해 불만족, opus 는 이렇게 답해 만족"을
+    -- 대조해 보여줄 때도 쓴다.
+    response        TEXT,
+
     -- 체인의 종결 표시. seq N+1 을 쓸 때 같은 트랜잭션에서 seq N 을 false 로 뒤집는다.
     -- 이게 없으면 한 질문에 대해 final_label 이 다른 "만족" 이벤트가 여러 건 나가고,
     -- ML 의 충돌 탐지가 그 질문군을 통째로 격리한다.

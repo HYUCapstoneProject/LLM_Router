@@ -8,6 +8,9 @@ import com.anthropic.errors.RateLimitException;
 import com.anthropic.errors.UnauthorizedException;
 import com.llmrouter.config.RequestIdFilter;
 import com.llmrouter.dto.ErrorResponse;
+import com.llmrouter.exception.EscalationConflictException;
+import com.llmrouter.exception.EscalationNotFoundException;
+import com.llmrouter.exception.InvalidEscalationException;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
@@ -37,6 +40,30 @@ public class GlobalExceptionHandler {
 
         log.warn("요청 검증 실패 - {}", detail);
         return build(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", detail);
+    }
+
+    /** /api/escalate 가 참조한 원본 요청이 request_log 에 없다 */
+    @ExceptionHandler(EscalationNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEscalationNotFound(EscalationNotFoundException e) {
+        log.warn("에스컬레이션 대상 없음 - {}", e.getMessage());
+        return build(HttpStatus.NOT_FOUND, "ESCALATION_TARGET_NOT_FOUND",
+                "원본 요청을 찾을 수 없습니다. 질문을 다시 보내주세요.");
+    }
+
+    /** 모르는 모델 이름이거나 더 낮은 티어로 내려가려는 요청 */
+    @ExceptionHandler(InvalidEscalationException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidEscalation(InvalidEscalationException e) {
+        log.warn("잘못된 에스컬레이션 요청 - {}", e.getMessage());
+        return build(HttpStatus.BAD_REQUEST, "INVALID_ESCALATION",
+                "더 높은 모델로만 재요청할 수 있습니다.");
+    }
+
+    /** 이미 처리됐거나 클라이언트가 낡은 화면을 보고 보낸 요청 */
+    @ExceptionHandler(EscalationConflictException.class)
+    public ResponseEntity<ErrorResponse> handleEscalationConflict(EscalationConflictException e) {
+        log.warn("에스컬레이션 충돌 - {}", e.getMessage());
+        return build(HttpStatus.CONFLICT, "ESCALATION_ALREADY_APPLIED",
+                "이미 상위 모델로 답변한 요청입니다. 화면을 새로고침해주세요.");
     }
 
     /** Claude API rate limit */

@@ -86,6 +86,11 @@ ALTER TABLE escalation_log ADD COLUMN IF NOT EXISTS user_satisfied BOOLEAN NOT N
 ALTER TABLE escalation_log ADD COLUMN IF NOT EXISTS router_model_version VARCHAR(128);
 
 ALTER TABLE escalation_log ADD COLUMN IF NOT EXISTS final_model_id VARCHAR(64);
+
+-- 상위 모델이 준 답. NULL 이면 "예약됨, 아직 응답 없음"이다.
+-- LLM 호출 전에 행을 먼저 꽂아 유니크 인덱스로 중복 호출을 막고(이중 과금 방지),
+-- 완료 시 채운다. 같은 요청이 다시 오면 저장된 답을 그대로 돌려준다(멱등).
+ALTER TABLE escalation_log ADD COLUMN IF NOT EXISTS response TEXT;
 ALTER TABLE escalation_log ADD COLUMN IF NOT EXISTS input_tokens  INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE escalation_log ADD COLUMN IF NOT EXISTS output_tokens INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE escalation_log ADD COLUMN IF NOT EXISTS latency_ms    INTEGER;

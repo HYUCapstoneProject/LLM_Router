@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.StringJoiner;
 
 /**
  * pgvector 기반 시맨틱 캐시.
@@ -82,7 +81,7 @@ public class CacheService {
             """;
 
     public Optional<CachedResponse> get(float[] embedding) {
-        String vec = toVectorLiteral(embedding);
+        String vec = PgVector.literal(embedding);
 
         List<CachedResponse> rows = jdbc.query(SELECT_SQL,
                 (rs, rowNum) -> new CachedResponse(
@@ -106,15 +105,15 @@ public class CacheService {
     }
 
     /**
-     * @param question 개인정보가 마스킹된 질문. 임베딩도 같은 문자열로 만든 것이어야 한다 —
-     *                 저장 시점과 조회 시점의 마스킹이 다르면 같은 질문인데 유사도가 떨어진다.
+     * @param embedding question 으로 만든 벡터여야 한다. 저장 시점과 조회 시점의
+     *                  입력 문자열이 다르면 같은 질문인데도 유사도가 떨어진다.
      * @return 생성된 행의 id. request_log.cache_entry_id 에 남겨
      *         나중에 /api/escalate 가 이 행을 정확히 지목해 갱신할 수 있게 한다.
      */
     public long put(String question, float[] embedding, LlmResult result) {
         Long id = jdbc.queryForObject(INSERT_SQL, Long.class,
                 question,
-                toVectorLiteral(embedding),
+                PgVector.literal(embedding),
                 result.text(),
                 result.tier(),
                 result.modelId(),
@@ -160,12 +159,4 @@ public class CacheService {
         };
     }
 
-    /** float[] → pgvector 리터럴 "[0.1,0.2,...]" */
-    private String toVectorLiteral(float[] v) {
-        StringJoiner sj = new StringJoiner(",", "[", "]");
-        for (float f : v) {
-            sj.add(Float.toString(f));
-        }
-        return sj.toString();
-    }
 }
