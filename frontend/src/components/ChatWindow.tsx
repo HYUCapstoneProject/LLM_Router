@@ -7,9 +7,10 @@ interface Props {
   conversation: Conversation
   isLoading: boolean
   onSubmit: (text: string) => void
+  onEscalate: (messageId: string) => void
 }
 
-export function ChatWindow({ conversation, isLoading, onSubmit }: Props) {
+export function ChatWindow({ conversation, isLoading, onSubmit, onEscalate }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -26,7 +27,12 @@ export function ChatWindow({ conversation, isLoading, onSubmit }: Props) {
         ) : (
           <div className="max-w-3xl mx-auto">
             {conversation.messages.map((msg) => (
-              <MessageBubble key={msg.id} message={msg} />
+              <MessageBubble
+                key={msg.id}
+                message={msg}
+                onEscalate={onEscalate}
+                busy={isLoading}
+              />
             ))}
             <div ref={bottomRef} />
           </div>
