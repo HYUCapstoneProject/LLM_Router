@@ -1,7 +1,14 @@
+import os
+
 from kfp import dsl
 
-
-DEFAULT_TRAINING_IMAGE = "llm-router-modernbert-training:cu124-v1"
+DEFAULT_TRAINING_IMAGE = os.environ.get(
+    "LLM_ROUTER_VERTEX_TRAINING_IMAGE",
+    (
+        "us-west1-docker.pkg.dev/replace-project/llm-router/"
+        "llm-router-modernbert-training:cu124-v1"
+    ),
+)
 RUNTIME_CONTRACT_PATH = "/opt/llm-router/config/modernbert_runtime_cu124_v1.json"
 
 
@@ -28,14 +35,53 @@ def modernbert_training_component(
             "--config",
             training_config.path,
             "--training-path",
-            dsl.ConcatPlaceholder(
-                items=[training_dataset.path, training_path_suffix]
-            ),
+            dsl.ConcatPlaceholder(items=[training_dataset.path, training_path_suffix]),
             "--runtime-contract",
             RUNTIME_CONTRACT_PATH,
             "--output-dir",
             trained_model.path,
             "--device",
             "cuda",
+        ],
+    )
+
+
+@dsl.container_component
+def modernbert_continual_training_component(
+    training_dataset: dsl.Input[dsl.Dataset],
+    training_config: dsl.Input[dsl.Artifact],
+    initial_model: dsl.Input[dsl.Model],
+    initialization_mode: str,
+    observability_run_uri: str,
+    batch_id: str,
+    candidate_model_version: str,
+    training_path_suffix: str,
+    trained_model: dsl.Output[dsl.Model],
+):
+    """Warm-start from an approved anchor, or periodically rebase from pristine."""
+    return dsl.ContainerSpec(
+        image=DEFAULT_TRAINING_IMAGE,
+        command=["modernbert-train"],
+        args=[
+            "--config",
+            training_config.path,
+            "--training-path",
+            dsl.ConcatPlaceholder(items=[training_dataset.path, training_path_suffix]),
+            "--runtime-contract",
+            RUNTIME_CONTRACT_PATH,
+            "--output-dir",
+            trained_model.path,
+            "--device",
+            "cuda",
+            "--initial-model-path",
+            initial_model.path,
+            "--initialization-mode",
+            initialization_mode,
+            "--observability-run-uri",
+            observability_run_uri,
+            "--batch-id",
+            batch_id,
+            "--candidate-model-version",
+            candidate_model_version,
         ],
     )

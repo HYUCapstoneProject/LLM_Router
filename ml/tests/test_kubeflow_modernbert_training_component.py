@@ -6,7 +6,11 @@ import unittest
 from pathlib import Path
 
 
-@unittest.skipUnless(importlib.util.find_spec("kfp"), "kfp SDK is not installed")
+@unittest.skipUnless(
+    importlib.util.find_spec("kfp")
+    and importlib.util.find_spec("google_cloud_pipeline_components"),
+    "KFP and Google Cloud Pipeline Components are required",
+)
 class KubeflowModernBertTrainingTest(unittest.TestCase):
     def test_component_and_pipeline_compile_to_ir_yaml(self) -> None:
         import yaml
@@ -19,6 +23,7 @@ class KubeflowModernBertTrainingTest(unittest.TestCase):
             )
             component_yaml = component_path.read_text(encoding="utf-8")
             pipeline_yaml = pipeline_path.read_text(encoding="utf-8")
+            component_definition = yaml.safe_load(component_yaml)
             pipeline_definition = yaml.safe_load(pipeline_yaml)
 
         self.assertIn("modernbert-train", component_yaml)
@@ -29,16 +34,38 @@ class KubeflowModernBertTrainingTest(unittest.TestCase):
         self.assertIn("trained_model", component_yaml)
         self.assertIn("modernbert_runtime_cu124_v1.json", component_yaml)
         self.assertIn("cuda", component_yaml)
-        resources = pipeline_definition["deploymentSpec"]["executors"][
+        worker_pool = pipeline_definition["components"][
+            "comp-modernbert-training-component"
+        ]["inputDefinitions"]["parameters"]["worker_pool_specs"]["defaultValue"][0]
+        self.assertEqual(worker_pool["machine_spec"]["machine_type"], "n1-standard-4")
+        self.assertEqual(
+            worker_pool["machine_spec"]["accelerator_type"],
+            "NVIDIA_TESLA_T4",
+        )
+        self.assertEqual(worker_pool["machine_spec"]["accelerator_count"], 1.0)
+        self.assertEqual(worker_pool["container_spec"]["command"], ["modernbert-train"])
+        self.assertIn("cuda", worker_pool["container_spec"]["args"])
+        training_executor = pipeline_definition["deploymentSpec"]["executors"][
             "exec-modernbert-training-component"
-        ]["container"]["resources"]
-        self.assertEqual(resources["accelerator"]["resourceType"], "nvidia.com/gpu")
-        self.assertEqual(resources["accelerator"]["count"], "1")
-        self.assertEqual(resources["resourceCpuRequest"], "4")
-        self.assertEqual(resources["resourceMemoryRequest"], "24Gi")
-        self.assertIn("training_dataset_uri", pipeline_yaml)
+        ]["container"]
+        self.assertIn("custom_job.launcher", " ".join(training_executor["command"]))
+        self.assertNotIn("resources", training_executor)
+        self.assertNotIn("nvidia.com/gpu", pipeline_yaml)
+        self.assertIn("NVIDIA_TESLA_T4", component_yaml)
+        self.assertIn("CustomJob", component_yaml)
+        self.assertEqual(
+            component_definition["pipelineInfo"]["name"],
+            "custom-training-job",
+        )
+        self.assertIn("routerbench_zero_shot_uri", pipeline_yaml)
+        self.assertIn("routerbench_five_shot_uri", pipeline_yaml)
+        self.assertIn("routerbench_labeling_config_uri", pipeline_yaml)
+        self.assertIn("routerbench_labeling_v2.json", pipeline_yaml)
+        self.assertIn("modernbert_t4_balanced_v2.json", pipeline_yaml)
+        self.assertIn("routerbench-v2-preprocessing-component", pipeline_yaml)
         self.assertIn("training_config_uri", pipeline_yaml)
-        self.assertIn("training_image", pipeline_yaml)
+        self.assertIn("training_service_account", pipeline_yaml)
+        self.assertIn("training_base_output_directory", pipeline_yaml)
 
 
 if __name__ == "__main__":
