@@ -4,21 +4,30 @@ import json
 import math
 import random
 import time
+from collections.abc import Callable, Mapping, Sequence
 from contextlib import nullcontext
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 import numpy as np
 import pandas as pd
 
-from ..shared.dataset_io import write_json
+from ..shared.dataset_io import sha256_file, write_json
+from .modernbert_checkpointing import (
+    CheckpointOptions,
+    ModernBertCheckpointError,
+    create_checkpoint,
+    next_training_cursor,
+    prune_checkpoints,
+    training_fingerprint,
+    verify_checkpoint,
+)
 from .modernbert_runtime import (
     RuntimeContract,
     collect_runtime_versions,
     validate_runtime_contract,
 )
-
 
 LABEL_ORDER = ("easy", "medium", "hard")
 LABEL2ID = {label: index for index, label in enumerate(LABEL_ORDER)}
@@ -59,6 +68,7 @@ class TrainingConfig:
     device: str
     precision: str
     attention_implementation: str
+    train_sampling_strategy: str = "shuffle"
 
     @classmethod
     def from_mapping(cls, values: Mapping[str, Any]) -> "TrainingConfig":
@@ -90,6 +100,9 @@ class TrainingConfig:
             gradient_accumulation_steps=int(
                 values.get("gradient_accumulation_steps", 1)
             ),
+            train_sampling_strategy=str(
+                values.get("train_sampling_strategy", "shuffle")
+            ),
             gradient_checkpointing=bool(values.get("gradient_checkpointing", False)),
             learning_rate=float(values["learning_rate"]),
             weight_decay=float(values["weight_decay"]),
@@ -117,6 +130,13 @@ class TrainingConfig:
                 raise ModernBertTrainingError(f"{name} must be positive")
         if self.max_train_steps is not None and self.max_train_steps <= 0:
             raise ModernBertTrainingError("max_train_steps must be positive or null")
+        if self.train_sampling_strategy not in {
+            "shuffle",
+            "balanced_effective_batch",
+        }:
+            raise ModernBertTrainingError(
+                "train_sampling_strategy must be shuffle or balanced_effective_batch"
+            )
         if self.learning_rate <= 0 or self.weight_decay < 0:
             raise ModernBertTrainingError(
                 "learning_rate must be positive and weight_decay non-negative"
@@ -133,6 +153,50 @@ class TrainingConfig:
 class TrainingResult:
     metrics: dict[str, Any]
     output_dir: Path
+
+
+@dataclass(frozen=True)
+class TrainingProgressState:
+    optimizer_steps: int
+    total_steps: int
+    epoch_number: int
+    total_epochs: int
+
+
+TrainingProgressCallback = Callable[[TrainingProgressState], None]
+
+
+@dataclass(frozen=True)
+class EpochEndState:
+    """Read-only observation point after one complete training epoch."""
+
+    epoch_number: int
+    optimizer_steps: int
+    training_fingerprint: str
+    checkpoint_path: Path
+    model: Any
+    tokenizer: Any
+    device: str
+    max_length: int
+
+
+EpochEndCallback = Callable[[EpochEndState], None]
+
+
+@dataclass(frozen=True)
+class ValidationObservationState:
+    """Inference-only RouterBench validation snapshot during an epoch."""
+
+    epoch_number: int
+    point_number: int
+    points_per_epoch: int
+    epoch_fraction: float
+    optimizer_steps: int
+    training_fingerprint: str
+    metrics: dict[str, Any]
+
+
+ValidationObservationCallback = Callable[[ValidationObservationState], None]
 
 
 def load_training_config(path: Path) -> TrainingConfig:
@@ -154,7 +218,9 @@ def validate_training_dataframe(dataframe: pd.DataFrame) -> None:
     if dataframe["model_input_text"].fillna("").astype(str).str.strip().eq("").any():
         raise ModernBertTrainingError("Training Parquet has an empty model_input_text")
     if not dataframe["difficulty_label"].isin(LABEL_ORDER).all():
-        raise ModernBertTrainingError("Training Parquet has an invalid difficulty label")
+        raise ModernBertTrainingError(
+            "Training Parquet has an invalid difficulty label"
+        )
     weights = pd.to_numeric(dataframe["sample_weight"], errors="coerce")
     if weights.isna().any() or not weights.gt(0).all():
         raise ModernBertTrainingError("Training sample_weight must be positive numeric")
@@ -214,9 +280,7 @@ def classification_metrics(
             else 0.0
         )
         f1 = (
-            2 * precision * recall / (precision + recall)
-            if precision + recall
-            else 0.0
+            2 * precision * recall / (precision + recall) if precision + recall else 0.0
         )
         per_class[label] = {
             "support": support,
@@ -312,6 +376,75 @@ def _set_seed(torch: Any, seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
+def balanced_effective_batch_indices(
+    dataframe: pd.DataFrame,
+    *,
+    effective_batch_size: int,
+    seed: int,
+) -> list[int]:
+    """Shuffle rows while keeping every optimizer unit class-balanced."""
+    if effective_batch_size <= 0:
+        raise ModernBertTrainingError("effective_batch_size must be positive")
+    label_counts = dataframe["difficulty_label"].value_counts().to_dict()
+    if set(label_counts) != set(LABEL_ORDER) or any(
+        int(label_counts[label]) <= 0 for label in LABEL_ORDER
+    ):
+        raise ModernBertTrainingError(
+            "balanced_effective_batch requires non-empty easy, medium, hard; "
+            f"got {label_counts}"
+        )
+
+    rng = np.random.default_rng(seed)
+    class_order = list(LABEL_ORDER)
+    rng.shuffle(class_order)
+    target_per_class = max(int(label_counts[label]) for label in LABEL_ORDER)
+    pools: dict[str, list[int]] = {}
+    for label in LABEL_ORDER:
+        source_indices = dataframe.index[
+            dataframe["difficulty_label"].astype(str).eq(label)
+        ].to_numpy(dtype=np.int64)
+        sampled_indices: list[int] = []
+        while len(sampled_indices) < target_per_class:
+            cycle = source_indices.copy()
+            rng.shuffle(cycle)
+            remaining = target_per_class - len(sampled_indices)
+            sampled_indices.extend(cycle[:remaining].tolist())
+        pools[label] = sampled_indices
+
+    label_sequence = [
+        class_order[position % len(class_order)]
+        for position in range(target_per_class * len(LABEL_ORDER))
+    ]
+    ordered_indices: list[int] = []
+    for start in range(0, len(label_sequence), effective_batch_size):
+        unit_labels = label_sequence[start : start + effective_batch_size]
+        rng.shuffle(unit_labels)
+        for label in unit_labels:
+            ordered_indices.append(pools[label].pop())
+    if any(pools[label] for label in LABEL_ORDER):
+        raise ModernBertTrainingError(
+            "Balanced sampler did not consume every class pool"
+        )
+    return ordered_indices
+
+
+def training_sample_count_per_epoch(
+    dataframe: pd.DataFrame, *, sampling_strategy: str
+) -> int:
+    if sampling_strategy == "shuffle":
+        return len(dataframe)
+    if sampling_strategy == "balanced_effective_batch":
+        counts = dataframe["difficulty_label"].value_counts()
+        if set(counts.index.astype(str)) != set(LABEL_ORDER):
+            raise ModernBertTrainingError(
+                "balanced_effective_batch requires all three labels"
+            )
+        return int(counts.max()) * len(LABEL_ORDER)
+    raise ModernBertTrainingError(
+        f"Unsupported train sampling strategy: {sampling_strategy}"
+    )
+
+
 def run_training(
     training_path: Path,
     output_dir: Path,
@@ -320,14 +453,18 @@ def run_training(
     runtime_contract: RuntimeContract,
     device_override: str | None = None,
     max_train_steps_override: int | None = None,
+    initial_model_dir: Path | None = None,
+    checkpoint_options: CheckpointOptions | None = None,
+    on_epoch_end: EpochEndCallback | None = None,
+    validation_observations_per_epoch: int = 0,
+    on_validation_observation: ValidationObservationCallback | None = None,
+    on_progress: TrainingProgressCallback | None = None,
 ) -> TrainingResult:
     torch, functional, transformers, transformer_classes, scheduler_factory = (
         _require_training_backends()
     )
     AutoModelForSequenceClassification, AutoTokenizer = transformer_classes
-    all_rows, train_rows, validation_rows = load_training_splits(
-        training_path, config
-    )
+    all_rows, train_rows, validation_rows = load_training_splits(training_path, config)
     requested_device = device_override or config.device
     device = _resolve_device(torch, requested_device)
     runtime_report = validate_runtime_contract(
@@ -335,23 +472,79 @@ def run_training(
         collect_runtime_versions(torch, transformers),
         device=device,
     )
+    if checkpoint_options is not None:
+        checkpoint_options.validate()
+    if (
+        initial_model_dir is not None
+        and checkpoint_options is not None
+        and checkpoint_options.resume_from is not None
+    ):
+        raise ModernBertTrainingError(
+            "initial_model_dir cannot be combined with checkpoint resume"
+        )
+    if on_epoch_end is not None and checkpoint_options is None:
+        raise ModernBertTrainingError(
+            "on_epoch_end requires checkpoint_options so the observed model is durable"
+        )
+    if validation_observations_per_epoch < 0:
+        raise ModernBertTrainingError(
+            "validation_observations_per_epoch must be non-negative"
+        )
+    if validation_observations_per_epoch == 0 and on_validation_observation is not None:
+        raise ModernBertTrainingError(
+            "on_validation_observation requires a positive observation count"
+        )
     if config.precision != "fp32" and not device.startswith("cuda"):
         raise ModernBertTrainingError(
             f"{config.precision} training is only enabled for CUDA, got {device}"
         )
     _set_seed(torch, config.seed)
 
-    tokenizer = AutoTokenizer.from_pretrained(
-        config.model_id, revision=config.model_revision
+    sampled_train_rows_per_epoch = training_sample_count_per_epoch(
+        train_rows, sampling_strategy=config.train_sampling_strategy
     )
-    model = AutoModelForSequenceClassification.from_pretrained(
-        config.model_id,
-        revision=config.model_revision,
-        num_labels=len(LABEL_ORDER),
-        label2id=LABEL2ID,
-        id2label=ID2LABEL,
-        attn_implementation=config.attention_implementation,
+    batches_in_epoch = math.ceil(sampled_train_rows_per_epoch / config.train_batch_size)
+    steps_per_epoch = math.ceil(batches_in_epoch / config.gradient_accumulation_steps)
+    planned_steps = steps_per_epoch * config.epochs
+    maximum_steps = (
+        max_train_steps_override
+        if max_train_steps_override is not None
+        else config.max_train_steps
     )
+    total_steps = min(planned_steps, maximum_steps or planned_steps)
+    training_data_sha256 = sha256_file(training_path)
+    current_fingerprint = training_fingerprint(
+        training_data_sha256=training_data_sha256,
+        config=asdict(config),
+        maximum_steps=maximum_steps,
+        runtime_version=runtime_report["runtime_version"],
+    )
+    resume_dir = (
+        checkpoint_options.resume_from if checkpoint_options is not None else None
+    )
+    if resume_dir is not None:
+        verify_checkpoint(resume_dir, expected_fingerprint=current_fingerprint)
+
+    if resume_dir is None and initial_model_dir is None:
+        tokenizer = AutoTokenizer.from_pretrained(
+            config.model_id, revision=config.model_revision
+        )
+        model = AutoModelForSequenceClassification.from_pretrained(
+            config.model_id,
+            revision=config.model_revision,
+            num_labels=len(LABEL_ORDER),
+            label2id=LABEL2ID,
+            id2label=ID2LABEL,
+            attn_implementation=config.attention_implementation,
+        )
+    else:
+        model_source = resume_dir or initial_model_dir
+        assert model_source is not None
+        tokenizer = AutoTokenizer.from_pretrained(model_source)
+        model = AutoModelForSequenceClassification.from_pretrained(
+            model_source,
+            attn_implementation=config.attention_implementation,
+        )
     if config.gradient_checkpointing:
         model.gradient_checkpointing_enable()
     model.to(device)
@@ -387,14 +580,32 @@ def run_training(
         )
         return encoded
 
-    generator = torch.Generator().manual_seed(config.seed)
-    train_loader = torch.utils.data.DataLoader(
-        WeightedDataset(train_rows),
-        batch_size=config.train_batch_size,
-        shuffle=True,
-        generator=generator,
-        collate_fn=collate,
-    )
+    train_dataset = WeightedDataset(train_rows)
+
+    def train_loader_for_epoch(epoch_index: int) -> Any:
+        generator = torch.Generator().manual_seed(config.seed + epoch_index)
+        if config.train_sampling_strategy == "balanced_effective_batch":
+            sampler = balanced_effective_batch_indices(
+                train_rows,
+                effective_batch_size=(
+                    config.train_batch_size * config.gradient_accumulation_steps
+                ),
+                seed=config.seed + epoch_index,
+            )
+            return torch.utils.data.DataLoader(
+                train_dataset,
+                batch_size=config.train_batch_size,
+                sampler=sampler,
+                collate_fn=collate,
+            )
+        return torch.utils.data.DataLoader(
+            train_dataset,
+            batch_size=config.train_batch_size,
+            shuffle=True,
+            generator=generator,
+            collate_fn=collate,
+        )
+
     validation_loader = torch.utils.data.DataLoader(
         WeightedDataset(validation_rows),
         batch_size=config.eval_batch_size,
@@ -404,22 +615,22 @@ def run_training(
     optimizer = torch.optim.AdamW(
         model.parameters(), lr=config.learning_rate, weight_decay=config.weight_decay
     )
-    steps_per_epoch = math.ceil(
-        len(train_loader) / config.gradient_accumulation_steps
-    )
-    planned_steps = steps_per_epoch * config.epochs
-    maximum_steps = (
-        max_train_steps_override
-        if max_train_steps_override is not None
-        else config.max_train_steps
-    )
-    total_steps = min(planned_steps, maximum_steps or planned_steps)
     warmup_steps = int(total_steps * config.warmup_ratio)
     scheduler = scheduler_factory(
         optimizer, num_warmup_steps=warmup_steps, num_training_steps=total_steps
     )
     use_scaler = config.precision == "fp16"
-    scaler = torch.cuda.amp.GradScaler(enabled=use_scaler)
+    scaler = torch.amp.GradScaler("cuda", enabled=use_scaler)
+    numeric_train_weights = pd.to_numeric(train_rows["sample_weight"], errors="raise")
+    if config.train_sampling_strategy == "balanced_effective_batch":
+        train_weight_mean = float(
+            train_rows.assign(_sample_weight=numeric_train_weights)
+            .groupby("difficulty_label")["_sample_weight"]
+            .mean()
+            .mean()
+        )
+    else:
+        train_weight_mean = float(numeric_train_weights.mean())
     autocast_dtype = {
         "fp16": torch.float16,
         "bf16": torch.bfloat16,
@@ -430,28 +641,261 @@ def run_training(
             return nullcontext()
         return torch.autocast(device_type="cuda", dtype=autocast_dtype)
 
+    def evaluate_validation() -> dict[str, Any]:
+        was_training = bool(model.training)
+        model.eval()
+        actual: list[int] = []
+        predicted: list[int] = []
+        validation_loss_sum = 0.0
+        validation_weighted_loss_sum = 0.0
+        validation_weight_sum = 0.0
+        validation_row_count = 0
+        try:
+            with torch.inference_mode():
+                for batch in validation_loader:
+                    weights = batch.pop("sample_weight").to(device)
+                    labels = batch.pop("labels").to(device)
+                    inputs = {key: value.to(device) for key, value in batch.items()}
+                    with precision_context():
+                        logits = model(**inputs).logits
+                        row_losses = functional.cross_entropy(
+                            logits, labels, reduction="none"
+                        )
+                    validation_loss_sum += float(row_losses.sum().cpu())
+                    validation_weighted_loss_sum += float(
+                        (row_losses * weights).sum().cpu()
+                    )
+                    validation_weight_sum += float(weights.sum().cpu())
+                    validation_row_count += int(labels.numel())
+                    actual.extend(labels.cpu().tolist())
+                    predicted.extend(logits.argmax(dim=-1).cpu().tolist())
+        finally:
+            model.train(was_training)
+        return {
+            **classification_metrics(actual, predicted),
+            "loss": validation_loss_sum / validation_row_count,
+            "weighted_loss": (validation_weighted_loss_sum / validation_weight_sum),
+        }
+
+    def run_rng_isolated(callback: Callable[[], Any]) -> Any:
+        python_random_state = random.getstate()
+        numpy_random_state = np.random.get_state()
+        torch_random_state = torch.get_rng_state()
+        cuda_random_state = (
+            torch.cuda.get_rng_state_all() if device.startswith("cuda") else None
+        )
+        try:
+            return callback()
+        finally:
+            random.setstate(python_random_state)
+            np.random.set_state(numpy_random_state)
+            torch.set_rng_state(torch_random_state)
+            if cuda_random_state is not None:
+                torch.cuda.set_rng_state_all(cuda_random_state)
+
+    start_epoch_index = 0
+    start_batch_index = 0
+    optimizer_steps = 0
+    train_loss_sum = 0.0
+    train_loss_count = 0
+    train_weighted_loss_sum = 0.0
+    train_weight_sum = 0.0
+    observation_train_loss_sum = 0.0
+    observation_train_weighted_loss_sum = 0.0
+    observation_train_weight_sum = 0.0
+    observation_train_row_count = 0
+    observation_start_optimizer_step = 0
+    completed_training_seconds = 0.0
+    resumed_from_step: int | None = None
+    if resume_dir is not None:
+        try:
+            resume_state = torch.load(
+                resume_dir / "training_state.pt",
+                map_location=device,
+                weights_only=False,
+            )
+        except Exception as error:
+            raise ModernBertCheckpointError(
+                f"Failed to load checkpoint state: {resume_dir}"
+            ) from error
+        if resume_state.get("training_fingerprint") != current_fingerprint:
+            raise ModernBertCheckpointError(
+                "Checkpoint state fingerprint does not match the current run"
+            )
+        optimizer.load_state_dict(resume_state["optimizer_state_dict"])
+        scheduler.load_state_dict(resume_state["scheduler_state_dict"])
+        scaler.load_state_dict(resume_state["scaler_state_dict"])
+        start_epoch_index = int(resume_state["epoch_index"])
+        start_batch_index = int(resume_state["next_batch_index"])
+        optimizer_steps = int(resume_state["optimizer_steps"])
+        train_loss_sum = float(resume_state["train_loss_sum"])
+        train_loss_count = int(resume_state["train_loss_count"])
+        train_weighted_loss_sum = float(
+            resume_state.get("train_weighted_loss_sum", train_loss_sum)
+        )
+        train_weight_sum = float(resume_state.get("train_weight_sum", train_loss_count))
+        observation_train_loss_sum = float(
+            resume_state.get("observation_train_loss_sum", 0.0)
+        )
+        observation_train_weighted_loss_sum = float(
+            resume_state.get("observation_train_weighted_loss_sum", 0.0)
+        )
+        observation_train_weight_sum = float(
+            resume_state.get("observation_train_weight_sum", 0.0)
+        )
+        observation_train_row_count = int(
+            resume_state.get("observation_train_row_count", 0)
+        )
+        observation_start_optimizer_step = int(
+            resume_state.get("observation_start_optimizer_step", optimizer_steps)
+        )
+        completed_training_seconds = float(resume_state.get("training_seconds", 0.0))
+        resumed_from_step = optimizer_steps
+        random.setstate(resume_state["python_random_state"])
+        np.random.set_state(resume_state["numpy_random_state"])
+        torch.set_rng_state(resume_state["torch_rng_state"])
+        if device.startswith("cuda") and resume_state.get("cuda_rng_state_all"):
+            torch.cuda.set_rng_state_all(resume_state["cuda_rng_state_all"])
+
+    def save_resume_checkpoint(
+        *, epoch_index: int, batch_index: int, session_started: float
+    ) -> Path:
+        if checkpoint_options is None:
+            raise ModernBertCheckpointError("Checkpoint options are not configured")
+        next_epoch_index, next_batch_index = next_training_cursor(
+            epoch_index=epoch_index,
+            batch_index=batch_index,
+            batches_in_epoch=batches_in_epoch,
+        )
+        elapsed_seconds = completed_training_seconds + (
+            time.perf_counter() - session_started
+        )
+
+        def write_payload(directory: Path) -> None:
+            model.save_pretrained(directory, safe_serialization=True)
+            tokenizer.save_pretrained(directory)
+            torch.save(
+                {
+                    "training_fingerprint": current_fingerprint,
+                    "optimizer_state_dict": optimizer.state_dict(),
+                    "scheduler_state_dict": scheduler.state_dict(),
+                    "scaler_state_dict": scaler.state_dict(),
+                    "epoch_index": next_epoch_index,
+                    "next_batch_index": next_batch_index,
+                    "optimizer_steps": optimizer_steps,
+                    "train_loss_sum": train_loss_sum,
+                    "train_loss_count": train_loss_count,
+                    "train_weighted_loss_sum": train_weighted_loss_sum,
+                    "train_weight_sum": train_weight_sum,
+                    "observation_train_loss_sum": observation_train_loss_sum,
+                    "observation_train_weighted_loss_sum": (
+                        observation_train_weighted_loss_sum
+                    ),
+                    "observation_train_weight_sum": observation_train_weight_sum,
+                    "observation_train_row_count": observation_train_row_count,
+                    "observation_start_optimizer_step": (
+                        observation_start_optimizer_step
+                    ),
+                    "training_seconds": elapsed_seconds,
+                    "python_random_state": random.getstate(),
+                    "numpy_random_state": np.random.get_state(),
+                    "torch_rng_state": torch.get_rng_state(),
+                    "cuda_rng_state_all": (
+                        torch.cuda.get_rng_state_all()
+                        if device.startswith("cuda")
+                        else None
+                    ),
+                },
+                directory / "training_state.pt",
+            )
+
+        checkpoint = create_checkpoint(
+            checkpoint_options.checkpoint_dir,
+            optimizer_steps=optimizer_steps,
+            metadata={
+                "training_fingerprint": current_fingerprint,
+                "training_data_sha256": training_data_sha256,
+                "optimizer_steps": optimizer_steps,
+                "epoch_index": next_epoch_index,
+                "next_batch_index": next_batch_index,
+                "total_steps": total_steps,
+            },
+            write_payload=write_payload,
+        )
+        if checkpoint_options.on_checkpoint_saved is not None:
+            checkpoint_options.on_checkpoint_saved(checkpoint)
+        prune_checkpoints(
+            checkpoint_options.checkpoint_dir,
+            keep_last=checkpoint_options.keep_last_checkpoints,
+        )
+        return checkpoint
+
     model.train()
     optimizer.zero_grad(set_to_none=True)
-    optimizer_steps = 0
-    batch_losses: list[float] = []
     started = time.perf_counter()
-    for _epoch in range(config.epochs):
-        for batch_index, batch in enumerate(train_loader, start=1):
+    latest_checkpoint: Path | None = None
+    latest_validation_metrics: dict[str, Any] | None = None
+    validation_targets: dict[int, list[tuple[int, int]]] = {}
+    if validation_observations_per_epoch:
+        for epoch_index in range(config.epochs):
+            for point_number in range(1, validation_observations_per_epoch + 1):
+                step_in_epoch = round(
+                    point_number * steps_per_epoch / validation_observations_per_epoch
+                )
+                step_in_epoch = max(1, min(steps_per_epoch, step_in_epoch))
+                global_step = epoch_index * steps_per_epoch + step_in_epoch
+                if global_step <= total_steps:
+                    validation_targets.setdefault(global_step, []).append(
+                        (epoch_index + 1, point_number)
+                    )
+    for epoch_index in range(start_epoch_index, config.epochs):
+        train_loader = train_loader_for_epoch(epoch_index)
+        first_batch_index = start_batch_index if epoch_index == start_epoch_index else 0
+        last_batch_index = -1
+        for batch_index, batch in enumerate(train_loader):
+            if batch_index < first_batch_index:
+                continue
+            last_batch_index = batch_index
             weights = batch.pop("sample_weight").to(device)
             labels = batch.pop("labels").to(device)
             inputs = {key: value.to(device) for key, value in batch.items()}
             with precision_context():
                 logits = model(**inputs).logits
-                row_losses = functional.cross_entropy(
-                    logits, labels, reduction="none"
+                row_losses = functional.cross_entropy(logits, labels, reduction="none")
+                window_start = (
+                    batch_index // config.gradient_accumulation_steps
+                ) * config.gradient_accumulation_steps
+                window_end = min(
+                    window_start + config.gradient_accumulation_steps,
+                    len(train_loader),
                 )
-                loss = (row_losses * weights).sum() / weights.sum()
-                scaled_loss = loss / config.gradient_accumulation_steps
-            batch_losses.append(float(loss.detach().cpu()))
+                first_row = window_start * config.train_batch_size
+                last_row = min(
+                    window_end * config.train_batch_size,
+                    sampled_train_rows_per_epoch,
+                )
+                window_sample_count = last_row - first_row
+                scaled_loss = (row_losses * weights).sum() / (
+                    train_weight_mean * window_sample_count
+                )
+            detached_row_losses = row_losses.detach()
+            batch_loss_sum = float(detached_row_losses.sum().cpu())
+            batch_weighted_loss_sum = float((detached_row_losses * weights).sum().cpu())
+            batch_weight_sum = float(weights.sum().cpu())
+            batch_row_count = int(labels.numel())
+            train_loss_sum += batch_loss_sum
+            train_loss_count += batch_row_count
+            train_weighted_loss_sum += batch_weighted_loss_sum
+            train_weight_sum += batch_weight_sum
+            observation_train_loss_sum += batch_loss_sum
+            observation_train_weighted_loss_sum += batch_weighted_loss_sum
+            observation_train_weight_sum += batch_weight_sum
+            observation_train_row_count += batch_row_count
             scaler.scale(scaled_loss).backward()
             should_step = (
-                batch_index % config.gradient_accumulation_steps == 0
-                or batch_index == len(train_loader)
+                batch_index + 1
+            ) % config.gradient_accumulation_steps == 0 or batch_index + 1 == len(
+                train_loader
             )
             if should_step:
                 scaler.step(optimizer)
@@ -459,40 +903,135 @@ def run_training(
                 scheduler.step()
                 optimizer.zero_grad(set_to_none=True)
                 optimizer_steps += 1
+                if on_progress is not None:
+                    on_progress(
+                        TrainingProgressState(
+                            optimizer_steps=optimizer_steps,
+                            total_steps=total_steps,
+                            epoch_number=epoch_index + 1,
+                            total_epochs=config.epochs,
+                        )
+                    )
+                for epoch_number, point_number in validation_targets.get(
+                    optimizer_steps, []
+                ):
+
+                    def observe_validation() -> dict[str, Any]:
+                        metrics = evaluate_validation()
+                        if observation_train_row_count <= 0:
+                            raise ModernBertTrainingError(
+                                "Validation observation has no preceding train rows"
+                            )
+                        if on_validation_observation is not None:
+                            on_validation_observation(
+                                ValidationObservationState(
+                                    epoch_number=epoch_number,
+                                    point_number=point_number,
+                                    points_per_epoch=validation_observations_per_epoch,
+                                    epoch_fraction=(
+                                        point_number / validation_observations_per_epoch
+                                    ),
+                                    optimizer_steps=optimizer_steps,
+                                    training_fingerprint=current_fingerprint,
+                                    metrics={
+                                        **metrics,
+                                        "train_loss": (
+                                            observation_train_loss_sum
+                                            / observation_train_row_count
+                                        ),
+                                        "train_weighted_loss": (
+                                            observation_train_weighted_loss_sum
+                                            / observation_train_weight_sum
+                                        ),
+                                        "train_loss_row_count": (
+                                            observation_train_row_count
+                                        ),
+                                        "train_loss_optimizer_step_start_exclusive": (
+                                            observation_start_optimizer_step
+                                        ),
+                                        "train_loss_optimizer_step_end_inclusive": (
+                                            optimizer_steps
+                                        ),
+                                    },
+                                )
+                            )
+                        return metrics
+
+                    latest_validation_metrics = run_rng_isolated(observe_validation)
+                    observation_train_loss_sum = 0.0
+                    observation_train_weighted_loss_sum = 0.0
+                    observation_train_weight_sum = 0.0
+                    observation_train_row_count = 0
+                    observation_start_optimizer_step = optimizer_steps
+                if checkpoint_options is not None and (
+                    optimizer_steps % checkpoint_options.save_every_optimizer_steps == 0
+                    or optimizer_steps >= total_steps
+                ):
+                    latest_checkpoint = save_resume_checkpoint(
+                        epoch_index=epoch_index,
+                        batch_index=batch_index,
+                        session_started=started,
+                    )
             if optimizer_steps >= total_steps:
                 break
+        epoch_completed = last_batch_index + 1 == len(train_loader)
+        if epoch_completed and on_epoch_end is not None:
+            expected_checkpoint_name = f"step-{optimizer_steps:08d}"
+            if (
+                latest_checkpoint is None
+                or latest_checkpoint.name != expected_checkpoint_name
+            ):
+                latest_checkpoint = save_resume_checkpoint(
+                    epoch_index=epoch_index,
+                    batch_index=last_batch_index,
+                    session_started=started,
+                )
+
+            was_training = bool(model.training)
+            model.eval()
+            try:
+                run_rng_isolated(
+                    lambda: on_epoch_end(
+                        EpochEndState(
+                            epoch_number=epoch_index + 1,
+                            optimizer_steps=optimizer_steps,
+                            training_fingerprint=current_fingerprint,
+                            checkpoint_path=latest_checkpoint,
+                            model=model,
+                            tokenizer=tokenizer,
+                            device=device,
+                            max_length=config.max_length,
+                        )
+                    )
+                )
+            finally:
+                model.train(was_training)
         if optimizer_steps >= total_steps:
             break
-    training_seconds = time.perf_counter() - started
+    training_seconds = completed_training_seconds + (time.perf_counter() - started)
 
-    model.eval()
-    actual: list[int] = []
-    predicted: list[int] = []
-    validation_losses: list[float] = []
-    with torch.inference_mode():
-        for batch in validation_loader:
-            weights = batch.pop("sample_weight").to(device)
-            labels = batch.pop("labels").to(device)
-            inputs = {key: value.to(device) for key, value in batch.items()}
-            with precision_context():
-                logits = model(**inputs).logits
-                row_losses = functional.cross_entropy(
-                    logits, labels, reduction="none"
-                )
-                loss = (row_losses * weights).sum() / weights.sum()
-            validation_losses.append(float(loss.cpu()))
-            actual.extend(labels.cpu().tolist())
-            predicted.extend(logits.argmax(dim=-1).cpu().tolist())
+    final_observation_is_current = bool(
+        validation_targets.get(optimizer_steps)
+        and validation_targets[optimizer_steps][-1]
+        == (config.epochs, validation_observations_per_epoch)
+    )
+    validation_metrics = (
+        latest_validation_metrics
+        if final_observation_is_current and latest_validation_metrics is not None
+        else run_rng_isolated(evaluate_validation)
+    )
 
     token_counts = [
         len(
             tokenizer(
-                str(text), add_special_tokens=True, truncation=False
+                str(text),
+                add_special_tokens=True,
+                truncation=False,
+                verbose=False,
             )["input_ids"]
         )
         for text in all_rows["model_input_text"]
     ]
-    validation_metrics = classification_metrics(actual, predicted)
     output_dir.mkdir(parents=True, exist_ok=True)
     model.save_pretrained(output_dir, safe_serialization=True)
     tokenizer.save_pretrained(output_dir)
@@ -534,12 +1073,12 @@ def run_training(
             "attention_implementation": config.attention_implementation,
         },
         "data": {
+            "training_data_sha256": training_data_sha256,
             "input_row_count": len(all_rows),
             "train_row_count": len(train_rows),
+            "sampled_train_row_count_per_epoch": sampled_train_rows_per_epoch,
             "validation_row_count": len(validation_rows),
-            "label_distribution": all_rows["difficulty_label"]
-            .value_counts()
-            .to_dict(),
+            "label_distribution": all_rows["difficulty_label"].value_counts().to_dict(),
         },
         "tokenization": {
             "max_length": config.max_length,
@@ -555,16 +1094,23 @@ def run_training(
             "optimizer_steps": optimizer_steps,
             "planned_steps": planned_steps,
             "max_train_steps": maximum_steps,
-            "mean_train_loss": float(np.mean(batch_losses)),
+            "mean_train_loss": train_loss_sum / train_loss_count,
+            "mean_weighted_train_loss": (train_weighted_loss_sum / train_weight_sum),
             "learning_rate": config.learning_rate,
             "weight_decay": config.weight_decay,
             "warmup_steps": warmup_steps,
             "gradient_accumulation_steps": config.gradient_accumulation_steps,
+            "effective_batch_size": (
+                config.train_batch_size * config.gradient_accumulation_steps
+            ),
+            "train_sampling_strategy": config.train_sampling_strategy,
+            "train_sample_weight_mean": train_weight_mean,
             "training_seconds": training_seconds,
+            "resumed_from_step": resumed_from_step,
+            "training_fingerprint": current_fingerprint,
         },
         "validation": {
             **validation_metrics,
-            "loss": float(np.mean(validation_losses)),
         },
         "checkpoint": {
             **checkpoint_contract,

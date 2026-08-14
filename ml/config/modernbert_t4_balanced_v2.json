@@ -1,0 +1,33 @@
+{
+  "training_version": "modernbert-router-t4-balanced-v2",
+  "model_id": "answerdotai/ModernBERT-base",
+  "model_revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+  "label2id": {
+    "easy": 0,
+    "medium": 1,
+    "hard": 2
+  },
+  "id2label": {
+    "0": "easy",
+    "1": "medium",
+    "2": "hard"
+  },
+  "train_split": "train",
+  "validation_split": "validation",
+  "max_length": 8192,
+  "truncation": true,
+  "train_batch_size": 1,
+  "eval_batch_size": 1,
+  "epochs": 3,
+  "max_train_steps": null,
+  "gradient_accumulation_steps": 8,
+  "train_sampling_strategy": "balanced_effective_batch",
+  "gradient_checkpointing": true,
+  "learning_rate": 0.00002,
+  "weight_decay": 0.01,
+  "warmup_ratio": 0.1,
+  "seed": 42,
+  "device": "cuda",
+  "precision": "fp16",
+  "attention_implementation": "eager"
+}

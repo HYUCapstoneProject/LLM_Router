@@ -14,6 +14,7 @@ from llm_router_labeling.training.modernbert_training import (
     LABEL2ID,
     ModernBertTrainingError,
     TrainingConfig,
+    balanced_effective_batch_indices,
     classification_metrics,
     load_training_config,
     validate_checkpoint_contract,
@@ -66,6 +67,53 @@ def training_frame() -> pd.DataFrame:
 
 
 class ModernBertTrainingTest(unittest.TestCase):
+    def test_balanced_sampler_balances_every_optimizer_unit(self) -> None:
+        dataframe = pd.DataFrame(
+            {
+                "difficulty_label": [
+                    label for label in ("easy", "medium", "hard") for _ in range(12)
+                ]
+            }
+        )
+        first = balanced_effective_batch_indices(
+            dataframe, effective_batch_size=8, seed=42
+        )
+        second = balanced_effective_batch_indices(
+            dataframe, effective_batch_size=8, seed=42
+        )
+        self.assertEqual(first, second)
+        self.assertEqual(len(first), len(set(first)))
+        for start in range(0, len(first), 8):
+            counts = dataframe.loc[first[start : start + 8], "difficulty_label"].value_counts()
+            padded = [int(counts.get(label, 0)) for label in ("easy", "medium", "hard")]
+            self.assertLessEqual(max(padded) - min(padded), 1)
+
+    def test_balanced_sampler_keeps_feedback_and_cycles_minority_classes(self) -> None:
+        dataframe = pd.DataFrame(
+            {
+                "difficulty_label": ["easy"] * 4
+                + ["medium"] * 5
+                + ["hard"] * 7
+            }
+        )
+        order = balanced_effective_batch_indices(
+            dataframe, effective_batch_size=8, seed=42
+        )
+        sampled = dataframe.loc[order, "difficulty_label"]
+        self.assertEqual(len(order), 21)
+        self.assertEqual(
+            sampled.value_counts().to_dict(),
+            {"easy": 7, "medium": 7, "hard": 7},
+        )
+        self.assertEqual(set(range(len(dataframe))), set(order))
+        for start in range(0, len(order), 8):
+            counts = sampled.iloc[start : start + 8].value_counts()
+            padded = [
+                int(counts.get(label, 0))
+                for label in ("easy", "medium", "hard")
+            ]
+            self.assertLessEqual(max(padded) - min(padded), 1)
+
     def test_top_level_routerbench_exports_remain_lazy_and_compatible(self) -> None:
         self.assertTrue(callable(llm_router_labeling.label_questions))
 
@@ -123,12 +171,18 @@ class ModernBertTrainingTest(unittest.TestCase):
                 "runtime.json",
                 "--device",
                 "cpu",
+                "--initial-model-path",
+                "approved-model",
+                "--initialization-mode",
+                "approved_anchor",
             ]
         )
         self.assertEqual(args.training_path, Path("input.parquet"))
         self.assertEqual(args.output_dir, Path("checkpoint"))
         self.assertEqual(args.runtime_contract, Path("runtime.json"))
         self.assertEqual(args.device, "cpu")
+        self.assertEqual(args.initial_model_path, Path("approved-model"))
+        self.assertEqual(args.initialization_mode, "approved_anchor")
 
     def test_runtime_contract_checks_core_versions_and_cuda(self) -> None:
         contract = RuntimeContract.from_mapping(
@@ -172,6 +226,19 @@ class ModernBertTrainingTest(unittest.TestCase):
         self.assertEqual(config.precision, "fp16")
         self.assertTrue(config.gradient_checkpointing)
         self.assertEqual(config.gradient_accumulation_steps, 8)
+
+    def test_t4_v2_config_balances_each_effective_batch(self) -> None:
+        config_path = (
+            Path(__file__).resolve().parents[1]
+            / "config"
+            / "modernbert_t4_balanced_v2.json"
+        )
+        config = load_training_config(config_path)
+        self.assertEqual(config.train_batch_size, 1)
+        self.assertEqual(config.gradient_accumulation_steps, 8)
+        self.assertEqual(
+            config.train_sampling_strategy, "balanced_effective_batch"
+        )
 
     def test_training_image_package_exposes_only_training_cli(self) -> None:
         ml_root = Path(__file__).resolve().parents[1]
