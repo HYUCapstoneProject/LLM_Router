@@ -7,6 +7,7 @@ from pathlib import Path
 import pandas as pd
 
 from ..shared.dataset_io import load_config, write_json
+from ..shared.observability import write_observability_json
 from .routerarena_routing_evaluator import (
     HuggingFaceRouterPredictor,
     run_routerarena_routing_evaluation,
@@ -46,6 +47,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--batch-size", type=int)
     parser.add_argument("--max-length", type=int)
     parser.add_argument("--device", choices=("auto", "cpu", "cuda", "mps"))
+    parser.add_argument("--observability-run-uri")
+    parser.add_argument("--batch-id")
+    parser.add_argument("--candidate-model-version")
     return parser
 
 
@@ -80,4 +84,17 @@ def main() -> None:
     write_json(args.output_dir / "metrics.json", result.metrics)
     write_json(args.output_dir / "model_info.json", predictor.info())
     write_routerarena_distribution_charts(result.metrics, args.output_dir)
+    if args.observability_run_uri:
+        if not args.batch_id or not args.candidate_model_version:
+            raise SystemExit(
+                "observability requires --batch-id and --candidate-model-version"
+            )
+        write_observability_json(
+            f"{args.observability_run_uri.rstrip('/')}/metrics/evaluation.json",
+            {
+                "batch_id": args.batch_id,
+                "candidate_model_version": args.candidate_model_version,
+                **result.metrics,
+            },
+        )
     print(json.dumps(result.metrics, ensure_ascii=False, indent=2, sort_keys=True))

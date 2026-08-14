@@ -126,6 +126,7 @@ class HuggingFaceRouterPredictor:
                 add_special_tokens=True,
                 padding=False,
                 truncation=False,
+                verbose=False,
             )
             token_counts = [len(input_ids) for input_ids in untruncated["input_ids"]]
             encoded = self.tokenizer(
@@ -171,6 +172,101 @@ class HuggingFaceRouterPredictor:
             "batch_size": self.batch_size,
             "max_length": self.max_length,
             "device": self.device,
+        }
+
+
+class LoadedHuggingFaceRouterPredictor:
+    """Inference-only adapter around a model already owned by the training loop."""
+
+    def __init__(
+        self,
+        model: Any,
+        tokenizer: Any,
+        torch_module: Any,
+        *,
+        checkpoint_path: str,
+        label_order: Sequence[str],
+        batch_size: int,
+        max_length: int,
+        device: str,
+    ) -> None:
+        if batch_size <= 0 or max_length <= 0:
+            raise ValueError("batch_size and max_length must be positive")
+        self.model = model
+        self.tokenizer = tokenizer
+        self._torch = torch_module
+        self.checkpoint_path = checkpoint_path
+        self.batch_size = batch_size
+        self.max_length = max_length
+        self.device = device
+        self.label_order = resolve_model_label_order(
+            getattr(model.config, "id2label", None),
+            label_order,
+            num_labels=int(model.config.num_labels),
+        )
+
+    def _synchronize(self) -> None:
+        if self.device.startswith("cuda"):
+            self._torch.cuda.synchronize()
+        elif self.device == "mps" and hasattr(self._torch, "mps"):
+            self._torch.mps.synchronize()
+
+    def predict(self, texts: Sequence[str]) -> pd.DataFrame:
+        records: list[dict[str, Any]] = []
+        for start in range(0, len(texts), self.batch_size):
+            batch_texts = [str(text) for text in texts[start : start + self.batch_size]]
+            untruncated = self.tokenizer(
+                batch_texts,
+                add_special_tokens=True,
+                padding=False,
+                truncation=False,
+                verbose=False,
+            )
+            token_counts = [len(input_ids) for input_ids in untruncated["input_ids"]]
+            encoded = self.tokenizer(
+                batch_texts,
+                add_special_tokens=True,
+                padding=True,
+                truncation=True,
+                max_length=self.max_length,
+                return_tensors="pt",
+            )
+            encoded = {key: value.to(self.device) for key, value in encoded.items()}
+            self._synchronize()
+            started = time.perf_counter()
+            with self._torch.inference_mode():
+                logits = self.model(**encoded).logits
+                probabilities = self._torch.softmax(logits, dim=-1).cpu().numpy()
+            self._synchronize()
+            per_row_latency_ms = (
+                (time.perf_counter() - started) * 1000.0 / len(batch_texts)
+            )
+            for probability, token_count in zip(
+                probabilities, token_counts, strict=True
+            ):
+                predicted_index = int(np.argmax(probability))
+                record: dict[str, Any] = {
+                    "predicted_label": self.label_order[predicted_index],
+                    "prediction_confidence": float(probability[predicted_index]),
+                    "input_token_count": int(token_count),
+                    "was_truncated": bool(token_count > self.max_length),
+                    "inference_latency_ms": per_row_latency_ms,
+                }
+                for index, label in enumerate(self.label_order):
+                    record[f"prob_{label}"] = float(probability[index])
+                records.append(record)
+        return pd.DataFrame.from_records(records)
+
+    def info(self) -> Mapping[str, Any]:
+        return {
+            "model_path": self.checkpoint_path,
+            "model_type": getattr(self.model.config, "model_type", None),
+            "num_labels": int(self.model.config.num_labels),
+            "label_order": list(self.label_order),
+            "batch_size": self.batch_size,
+            "max_length": self.max_length,
+            "device": self.device,
+            "model_ownership": "training-loop-read-only-reference",
         }
 
 
