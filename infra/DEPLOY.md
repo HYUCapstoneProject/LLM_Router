@@ -228,8 +228,9 @@ Cloud Run 은 scale-to-zero 라 접속이 없으면 과금되지 않는다. **GC
 `/api/escalate` 는 LLM 을 부르기 전에 `escalation_log` 에 자리를 예약한다
 (`response IS NULL` 인 행). 프로세스가 LLM 호출 도중 죽으면 그 예약이 남는다.
 
-`llm.escalation.reservation-timeout`(기본 5분)이 지나면 다음 요청이 알아서 인수하므로
-보통은 기다리면 된다. 급하면 직접 지운다.
+`llm.escalation.reservation-timeout`(기본 15분)이 지나면 다음 요청이 알아서 인수하므로
+보통은 기다리면 된다. Anthropic SDK 요청 타임아웃(기본 10분)보다 길게 잡아야
+"느리지만 살아 있는" 호출을 가로채지 않는다. 급하면 직접 지운다.
 
 ```sql
 -- 남아 있는 예약 확인
@@ -237,7 +238,7 @@ SELECT request_id, escalation_seq, final_tier, created_at
 FROM escalation_log WHERE response IS NULL;
 
 -- 지우기 (완료된 행은 response 가 있으므로 이 조건에 안 걸린다)
-DELETE FROM escalation_log WHERE response IS NULL AND created_at < now() - interval '5 minutes';
+DELETE FROM escalation_log WHERE response IS NULL AND created_at < now() - interval '15 minutes';
 ```
 
 ### 답변은 나오는데 request_log 가 비어 있다

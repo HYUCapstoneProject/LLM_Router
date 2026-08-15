@@ -11,6 +11,7 @@ import com.llmrouter.dto.ExistingEscalation;
 import com.llmrouter.dto.LlmResult;
 import com.llmrouter.dto.RequestLogEntry;
 import com.llmrouter.exception.EscalationConflictException;
+import com.llmrouter.exception.EscalationInProgressException;
 import com.llmrouter.exception.EscalationNotFoundException;
 import com.llmrouter.exception.InvalidEscalationException;
 import com.llmrouter.service.RouterService.Tier;
@@ -250,11 +251,11 @@ class EscalationServiceTest {
             when(escalationLogService.findByTier(REQ_ID, "hard")).thenReturn(Optional.of(
                     new ExistingEscalation(1, null, "medium", "hard", null,
                             List.of("sonnet", "opus"), 0, 0, 0)));
-            when(escalationLogService.deleteStaleReservation(anyString(), anyString(), any()))
+            when(escalationLogService.deleteStaleReservation(anyString(), any()))
                     .thenReturn(false);
 
             assertThatThrownBy(() -> service.escalate(request("sonnet", "opus")))
-                    .isInstanceOf(EscalationConflictException.class);
+                    .isInstanceOf(EscalationInProgressException.class);
             verify(llmService, never()).call(any(), anyString());
         }
 
@@ -265,7 +266,7 @@ class EscalationServiceTest {
             when(escalationLogService.findByTier(REQ_ID, "hard")).thenReturn(Optional.of(
                     new ExistingEscalation(1, null, "medium", "hard", null,
                             List.of("sonnet", "opus"), 0, 0, 0)));
-            when(escalationLogService.deleteStaleReservation(eq(REQ_ID), eq("hard"), any()))
+            when(escalationLogService.deleteStaleReservation(eq(REQ_ID), any()))
                     .thenReturn(true);
             // 첫 예약은 유령 때문에 실패, 치운 뒤 두 번째는 성공
             doThrow(new DuplicateKeyException("dup")).doNothing()
@@ -284,12 +285,12 @@ class EscalationServiceTest {
             givenMissOriginContext("medium");
             when(escalationLogService.findByTier(REQ_ID, "hard")).thenReturn(Optional.of(
                     new ExistingEscalation(1, null, "medium", "hard", null, List.of(), 0, 0, 0)));
-            when(escalationLogService.deleteStaleReservation(anyString(), anyString(), any()))
+            when(escalationLogService.deleteStaleReservation(anyString(), any()))
                     .thenReturn(true);
             doThrow(new DuplicateKeyException("dup")).when(escalationLogService).reserve(any());
 
             assertThatThrownBy(() -> service.escalate(request("sonnet", "opus")))
-                    .isInstanceOf(EscalationConflictException.class);
+                    .isInstanceOf(EscalationInProgressException.class);
             verify(llmService, never()).call(any(), anyString());
         }
 

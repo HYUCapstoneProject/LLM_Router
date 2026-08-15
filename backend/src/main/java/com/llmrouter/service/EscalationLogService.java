@@ -8,6 +8,7 @@ import com.llmrouter.dto.ExistingEscalation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,25 +100,38 @@ public class EscalationLogService {
              WHERE request_id = ?::uuid AND escalation_seq = ? AND response IS NULL
             """;
 
+    /**
+     * 티어로 좁히지 않고 이 requestId 의 오래된 미완료 예약을 전부 치운다.
+     *
+     * 예약은 (request_id, final_tier) 뿐 아니라 (request_id, escalation_seq) 로도 충돌한다.
+     * haiku -> opus 처럼 중간 단계를 건너뛴 요청이 죽어 hard 예약을 남기면,
+     * 그 뒤의 haiku -> sonnet 요청은 seq 충돌로 막히는데 티어가 달라 청소 대상에서 빠진다.
+     * 그러면 자가 복구가 안 되고 수동 SQL 로만 풀린다.
+     */
     private static final String DELETE_STALE_SQL = """
             DELETE FROM escalation_log
-             WHERE request_id = ?::uuid AND final_tier = ?
+             WHERE request_id = ?::uuid
                AND response IS NULL
                AND created_at < now() - make_interval(secs => ?)
             """;
 
+    /**
+     * package-private 로 꺼내둔 이유: 이 매퍼가 드라이버가 돌려주는 타입에 의존하는데
+     * 서비스 테스트는 loadContext 자체를 목으로 대체해 버려 그 가정을 검증하지 못한다.
+     * ResultSet 을 목으로 만들어 직접 때려볼 수 있게 분리했다.
+     */
+    static final RowMapper<EscalationContext> CONTEXT_MAPPER = (rs, rowNum) -> new EscalationContext(
+            rs.getString("question"),
+            rs.getString("conversation_id"),
+            rs.getString("tier"),
+            rs.getBoolean("cache_hit"),
+            nullableLong(rs.getObject("cache_entry_id")),
+            nullableDouble(rs.getObject("similarity")),
+            rs.getString("router_model_version"),
+            rs.getString("embed_model_version"));
+
     public Optional<EscalationContext> loadContext(String requestId) {
-        return jdbc.query(SELECT_CONTEXT_SQL,
-                (rs, rowNum) -> new EscalationContext(
-                        rs.getString("question"),
-                        rs.getString("conversation_id"),
-                        rs.getString("tier"),
-                        rs.getBoolean("cache_hit"),
-                        (Long) rs.getObject("cache_entry_id"),
-                        (Double) rs.getObject("similarity"),
-                        rs.getString("router_model_version"),
-                        rs.getString("embed_model_version")),
-                requestId).stream().findFirst();
+        return jdbc.query(SELECT_CONTEXT_SQL, CONTEXT_MAPPER, requestId).stream().findFirst();
     }
 
     public Optional<EscalationChainState> loadChain(String requestId) {
@@ -208,17 +222,31 @@ public class EscalationLogService {
     /**
      * 프로세스가 LLM 호출 도중 죽어 남은 유령 예약을 치운다.
      *
-     * 이게 없으면 그 (질문, 티어) 조합이 영구히 막히고 풀 방법이 수동 SQL 뿐이다.
+     * 이게 없으면 그 질문이 영구히 막히고 풀 방법이 수동 SQL 뿐이다.
      *
-     * @return 치웠으면 true. 아직 진행 중이거나 이미 완료된 행이면 false.
+     * @return 치웠으면 true. 아직 진행 중이거나 이미 완료된 행뿐이면 false.
      */
-    public boolean deleteStaleReservation(String requestId, String finalTier, Duration timeout) {
-        int deleted = jdbc.update(DELETE_STALE_SQL, requestId, finalTier, timeout.toSeconds());
+    public boolean deleteStaleReservation(String requestId, Duration timeout) {
+        int deleted = jdbc.update(DELETE_STALE_SQL, requestId, timeout.toSeconds());
         if (deleted > 0) {
-            log.warn("유령 예약을 치우고 재시도한다 requestId={} tier={} (예약이 {} 보다 오래됨)",
-                    requestId, finalTier, timeout);
+            log.warn("유령 예약 {}건을 치우고 재시도한다 requestId={} ({} 보다 오래됨)",
+                    deleted, requestId, timeout);
         }
         return deleted > 0;
+    }
+
+    /**
+     * similarity 는 REAL 컬럼이라 pgJDBC 가 {@link Float} 를 돌려준다.
+     * {@code (Double) rs.getObject(...)} 로 받으면 ClassCastException 이 나는데,
+     * 캐시 미스 유래 행은 이 값이 NULL 이라 캐시 히트 답변을 에스컬레이션할 때만 터진다.
+     * 컬럼 타입이 바뀌어도 안전하도록 Number 로 받아 변환한다.
+     */
+    private static Double nullableDouble(Object value) {
+        return value == null ? null : ((Number) value).doubleValue();
+    }
+
+    private static Long nullableLong(Object value) {
+        return value == null ? null : ((Number) value).longValue();
     }
 
     private static List<String> readTextArray(Array array) throws SQLException {

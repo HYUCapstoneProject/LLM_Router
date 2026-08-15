@@ -9,6 +9,7 @@ import com.anthropic.errors.UnauthorizedException;
 import com.llmrouter.config.RequestIdFilter;
 import com.llmrouter.dto.ErrorResponse;
 import com.llmrouter.exception.EscalationConflictException;
+import com.llmrouter.exception.EscalationInProgressException;
 import com.llmrouter.exception.EscalationNotFoundException;
 import com.llmrouter.exception.InvalidEscalationException;
 import lombok.extern.slf4j.Slf4j;
@@ -58,12 +59,25 @@ public class GlobalExceptionHandler {
                 "더 높은 모델로만 재요청할 수 있습니다.");
     }
 
-    /** 이미 처리됐거나 클라이언트가 낡은 화면을 보고 보낸 요청 */
+    /**
+     * 클라이언트가 낡은 화면을 보고 보낸 요청.
+     *
+     * "새로고침하라"고 안내하지 않는다. 대화 상태가 메모리에만 있어(useChat)
+     * 새로고침하면 대화가 통째로 날아간다.
+     */
     @ExceptionHandler(EscalationConflictException.class)
     public ResponseEntity<ErrorResponse> handleEscalationConflict(EscalationConflictException e) {
         log.warn("에스컬레이션 충돌 - {}", e.getMessage());
         return build(HttpStatus.CONFLICT, "ESCALATION_ALREADY_APPLIED",
-                "이미 상위 모델로 답변한 요청입니다. 화면을 새로고침해주세요.");
+                "이미 상위 모델로 답변한 요청입니다.");
+    }
+
+    /** 같은 요청이 아직 처리 중 — 기다리면 되는 상황이라 위와 안내가 달라야 한다 */
+    @ExceptionHandler(EscalationInProgressException.class)
+    public ResponseEntity<ErrorResponse> handleEscalationInProgress(EscalationInProgressException e) {
+        log.warn("에스컬레이션 처리 중 중복 요청 - {}", e.getMessage());
+        return build(HttpStatus.CONFLICT, "ESCALATION_IN_PROGRESS",
+                "같은 요청을 처리하고 있습니다. 잠시 후 다시 시도해주세요.");
     }
 
     /** Claude API rate limit */

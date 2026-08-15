@@ -12,6 +12,7 @@ import com.llmrouter.dto.ExistingEscalation;
 import com.llmrouter.dto.LlmResult;
 import com.llmrouter.dto.RequestLogEntry;
 import com.llmrouter.exception.EscalationConflictException;
+import com.llmrouter.exception.EscalationInProgressException;
 import com.llmrouter.exception.EscalationNotFoundException;
 import com.llmrouter.exception.InvalidEscalationException;
 import com.llmrouter.service.RouterService.Tier;
@@ -63,8 +64,11 @@ public class EscalationService {
     @Value("${llm.escalation.cache-refresh.overwrite-similarity:0.95}")
     private double overwriteSimilarity;
 
-    /** 이보다 오래된 미완료 예약은 죽은 프로세스가 남긴 것으로 보고 인수한다. */
-    @Value("${llm.escalation.reservation-timeout:PT5M}")
+    /**
+     * 이보다 오래된 미완료 예약은 죽은 프로세스가 남긴 것으로 보고 인수한다.
+     * Anthropic SDK 요청 타임아웃(기본 10분)보다 길어야 한다 — application.yml 주석 참조.
+     */
+    @Value("${llm.escalation.reservation-timeout:PT15M}")
     private Duration reservationTimeout;
 
     public EscalateResponse escalate(EscalateRequest request) {
@@ -129,9 +133,21 @@ public class EscalationService {
             throw e;
         }
 
+        // ── 여기서부터는 이미 요금을 지불했다. 무슨 일이 있어도 답변은 사용자에게 돌려준다. ──
+
         // 7. 캐시 갱신 (기획서 4-3). 갱신하지 않으면 이후 유사 질문에 불만족스러웠던 답이 다시 나간다.
-        float[] embedding = routerClient.embed(ctx.question());
-        refreshCache(ctx, embedding, result);
+        //
+        //    임베딩 호출과 캐시 갱신은 부가 작업이라 실패해도 응답을 막지 않는다.
+        //    여기서 예외가 새어 나가면 지불한 Opus 답변을 버리고, 예약도 남아
+        //    타임아웃 전까지 재시도가 409 로 막힌다 — 사용자는 돈만 내고 아무것도 못 받는다.
+        float[] embedding = null;
+        try {
+            embedding = routerClient.embed(ctx.question());
+            refreshCache(ctx, embedding, result);
+        } catch (RuntimeException e) {
+            log.error("에스컬레이션 후처리(임베딩/캐시 갱신) 실패 - 답변은 반환한다 requestId={}",
+                    originalRequestId, e);
+        }
 
         // 8. 예약한 행에 결과를 채우고 체인의 종결점으로 만든다.
         long latency = System.currentTimeMillis() - start;
@@ -217,10 +233,9 @@ public class EscalationService {
                 return Optional.of(toResponse(requestId, existing.get()));
             }
 
-            boolean reclaimed = escalationLogService.deleteStaleReservation(
-                    requestId, targetTier.label(), reservationTimeout);
+            boolean reclaimed = escalationLogService.deleteStaleReservation(requestId, reservationTimeout);
             if (!reclaimed) {
-                throw new EscalationConflictException(
+                throw new EscalationInProgressException(
                         "같은 요청이 처리 중입니다. requestId=" + requestId + " tier=" + targetTier.label());
             }
 
@@ -229,7 +244,7 @@ public class EscalationService {
                 escalationLogService.reserve(reservation);
                 return Optional.empty();
             } catch (DuplicateKeyException second) {
-                throw new EscalationConflictException(
+                throw new EscalationInProgressException(
                         "같은 요청이 처리 중입니다. requestId=" + requestId);
             }
         }
