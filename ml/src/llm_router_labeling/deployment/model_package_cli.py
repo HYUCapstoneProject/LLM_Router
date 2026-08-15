@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
+from ..shared.observability import write_observability_json
 from .model_package import (
     assemble_model_package,
     create_model_manifest,
@@ -23,6 +24,12 @@ def build_parser() -> argparse.ArgumentParser:
     assemble.add_argument("--metadata", type=Path, required=True)
     assemble.add_argument("--output-dir", type=Path, required=True)
     assemble.add_argument("--evaluation-metrics", type=Path)
+    assemble.add_argument(
+        "--model-version",
+        help="Overrides metadata['model_version'] with the run's candidate version",
+    )
+    assemble.add_argument("--observability-run-uri")
+    assemble.add_argument("--batch-id")
     validate = subparsers.add_parser("validate")
     validate.add_argument("--package-dir", type=Path, required=True)
     validate.add_argument("--manifest", type=Path)
@@ -42,9 +49,25 @@ def main() -> None:
                 args.output_dir,
                 metadata,
                 args.evaluation_metrics,
+                model_version=args.model_version,
             )
     else:
         result = validate_model_package(args.package_dir, args.manifest)
+    if (
+        args.command == "assemble"
+        and args.observability_run_uri
+        and args.model_version
+    ):
+        if not args.batch_id:
+            raise SystemExit("observability requires --batch-id")
+        write_observability_json(
+            f"{args.observability_run_uri.rstrip('/')}/metrics/packaging.json",
+            {
+                "batch_id": args.batch_id,
+                "candidate_model_version": args.model_version,
+                "package_file_count": len(result.get("files", {})),
+            },
+        )
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
 
 

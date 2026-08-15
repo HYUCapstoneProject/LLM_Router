@@ -1,0 +1,11 @@
+{
+  "rules_version": "deploy-gate-smoke-v1",
+  "minimum_metrics": {
+    "accuracy": 0.0
+  },
+  "maximum_metrics": {
+    "under_routing_rate": 1.0
+  },
+  "minimum_delta": {},
+  "maximum_delta": {}
+}

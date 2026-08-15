@@ -25,12 +25,18 @@ COPY ml/src/llm_router_labeling/deployment/model_package.py /opt/llm-router/ml/s
 COPY ml/src/llm_router_labeling/deployment/model_package_cli.py /opt/llm-router/ml/src/llm_router_labeling/deployment/model_package_cli.py
 COPY ml/src/llm_router_labeling/deployment/deploy_gate.py /opt/llm-router/ml/src/llm_router_labeling/deployment/deploy_gate.py
 COPY ml/src/llm_router_labeling/deployment/deploy_gate_cli.py /opt/llm-router/ml/src/llm_router_labeling/deployment/deploy_gate_cli.py
+COPY ml/src/llm_router_labeling/deployment/model_publish.py /opt/llm-router/ml/src/llm_router_labeling/deployment/model_publish.py
+COPY ml/src/llm_router_labeling/deployment/model_publish_cli.py /opt/llm-router/ml/src/llm_router_labeling/deployment/model_publish_cli.py
 COPY ml/src/llm_router_labeling/shared/__init__.py /opt/llm-router/ml/src/llm_router_labeling/shared/__init__.py
 COPY ml/src/llm_router_labeling/shared/dataset_io.py /opt/llm-router/ml/src/llm_router_labeling/shared/dataset_io.py
+COPY ml/src/llm_router_labeling/shared/object_store.py /opt/llm-router/ml/src/llm_router_labeling/shared/object_store.py
+COPY ml/src/llm_router_labeling/shared/observability.py /opt/llm-router/ml/src/llm_router_labeling/shared/observability.py
 
-RUN python -m pip install --no-deps /opt/llm-router/ml \
+RUN python -m pip install "google-cloud-storage>=3.0,<4.0" \
+    && python -m pip install --no-deps /opt/llm-router/ml \
     && modernbert-package --help >/dev/null \
     && modernbert-deploy-gate --help >/dev/null \
+    && modernbert-publish --help >/dev/null \
     && groupadd --gid 10001 promoter \
     && useradd --uid 10001 --gid promoter --create-home --shell /usr/sbin/nologin promoter \
     && mkdir -p /workspace/input /workspace/output \

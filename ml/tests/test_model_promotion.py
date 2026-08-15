@@ -94,6 +94,27 @@ class ModelPackageTest(unittest.TestCase):
             report = validate_model_package(package_dir)
             self.assertIn("routerarena_metrics.json", report["verified_files"])
 
+    def test_assemble_overrides_static_metadata_with_the_run_candidate_version(self) -> None:
+        # package_metadata_uri is one static file shared by every pipeline run, so
+        # its own model_version cannot vary per run without this override.
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            checkpoint_dir = root / "checkpoint"
+            checkpoint_dir.mkdir()
+            _checkpoint(checkpoint_dir)
+            metadata = {**_metadata(), "model_version": "static-placeholder-in-gcs"}
+
+            manifest = assemble_model_package(
+                checkpoint_dir,
+                root / "package",
+                metadata,
+                model_version="router-modernbert-base-feedback-20260901-a1b2c3d",
+            )
+
+            self.assertEqual(
+                manifest["model_version"], "router-modernbert-base-feedback-20260901-a1b2c3d"
+            )
+
 
 class DeployGateTest(unittest.TestCase):
     def test_absolute_and_baseline_rules_are_auditable(self) -> None:
@@ -112,7 +133,7 @@ class DeployGateTest(unittest.TestCase):
                 "minimum_delta": {"routerbench.macro_f1": -0.01},
             },
             candidate_model_version="candidate-v2",
-            package_validation={"valid": True},
+            package_validation={"valid": True, "model_version": "candidate-v2"},
             baseline_metrics={"routerbench": {"macro_f1": 0.825}},
             baseline_model_version="approved-v1",
         )
@@ -125,7 +146,7 @@ class DeployGateTest(unittest.TestCase):
             {"routerbench": {"macro_f1": 0.70}},
             {"minimum_metrics": {"routerbench.macro_f1": 0.80}},
             candidate_model_version="candidate-v2",
-            package_validation={"valid": True},
+            package_validation={"valid": True, "model_version": "candidate-v2"},
         )
         self.assertFalse(result["passed"])
         self.assertEqual(result["failed_checks"][0]["actual"], 0.70)
@@ -137,7 +158,7 @@ class DeployGateTest(unittest.TestCase):
                 {"routerbench": {"macro_f1": 0.82}},
                 {"minimum_delta": {"routerbench.macro_f1": -0.01}},
                 candidate_model_version="candidate-v2",
-                package_validation={"valid": True},
+                package_validation={"valid": True, "model_version": "candidate-v2"},
             )
 
 

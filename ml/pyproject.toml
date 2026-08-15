@@ -22,6 +22,9 @@ model-training = [
   "torch==2.5.1",
   "transformers==4.48.3",
 ]
+model-publishing = [
+  "google-cloud-storage>=3.0,<4.0",
+]
 
 [project.scripts]
 routerbench-labeling = "llm_router_labeling.training.routerbench_cli:main"
@@ -29,8 +32,10 @@ routerarena-preprocessing = "llm_router_labeling.evaluation.routerarena_cli:main
 routerarena-evaluate = "llm_router_labeling.evaluation.routerarena_evaluation_cli:main"
 escalation-feedback-preprocessing = "llm_router_labeling.training.feedback_retraining_cli:main"
 modernbert-train = "llm_router_labeling.training.modernbert_training_cli:main"
+modernbert-colab-train = "llm_router_labeling.training.modernbert_colab_training_cli:main"
 modernbert-package = "llm_router_labeling.deployment.model_package_cli:main"
 modernbert-deploy-gate = "llm_router_labeling.deployment.deploy_gate_cli:main"
+modernbert-publish = "llm_router_labeling.deployment.model_publish_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

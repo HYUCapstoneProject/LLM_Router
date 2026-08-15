@@ -33,6 +33,13 @@ def evaluate_deploy_gate(
     if not package_validation.get("valid"):
         raise DeployGateError("Candidate model package did not pass validation")
 
+    packaged_version = str(package_validation.get("model_version", ""))
+    if packaged_version != candidate_model_version:
+        raise DeployGateError(
+            "Package model_version does not match the candidate model version: "
+            f"{packaged_version!r} != {candidate_model_version!r}"
+        )
+
     checks: list[dict[str, Any]] = [
         {
             "name": "package_integrity",
@@ -40,7 +47,14 @@ def evaluate_deploy_gate(
             "actual": True,
             "threshold": True,
             "passed": True,
-        }
+        },
+        {
+            "name": "package_model_version",
+            "operator": "==",
+            "actual": packaged_version,
+            "threshold": candidate_model_version,
+            "passed": True,
+        },
     ]
 
     rule_groups = (

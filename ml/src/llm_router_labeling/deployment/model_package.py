@@ -181,7 +181,15 @@ def assemble_model_package(
     output_dir: Path,
     metadata: Mapping[str, Any],
     evaluation_metrics_path: Path | None = None,
+    model_version: str | None = None,
 ) -> dict[str, Any]:
+    """Assemble a candidate package from a checkpoint and static metadata.
+
+    ``package_metadata_uri`` is one immutable GCS file shared by every pipeline
+    run, so its ``model_version`` cannot vary per run on its own. ``model_version``
+    overrides that field with the run's actual candidate version, which is what
+    the deploy gate and the publish step both key off of.
+    """
     checkpoint_dir = checkpoint_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     checkpoint_contract = _validate_checkpoint_contract(checkpoint_dir)
@@ -202,6 +210,8 @@ def assemble_model_package(
             evaluation_metrics_path, output_dir / "routerarena_metrics.json"
         )
     candidate_metadata = {**metadata, "gate_status": "candidate"}
+    if model_version:
+        candidate_metadata["model_version"] = model_version
     manifest = create_model_manifest(output_dir, candidate_metadata)
     if evaluation_metrics_path is not None:
         manifest["files"]["routerarena_metrics.json"] = sha256_file(
