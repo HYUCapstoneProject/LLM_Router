@@ -32,7 +32,7 @@ export function ModelBadge({
       {/* 에스컬레이션이 눈에 보이는 유일한 흔적이다. 데모의 핵심 장면 */}
       {escalated && (
         <span className="text-xs text-gray-500">
-          ⤴ {escalationPath.map((m) => MODEL_CONFIG[m].label).join(' → ')}
+          ↑ {escalationPath.map((m) => MODEL_CONFIG[m].label).join(' → ')}
         </span>
       )}
       {cacheHit && (

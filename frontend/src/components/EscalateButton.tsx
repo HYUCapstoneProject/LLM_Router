@@ -32,7 +32,7 @@ export function EscalateButton({ target, escalating, disabled, onClick }: Props)
           {cfg.label}에게 다시 묻는 중…
         </>
       ) : (
-        <>⤴ {cfg.label}로 다시 답변</>
+        <>↑ {cfg.label}로 다시 답변</>
       )}
     </button>
   )
