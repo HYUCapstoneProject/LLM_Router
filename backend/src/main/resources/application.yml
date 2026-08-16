@@ -40,6 +40,20 @@ llm:
     embed-model-version: ${ROUTER_EMBED_MODEL_VERSION:bge-large-en-v1.5}
     model-version: ${ROUTER_MODEL_VERSION:router-modernbert-base-routerbench-20260814-45dcc6d}
 
+  pricing:
+    # 100만 토큰당 USD. 가격이 개정되면 version 을 올리고 값을 바꾼다.
+    # 실험 결과에는 이 version 을 같이 남겨야 나중에 숫자를 재현할 수 있다.
+    version: "2026-06"
+    haiku:
+      input: 1.0
+      output: 5.0
+    sonnet:
+      input: 3.0
+      output: 15.0
+    opus:
+      input: 5.0
+      output: 25.0
+
   # 티어 → Claude 모델 매핑 (기획서 2장 기술 스택)
   # 실험 중 재컴파일 없이 바꿀 수 있도록 설정으로 뺌
   models:
