@@ -249,6 +249,56 @@ DELETE FROM escalation_log WHERE response IS NULL AND created_at < now() - inter
 
 ---
 
+## 7. main 머지 후 반복 배포
+
+현재 운영 리소스는 다음과 같다.
+
+- 프론트엔드: Cloud Run `llm-router-frontend` (`asia-northeast3`)
+- 백엔드 VM: GCE `llm-router-workspace` (`asia-northeast3-a`)
+- 백엔드 컨테이너: `llm-router-backend`
+- 고정 외부 IP: `llm-router-workspace-ip`
+
+Cloud Run 은 VPC 직접 연결로 VM 내부 IP를 사용한다. `BACKEND_URL`, Secret Manager의
+`GATEWAY_KEY`, VPC 설정은 기존 Cloud Run 서비스 설정에 유지되므로 반복 배포 때 값을
+명령줄에 다시 쓰지 않는다.
+
+배포 전 반드시 최신 `main`과 깨끗한 작업 트리를 준비한다.
+
+```bash
+git switch main
+git pull --ff-only origin main
+```
+
+프론트만 바뀌었으면 다음 명령으로 빌드 검사 후 Cloud Run에 배포한다.
+
+```bash
+./scripts/deploy-frontend.sh
+```
+
+백엔드만 바뀌었으면 다음 명령으로 테스트 후 GCE 컨테이너를 교체한다.
+
+```bash
+./scripts/deploy-backend.sh
+```
+
+> 스키마 변경이 포함된 백엔드 배포는 스크립트를 실행하기 전에 반드시 §2-6의
+> 마이그레이션을 먼저 적용한다. 현재 배포 스크립트는 DB 마이그레이션을 실행하지 않는다.
+
+백엔드 스크립트는 현재 컨테이너의 환경변수를 VM 내부 임시 파일로 승계하며 값을
+터미널에 출력하지 않는다. 새 컨테이너가 60초 안에 `401 GATEWAY_KEY_INVALID` 상태로
+응답하지 않으면 직전 컨테이너로 자동 롤백한다. 성공 시 직전 컨테이너는
+`llm-router-backend-previous` 이름으로 정지 상태를 유지한다.
+
+프론트와 백엔드가 함께 바뀌었으면 백엔드를 먼저 배포·검증한 뒤 프론트를 배포한다.
+다른 프로젝트나 리소스를 사용할 때는 환경변수로 기본값을 덮어쓸 수 있다.
+
+```bash
+PROJECT_ID=<PROJECT_ID> REGION=<REGION> ./scripts/deploy-frontend.sh
+PROJECT_ID=<PROJECT_ID> ZONE=<ZONE> BACKEND_INSTANCE=<VM_NAME> ./scripts/deploy-backend.sh
+```
+
+---
+
 ## 미해결
 
 - [ ] JWT 인증 — 현재 `SecurityConfig` 는 permitAll 이고 공유 시크릿으로만 막고 있다
