@@ -70,7 +70,7 @@ docker push $REPO/gateway:v1
 ### 2-2. VM 생성
 
 ```bash
-gcloud compute instances create llm-gateway \
+gcloud compute instances create llm-router-workspace \
   --zone=asia-northeast3-a \
   --machine-type=e2-standard-2 \
   --image-family=cos-stable --image-project=cos-cloud \
@@ -91,7 +91,7 @@ gcloud compute firewall-rules create allow-gateway-8080 \
 ### 2-4. VM 안에서 기동
 
 ```bash
-gcloud compute ssh llm-gateway --zone=asia-northeast3-a
+gcloud compute ssh llm-router-workspace --zone=asia-northeast3-a
 ```
 
 ```bash
@@ -109,7 +109,7 @@ docker run -d --name llmrouter-postgres --restart unless-stopped \
 docker exec -i llmrouter-postgres psql -U llmrouter -d llmrouter < 01-schema.sql
 
 # 게이트웨이
-docker run -d --name llm-gateway --restart unless-stopped \
+docker run -d --name llm-router-backend --restart unless-stopped \
   --network host \
   -e SPRING_PROFILES_ACTIVE=prod \
   -e ANTHROPIC_API_KEY=<KEY> \
@@ -123,7 +123,7 @@ docker run -d --name llm-gateway --restart unless-stopped \
 > 키 미설정은 "검증 통과"로 동작하므로(fail-open), 이 장치가 없으면
 > 환경변수를 빠뜨렸을 때 경고 없이 8080 이 무방비로 열린다.
 >
-> 컨테이너가 바로 죽는다면 `docker logs llm-gateway` 로 확인할 것.
+> 컨테이너가 바로 죽는다면 `docker logs llm-router-backend` 로 확인할 것.
 
 ### 2-5. 확인
 
@@ -152,10 +152,10 @@ curl -i http://<VM_EXTERNAL_IP>:8080/api/chat \
 ```bash
 # 1. VM 으로 복사
 gcloud compute scp infra/postgres/migrations/*.sql \
-  llm-gateway:/tmp/ --zone=asia-northeast3-a
+  llm-router-workspace:/tmp/ --zone=asia-northeast3-a
 
 # 2. VM 안에서 적용 (컨테이너 교체 전!)
-gcloud compute ssh llm-gateway --zone=asia-northeast3-a
+gcloud compute ssh llm-router-workspace --zone=asia-northeast3-a
 for f in /tmp/0*.sql; do
   echo "--- $f"
   docker exec -i llmrouter-postgres psql -U llmrouter -d llmrouter -v ON_ERROR_STOP=1 < "$f"
@@ -214,7 +214,7 @@ gcloud run deploy llm-router-frontend \
 ## 5. 중지 (크레딧 절약)
 
 ```bash
-gcloud compute instances stop llm-gateway --zone=asia-northeast3-a
+gcloud compute instances stop llm-router-workspace --zone=asia-northeast3-a
 ```
 
 Cloud Run 은 scale-to-zero 라 접속이 없으면 과금되지 않는다. **GCE 만 끄면 된다.**
@@ -245,7 +245,7 @@ DELETE FROM escalation_log WHERE response IS NULL AND created_at < now() - inter
 
 마이그레이션 누락이 가장 흔한 원인이다. §2-6 참조.
 `RequestLogService` 가 적재 실패를 삼키므로 사용자 화면에는 아무 이상이 없다.
-`docker logs llm-gateway | grep 'request_log 적재 실패'` 로 확인한다.
+`docker logs llm-router-backend | grep 'request_log 적재 실패'` 로 확인한다.
 
 ---
 
