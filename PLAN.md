@@ -188,7 +188,122 @@ Notion `06 Decision Log` 2026-08-03 및 `05 Experiment Log` EXP-004 에 있다.
 - [ ] JWT 또는 사용자 인증 도입 여부 결정
 - [ ] GCE 직접 노출 축소와 TLS 적용 검토
 
-## 5. 발표 시나리오
+## 5. 시연 시나리오
+
+### 5-0. 중간 시연 (지금 가능한 범위)
+
+목표는 "어디까지 했고, 얼마나 진척됐고, 성능이 어느 정도인가" 세 가지다.
+최종 발표(5-1)의 8단계 중 **1~5번만 구현되어 있다.** 6~8번은 없다고 먼저 말하고 시작한다.
+
+#### 사전 준비 (시연 당일 아침)
+
+1. **운영로그 초기화** — 지금 28행 중 11행이 stub 라우터가 만든 것이다.
+   그대로 두면 "medium 62.5%"가 라우터 판단인 것처럼 보인다.
+   ```sql
+   TRUNCATE request_log, escalation_log, cache_entry RESTART IDENTITY;
+   ```
+2. **캐시 워밍** — 4단계에서 쓸 질문(`de1`)을 미리 한 번 던져 캐시에 넣어둔다.
+3. **접속 확인** — Cloud Run URL 이 뜨는지, 첫 요청이 cold start 로 느리지 않은지.
+
+#### 검증된 시연 질문 (2026-08-16 실측)
+
+35문항을 `/router/classify` 에 직접 던져 확인했다. 즉흥 질문은 쓰지 않는다.
+
+**언어는 영어로 한다.** 같은 질문의 한국어본을 함께 돌린 결과다.
+
+| | easy 적중 | medium 적중 | hard 적중 | 전체 |
+|---|---|---|---|---|
+| 영어 | 6/7 | 0/6 | 3/6 | 47% |
+| 한국어 | 2/7 | **6/6** | **0/6** | 42% |
+
+한국어는 medium 은 잘 맞히지만 **hard 를 6/6 전부 easy 로 보낸다.** 시연의 하이라이트인
+"어려운 질문 → Opus"가 한국어로는 절대 안 나온다. 게다가 confidence 가 0.37~0.60 에
+몰려 있어 3-class 무작위(0.33)와 크게 다르지 않다. bge-large-**en** 과 RouterBench 가
+영어 전용이라 예상된 결과다.
+
+**1단계 (easy → Haiku) — 신뢰도 높음**
+
+| id | confidence | 질문 |
+|---|---|---|
+| `de4` | **0.97** | Who wrote the play Romeo and Juliet? |
+| `de3` | 0.93 | What does HTTP stand for? |
+| `de5` | 0.93 | What is the chemical symbol for gold? |
+
+**2단계 (hard → Opus) — 맞지만 confidence 가 낮다**
+
+| id | confidence | 질문 |
+|---|---|---|
+| `dh1` | 0.64 | Design a rate limiter for a distributed API gateway … (20 servers, no SPOF) |
+| `dh4` | 0.63 | Derive the amortized time complexity of union-find … |
+| `dh3` | 0.56 | A database serves 40% write and 60% read traffic … |
+| `h04` | 0.52 | Given a 10TB dataset that no longer fits in memory … |
+
+**4단계 (캐시 히트) — 안전 확인됨**
+
+```
+de1   What is the capital of Australia?
+de1p  Which city is the capital of Australia?     유사도 0.9730
+```
+이 질문셋 안에서 다른 어떤 쌍도 0.75 를 넘지 않는다. 오탐 위험 없음.
+
+**medium 은 라이브로 보여줄 수 없다.** 영어 medium 후보 18개 중 1개만 medium 으로
+분류됐고 그마저 confidence 0.37 이었다. 대신 **3단계 에스컬레이션이 Sonnet 을 띄운다** —
+Haiku → Sonnet 경로로 세 모델이 모두 화면에 나온다. medium 붕괴는 숨기지 말고
+아래 "먼저 인정할 것" 1번에서 측정치로 제시한다.
+
+재현:
+```
+python experiments/probe_router.py --questions experiments/questions-demo-en.json
+python experiments/probe_router.py --questions experiments/questions-demo-ko.json
+python experiments/probe_router.py --questions experiments/questions-demo-en2.json
+```
+
+#### 진행 순서
+
+| # | 화면 | 할 것 | 할 말 |
+|---|---|---|---|
+| 0 | — | 구조 한 장 | "게이트웨이가 캐시를 보고, 미스면 라우터가 티어를 정하고, 그 티어의 Claude 를 부릅니다" |
+| 1 | 채팅 | 쉬운 질문 | 답변 아래 **Haiku 배지 + 토큰 + 지연** 을 짚는다 |
+| 2 | 채팅 | 어려운 질문 | 같은 자리에 **Opus 배지**. 모델이 바뀐 게 눈에 보이는 지점 |
+| 3 | 채팅 | 2번 답변에 불만족 버튼 | 에스컬레이션 경로 `Haiku → Sonnet` 표시. "이 기록이 재학습 정정 라벨이 됩니다" |
+| 4 | 채팅 | 1번과 같은 질문 재전송 | **⚡ Cache Hit / LLM 호출 없음 / 지연 급감**. 여기가 가장 잘 보이는 장면 |
+| 5 | 지표 | 헤더 "지표 보기" | 누적 히트율·티어 분포·비용·지연. **"이건 방금 시연한 몇 건이라 통계가 아닙니다"를 먼저 말한다** |
+
+#### 진척도를 말하는 방식
+
+숫자로 말하는 편이 낫다.
+
+- 게이트웨이·프론트·DB·배포 파이프라인: **동작함** (Cloud Run + GCE, 자동 롤백 포함)
+- 라우터 연동: **동작함** (ModernBERT 실서버 호출)
+- 캐시: **동작함** (pgvector HNSW, 임계값 튜닝 남음)
+- 정량 평가·baseline 비교: **미착수** — 최종 발표 과제
+
+#### 먼저 인정하고 갈 것 (질문받기 전에)
+
+방어하려 하지 말고 측정한 결과를 그대로 내는 편이 유리하다.
+
+1. **라우터가 easy 로 붕괴한다.** 영어 35문항에서 easy 29 / medium 2 / hard 4 로
+   분류됐다. medium 후보 18개 중 17개가 easy 로 갔고, `Explain the CAP theorem …`
+   같은 질문에 confidence 0.88 로 easy 를 확신했다. 원인은 학습 데이터
+   (RouterBench)가 객관식 상식 문제에 치우친 것으로 본다 —
+   **기획서 3-3 이 예측한 클래스 불균형 위험이 실제로 나타났다.**
+   완화안: 클래스 가중 손실, 개방형 질문 데이터 보강, 결정 임계값 재조정.
+2. **캐시 임계값이 아직 안전하지 않다.** 92문항 실측에서 paraphrase 최소 0.8621 <
+   hard_negative 최대 0.9371 로 두 분포가 겹친다. 현재 0.80 은 오탐을 낸다.
+   → cross-encoder 리랭커 도입을 팀원에게 요청해 둔 상태 (`experiments/RERANKER_REQUEST.md`)
+3. **지연 숫자에 배포 아티팩트가 섞여 있다.** 라우터가 us-west1, 게이트웨이가
+   asia-northeast3 라 왕복 120ms 가 매 요청에 붙는다. 같은 리전으로 옮기면 사라진다.
+
+#### 예상 질문
+
+| 질문 | 답 |
+|---|---|
+| "절감률이 왜 28%밖에 안 되나" | 캐시 히트는 토큰이 0 이라 단가 비교에서 제외했다. 캐시 효과는 생략된 호출 수로 따로 본다. 합치면 더 크지만 그건 두 개를 섞은 숫자다 |
+| "그 비용 비교가 공정한가" | 아니다. 같은 토큰을 Opus 단가로 환산한 값이라 Opus 가 더 길게 답할 가능성은 반영이 안 됐다. 화면에도 그렇게 써 뒀다. 정확한 비교는 고정 실험에서 Opus 를 실제로 돌려 낸다 |
+| "품질은 어떻게 보장하나" | 지금은 못 한다. under-routing 비율과 Oracle 대비 달성률이 최종 발표 과제다 |
+| "기존 방법 대비 나은 점은" | 그 비교(파레토 곡선)가 남은 핵심 작업이다 |
+
+### 5-1. 최종 발표 시나리오
 
 | # | 화면 | 보여줄 것 | 예상 질문에 대한 방어 |
 |---|---|---|---|

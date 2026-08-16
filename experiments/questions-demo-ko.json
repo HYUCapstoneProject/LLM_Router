@@ -1,0 +1,27 @@
+{
+  "version": "demo-ko-v1",
+  "note": "questions-demo-en.json 의 한국어 대응본. 라우터(bge-large-en / RouterBench)는 영어 학습이라 한국어 질문에서 분류가 무너지는지 측정하기 위한 것이다. 시연 언어를 정하는 근거로 쓴다.",
+  "questions": [
+    { "id": "de1", "expectedTier": "easy", "kind": "base", "group": "d01", "text": "호주의 수도는 어디야?" },
+    { "id": "de1p", "expectedTier": "easy", "kind": "paraphrase", "group": "d01", "text": "호주의 수도인 도시는 어디인가요?" },
+    { "id": "de2", "expectedTier": "easy", "kind": "base", "group": "d02", "text": "윤년은 며칠이야?" },
+    { "id": "de3", "expectedTier": "easy", "kind": "base", "group": "d03", "text": "HTTP는 무엇의 약자야?" },
+    { "id": "de4", "expectedTier": "easy", "kind": "base", "group": "d04", "text": "로미오와 줄리엣을 쓴 사람은 누구야?" },
+    { "id": "de5", "expectedTier": "easy", "kind": "base", "group": "d05", "text": "금의 원소 기호는 뭐야?" },
+    { "id": "de6", "expectedTier": "easy", "kind": "base", "group": "d06", "text": "섭씨 100도를 화씨로 바꾸면 얼마야?" },
+
+    { "id": "dm1", "expectedTier": "medium", "kind": "base", "group": "d11", "text": "프로세스와 스레드의 차이를 설명해줘." },
+    { "id": "dm2", "expectedTier": "medium", "kind": "base", "group": "d12", "text": "단일 연결 리스트를 제자리에서 뒤집는 파이썬 함수를 작성해줘." },
+    { "id": "dm3", "expectedTier": "medium", "kind": "base", "group": "d13", "text": "인덱스를 추가하면 왜 데이터베이스 쿼리가 빨라져?" },
+    { "id": "dm4", "expectedTier": "medium", "kind": "base", "group": "d14", "text": "브라우저와 서버가 HTTPS로 보안 연결을 맺는 과정을 요약해줘." },
+    { "id": "dm5", "expectedTier": "medium", "kind": "base", "group": "d15", "text": "TCP와 UDP의 차이는 뭐고 각각 언제 선택해야 해?" },
+    { "id": "dm6", "expectedTier": "medium", "kind": "base", "group": "d16", "text": "레이스 컨디션이 뭔지 설명하고 그걸 일으키는 짧은 코드 예시를 보여줘." },
+
+    { "id": "dh1", "expectedTier": "hard", "kind": "base", "group": "d21", "text": "서버 20대에 걸쳐 단일 장애점 없이 정확하게 동작하는 분산 API 게이트웨이용 레이트 리미터를 설계해줘. 최소 세 가지 방식을 비교하고 p99 지연 5ms 예산 안에서 어떤 것을 골라야 하는지 근거를 들어줘." },
+    { "id": "dh2", "expectedTier": "hard", "kind": "base", "group": "d22", "text": "정지 문제가 결정 불가능함을 증명하고, 대각선 논법이 왜 우연이 아니라 증명에 본질적인지 정확히 설명해줘." },
+    { "id": "dh3", "expectedTier": "hard", "kind": "base", "group": "d23", "text": "쓰기 40%, 읽기 60% 트래픽을 처리하면서 p99 지연을 5ms 이하로 유지해야 하는 데이터베이스가 있어. 샤딩, 읽기 복제본, 캐싱을 비교하고 구체적인 아키텍처를 제안한 다음 트래픽이 10배가 되면 무엇이 먼저 무너지는지 설명해줘." },
+    { "id": "dh4", "expectedTier": "hard", "kind": "base", "group": "d24", "text": "경로 압축과 랭크 기반 합치기를 적용한 union-find의 상각 시간 복잡도를 유도하고, 분석 과정에서 역 아커만 함수가 어디서 나오는지 설명해줘." },
+    { "id": "dh5", "expectedTier": "hard", "kind": "base", "group": "d25", "text": "분산 시스템에서 정확히 한 번 메시지 전달이 일반적으로 불가능한 이유를 설명하고, Kafka 같은 실제 시스템이 대신 무엇을 보장하며 그 대가가 무엇인지 분석해줘." },
+    { "id": "dh6", "expectedTier": "hard", "kind": "base", "group": "d26", "text": "높은 쓰기 경합 상황에서 낙관적 동시성 제어와 비관적 동시성 제어의 트레이드오프를 분석하고, 하이브리드 방식을 설계한 뒤 어떤 조건에서 두 순수 전략보다 나은지 논증해줘." }
+  ]
+}
