@@ -291,7 +291,9 @@ git pull --ff-only origin main
 > 마이그레이션을 먼저 적용한다. 현재 배포 스크립트는 DB 마이그레이션을 실행하지 않는다.
 
 백엔드 스크립트는 현재 컨테이너의 환경변수를 VM 내부 임시 파일로 승계하며 값을
-터미널에 출력하지 않는다. 새 컨테이너가 60초 안에 `401 GATEWAY_KEY_INVALID` 상태로
+터미널에 출력하지 않는다. FastAPI 토큰은 배포할 때마다 VM에서 Secret Manager의
+`llm-router-internal-api-token` 최신 버전을 읽어 임시 env 파일에만 넣는다. VM 서비스 계정에는
+해당 secret의 `Secret Manager Secret Accessor` 권한이 필요하다. 새 컨테이너가 60초 안에 `401 GATEWAY_KEY_INVALID` 상태로
 응답하지 않으면 직전 컨테이너로 자동 롤백한다. 성공 시 직전 컨테이너는
 `llm-router-backend-previous` 이름으로 정지 상태를 유지한다.
 
