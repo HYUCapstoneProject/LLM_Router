@@ -1,6 +1,7 @@
 package com.llmrouter.service;
 
 import com.llmrouter.client.RouterClient;
+import com.llmrouter.client.RouterClassification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +46,7 @@ public class RouterService {
         }
     }
 
-    public Tier classify(String message) {
+    public RouterClassification classify(String message) {
         return routerClient.classify(message);
     }
 

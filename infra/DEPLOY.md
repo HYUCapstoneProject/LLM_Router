@@ -11,8 +11,8 @@ Cloud Run (nginx + React)          ← 공개. 인증 없음
    ▼
 GCE VM (Spring Gateway + PostgreSQL/pgvector)   ← 키 없으면 거부
    │
-   ▼
-Anthropic Claude API
+   ├──▶ FastAPI Router (10.138.0.2:8000)         ← 임베딩·분류
+   └──▶ Anthropic Claude API
 ```
 
 프론트 nginx 가 `/api` 를 프록시하므로 **브라우저는 Cloud Run 도메인만 본다.**
@@ -115,6 +115,9 @@ docker run -d --name llm-router-backend --restart unless-stopped \
   -e ANTHROPIC_API_KEY=<KEY> \
   -e POSTGRES_PASSWORD=<DB_PASSWORD> \
   -e GATEWAY_KEY=<공유 시크릿> \
+  -e ROUTER_MODE=fastapi \
+  -e ROUTER_BASE_URL=http://10.138.0.2:8000 \
+  -e ROUTER_API_TOKEN=<Secret Manager의 llm-router-internal-api-token> \
   $REPO/gateway:v1
 ```
 
@@ -122,6 +125,8 @@ docker run -d --name llm-router-backend --restart unless-stopped \
 > 이 프로파일에서 `GATEWAY_KEY` 가 비어 있으면 **기동 자체가 실패한다.**
 > 키 미설정은 "검증 통과"로 동작하므로(fail-open), 이 장치가 없으면
 > 환경변수를 빠뜨렸을 때 경고 없이 8080 이 무방비로 열린다.
+> `ROUTER_MODE=fastapi`에서도 `ROUTER_API_TOKEN`이 비어 있으면 기동이 실패한다.
+> 토큰은 저장소나 명령 이력에 넣지 말고 Secret Manager에서 읽어 환경변수로 주입한다.
 >
 > 컨테이너가 바로 죽는다면 `docker logs llm-router-backend` 로 확인할 것.
 
@@ -208,6 +213,7 @@ gcloud run deploy llm-router-frontend \
 - [ ] 에스컬레이션 후 `request_log` 에 `origin='escalate'` 행이 생기는지 —
       없으면 비용 집계가 에스컬레이션을 빠뜨린다
 - [ ] `GATEWAY_KEY` 없이 기동 시도 → 컨테이너가 죽는지 확인 (fail-fast 동작 검증)
+- [ ] 백엔드 로그의 request_log에 실제 `embed_model_version`, `router_model_version`이 기록되는지 확인
 
 ---
 
@@ -304,4 +310,4 @@ PROJECT_ID=<PROJECT_ID> ZONE=<ZONE> BACKEND_INSTANCE=<VM_NAME> ./scripts/deploy-
 - [ ] JWT 인증 — 현재 `SecurityConfig` 는 permitAll 이고 공유 시크릿으로만 막고 있다
 - [ ] HTTPS — 백엔드가 평문 HTTP 다. 공유 시크릿이 네트워크에 노출된다.
       Cloud Run→GCE 구간이므로 데모 수준에서는 감수하나, 개선 시 로드밸런서 또는 Cloud Run 사이드카 검토
-- [ ] FastAPI 라우터 서빙 배포 (팀원 담당, M4)
+- [x] FastAPI 임베딩·라우팅 HTTP 연동 (`ROUTER_MODE=fastapi`에서 활성화)

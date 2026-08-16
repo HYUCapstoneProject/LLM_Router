@@ -27,6 +27,7 @@ public record RequestLogEntry(
         String tier,
         String modelId,
         String routerModelVersion,
+        Double routerConfidence,
         String embedModelVersion,
         boolean cacheHit,
         Double similarity,

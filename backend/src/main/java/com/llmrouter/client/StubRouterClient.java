@@ -1,6 +1,7 @@
 package com.llmrouter.client;
 
 import com.llmrouter.service.RouterService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;
@@ -22,12 +23,13 @@ import java.util.Random;
  * (캐시를 미리 심어 히트 경로만 검증하는 용도). 여기를 고치면 그쪽도 같이 고쳐야 한다.
  */
 @Component
+@ConditionalOnProperty(name = "llm.router.mode", havingValue = "stub", matchIfMissing = true)
 public class StubRouterClient implements RouterClient {
 
     private static final int DIM = 1024;
 
     @Override
-    public float[] embed(String message) {
+    public RouterEmbedding embed(String message) {
         Random rnd = new Random(message.hashCode());
 
         float[] v = new float[DIM];
@@ -44,14 +46,14 @@ public class StubRouterClient implements RouterClient {
                 v[i] /= (float) norm;
             }
         }
-        return v;
+        return new RouterEmbedding(v, embedModelVersion());
     }
 
     @Override
-    public RouterService.Tier classify(String message) {
+    public RouterClassification classify(String message) {
         // HARD 가 아니라 MEDIUM 인 이유:
         // HARD 고정이면 전 요청이 Opus 로 나가 비용 측정이 왜곡된다.
-        return RouterService.Tier.MEDIUM;
+        return new RouterClassification(RouterService.Tier.MEDIUM, 1.0, routerModelVersion());
     }
 
     @Override

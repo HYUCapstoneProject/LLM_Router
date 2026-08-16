@@ -20,11 +20,11 @@ public class RequestLogService {
     private static final String INSERT_SQL = """
             INSERT INTO request_log
                 (request_id, question, conversation_id, tier, model_id,
-                 router_model_version, embed_model_version,
+                 router_model_version, router_confidence, embed_model_version,
                  cache_hit, similarity, cache_entry_id,
                  input_tokens, output_tokens, latency_ms, fallback_reason,
                  parent_request_id, origin, status, error_type)
-            VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::uuid, ?, ?, ?)
+            VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::uuid, ?, ?, ?)
             """;
 
     private static final String INSERT_FAILURE_SQL = """
@@ -43,6 +43,7 @@ public class RequestLogService {
                     entry.tier(),
                     entry.modelId(),
                     entry.routerModelVersion(),
+                    entry.routerConfidence(),
                     entry.embedModelVersion(),
                     entry.cacheHit(),
                     entry.similarity(),

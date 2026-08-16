@@ -1,6 +1,5 @@
 package com.llmrouter.service;
 
-import com.llmrouter.client.RouterClient;
 import com.llmrouter.dto.CachedResponse;
 import com.llmrouter.dto.LlmResult;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,6 @@ import java.util.Optional;
 public class CacheService {
 
     private final JdbcTemplate jdbc;
-    private final RouterClient routerClient;
 
     @Value("${llm.cache.thresholds.easy}")
     private double easyThreshold;
@@ -119,7 +117,7 @@ public class CacheService {
      * @return 갱신했거나 새로 만든 행의 id
      */
     public long upsertForQuestion(String question, float[] embedding, LlmResult result,
-                                  double sameQuestionSimilarity) {
+                                  String embedModelVersion, double sameQuestionSimilarity) {
         Optional<CachedResponse> existing = findBest(embedding)
                 .filter(c -> c.similarity() >= sameQuestionSimilarity);
 
@@ -128,7 +126,7 @@ public class CacheService {
             refresh(id, result);
             return id;
         }
-        return put(question, embedding, result);
+        return put(question, embedding, result, embedModelVersion);
     }
 
     /**
@@ -137,14 +135,14 @@ public class CacheService {
      * @return 생성된 행의 id. request_log.cache_entry_id 에 남겨
      *         나중에 /api/escalate 가 이 행을 정확히 지목해 갱신할 수 있게 한다.
      */
-    public long put(String question, float[] embedding, LlmResult result) {
+    public long put(String question, float[] embedding, LlmResult result, String embedModelVersion) {
         Long id = jdbc.queryForObject(INSERT_SQL, Long.class,
                 question,
                 PgVector.literal(embedding),
                 result.text(),
                 result.tier(),
                 result.modelId(),
-                routerClient.embedModelVersion(),
+                embedModelVersion,
                 thresholdFor(result.tier()));
 
         log.info("캐시 저장 id={} tier={} model={}", id, result.tier(), result.modelId());
