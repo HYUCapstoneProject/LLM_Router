@@ -1,6 +1,7 @@
 package com.llmrouter.service;
 
 import com.llmrouter.client.RouterClient;
+import com.llmrouter.client.RouterEmbedding;
 import com.llmrouter.config.RequestIdFilter;
 import com.llmrouter.dto.EscalateRequest;
 import com.llmrouter.dto.EscalateResponse;
@@ -142,9 +143,12 @@ public class EscalationService {
         //    여기서 예외가 새어 나가면 지불한 Opus 답변을 버리고, 예약도 남아
         //    타임아웃 전까지 재시도가 409 로 막힌다 — 사용자는 돈만 내고 아무것도 못 받는다.
         float[] embedding = null;
+        String embedModelVersion = null;
         try {
-            embedding = routerClient.embed(ctx.question());
-            refreshCache(ctx, embedding, result);
+            RouterEmbedding embedded = routerClient.embed(ctx.question());
+            embedding = embedded.vector();
+            embedModelVersion = embedded.modelVersion();
+            refreshCache(ctx, embedding, result, embedModelVersion);
         } catch (RuntimeException e) {
             log.error("에스컬레이션 후처리(임베딩/캐시 갱신) 실패 - 답변은 반환한다 requestId={}",
                     originalRequestId, e);
@@ -163,7 +167,7 @@ public class EscalationService {
                 .tier(result.tier())
                 .modelId(result.modelId())
                 .routerModelVersion(ctx.routerModelVersion())
-                .embedModelVersion(routerClient.embedModelVersion())
+                .embedModelVersion(embedModelVersion)
                 .cacheHit(false)
                 .cacheEntryId(ctx.cacheEntryId())
                 .inputTokens(result.inputTokens())
@@ -300,14 +304,16 @@ public class EscalationService {
                 field + " 값이 올바르지 않습니다: " + modelName + " (haiku | sonnet | opus)"));
     }
 
-    private void refreshCache(EscalationContext ctx, float[] embedding, LlmResult result) {
+    private void refreshCache(EscalationContext ctx, float[] embedding, LlmResult result,
+                              String embedModelVersion) {
         if (!cacheRefreshEnabled) {
             return;
         }
 
         if (ctx.cacheEntryId() == null) {
             // 원본 요청이 캐시에 행을 남기지 못했다. 만족한 답으로 새로 만든다.
-            cacheService.upsertForQuestion(ctx.question(), embedding, result, overwriteSimilarity);
+            cacheService.upsertForQuestion(ctx.question(), embedding, result,
+                    embedModelVersion, overwriteSimilarity);
             return;
         }
 
@@ -330,7 +336,8 @@ public class EscalationService {
             // (Decision Log 2026-08-03 은 Level 2 까지만 채택).
             log.info("캐시 히트 유래이고 유사도 {} < {} 이라 기존 행을 덮어쓰지 않는다 id={}",
                     ctx.similarity(), overwriteSimilarity, ctx.cacheEntryId());
-            cacheService.upsertForQuestion(ctx.question(), embedding, result, overwriteSimilarity);
+            cacheService.upsertForQuestion(ctx.question(), embedding, result,
+                    embedModelVersion, overwriteSimilarity);
         }
     }
 

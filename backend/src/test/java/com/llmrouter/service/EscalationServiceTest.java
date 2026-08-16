@@ -1,6 +1,7 @@
 package com.llmrouter.service;
 
 import com.llmrouter.client.RouterClient;
+import com.llmrouter.client.RouterEmbedding;
 import com.llmrouter.dto.EscalateRequest;
 import com.llmrouter.dto.EscalateResponse;
 import com.llmrouter.dto.EscalationChainState;
@@ -68,8 +69,8 @@ class EscalationServiceTest {
         ReflectionTestUtils.setField(service, "overwriteSimilarity", 0.95);
         ReflectionTestUtils.setField(service, "reservationTimeout", Duration.ofMinutes(5));
 
-        when(routerClient.embed(anyString())).thenReturn(new float[]{0.1f, 0.2f});
-        when(routerClient.embedModelVersion()).thenReturn("stub-hash-v0");
+        when(routerClient.embed(anyString()))
+                .thenReturn(new RouterEmbedding(new float[]{0.1f, 0.2f}, "stub-hash-v0"));
         when(routerClient.routerModelVersion()).thenReturn("stub-medium-v0");
         when(escalationLogService.loadChain(anyString())).thenReturn(Optional.empty());
         when(escalationLogService.findByTier(anyString(), anyString())).thenReturn(Optional.empty());
@@ -392,7 +393,7 @@ class EscalationServiceTest {
             service.escalate(request("sonnet", "opus"));
 
             verify(cacheService).refresh(eq(42L), any());
-            verify(cacheService, never()).upsertForQuestion(anyString(), any(), any(), anyDouble());
+            verify(cacheService, never()).upsertForQuestion(anyString(), any(), any(), anyString(), anyDouble());
         }
 
         @Test
@@ -419,7 +420,8 @@ class EscalationServiceTest {
             verify(cacheService, never()).refresh(anyLong(), any());
             // put 이 아니라 upsert 다. 2단계 체인에서 같은 임베딩의 행이 둘 생기면
             // 동점 상황에서 거부당한 하위 모델 답이 나갈 수 있다.
-            verify(cacheService).upsertForQuestion(eq(QUESTION), any(), any(), eq(0.95));
+            verify(cacheService).upsertForQuestion(eq(QUESTION), any(), any(),
+                    eq("stub-hash-v0"), eq(0.95));
         }
 
         @Test
@@ -431,7 +433,8 @@ class EscalationServiceTest {
 
             service.escalate(request("sonnet", "opus"));
 
-            verify(cacheService).upsertForQuestion(eq(QUESTION), any(), any(), eq(0.95));
+            verify(cacheService).upsertForQuestion(eq(QUESTION), any(), any(),
+                    eq("stub-hash-v0"), eq(0.95));
             verify(cacheService, never()).refresh(anyLong(), any());
         }
 
@@ -444,7 +447,7 @@ class EscalationServiceTest {
             service.escalate(request("sonnet", "opus"));
 
             verify(cacheService, never()).refresh(anyLong(), any());
-            verify(cacheService, never()).upsertForQuestion(anyString(), any(), any(), anyDouble());
+            verify(cacheService, never()).upsertForQuestion(anyString(), any(), any(), anyString(), anyDouble());
         }
     }
 

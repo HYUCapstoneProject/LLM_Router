@@ -16,10 +16,10 @@ public interface RouterClient {
      * @return L2 정규화된 1024차원 벡터.
      *         정규화 전제가 깨지면 pgvector 의 `유사도 = 1 - 거리` 가 성립하지 않는다.
      */
-    float[] embed(String message);
+    RouterEmbedding embed(String message);
 
     /** POST /router/classify — cache miss 일 때만 호출된다. */
-    RouterService.Tier classify(String message);
+    RouterClassification classify(String message);
 
     /** request_log 에 기록할 임베딩 모델 버전 */
     String embedModelVersion();

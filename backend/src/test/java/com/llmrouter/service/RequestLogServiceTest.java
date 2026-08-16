@@ -33,6 +33,7 @@ class RequestLogServiceTest {
                 .conversationId("c1")
                 .tier("medium")
                 .modelId("sonnet")
+                .routerConfidence(0.87)
                 .cacheHit(false)
                 .inputTokens(10)
                 .outputTokens(20)
@@ -44,9 +45,10 @@ class RequestLogServiceTest {
 
         ArgumentCaptor<Object[]> args = ArgumentCaptor.forClass(Object[].class);
         verify(jdbc).update(anyString(), args.capture());
-        assertThat(args.getValue()[15]).isEqualTo(RequestLogEntry.ORIGIN_CHAT);
-        assertThat(args.getValue()[16]).isEqualTo("success");
-        assertThat(args.getValue()[17]).isNull();
+        assertThat(args.getValue()[6]).isEqualTo(0.87);
+        assertThat(args.getValue()[16]).isEqualTo(RequestLogEntry.ORIGIN_CHAT);
+        assertThat(args.getValue()[17]).isEqualTo("success");
+        assertThat(args.getValue()[18]).isNull();
     }
 
     @Test

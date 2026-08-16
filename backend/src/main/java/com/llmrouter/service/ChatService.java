@@ -1,6 +1,9 @@
 package com.llmrouter.service;
 
 import com.llmrouter.client.RouterClient;
+import com.llmrouter.client.RouterClassification;
+import com.llmrouter.client.RouterClientException;
+import com.llmrouter.client.RouterEmbedding;
 import com.llmrouter.config.RequestIdFilter;
 import com.llmrouter.dto.CachedResponse;
 import com.llmrouter.dto.ChatRequest;
@@ -32,13 +35,23 @@ public class ChatService {
 
         // 임베딩·캐시 조회 단계에서 실패하면 아직 분류 전이므로 null로 기록한다.
         RouterService.Tier tier = null;
+        RouterEmbedding embeddingResult = null;
+        String fallbackReason = null;
 
         try {
             // 1. 캐시 조회를 위해 질문을 임베딩한다.
-            float[] embedding = routerClient.embed(message);
+            Optional<CachedResponse> cached = Optional.empty();
+            try {
+                embeddingResult = routerClient.embed(message);
+                cached = cacheService.get(embeddingResult.vector());
+            } catch (RouterClientException error) {
+                // 임베딩 서버가 죽어도 Claude 응답까지 막지는 않는다. 캐시만 우회한다.
+                fallbackReason = "embed_unavailable";
+                log.warn("임베딩 실패로 캐시를 우회한다 requestId={} status={}",
+                        requestId, error.statusCode(), error);
+            }
 
             // 2. 캐시 히트면 분류와 Claude 호출을 생략한다.
-            Optional<CachedResponse> cached = cacheService.get(embedding);
             if (cached.isPresent()) {
                 CachedResponse hit = cached.get();
                 ChatResponse response = ChatResponse.builder()
@@ -60,7 +73,8 @@ public class ChatService {
                         .tier(hit.tier())
                         .modelId(hit.modelId())
                         .routerModelVersion(null)
-                        .embedModelVersion(routerClient.embedModelVersion())
+                        .routerConfidence(null)
+                        .embedModelVersion(embeddingResult.modelVersion())
                         .cacheHit(true)
                         .similarity(hit.similarity())
                         .cacheEntryId(hit.cacheEntryId())
@@ -73,11 +87,26 @@ public class ChatService {
             }
 
             // 3. 캐시 미스일 때만 분류하고 Claude를 호출한다.
-            tier = routerService.classify(message);
+            RouterClassification classification = null;
+            try {
+                classification = routerService.classify(message);
+                tier = classification.tier();
+            } catch (RouterClientException error) {
+                // 라우터 장애 시 가장 비싸지도, 성능이 낮지도 않은 MEDIUM을 안전 기본값으로 쓴다.
+                tier = RouterService.Tier.MEDIUM;
+                fallbackReason = fallbackReason == null
+                        ? "classify_unavailable"
+                        : "embed_and_classify_unavailable";
+                log.warn("라우팅 실패로 MEDIUM 폴백한다 requestId={} status={}",
+                        requestId, error.statusCode(), error);
+            }
             LlmResult result = llmService.call(tier, message);
 
             // 4. 생성한 캐시 행을 요청 로그와 연결해 이후 에스컬레이션에서 갱신한다.
-            long cacheEntryId = cacheService.put(message, embedding, result);
+            Long cacheEntryId = embeddingResult == null
+                    ? null
+                    : cacheService.put(message, embeddingResult.vector(), result,
+                            embeddingResult.modelVersion());
 
             ChatResponse response = ChatResponse.builder()
                     .requestId(requestId)
@@ -97,13 +126,15 @@ public class ChatService {
                     .conversationId(request.getConversationId())
                     .tier(result.tier())
                     .modelId(result.modelId())
-                    .routerModelVersion(routerClient.routerModelVersion())
-                    .embedModelVersion(routerClient.embedModelVersion())
+                    .routerModelVersion(classification == null ? null : classification.modelVersion())
+                    .routerConfidence(classification == null ? null : classification.confidence())
+                    .embedModelVersion(embeddingResult == null ? null : embeddingResult.modelVersion())
                     .cacheHit(false)
                     .cacheEntryId(cacheEntryId)
                     .inputTokens(result.inputTokens())
                     .outputTokens(result.outputTokens())
                     .latencyMs(response.getLatency())
+                    .fallbackReason(fallbackReason)
                     .origin(RequestLogEntry.ORIGIN_CHAT)
                     .build());
             return response;

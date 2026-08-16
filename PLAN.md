@@ -15,6 +15,7 @@
 - React 채팅 UI와 모델·티어·토큰·지연시간·캐시 히트 표시
 - Spring Boot `POST /api/chat`과 Anthropic Claude 호출
 - PostgreSQL/pgvector 기반 시맨틱 캐시 조회·저장
+- FastAPI bge-large 임베딩·ModernBERT 라우팅 HTTP 연동과 장애 폴백
 - `POST /api/escalate` 재요청, 중복 과금 방지, 체인 기록, 캐시 답변 갱신
 - 성공·실패 요청의 `request_log` 적재
 - 에스컬레이션 호출 비용을 `origin='escalate'`로 구분해 적재
@@ -30,9 +31,10 @@
 | DB | PostgreSQL/pgvector 실행 정상 | GCE Docker `llmrouter-postgres` |
 | 채팅 경로 | 정상 | Cloud Run → nginx → GCE `/api/chat` |
 | 에스컬레이션 경로 | 정상 | Cloud Run → nginx → GCE `/api/escalate` |
+| FastAPI Router | 모델 로드·계약 호출 정상 | GCE `llm-router-serving`, `10.138.0.2:8000` |
 
-운영 서버는 현재 커밋 `0bb0ea5` 기준이다. 이번 통합 커밋을 배포할 때는 백엔드보다 먼저
-`infra/postgres/migrations/03-request-log-status.sql`을 적용해야 한다.
+운영 Spring 서버는 현재 커밋 `89874e1` 기준이다. FastAPI 연동 배포 전
+`infra/postgres/migrations/04-router-confidence.sql`을 먼저 적용해야 한다.
 
 ## 2. 완료된 기능
 
@@ -44,6 +46,9 @@
 - [x] 요청별 모델, 티어, 토큰, latency, similarity, 캐시 행 ID 기록
 - [x] 실패 요청의 `status`, `error_type` 기록
 - [x] Gateway 공유 시크릿과 운영 프로파일 fail-fast
+- [x] FastAPI Bearer 인증·`X-Request-ID` 전파·커넥션 재사용
+- [x] 임베딩 실패 시 캐시 우회, 분류 실패 시 medium 폴백
+- [x] 요청별 실제 모델 버전·confidence·fallback reason 기록
 
 ### 에스컬레이션
 
@@ -68,9 +73,7 @@
 
 | 항목 | 현재 상태 | 영향 |
 |---|---|---|
-| 임베딩 | `stub-hash-v0` | 동일 문자열 외 의미 유사 질문의 캐시 품질을 평가할 수 없음 |
-| 라우팅 | `stub-medium-v0` | 모든 cache miss가 medium으로 가므로 모델 절감·정확도 실험 불가 |
-| FastAPI 연동 | 계약 및 팀 브랜치만 존재 | 실제 bge-large·ModernBERT 호출 미완료 |
+| 임베딩·라우팅 | FastAPI 연동 구현·실서버 계약 확인, Spring 운영 배포 전 | 운영 게이트웨이는 재배포 전까지 stub 사용 |
 | 분석 화면 | 미구현 | 캐시·라우팅 절감 효과를 발표 화면에서 설명하기 어려움 |
 | 실험 실행·저장 | 미구현 | Always Opus 대비 재현 가능한 비교 결과가 없음 |
 | 재학습 전달 | 설계 단계 | 에스컬레이션 1,000건 단위 배치 export·trigger 미구현 |
@@ -80,12 +83,12 @@
 
 ### P0 — 통합본 배포 완료
 
-- [ ] 통합된 로컬 `main`을 원격에 push
-- [ ] 운영 DB에 `03-request-log-status.sql` 적용
-- [ ] 최신 `main`으로 GCE 백엔드 재배포
-- [ ] Cloud Run 프론트 재배포
-- [ ] `/api/chat`, `/api/escalate`, 실패 로그 smoke test
-- [ ] `request_log.status/error_type/origin` 적재 확인
+- [x] 통합된 로컬 `main`을 원격에 push
+- [x] 운영 DB에 `03-request-log-status.sql` 적용
+- [x] 최신 `main`으로 GCE 백엔드 재배포
+- [x] Cloud Run 프론트 재배포
+- [x] `/api/chat`, `/api/escalate`, 실패 로그 smoke test
+- [x] `request_log.status/error_type/origin` 적재 확인
 
 ### P0 — 교수님 시연용 분석 기능
 
@@ -99,15 +102,18 @@
 
 ### P0 — 실제 FastAPI Router 통합
 
-- [ ] `POST /router/embed`, `POST /router/classify`, `GET /health` 계약 확정
-- [ ] Spring `FastApiRouterClient` 구현
-- [ ] embed/classify timeout과 retry 범위 확정
-- [ ] embed 실패 시 cache bypass, classify 실패 시 medium fallback
-- [ ] `fallback_reason`, confidence, 실제 model version 기록
+- [x] `POST /router/embed`, `POST /router/classify`, `GET /health` 계약 확정
+- [x] Spring `FastApiRouterClient` 구현
+- [x] embed/classify timeout과 retry 범위 확정
+- [x] embed 실패 시 cache bypass, classify 실패 시 medium fallback
+- [x] `fallback_reason`, confidence, 실제 model version 기록
 - [ ] 동일 fixture 기반 Spring↔FastAPI contract test
-- [ ] bge-large와 ModernBERT artifact를 GCE에 배포
+- [x] bge-large와 ModernBERT artifact를 GCE에 배포
+- [ ] 운영 DB에 `04-router-confidence.sql` 적용 후 Spring 백엔드 재배포
 
-### P1 — 발표용 고정 실험
+### P1 — 발표용 고정 실험 (A: 우리 시스템 ablation)
+
+우리 시스템을 실제로 돌려 얻는 숫자다. Claude 호출이 발생한다.
 
 - [ ] easy/medium/hard 균형 질문과 정답 tier 100~200개 준비
 - [ ] 유사 표현, 무관 질문, hard negative 포함
@@ -117,6 +123,40 @@
 - [ ] false cache hit과 threshold별 품질 산출
 - [ ] 데이터셋·모델·threshold·가격표 버전을 포함한 immutable 결과 저장
 - [ ] 프론트 `/experiments/:runId` 결과 조회 화면
+
+> 비용 추정: 200문항 × 3구성 ≈ 600회 호출. 문항당 입출력 500토큰 가정 시 약 \$5~8.
+
+### P1 — 발표용 고정 실험 (B: 기존 기법 대비 baseline)
+
+**교수님 지적에 대한 직접적인 답이다.** 2026-08-03 미팅에서 "토큰을 아끼는 기법이 이미
+여럿 있는데 그 대비 성능을 비교하라"는 지적이 있었고, 근거는
+Notion `06 Decision Log` 2026-08-03 및 `05 Experiment Log` EXP-004 에 있다.
+
+위 A는 **우리 시스템의 ablation**이지 다른 기법과의 비교가 아니다. Haiku 가 Opus 보다
+5배 싸므로 무작위로 라우팅해도 비용은 내려간다. Always-Opus 비교만으로는
+"우리 라우터가 좋다"가 아니라 "싼 모델이 싸다"를 보여줄 뿐이다.
+
+- [ ] **Random (동일 분포)** — 분류기가 학습한 게 있는지 증명하는 최소 조건
+- [ ] **Rule-based (길이/토큰 기반 if문)** — ModernBERT 학습이 값어치를 하는지
+- [ ] **Oracle router** — 상한선 대비 달성률. RouterBench §4.4 에 정의가 있다
+- [ ] **always-Haiku / always-Sonnet / always-Opus** — 비용 하한선과 품질 손실
+- [ ] **RouteLLM BERT 분류기** — 선행연구 대비 개선폭
+- [ ] 결과를 **비용-정확도 파레토 곡선 한 장**으로 산출
+
+**실제 Claude 호출이 필요 없다.** RouterBench 에 11개 모델의 정오답과 비용이 이미
+들어 있으므로, 라우팅 정책 함수만 교체해 오프라인으로 전부 계산한다.
+평가 스크립트를 처음 짤 때 **정책을 교체 가능한 형태로** 설계해야 한 번에 들어간다.
+
+> ⚠️ RouteLLM 공개 체크포인트를 그대로 쓰면 안 된다. 학습 도메인이 달라
+> (Chatbot Arena 선호 데이터 vs RouterBench solve rate) 불리하게 나오는데,
+> 그것은 방법의 차이가 아니라 데이터의 차이다. 같은 RouterBench 라벨로 재학습해 비교한다.
+
+> 비교 대상이 **아닌** 것: 프롬프트 압축(LLMLingua), 컨텍스트 편집, Batch 할인,
+> 프롬프트 캐싱. 이들은 우리 라우터와 병행 가능한 직교 기법이므로
+> Related Work 에서 그렇게 정리한다. 상용 게이트웨이(OpenRouter 등)는 라우팅 정책이
+> 비공개라 같은 테스트셋의 정오답을 얻을 수 없어 정량 비교가 불가능하다.
+
+담당: RouterBench 데이터와 평가 스크립트를 가진 팀원. 게이트웨이는 이 실험에 관여하지 않는다.
 
 ### P1 — 피드백 배치와 재학습 연동
 
@@ -141,20 +181,150 @@
 
 ## 5. 발표 시나리오
 
-1. 쉬운 질문에서 낮은 티어 모델 선택을 보여준다.
-2. 어려운 질문에서 상위 모델 선택을 보여준다.
-3. 불만족 버튼으로 에스컬레이션 경로와 개선된 답변을 보여준다.
-4. 같은 질문과 유사 질문을 다시 보내 cache hit, 토큰 0, latency 감소를 보여준다.
-5. `/analytics`에서 누적 cache hit rate, 모델 분포, 비용·토큰 절감을 보여준다.
-6. `/experiments/:runId`에서 Always Opus 대비 라우팅·캐시 효과를 고정 결과로 비교한다.
-7. confusion matrix와 under-routing을 함께 보여 절감률만 높인 결과가 아님을 설명한다.
+| # | 화면 | 보여줄 것 | 예상 질문에 대한 방어 |
+|---|---|---|---|
+| 1 | 채팅 | 쉬운 질문 → 낮은 티어 선택 | |
+| 2 | 채팅 | 어려운 질문 → 상위 모델 선택 | |
+| 3 | 채팅 | 불만족 버튼 → 에스컬레이션 경로와 개선된 답변 | 재학습 정정 라벨이 여기서 나온다 |
+| 4 | 채팅 | 같은/유사 질문 재전송 → cache hit, 토큰 0, latency 감소 | |
+| 5 | `/analytics` | 누적 cache hit rate, 모델 분포, 비용·토큰 절감 | "실제로 쓸 때도 그러냐" |
+| 6 | `/experiments/:runId` | Always Opus 대비 라우팅·캐시 효과 (고정 결과) | "재현 가능하냐" |
+| 7 | `/experiments/:runId` | confusion matrix, under-routing 비율 | **"비용만 줄인 거 아니냐"** |
+| 8 | 파레토 곡선 | Random·Rule-based·Oracle 대비 위치 | **"기존 기법 대비 뭐가 낫냐"** |
+
+7·8번이 방어의 핵심이다.
+
+**7번** — 라우터가 전부 Haiku 로 보내면 비용은 최저지만 품질이 무너진다.
+under-routing 비율을 같이 보여야 절감률만 높인 결과가 아님이 증명된다.
+
+**8번** — 교수님이 지적하신 부분이다. Oracle 을 상한, Random·always-Haiku 를 하한으로
+두고 우리 점이 Rule-based 보다 **왼쪽 위**에 있어야 한다.
+"Always-Opus 대비 3배 절감"보다 **"Oracle 성능의 N% 달성"** 이 설득력이 크다.
+
+```
+정확도
+  ▲          ┌ Oracle (상한선)
+  │        ● │
+  │      ●───┘ Ours
+  │    ●  Rule-based
+  │  ●  Random          ● always-Opus
+  │ ● always-Haiku
+  └──────────────────────────▶ 비용
+```
 
 핵심 설명은 다음과 같다.
 
 > 라우팅은 요청마다 필요한 수준의 모델을 선택해 모델 단가를 낮추고, 시맨틱 캐시는
 > 충분히 유사한 기존 답변을 재사용해 LLM 호출 자체와 토큰 비용을 제거한다.
+> 두 효과는 독립적이며, Oracle 대비 달성률로 라우터 자체의 품질을 별도로 검증한다.
 
-## 6. 작업 규칙
+## 6. 구현 설계 — 분석·실험 화면
+
+발표 시나리오 5~8번을 만들기 위한 구체적인 설계다. 순서대로 진행한다.
+
+### 6-1. `/analytics` — 누적 집계 (시나리오 5)
+
+`request_log` 에 이미 데이터가 쌓이고 있으므로 집계 쿼리만 붙이면 된다. 가장 값이 싸다.
+
+**API**
+
+```
+GET /api/analytics/summary?period=today|7d|all
+```
+
+```json
+{
+  "period": "7d",
+  "totalRequests": 128,
+  "successRate": 0.98,
+  "cacheHitRate": 0.31,
+  "llmCallsSkipped": 40,
+  "byTier":  [{ "tier": "easy", "count": 52, "inputTokens": 6100, "outputTokens": 21000 }],
+  "cost":    { "actual": 0.42, "alwaysOpus": 1.31, "savedRatio": 0.68 },
+  "latency": { "avgMs": 1820, "p95Ms": 4400, "cacheHitAvgMs": 61 },
+  "errors":  [{ "status": "llm_error", "count": 2 }]
+}
+```
+
+**작업**
+
+- [ ] `AnalyticsService` — `request_log` 집계 SQL (period 필터)
+- [ ] Always-Opus 기준 비용 계산 — 같은 토큰 수를 Opus 단가로 환산
+- [ ] 모델 단가를 `application.yml` 로 분리 (`llm.pricing.*`) — 가격 개정 시 코드 수정 없이 대응
+- [ ] `AnalyticsController` — `GET /api/analytics/summary`
+- [ ] 프론트 `/analytics` 페이지 + 상단 이동 버튼
+- [ ] `origin='escalate'` 행을 비용에 포함하되 요청 수에서는 분리 집계
+- [ ] 보안 테스트 — 원문 질문·API key 미반환, 집계값만
+
+> ⚠️ Always-Opus 환산은 **실제 사용한 토큰 수**로 계산한다. 같은 질문을 Opus 에 보냈을 때
+> 출력 토큰이 같다는 보장은 없으므로, 이 값은 "동일 토큰 기준 단가 차이"임을 화면에 명시한다.
+> 정확한 비교는 6-2 의 고정 실험에서 실제로 Opus 를 돌려 얻는다.
+
+### 6-2. `/experiments/:runId` — 고정 실험 (시나리오 6·7)
+
+같은 질문셋을 여러 구성으로 돌려 재현 가능한 결과를 남긴다.
+
+**스키마**
+
+```sql
+CREATE TABLE experiment_run (
+    id              BIGSERIAL PRIMARY KEY,
+    run_id          UUID NOT NULL UNIQUE,
+    config          VARCHAR(32) NOT NULL,   -- always_opus | router_only | router_cache
+    dataset_version VARCHAR(64) NOT NULL,
+    router_model_version VARCHAR(128),
+    embed_model_version  VARCHAR(64),
+    pricing_version VARCHAR(32) NOT NULL,
+    thresholds      JSONB,
+    started_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    finished_at     TIMESTAMPTZ
+);
+
+CREATE TABLE experiment_result (
+    id            BIGSERIAL PRIMARY KEY,
+    run_id        UUID NOT NULL REFERENCES experiment_run(run_id),
+    question_id   VARCHAR(64) NOT NULL,
+    expected_tier VARCHAR(10) NOT NULL,   -- 정답 라벨
+    actual_tier   VARCHAR(10),            -- 라우터 판정
+    cache_hit     BOOLEAN NOT NULL,
+    input_tokens  INTEGER NOT NULL,
+    output_tokens INTEGER NOT NULL,
+    latency_ms    INTEGER NOT NULL
+);
+```
+
+**작업**
+
+- [ ] 질문셋 파일 (`experiments/questions-v1.json`) — id, question, expectedTier
+- [ ] `ExperimentRunner` — 구성별로 질문셋을 순회하며 실행
+- [ ] `config=always_opus` 는 라우터를 건너뛰고 hard 로 고정
+- [ ] `config=router_only` 는 캐시를 우회
+- [ ] 실행 결과를 `experiment_result` 에 적재하고 `finished_at` 기록
+- [ ] `GET /api/experiments/:runId` — 집계 + confusion matrix + under-routing 비율
+- [ ] 프론트 `/experiments/:runId` 화면
+- [ ] 실행은 수동 트리거로 제한 (실수로 반복 호출되면 크레딧이 녹는다)
+
+> 실행 순서 주의: `router_cache` 를 먼저 돌리면 캐시가 채워져 뒤 구성이 오염된다.
+> 구성마다 `cache_entry` 를 비우거나 실험 전용 스키마를 쓴다.
+
+### 6-3. baseline 파레토 곡선 (시나리오 8)
+
+**게이트웨이 작업이 아니다.** RouterBench 오프라인 계산이라 팀원 담당이며,
+§4 P1(B) 에 항목이 있다. 게이트웨이는 결과 이미지나 CSV 를 받아
+`/experiments` 화면에 함께 표시하는 정도만 맡는다.
+
+- [ ] 팀원과 결과 전달 형식 합의 (CSV 컬럼: policy, cost, accuracy)
+- [ ] `/experiments` 화면에 파레토 곡선 표시
+
+### 우선순위
+
+| 순서 | 항목 | 이유 |
+|---|---|---|
+| 1 | 6-1 `/analytics` | 데이터가 이미 있어 가장 싸고, 데모에서 바로 보인다 |
+| 2 | 6-2 고정 실험 | 재현 가능한 숫자. 발표에서 빠질 수 없다 |
+| 3 | 6-3 파레토 곡선 | 교수님 지적에 대한 답이지만 팀원 협업이 필요하다 |
+
+## 7. 작업 규칙
 
 - 기능 변경은 실패 테스트 작성 → 최소 구현 → 전체 관련 테스트 순으로 진행한다.
 - DB 초기 스키마와 운영 마이그레이션은 항상 함께 수정한다.

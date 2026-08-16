@@ -75,6 +75,7 @@ CREATE TABLE request_log (
 
     -- 재학습 전후 비교에 필수. 어느 모델 버전이 내린 판정인지 알아야 한다.
     router_model_version VARCHAR(128),
+    router_confidence    REAL,
     embed_model_version  VARCHAR(64),
 
     cache_hit            BOOLEAN      NOT NULL,
