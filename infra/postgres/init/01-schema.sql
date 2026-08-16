@@ -95,6 +95,12 @@ CREATE TABLE request_log (
     -- 라우터 정확도 집계에서 제외한다 (04 API Contract / Failure Handling).
     fallback_reason      VARCHAR(32),
 
+    -- 실패한 요청도 남긴다. 성공만 기록하면 "전체 중 몇 %가 실패했나",
+    -- "지연시간 분포" 같은 지표를 낼 수 없다.
+    -- success | llm_error | db_error | internal_error
+    status               VARCHAR(20)  NOT NULL DEFAULT 'success',
+    error_type           VARCHAR(64),   -- 예외 클래스명. 실패 원인 분류용
+
     -- 에스컬레이션은 실제로 과금되는 LLM 호출이다.
     -- RequestIdFilter 가 /api/escalate 에 "새" requestId 를 발급하므로,
     -- 이 구분이 없으면 비용 집계가 에스컬레이션을 통째로 빠뜨린다 —
@@ -110,6 +116,7 @@ CREATE TABLE request_log (
 CREATE INDEX idx_request_log_created_at ON request_log (created_at);
 CREATE INDEX idx_request_log_tier       ON request_log (tier);
 CREATE INDEX idx_request_log_cache_hit  ON request_log (cache_hit);
+CREATE INDEX idx_request_log_status     ON request_log (status);
 CREATE INDEX idx_request_log_parent     ON request_log (parent_request_id);
 CREATE INDEX idx_request_log_origin     ON request_log (origin);
 

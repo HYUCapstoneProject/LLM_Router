@@ -168,7 +168,7 @@ done
 
 ```bash
 docker exec llmrouter-postgres psql -U llmrouter -d llmrouter -c '\d request_log' \
-  | grep -E 'conversation_id|cache_entry_id|origin|parent_request_id'
+  | grep -E 'conversation_id|cache_entry_id|origin|parent_request_id|status|error_type'
 ```
 
 > 배포 스크립트(`scripts/deploy-backend.sh`, PR #17)는 **마이그레이션을 돌리지 않는다.**
