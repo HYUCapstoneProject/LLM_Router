@@ -6,6 +6,7 @@ import com.llmrouter.dto.CachedResponse;
 import com.llmrouter.dto.ChatRequest;
 import com.llmrouter.dto.ChatResponse;
 import com.llmrouter.dto.LlmResult;
+import com.llmrouter.dto.RequestLogEntry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -50,11 +51,22 @@ public class ChatService {
                     .latency(System.currentTimeMillis() - start)
                     .build();
 
-            requestLogService.record(response, message,
-                    null,                              // 캐시 히트면 classify 를 안 부른다
-                    routerClient.embedModelVersion(),
-                    hit.similarity(),
-                    null);
+            requestLogService.record(RequestLogEntry.builder()
+                    .requestId(requestId)
+                    .question(message)
+                    .conversationId(request.getConversationId())
+                    .tier(hit.tier())
+                    .modelId(hit.modelId())
+                    .routerModelVersion(null)   // 캐시 히트면 classify 를 안 부른다
+                    .embedModelVersion(routerClient.embedModelVersion())
+                    .cacheHit(true)
+                    .similarity(hit.similarity())
+                    .cacheEntryId(hit.cacheEntryId())
+                    .inputTokens(0)
+                    .outputTokens(0)
+                    .latencyMs(response.getLatency())
+                    .origin(RequestLogEntry.ORIGIN_CHAT)
+                    .build());
             return response;
         }
 
@@ -64,8 +76,10 @@ public class ChatService {
         // 4. 티어에 맞는 Claude 호출
         LlmResult result = llmService.call(tier, message);
 
-        // 5. 캐시 적재
-        cacheService.put(message, embedding, result);
+        // 5. 캐시 적재.
+        //    반환된 id 를 request_log 에 남겨야 /api/escalate 가 나중에
+        //    "불만족한 답이 어느 캐시 행에서 나왔는지" 를 알고 그 행을 갱신할 수 있다.
+        long cacheEntryId = cacheService.put(message, embedding, result);
 
         ChatResponse response = ChatResponse.builder()
                 .requestId(requestId)
@@ -79,11 +93,21 @@ public class ChatService {
                 .latency(System.currentTimeMillis() - start)
                 .build();
 
-        requestLogService.record(response, message,
-                routerClient.routerModelVersion(),
-                routerClient.embedModelVersion(),
-                null,
-                null);
+        requestLogService.record(RequestLogEntry.builder()
+                .requestId(requestId)
+                .question(message)
+                .conversationId(request.getConversationId())
+                .tier(result.tier())
+                .modelId(result.modelId())
+                .routerModelVersion(routerClient.routerModelVersion())
+                .embedModelVersion(routerClient.embedModelVersion())
+                .cacheHit(false)
+                .cacheEntryId(cacheEntryId)
+                .inputTokens(result.inputTokens())
+                .outputTokens(result.outputTokens())
+                .latencyMs(response.getLatency())
+                .origin(RequestLogEntry.ORIGIN_CHAT)
+                .build());
         return response;
     }
 }

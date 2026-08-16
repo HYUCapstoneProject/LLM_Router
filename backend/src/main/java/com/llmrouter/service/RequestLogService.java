@@ -1,6 +1,6 @@
 package com.llmrouter.service;
 
-import com.llmrouter.dto.ChatResponse;
+import com.llmrouter.dto.RequestLogEntry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,37 +24,38 @@ public class RequestLogService {
 
     private static final String INSERT_SQL = """
             INSERT INTO request_log
-                (request_id, question, tier, model_id,
+                (request_id, question, conversation_id, tier, model_id,
                  router_model_version, embed_model_version,
-                 cache_hit, similarity, input_tokens, output_tokens,
-                 latency_ms, fallback_reason)
-            VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 cache_hit, similarity, cache_entry_id,
+                 input_tokens, output_tokens, latency_ms, fallback_reason,
+                 parent_request_id, origin)
+            VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::uuid, ?)
             """;
 
-    public void record(ChatResponse response,
-                       String question,
-                       String routerModelVersion,
-                       String embedModelVersion,
-                       Double similarity,
-                       String fallbackReason) {
+    public void record(RequestLogEntry entry) {
         try {
             jdbc.update(INSERT_SQL,
-                    response.getRequestId(),
-                    question,
-                    response.getTier(),
-                    response.getModelId(),
-                    routerModelVersion,
-                    embedModelVersion,
-                    response.isCacheHit(),
-                    similarity,
-                    response.getInputTokens(),
-                    response.getOutputTokens(),
-                    response.getLatency(),
-                    fallbackReason);
+                    entry.requestId(),
+                    entry.question(),
+                    entry.conversationId(),
+                    entry.tier(),
+                    entry.modelId(),
+                    entry.routerModelVersion(),
+                    entry.embedModelVersion(),
+                    entry.cacheHit(),
+                    entry.similarity(),
+                    entry.cacheEntryId(),
+                    entry.inputTokens(),
+                    entry.outputTokens(),
+                    entry.latencyMs(),
+                    entry.fallbackReason(),
+                    entry.parentRequestId(),
+                    entry.origin());
         } catch (Exception e) {
             // 로그 적재 실패로 사용자 응답을 실패시키지 않는다.
             // 다만 실험 데이터가 비므로 반드시 눈에 띄게 남긴다.
-            log.error("request_log 적재 실패 requestId={}", response.getRequestId(), e);
+            log.error("request_log 적재 실패 requestId={} origin={}",
+                    entry.requestId(), entry.origin(), e);
         }
     }
 }
