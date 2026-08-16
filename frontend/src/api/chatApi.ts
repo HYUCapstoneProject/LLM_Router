@@ -1,4 +1,6 @@
 import type {
+  AnalyticsPeriod,
+  AnalyticsSummary,
   ChatRequest,
   ChatResponse,
   EscalateRequest,
@@ -17,13 +19,7 @@ export class ApiError extends Error {
   }
 }
 
-async function postJson<T>(url: string, body: unknown): Promise<T> {
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  })
-
+async function parse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     // 백엔드가 항상 ErrorResponse 를 주지만, 프록시 오류 등으로
     // JSON 이 아닐 수 있으므로 파싱 실패도 처리한다
@@ -36,6 +32,16 @@ async function postJson<T>(url: string, body: unknown): Promise<T> {
   }
 
   return res.json() as Promise<T>
+}
+
+async function postJson<T>(url: string, body: unknown): Promise<T> {
+  return parse<T>(
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }),
+  )
 }
 
 /**
@@ -71,4 +77,13 @@ export async function sendMessage(
  */
 export async function escalate(req: EscalateRequest): Promise<EscalateResponse> {
   return postJson<EscalateResponse>('/api/escalate', req)
+}
+
+/**
+ * 운영 로그 집계를 가져온다 (시연용).
+ *
+ * 응답에 질문 원문은 없다. 서버가 집계값만 내려주므로 화면에 그대로 띄워도 된다.
+ */
+export async function fetchAnalytics(period: AnalyticsPeriod): Promise<AnalyticsSummary> {
+  return parse<AnalyticsSummary>(await fetch(`/api/analytics/summary?period=${period}`))
 }

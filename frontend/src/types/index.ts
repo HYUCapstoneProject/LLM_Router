@@ -58,6 +58,50 @@ export interface ChatResponse {
   latency: number
 }
 
+/** GET /api/analytics/summary — 집계값만 온다. 질문 원문은 포함되지 않는다 */
+export interface AnalyticsSummary {
+  period: AnalyticsPeriod
+  /** 비용 계산에 쓴 단가표 버전. 숫자를 재현하려면 이 값이 필요하다 */
+  pricingVersion: string
+  requests: {
+    total: number
+    chat: number
+    escalation: number
+    success: number
+    successRate: number
+  }
+  cache: {
+    hits: number
+    hitRate: number
+    /** 캐시 히트로 아예 건너뛴 LLM 호출 수 */
+    llmCallsSkipped: number
+  }
+  byTier: Array<{
+    tier: TierType
+    modelId: string
+    count: number
+    share: number
+    inputTokens: number
+    outputTokens: number
+    cost: number
+  }>
+  cost: {
+    actual: number
+    alwaysOpus: number
+    savedRatio: number
+    /** 이 비교가 무엇인지. 화면에 그대로 노출한다 */
+    note: string
+  }
+  latency: {
+    avgMs: number
+    cacheHitAvgMs: number
+    cacheMissAvgMs: number
+  }
+  errors: Array<{ status: string; count: number }>
+}
+
+export type AnalyticsPeriod = 'today' | '7d' | 'all'
+
 export interface EscalateRequest {
   /** /api/chat 응답의 requestId. 체인의 기준점이다 */
   requestId: string

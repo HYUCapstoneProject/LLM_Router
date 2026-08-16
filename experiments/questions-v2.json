@@ -1,0 +1,135 @@
+{
+  "version": "v2",
+  "language": "en",
+  "note": [
+    "v1(30문항)은 hard_negative 가 2개뿐이라 결론이 서지 않았다. v2 는 그 부분을 크게 늘렸다.",
+    "",
+    "라우터는 RouterBench(영어), 임베딩은 bge-large-en-v1.5 다. 질문은 영어로 둔다.",
+    "",
+    "kind:",
+    "  base           기준 질문",
+    "  paraphrase     같은 뜻 다른 표현 → 캐시가 잡아야 한다 (true hit)",
+    "  hard_negative  표현은 비슷한데 답이 다름 → 캐시가 잡으면 안 된다 (false hit)",
+    "  filler         무관한 질문. false hit 분모를 넓히기 위한 것",
+    "",
+    "negType — 실제 서비스에서 시맨틱 캐시가 틀리는 유형별로 나눴다:",
+    "  entity_swap      구조는 같고 대상만 다름 (France -> Germany)",
+    "  adjacent_concept 같은 도메인의 인접 개념 (hash table -> hash function)",
+    "  inverted         반대를 묻는 질문 (when to use -> when NOT to use)",
+    "  scope_shift      범위가 달라짐 (general -> specific context)",
+    "  same_domain      같은 주제의 다른 질문 (TCP vs UDP -> TCP handshake)"
+  ],
+  "questions": [
+    { "id": "g01",   "expectedTier": "easy", "kind": "base",          "group": "g01", "text": "What is the capital of France?" },
+    { "id": "g01p1", "expectedTier": "easy", "kind": "paraphrase",    "group": "g01", "text": "Which city is the capital of France?" },
+    { "id": "g01p2", "expectedTier": "easy", "kind": "paraphrase",    "group": "g01", "text": "France's capital city is what?" },
+    { "id": "g01n1", "expectedTier": "easy", "kind": "hard_negative", "group": "g01", "negType": "entity_swap", "text": "What is the capital of Germany?" },
+    { "id": "g01n2", "expectedTier": "easy", "kind": "hard_negative", "group": "g01", "negType": "same_domain", "text": "What is the population of France?" },
+
+    { "id": "g02",   "expectedTier": "easy", "kind": "base",          "group": "g02", "text": "What does HTTP stand for?" },
+    { "id": "g02p1", "expectedTier": "easy", "kind": "paraphrase",    "group": "g02", "text": "What is the full form of the acronym HTTP?" },
+    { "id": "g02n1", "expectedTier": "easy", "kind": "hard_negative", "group": "g02", "negType": "entity_swap", "text": "What does HTTPS stand for?" },
+    { "id": "g02n2", "expectedTier": "easy", "kind": "hard_negative", "group": "g02", "negType": "same_domain", "text": "What port does HTTP use by default?" },
+
+    { "id": "g03",   "expectedTier": "easy", "kind": "base",          "group": "g03", "text": "What is the boiling point of water in Celsius?" },
+    { "id": "g03p1", "expectedTier": "easy", "kind": "paraphrase",    "group": "g03", "text": "At what temperature in Celsius does water boil?" },
+    { "id": "g03n1", "expectedTier": "easy", "kind": "hard_negative", "group": "g03", "negType": "entity_swap", "text": "What is the freezing point of water in Celsius?" },
+    { "id": "g03n2", "expectedTier": "easy", "kind": "hard_negative", "group": "g03", "negType": "entity_swap", "text": "What is the boiling point of water in Fahrenheit?" },
+
+    { "id": "g04",   "expectedTier": "easy", "kind": "base",          "group": "g04", "text": "Who wrote Romeo and Juliet?" },
+    { "id": "g04p1", "expectedTier": "easy", "kind": "paraphrase",    "group": "g04", "text": "Which author is Romeo and Juliet by?" },
+    { "id": "g04n1", "expectedTier": "easy", "kind": "hard_negative", "group": "g04", "negType": "entity_swap", "text": "Who wrote Hamlet?" },
+    { "id": "g04n2", "expectedTier": "easy", "kind": "hard_negative", "group": "g04", "negType": "same_domain", "text": "When was Romeo and Juliet first performed?" },
+
+    { "id": "g05",   "expectedTier": "easy", "kind": "base",          "group": "g05", "text": "How many days are in a leap year?" },
+    { "id": "g05p1", "expectedTier": "easy", "kind": "paraphrase",    "group": "g05", "text": "A leap year has how many days?" },
+    { "id": "g05n1", "expectedTier": "easy", "kind": "hard_negative", "group": "g05", "negType": "adjacent_concept", "text": "How do you determine whether a year is a leap year?" },
+
+    { "id": "n01",   "expectedTier": "medium", "kind": "base",          "group": "n01", "text": "Explain the difference between TCP and UDP." },
+    { "id": "n01p1", "expectedTier": "medium", "kind": "paraphrase",    "group": "n01", "text": "What's the difference between TCP and UDP protocols?" },
+    { "id": "n01p2", "expectedTier": "medium", "kind": "paraphrase",    "group": "n01", "text": "How do TCP and UDP differ from each other?" },
+    { "id": "n01n1", "expectedTier": "medium", "kind": "hard_negative", "group": "n01", "negType": "same_domain", "text": "Explain the steps of the TCP three-way handshake." },
+    { "id": "n01n2", "expectedTier": "medium", "kind": "hard_negative", "group": "n01", "negType": "entity_swap", "text": "Explain the difference between TCP and QUIC." },
+
+    { "id": "n02",   "expectedTier": "medium", "kind": "base",          "group": "n02", "text": "How does a hash table handle collisions?" },
+    { "id": "n02p1", "expectedTier": "medium", "kind": "paraphrase",    "group": "n02", "text": "What strategies does a hash table use when two keys collide?" },
+    { "id": "n02n1", "expectedTier": "medium", "kind": "hard_negative", "group": "n02", "negType": "adjacent_concept", "text": "How does a hash function avoid producing collisions?" },
+    { "id": "n02n2", "expectedTier": "medium", "kind": "hard_negative", "group": "n02", "negType": "same_domain", "text": "What is the average time complexity of a hash table lookup?" },
+
+    { "id": "n03",   "expectedTier": "medium", "kind": "base",          "group": "n03", "text": "Explain how database indexes speed up queries." },
+    { "id": "n03p1", "expectedTier": "medium", "kind": "paraphrase",    "group": "n03", "text": "Why do queries run faster when a database index exists?" },
+    { "id": "n03n1", "expectedTier": "medium", "kind": "hard_negative", "group": "n03", "negType": "inverted",         "text": "When do database indexes make performance worse?" },
+    { "id": "n03n2", "expectedTier": "medium", "kind": "hard_negative", "group": "n03", "negType": "adjacent_concept", "text": "How does a database query planner decide which index to use?" },
+
+    { "id": "n04",   "expectedTier": "medium", "kind": "base",          "group": "n04", "text": "What causes a deadlock and how can it be prevented?" },
+    { "id": "n04p1", "expectedTier": "medium", "kind": "paraphrase",    "group": "n04", "text": "Why do deadlocks happen and what prevents them?" },
+    { "id": "n04n1", "expectedTier": "medium", "kind": "hard_negative", "group": "n04", "negType": "adjacent_concept", "text": "What causes a livelock and how is it different from starvation?" },
+    { "id": "n04n2", "expectedTier": "medium", "kind": "hard_negative", "group": "n04", "negType": "adjacent_concept", "text": "How does a database detect and resolve deadlocks at runtime?" },
+
+    { "id": "n05",   "expectedTier": "medium", "kind": "base",          "group": "n05", "text": "What are the tradeoffs between REST and GraphQL for a mobile client?" },
+    { "id": "n05p1", "expectedTier": "medium", "kind": "paraphrase",    "group": "n05", "text": "For a mobile app, what are the pros and cons of REST versus GraphQL?" },
+    { "id": "n05n1", "expectedTier": "medium", "kind": "hard_negative", "group": "n05", "negType": "entity_swap",  "text": "What are the tradeoffs between REST and gRPC for a mobile client?" },
+    { "id": "n05n2", "expectedTier": "medium", "kind": "hard_negative", "group": "n05", "negType": "scope_shift",  "text": "What are the tradeoffs between REST and GraphQL for a public third-party API?" },
+
+    { "id": "n06",   "expectedTier": "medium", "kind": "base",          "group": "n06", "text": "How does garbage collection work in the JVM?" },
+    { "id": "n06p1", "expectedTier": "medium", "kind": "paraphrase",    "group": "n06", "text": "Explain the JVM's garbage collection mechanism." },
+    { "id": "n06n1", "expectedTier": "medium", "kind": "hard_negative", "group": "n06", "negType": "entity_swap",      "text": "How does garbage collection work in CPython?" },
+    { "id": "n06n2", "expectedTier": "medium", "kind": "hard_negative", "group": "n06", "negType": "adjacent_concept", "text": "How do you tune JVM heap size to reduce GC pauses?" },
+
+    { "id": "n07",   "expectedTier": "medium", "kind": "base",          "group": "n07", "text": "Why does quicksort have O(n log n) average time complexity?" },
+    { "id": "n07p1", "expectedTier": "medium", "kind": "paraphrase",    "group": "n07", "text": "Explain why quicksort averages O(n log n) running time." },
+    { "id": "n07n1", "expectedTier": "medium", "kind": "hard_negative", "group": "n07", "negType": "inverted",    "text": "Why does quicksort degrade to O(n squared) in the worst case?" },
+    { "id": "n07n2", "expectedTier": "medium", "kind": "hard_negative", "group": "n07", "negType": "entity_swap", "text": "Why does mergesort have O(n log n) time complexity in all cases?" },
+
+    { "id": "n08",   "expectedTier": "medium", "kind": "base",          "group": "n08", "text": "Write a Python function that returns the longest common prefix of a list of strings." },
+    { "id": "n08p1", "expectedTier": "medium", "kind": "paraphrase",    "group": "n08", "text": "In Python, how do I compute the longest common prefix across several strings?" },
+    { "id": "n08n1", "expectedTier": "medium", "kind": "hard_negative", "group": "n08", "negType": "adjacent_concept", "text": "Write a Python function that returns the longest common subsequence of two strings." },
+    { "id": "n08n2", "expectedTier": "medium", "kind": "hard_negative", "group": "n08", "negType": "entity_swap",      "text": "Write a Java function that returns the longest common prefix of an array of strings." },
+
+    { "id": "h01",   "expectedTier": "hard", "kind": "base",          "group": "h01", "text": "Design a distributed rate limiter that works across multiple servers, and explain the consistency and availability tradeoffs of your approach." },
+    { "id": "h01p1", "expectedTier": "hard", "kind": "paraphrase",    "group": "h01", "text": "How would you build a rate limiter spanning several servers, and what consistency versus availability tradeoffs does it involve?" },
+    { "id": "h01n1", "expectedTier": "hard", "kind": "hard_negative", "group": "h01", "negType": "adjacent_concept", "text": "Design a distributed lock that works across multiple servers, and explain the failure modes that remain under network partition." },
+    { "id": "h01n2", "expectedTier": "hard", "kind": "hard_negative", "group": "h01", "negType": "scope_shift",      "text": "Design a rate limiter for a single-process application and explain the memory tradeoffs." },
+
+    { "id": "h02",   "expectedTier": "hard", "kind": "base",          "group": "h02", "text": "Prove that the halting problem is undecidable, and explain why the diagonalization argument is necessary." },
+    { "id": "h02p1", "expectedTier": "hard", "kind": "paraphrase",    "group": "h02", "text": "Give a proof of the undecidability of the halting problem and justify the use of diagonalization." },
+    { "id": "h02n1", "expectedTier": "hard", "kind": "hard_negative", "group": "h02", "negType": "adjacent_concept", "text": "Explain why the P versus NP question remains open and what a proof would require." },
+    { "id": "h02n2", "expectedTier": "hard", "kind": "hard_negative", "group": "h02", "negType": "adjacent_concept", "text": "Prove that the set of real numbers is uncountable using a diagonalization argument." },
+
+    { "id": "h03",   "expectedTier": "hard", "kind": "base",          "group": "h03", "text": "Explain the CAP theorem and why partition tolerance cannot be sacrificed in practice." },
+    { "id": "h03p1", "expectedTier": "hard", "kind": "paraphrase",    "group": "h03", "text": "What does the CAP theorem state, and why must real systems accept partition tolerance?" },
+    { "id": "h03n1", "expectedTier": "hard", "kind": "hard_negative", "group": "h03", "negType": "adjacent_concept", "text": "Explain the PACELC theorem and how it extends beyond CAP." },
+    { "id": "h03n2", "expectedTier": "hard", "kind": "hard_negative", "group": "h03", "negType": "same_domain",      "text": "Compare strong consistency and eventual consistency in terms of client-observable behavior." },
+
+    { "id": "h04",   "expectedTier": "hard", "kind": "base",          "group": "h04", "text": "Analyze the time and space complexity of a red-black tree deletion, and explain why the rebalancing cases are exhaustive." },
+    { "id": "h04p1", "expectedTier": "hard", "kind": "paraphrase",    "group": "h04", "text": "What is the complexity of deleting from a red-black tree, and why do the rebalancing cases cover every situation?" },
+    { "id": "h04n1", "expectedTier": "hard", "kind": "hard_negative", "group": "h04", "negType": "inverted",    "text": "Analyze the time and space complexity of a red-black tree insertion and its rebalancing cases." },
+    { "id": "h04n2", "expectedTier": "hard", "kind": "hard_negative", "group": "h04", "negType": "entity_swap", "text": "Analyze the time and space complexity of an AVL tree deletion and its rotation cases." },
+
+    { "id": "h05",   "expectedTier": "hard", "kind": "base",          "group": "h05", "text": "Derive the backpropagation update rule for a two-layer network with cross-entropy loss and softmax output, showing each gradient step." },
+    { "id": "h05p1", "expectedTier": "hard", "kind": "paraphrase",    "group": "h05", "text": "Work through the gradient derivation for backpropagation in a two-layer softmax network trained with cross-entropy." },
+    { "id": "h05n1", "expectedTier": "hard", "kind": "hard_negative", "group": "h05", "negType": "inverted",    "text": "Describe the forward pass of a two-layer network with softmax output and cross-entropy loss." },
+    { "id": "h05n2", "expectedTier": "hard", "kind": "hard_negative", "group": "h05", "negType": "entity_swap", "text": "Derive the gradient update rule for a two-layer network using mean squared error loss." },
+
+    { "id": "h06",   "expectedTier": "hard", "kind": "base",          "group": "h06", "text": "Design a schema migration strategy for a live service with zero downtime, covering rollback, dual-write, and backfill ordering." },
+    { "id": "h06p1", "expectedTier": "hard", "kind": "paraphrase",    "group": "h06", "text": "How do you migrate a database schema on a running service without downtime, including rollback and backfill order?" },
+    { "id": "h06n1", "expectedTier": "hard", "kind": "hard_negative", "group": "h06", "negType": "adjacent_concept", "text": "Design a blue-green deployment strategy for a live service and explain traffic cutover and rollback." },
+    { "id": "h06n2", "expectedTier": "hard", "kind": "hard_negative", "group": "h06", "negType": "scope_shift",      "text": "Design a one-time bulk data migration between two databases during a scheduled maintenance window." },
+
+    { "id": "f01", "expectedTier": "easy",   "kind": "filler", "group": null, "text": "What is the largest ocean on Earth?" },
+    { "id": "f02", "expectedTier": "easy",   "kind": "filler", "group": null, "text": "Which planet is closest to the Sun?" },
+    { "id": "f03", "expectedTier": "easy",   "kind": "filler", "group": null, "text": "What is 15 percent of 200?" },
+    { "id": "f04", "expectedTier": "easy",   "kind": "filler", "group": null, "text": "How many continents are there?" },
+    { "id": "f05", "expectedTier": "easy",   "kind": "filler", "group": null, "text": "What is the chemical symbol for gold?" },
+    { "id": "f06", "expectedTier": "medium", "kind": "filler", "group": null, "text": "A train travels 120 km in 1.5 hours, then 80 km in 45 minutes. What is its average speed?" },
+    { "id": "f07", "expectedTier": "medium", "kind": "filler", "group": null, "text": "Explain how OAuth 2.0 authorization code flow works." },
+    { "id": "f08", "expectedTier": "medium", "kind": "filler", "group": null, "text": "What is the difference between a process and a thread?" },
+    { "id": "f09", "expectedTier": "medium", "kind": "filler", "group": null, "text": "How does DNS resolution work from browser to IP address?" },
+    { "id": "f10", "expectedTier": "medium", "kind": "filler", "group": null, "text": "Explain what a memory leak is and how to detect one." },
+    { "id": "f11", "expectedTier": "hard",   "kind": "filler", "group": null, "text": "Explain how Raft achieves consensus and what happens during a leader election with a split vote." },
+    { "id": "f12", "expectedTier": "hard",   "kind": "filler", "group": null, "text": "Design a multi-region active-active write path and explain conflict resolution under concurrent updates." },
+    { "id": "f13", "expectedTier": "hard",   "kind": "filler", "group": null, "text": "Derive the expected number of comparisons for randomized quickselect and prove the linear bound." },
+    { "id": "f14", "expectedTier": "hard",   "kind": "filler", "group": null, "text": "Explain how a JIT compiler performs escape analysis and when stack allocation becomes unsafe." },
+    { "id": "f15", "expectedTier": "hard",   "kind": "filler", "group": null, "text": "Design an exactly-once delivery guarantee over an at-least-once message broker and enumerate the required invariants." }
+  ]
+}

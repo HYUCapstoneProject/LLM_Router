@@ -4,8 +4,22 @@
 # nginx 자체 변수($host, $remote_addr 등)는 같은 이름의 환경변수가 없으면 그대로 남는다.
 
 # IP 당 요청 제한. Claude 크레딧이 뒤에 있으므로 필수다.
+#
+# 두 종류를 나눈 이유: /api/analytics 는 DB 집계만 하고 Claude 를 부르지 않는다.
+# 한 통에 묶으면 시연 중 지표를 몇 번 새로고침하는 것만으로 채팅이 429 를 맞는다.
+# limit_req 는 키가 빈 문자열이면 그 요청을 건너뛰므로, map 으로 서로를 비활성화한다.
+map $uri $llm_limit_key {
+    ~^/api/analytics    "";
+    default             $binary_remote_addr;
+}
+map $uri $analytics_limit_key {
+    ~^/api/analytics    $binary_remote_addr;
+    default             "";
+}
+
 # 데모에서 사람이 질문을 던지는 속도는 분당 몇 회 수준이라 20r/m 이면 충분하다.
-limit_req_zone $binary_remote_addr zone=api_limit:10m rate=20r/m;
+limit_req_zone $llm_limit_key       zone=api_limit:10m       rate=20r/m;
+limit_req_zone $analytics_limit_key zone=analytics_limit:10m rate=60r/m;
 
 server {
     listen ${PORT};
@@ -17,7 +31,8 @@ server {
     # 백엔드 IP 를 브라우저에 노출하지 않기 위해 여기서 프록시한다.
     # 브라우저는 Cloud Run 도메인만 보므로 same-origin 이 되어 CORS 도 불필요하다.
     location /api/ {
-        limit_req zone=api_limit burst=5 nodelay;
+        limit_req zone=api_limit       burst=5  nodelay;
+        limit_req zone=analytics_limit burst=20 nodelay;
         limit_req_status 429;
 
         proxy_pass ${BACKEND_URL};

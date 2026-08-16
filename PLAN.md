@@ -92,13 +92,22 @@
 
 ### P0 — 교수님 시연용 분석 기능
 
-- [ ] `GET /api/analytics/summary?period=today|7d|all`
-- [ ] 총 요청 수, 성공률, cache hit rate, LLM 호출 생략 횟수
-- [ ] 모델·티어별 호출 비율과 입력·출력 토큰 합계
-- [ ] 실제 비용과 Always-Opus 기준 비용 및 절감률
-- [ ] 평균·P95 latency와 오류 유형별 발생 건수
-- [ ] 프론트 `/analytics` 누적 대시보드와 상단 이동 버튼
+- [x] `GET /api/analytics/summary?period=today|7d|all`
+- [x] 총 요청 수, 성공률, cache hit rate, LLM 호출 생략 횟수
+- [x] 모델·티어별 호출 비율과 입력·출력 토큰 합계
+- [x] 실제 비용과 Always-Opus 기준 비용 및 절감률
+      → **캐시 히트 행은 제외하고 계산한다.** 토큰이 0 이라 "Opus 였다면"을 만들 근거가
+      없다. 캐시 효과는 `llmCallsSkipped` 로 따로 보고하고, 응답의 `cost.note` 에
+      "동일 토큰 기준 단가 차이"임을 명시해 화면에 그대로 띄운다.
+- [x] 평균 latency (캐시 히트/미스 분리)와 오류 유형별 발생 건수
+- [ ] P95 latency — 중간 시연 범위에서 제외. 표본이 적어 의미가 없다
+- [x] 프론트 누적 대시보드와 상단 이동 버튼
+      → 라우터 라이브러리가 없어 `/analytics` 경로 대신 `App.tsx` 의 view 토글로 구현
+- [x] nginx rate limit 분리 — 지표 새로고침이 채팅 요청 한도를 먹지 않게 zone 을 나눔
 - [ ] 원문 질문이나 API key 없이 집계값만 반환하는 보안 테스트
+      → DTO 에는 질문 필드가 없다. 응답 본문 검증 테스트는 미작성
+- [ ] **실 DB smoke test 미실행** — 집계 SQL 을 살아 있는 Postgres 에 한 번 돌려봐야 한다.
+      로컬 5432 가 내려가 있어 확인하지 못했다
 
 ### P0 — 실제 FastAPI Router 통합
 
