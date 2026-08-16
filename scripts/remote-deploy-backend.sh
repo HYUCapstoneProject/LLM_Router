@@ -24,10 +24,11 @@ fi
 
 work_dir="$(mktemp -d /tmp/llm-router-backend-deploy-XXXXXX)"
 env_file="$(mktemp /tmp/llm-router-backend-env-XXXXXX)"
+router_env_file="${env_file}.router"
 
 cleanup() {
   rm -rf "$work_dir"
-  rm -f "$env_file" "$archive_path"
+  rm -f "$env_file" "$router_env_file" "$archive_path"
 }
 trap cleanup EXIT
 
@@ -45,6 +46,22 @@ fi
 # 환경변수 파일은 VM의 임시 파일에만 저장하며 출력하거나 로컬로 전송하지 않는다.
 docker inspect "$container_name" \
   --format '{{range .Config.Env}}{{println .}}{{end}}' > "$env_file"
+
+# FastAPI 토큰은 저장소·배포 인자에 싣지 않고 VM에서 Secret Manager로 직접 읽는다.
+# 기존 ROUTER_* 값은 제거하고 매 배포마다 최신 토큰과 내부 주소로 교체한다.
+# 이 단계는 기존 컨테이너를 멈추기 전이라 권한/네트워크 실패 시 서비스에 영향이 없다.
+grep -v -E '^(ROUTER_MODE|ROUTER_BASE_URL|ROUTER_API_TOKEN)=' "$env_file" > "$router_env_file"
+router_api_token="$(gcloud secrets versions access latest \
+  --secret="${ROUTER_TOKEN_SECRET:-llm-router-internal-api-token}")"
+if [[ -z "$router_api_token" ]]; then
+  echo "FastAPI 라우터 토큰을 Secret Manager에서 읽지 못했습니다." >&2
+  exit 1
+fi
+printf 'ROUTER_MODE=fastapi\nROUTER_BASE_URL=%s\nROUTER_API_TOKEN=%s\n' \
+  "${ROUTER_BASE_URL:-http://10.138.0.2:8000}" "$router_api_token" >> "$router_env_file"
+mv "$router_env_file" "$env_file"
+chmod 600 "$env_file"
+unset router_api_token
 
 if docker container inspect "$previous_name" >/dev/null 2>&1; then
   docker rm "$previous_name"
