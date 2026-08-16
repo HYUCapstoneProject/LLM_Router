@@ -7,7 +7,8 @@ WORKDIR /build
 # src 가 바뀌어도 의존성 레이어는 캐시에서 재사용되어 빌드가 빨라진다.
 COPY gradlew settings.gradle build.gradle gradle.properties ./
 COPY gradle ./gradle
-RUN chmod +x gradlew && ./gradlew dependencies --no-daemon || true
+# Windows에서 만든 배포 아카이브도 Linux에서 실행되도록 Gradle wrapper의 CRLF를 제거한다.
+RUN sed -i 's/\r$//' gradlew && chmod +x gradlew && ./gradlew dependencies --no-daemon || true
 
 COPY src ./src
 RUN ./gradlew bootJar --no-daemon -x test
