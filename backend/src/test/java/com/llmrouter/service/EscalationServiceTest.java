@@ -36,6 +36,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -72,6 +73,7 @@ class EscalationServiceTest {
         when(routerClient.routerModelVersion()).thenReturn("stub-medium-v0");
         when(escalationLogService.loadChain(anyString())).thenReturn(Optional.empty());
         when(escalationLogService.findByTier(anyString(), anyString())).thenReturn(Optional.empty());
+        when(escalationLogService.reserve(any())).thenReturn(1001L);
         when(llmService.call(any(), anyString()))
                 .thenReturn(new LlmResult("상위 모델 답변", "hard", "claude-opus-4-8", 200, 900));
     }
@@ -219,8 +221,8 @@ class EscalationServiceTest {
                     .thenReturn(Optional.of(new ExistingEscalation(1, "먼저 받은 opus 답변",
                             "medium", "hard", "claude-opus-4-8",
                             List.of("sonnet", "opus"), 200, 900, 1500)));
-            doThrow(new DuplicateKeyException("uq_escalation_log_tier"))
-                    .when(escalationLogService).reserve(any());
+            when(escalationLogService.reserve(any()))
+                    .thenThrow(new DuplicateKeyException("uq_escalation_log_tier"));
 
             EscalateResponse response = service.escalate(request("sonnet", "opus"));
 
@@ -232,7 +234,7 @@ class EscalationServiceTest {
         @DisplayName("멱등 반환에는 request_log 를 남기지 않는다 - 요금이 나가지 않았다")
         void idempotentReplayDoesNotDoubleCountCost() {
             givenMissOriginContext("medium");
-            doThrow(new DuplicateKeyException("dup")).when(escalationLogService).reserve(any());
+            when(escalationLogService.reserve(any())).thenThrow(new DuplicateKeyException("dup"));
             when(escalationLogService.findByTier(REQ_ID, "hard")).thenReturn(Optional.of(
                     new ExistingEscalation(1, "답", "medium", "hard", "claude-opus-4-8",
                             List.of("sonnet", "opus"), 200, 900, 1500)));
@@ -247,7 +249,7 @@ class EscalationServiceTest {
         @DisplayName("아직 진행 중인 예약이면 409 를 내고 LLM 을 부르지 않는다")
         void inFlightReservationYieldsConflict() {
             givenMissOriginContext("medium");
-            doThrow(new DuplicateKeyException("dup")).when(escalationLogService).reserve(any());
+            when(escalationLogService.reserve(any())).thenThrow(new DuplicateKeyException("dup"));
             when(escalationLogService.findByTier(REQ_ID, "hard")).thenReturn(Optional.of(
                     new ExistingEscalation(1, null, "medium", "hard", null,
                             List.of("sonnet", "opus"), 0, 0, 0)));
@@ -269,8 +271,9 @@ class EscalationServiceTest {
             when(escalationLogService.deleteStaleReservation(eq(REQ_ID), any()))
                     .thenReturn(true);
             // 첫 예약은 유령 때문에 실패, 치운 뒤 두 번째는 성공
-            doThrow(new DuplicateKeyException("dup")).doNothing()
-                    .when(escalationLogService).reserve(any());
+            when(escalationLogService.reserve(any()))
+                    .thenThrow(new DuplicateKeyException("dup"))
+                    .thenReturn(2002L);
 
             EscalateResponse response = service.escalate(request("sonnet", "opus"));
 
@@ -287,7 +290,7 @@ class EscalationServiceTest {
                     new ExistingEscalation(1, null, "medium", "hard", null, List.of(), 0, 0, 0)));
             when(escalationLogService.deleteStaleReservation(anyString(), any()))
                     .thenReturn(true);
-            doThrow(new DuplicateKeyException("dup")).when(escalationLogService).reserve(any());
+            when(escalationLogService.reserve(any())).thenThrow(new DuplicateKeyException("dup"));
 
             assertThatThrownBy(() -> service.escalate(request("sonnet", "opus")))
                     .isInstanceOf(EscalationInProgressException.class);
@@ -303,7 +306,7 @@ class EscalationServiceTest {
             assertThatThrownBy(() -> service.escalate(request("sonnet", "opus")))
                     .isInstanceOf(RuntimeException.class);
 
-            verify(escalationLogService).release(REQ_ID, 1);
+            verify(escalationLogService).release(1001L);
             verify(escalationLogService, never()).complete(any());
         }
     }
@@ -389,7 +392,7 @@ class EscalationServiceTest {
             service.escalate(request("sonnet", "opus"));
 
             verify(cacheService).refresh(eq(42L), any());
-            verify(cacheService, never()).put(anyString(), any(), any());
+            verify(cacheService, never()).upsertForQuestion(anyString(), any(), any(), anyDouble());
         }
 
         @Test
@@ -414,7 +417,9 @@ class EscalationServiceTest {
             service.escalate(request("sonnet", "opus"));
 
             verify(cacheService, never()).refresh(anyLong(), any());
-            verify(cacheService).put(eq(QUESTION), any(), any());
+            // put 이 아니라 upsert 다. 2단계 체인에서 같은 임베딩의 행이 둘 생기면
+            // 동점 상황에서 거부당한 하위 모델 답이 나갈 수 있다.
+            verify(cacheService).upsertForQuestion(eq(QUESTION), any(), any(), eq(0.95));
         }
 
         @Test
@@ -426,7 +431,7 @@ class EscalationServiceTest {
 
             service.escalate(request("sonnet", "opus"));
 
-            verify(cacheService).put(eq(QUESTION), any(), any());
+            verify(cacheService).upsertForQuestion(eq(QUESTION), any(), any(), eq(0.95));
             verify(cacheService, never()).refresh(anyLong(), any());
         }
 
@@ -439,7 +444,7 @@ class EscalationServiceTest {
             service.escalate(request("sonnet", "opus"));
 
             verify(cacheService, never()).refresh(anyLong(), any());
-            verify(cacheService, never()).put(anyString(), any(), any());
+            verify(cacheService, never()).upsertForQuestion(anyString(), any(), any(), anyDouble());
         }
     }
 
@@ -492,7 +497,7 @@ class EscalationServiceTest {
             service.escalate(request("sonnet", "opus"));
 
             EscalationCompletion completion = captureCompletion();
-            assertThat(completion.escalationSeq()).isEqualTo(1);
+            assertThat(completion.escalationLogId()).isEqualTo(1001L);
             assertThat(completion.response()).isEqualTo("상위 모델 답변");
             assertThat(completion.finalModelId()).isEqualTo("claude-opus-4-8");
             assertThat(completion.inputTokens()).isEqualTo(200);

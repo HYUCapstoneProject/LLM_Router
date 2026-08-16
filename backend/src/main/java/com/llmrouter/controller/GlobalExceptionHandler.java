@@ -51,12 +51,18 @@ public class GlobalExceptionHandler {
                 "원본 요청을 찾을 수 없습니다. 질문을 다시 보내주세요.");
     }
 
-    /** 모르는 모델 이름이거나 더 낮은 티어로 내려가려는 요청 */
+    /**
+     * 모르는 모델 이름이거나 더 낮은 티어로 내려가려는 요청.
+     *
+     * 예외 메시지를 그대로 내보낸다. "gpt-4 는 모르는 모델"과 "opus 에서 sonnet 으로는 못 간다"는
+     * 고쳐야 할 것이 다른데, 한 문구로 뭉개면 RouterService.toTier 가 예외 대신
+     * Optional 을 돌려주며 둘을 나눈 이유가 없어진다.
+     * 내용은 요청에 실려 온 값과 허용 목록뿐이라 노출해도 안전하다.
+     */
     @ExceptionHandler(InvalidEscalationException.class)
     public ResponseEntity<ErrorResponse> handleInvalidEscalation(InvalidEscalationException e) {
         log.warn("잘못된 에스컬레이션 요청 - {}", e.getMessage());
-        return build(HttpStatus.BAD_REQUEST, "INVALID_ESCALATION",
-                "더 높은 모델로만 재요청할 수 있습니다.");
+        return build(HttpStatus.BAD_REQUEST, "INVALID_ESCALATION", e.getMessage());
     }
 
     /**

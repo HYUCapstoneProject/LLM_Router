@@ -117,11 +117,12 @@ public class EscalationService {
         int seq = chain.map(EscalationChainState::lastSeq).orElse(0) + 1;
 
         // 5. 자리 예약. 중복 요청은 여기서 끊긴다 — LLM 요금이 나가기 전이다.
-        Optional<EscalateResponse> replay =
+        ReservationOutcome reserved =
                 reserve(ctx, originalRequestId, initialTier, path, targetTier, seq);
-        if (replay.isPresent()) {
-            return replay.get();
+        if (reserved.replay() != null) {
+            return reserved.replay();
         }
+        long escalationLogId = reserved.escalationLogId();
 
         // 6. 상위 모델 호출.
         //    실패하면 예약을 되돌려야 한다. 안 풀면 그 티어로 다시 시도할 수 없게 된다.
@@ -129,7 +130,7 @@ public class EscalationService {
         try {
             result = llmService.call(targetTier, ctx.question());
         } catch (RuntimeException e) {
-            escalationLogService.release(originalRequestId, seq);
+            escalationLogService.release(escalationLogId);
             throw e;
         }
 
@@ -151,7 +152,7 @@ public class EscalationService {
 
         // 8. 예약한 행에 결과를 채우고 체인의 종결점으로 만든다.
         long latency = System.currentTimeMillis() - start;
-        completeReservation(originalRequestId, seq, result, embedding, latency);
+        completeReservation(originalRequestId, escalationLogId, result, embedding, latency);
 
         // 9. 이 호출 자체도 과금되는 LLM 요청이므로 request_log 에 남긴다.
         //    origin 으로 구분해야 비용 집계에는 잡히고 라우터 정확도 집계에서는 빠진다.
@@ -198,9 +199,12 @@ public class EscalationService {
      *
      * @return 멱등 반환할 응답이 있으면 그것, 예약에 성공했으면 empty
      */
-    private Optional<EscalateResponse> reserve(EscalationContext ctx, String requestId,
-                                               String initialTier, List<String> path,
-                                               Tier targetTier, int seq) {
+    /** 예약 결과. 둘 중 하나만 채워진다 — 멱등 반환할 응답이거나, 새로 잡은 행의 id 다. */
+    private record ReservationOutcome(EscalateResponse replay, long escalationLogId) {}
+
+    private ReservationOutcome reserve(EscalationContext ctx, String requestId,
+                                       String initialTier, List<String> path,
+                                       Tier targetTier, int seq) {
         EscalationReservation reservation = EscalationReservation.builder()
                 .requestId(requestId)
                 .question(ctx.question())
@@ -221,8 +225,7 @@ public class EscalationService {
                 .build();
 
         try {
-            escalationLogService.reserve(reservation);
-            return Optional.empty();
+            return new ReservationOutcome(null, escalationLogService.reserve(reservation));
         } catch (DuplicateKeyException first) {
             Optional<ExistingEscalation> existing =
                     escalationLogService.findByTier(requestId, targetTier.label());
@@ -230,7 +233,7 @@ public class EscalationService {
             if (existing.isPresent() && existing.get().completed()) {
                 log.info("이미 처리된 에스컬레이션이라 저장된 답을 돌려준다 requestId={} tier={}",
                         requestId, targetTier.label());
-                return Optional.of(toResponse(requestId, existing.get()));
+                return new ReservationOutcome(toResponse(requestId, existing.get()), 0L);
             }
 
             boolean reclaimed = escalationLogService.deleteStaleReservation(requestId, reservationTimeout);
@@ -241,8 +244,7 @@ public class EscalationService {
 
             // 유령 예약을 치웠으니 딱 한 번 다시 시도한다. 또 실패하면 진짜 경쟁이므로 409.
             try {
-                escalationLogService.reserve(reservation);
-                return Optional.empty();
+                return new ReservationOutcome(null, escalationLogService.reserve(reservation));
             } catch (DuplicateKeyException second) {
                 throw new EscalationInProgressException(
                         "같은 요청이 처리 중입니다. requestId=" + requestId);
@@ -272,12 +274,12 @@ public class EscalationService {
      * 다만 여기서는 로그가 곧 제품이라 RequestLogService 보다 의식이 무겁다.
      * 실패하면 이벤트 내용을 한 줄로 남겨 Cloud Logging 에서 수동 복구할 수 있게 한다.
      */
-    private void completeReservation(String requestId, int seq, LlmResult result,
+    private void completeReservation(String requestId, long escalationLogId, LlmResult result,
                                      float[] embedding, long latency) {
         try {
             escalationLogService.complete(EscalationCompletion.builder()
                     .requestId(requestId)
-                    .escalationSeq(seq)
+                    .escalationLogId(escalationLogId)
                     .response(result.text())
                     .embedding(embedding)
                     .finalModelId(result.modelId())
@@ -287,8 +289,8 @@ public class EscalationService {
                     .build());
         } catch (Exception e) {
             log.error("escalation_log 완료 처리 실패 - 재학습 라벨이 유실된다. "
-                            + "requestId={} seq={} final={} model={} tokens={}/{}",
-                    requestId, seq, result.tier(), result.modelId(),
+                            + "requestId={} id={} final={} model={} tokens={}/{}",
+                    requestId, escalationLogId, result.tier(), result.modelId(),
                     result.inputTokens(), result.outputTokens(), e);
         }
     }
@@ -305,7 +307,7 @@ public class EscalationService {
 
         if (ctx.cacheEntryId() == null) {
             // 원본 요청이 캐시에 행을 남기지 못했다. 만족한 답으로 새로 만든다.
-            cacheService.put(ctx.question(), embedding, result);
+            cacheService.upsertForQuestion(ctx.question(), embedding, result, overwriteSimilarity);
             return;
         }
 
@@ -316,13 +318,19 @@ public class EscalationService {
         if (ourOwnRow || effectivelySameQuestion) {
             cacheService.refresh(ctx.cacheEntryId(), result);
         } else {
-            // 유사하지만 다른 질문의 행이다. 덮어쓰지 않고 별도 행을 만든다.
+            // 유사하지만 다른 질문의 행이다. 덮어쓰지 않고 이 질문 자신의 행을 만든다.
             //
-            // 이 항목의 threshold 를 올려 false-hit 을 줄이는 것은 적응형 임계값 Level 3 이며
-            // 여기서는 의도적으로 하지 않는다 (Decision Log 2026-08-03 은 Level 2 까지만 채택).
+            // put 이 아니라 upsert 인 이유: ctx 는 매 단계 원본 request_log 를 다시 읽어
+            // cacheHit/similarity 가 변하지 않는다. 그냥 put 하면 2단계 체인에서
+            // 같은 임베딩의 행이 둘 생기고, 동점 상황에서 거부당한 하위 모델 답이
+            // 상위 모델 답을 제치고 나갈 수 있다.
+            //
+            // 원래 히트한 항목의 threshold 를 올려 false-hit 을 줄이는 것은
+            // 적응형 임계값 Level 3 이며 여기서는 의도적으로 하지 않는다
+            // (Decision Log 2026-08-03 은 Level 2 까지만 채택).
             log.info("캐시 히트 유래이고 유사도 {} < {} 이라 기존 행을 덮어쓰지 않는다 id={}",
                     ctx.similarity(), overwriteSimilarity, ctx.cacheEntryId());
-            cacheService.put(ctx.question(), embedding, result);
+            cacheService.upsertForQuestion(ctx.question(), embedding, result, overwriteSimilarity);
         }
     }
 

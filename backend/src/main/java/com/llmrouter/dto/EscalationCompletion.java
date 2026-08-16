@@ -12,7 +12,8 @@ import lombok.Builder;
 @Builder
 public record EscalationCompletion(
         String requestId,
-        int escalationSeq,
+        /** 예약 INSERT 가 돌려준 행 id. seq 로 찾으면 슬롯이 넘어간 뒤 남의 행을 건드린다 */
+        long escalationLogId,
         String response,
         float[] embedding,
         String finalModelId,

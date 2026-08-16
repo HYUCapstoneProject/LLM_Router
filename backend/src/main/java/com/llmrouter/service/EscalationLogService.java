@@ -80,6 +80,7 @@ public class EscalationLogService {
                     ?, ?::text[], ?, ?,
                     false, ?,
                     ?, ?, ?)
+            RETURNING id
             """;
 
     private static final String COMPLETE_SQL = """
@@ -91,13 +92,22 @@ public class EscalationLogService {
                    output_tokens  = ?,
                    latency_ms     = ?,
                    user_satisfied = true
-             WHERE request_id = ?::uuid AND escalation_seq = ?
+             WHERE id = ?
             """;
 
-    /** 완료된 행은 지우지 않는다. response IS NULL 가드가 그것을 보장한다. */
+    /**
+     * 예약한 행을 id 로 콕 집어 지운다.
+     *
+     * (request_id, escalation_seq) 로 지우면 안 된다. 내 호출이 오래 걸려 예약이
+     * 유령으로 판정되고 다른 요청이 같은 seq 를 새로 잡은 뒤라면, 내 실패 처리가
+     * 남의 살아 있는 예약을 지워버린다. 그쪽은 완료 시 0행 갱신으로 조용히 실패하고
+     * 사용자는 요금만 낸다.
+     *
+     * 완료된 행은 지우지 않는다 — response IS NULL 가드가 그것을 보장한다.
+     */
     private static final String RELEASE_SQL = """
             DELETE FROM escalation_log
-             WHERE request_id = ?::uuid AND escalation_seq = ? AND response IS NULL
+             WHERE id = ? AND response IS NULL
             """;
 
     /**
@@ -163,8 +173,8 @@ public class EscalationLogService {
      * 자리를 먼저 잡는다. 이미 같은 (requestId, seq) 나 (requestId, finalTier) 가 있으면
      * {@link org.springframework.dao.DuplicateKeyException} 이 난다 — 그게 이 메서드의 요점이다.
      */
-    public void reserve(EscalationReservation r) {
-        jdbc.update(RESERVE_SQL,
+    public long reserve(EscalationReservation r) {
+        Long id = jdbc.queryForObject(RESERVE_SQL, Long.class,
                 r.requestId(),
                 r.question(),
                 r.conversationId(),
@@ -176,6 +186,7 @@ public class EscalationLogService {
                 r.wasCacheHit(),
                 r.cacheEntryId(),
                 r.similarity());
+        return id;
     }
 
     /**
@@ -188,8 +199,8 @@ public class EscalationLogService {
     @Transactional
     public void complete(EscalationCompletion c) {
         jdbc.update("UPDATE escalation_log SET user_satisfied = false "
-                        + "WHERE request_id = ?::uuid AND escalation_seq <> ?",
-                c.requestId(), c.escalationSeq());
+                        + "WHERE request_id = ?::uuid AND id <> ?",
+                c.requestId(), c.escalationLogId());
 
         int updated = jdbc.update(COMPLETE_SQL,
                 c.response(),
@@ -198,24 +209,23 @@ public class EscalationLogService {
                 c.inputTokens(),
                 c.outputTokens(),
                 c.latencyMs(),
-                c.requestId(),
-                c.escalationSeq());
+                c.escalationLogId());
 
         if (updated == 0) {
             // 예약이 사라졌다. 여기까지 왔다는 건 LLM 요금은 이미 나갔다는 뜻이라 눈에 띄게 남긴다.
             throw new IllegalStateException(
-                    "예약된 에스컬레이션 행이 없다 requestId=" + c.requestId() + " seq=" + c.escalationSeq());
+                    "예약된 에스컬레이션 행이 없다 requestId=" + c.requestId() + " id=" + c.escalationLogId());
         }
 
-        log.info("에스컬레이션 완료 requestId={} seq={} model={} in={} out={}",
-                c.requestId(), c.escalationSeq(), c.finalModelId(), c.inputTokens(), c.outputTokens());
+        log.info("에스컬레이션 완료 requestId={} id={} model={} in={} out={}",
+                c.requestId(), c.escalationLogId(), c.finalModelId(), c.inputTokens(), c.outputTokens());
     }
 
     /** LLM 호출이 실패했을 때 예약을 되돌린다. 안 풀면 그 티어로 다시 시도할 수 없다. */
-    public void release(String requestId, int escalationSeq) {
-        int deleted = jdbc.update(RELEASE_SQL, requestId, escalationSeq);
+    public void release(long escalationLogId) {
+        int deleted = jdbc.update(RELEASE_SQL, escalationLogId);
         if (deleted > 0) {
-            log.info("에스컬레이션 예약 해제 requestId={} seq={}", requestId, escalationSeq);
+            log.info("에스컬레이션 예약 해제 id={}", escalationLogId);
         }
     }
 

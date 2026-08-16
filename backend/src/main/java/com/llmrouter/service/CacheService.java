@@ -81,27 +81,54 @@ public class CacheService {
             """;
 
     public Optional<CachedResponse> get(float[] embedding) {
-        String vec = PgVector.literal(embedding);
+        Optional<CachedResponse> found = findBest(embedding);
+        if (found.isEmpty()) {
+            return Optional.empty();
+        }
 
-        List<CachedResponse> rows = jdbc.query(SELECT_SQL,
+        CachedResponse hit = found.get();
+        jdbc.update("UPDATE cache_entry SET hit_count = hit_count + 1, updated_at = now() WHERE id = ?",
+                hit.cacheEntryId());
+
+        log.info("캐시 히트 id={} similarity={}", hit.cacheEntryId(), hit.similarity());
+        return Optional.of(hit);
+    }
+
+    /** hit_count 를 건드리지 않는 조회. 사용자 요청이 아닌 내부 판단용이다. */
+    private Optional<CachedResponse> findBest(float[] embedding) {
+        String vec = PgVector.literal(embedding);
+        return jdbc.query(SELECT_SQL,
                 (rs, rowNum) -> new CachedResponse(
                         rs.getLong("id"),
                         rs.getString("response"),
                         rs.getString("tier"),
                         rs.getString("model_id"),
                         rs.getDouble("similarity")),
-                vec, vec);
+                vec, vec).stream().findFirst();
+    }
 
-        if (rows.isEmpty()) {
-            return Optional.empty();
+    /**
+     * 이 질문의 행이 이미 있으면 갱신하고, 없으면 새로 만든다.
+     *
+     * <p>에스컬레이션이 캐시에 쓸 때 {@link #put} 대신 이걸 쓴다. 그냥 put 하면
+     * 2단계 체인에서 같은 질문·같은 임베딩의 행이 두 개 생긴다. 조회 쿼리가
+     * {@code ORDER BY similarity DESC LIMIT 1} 인데 둘 다 유사도 1.0 이라 동점이 되고,
+     * 사용자가 <b>거부한</b> 하위 모델 답이 상위 모델 답을 제치고 나갈 수 있다.
+     *
+     * @param sameQuestionSimilarity 이 값 이상이면 "사실상 같은 질문"으로 보고 그 행을 갱신한다
+     * @return 갱신했거나 새로 만든 행의 id
+     */
+    public long upsertForQuestion(String question, float[] embedding, LlmResult result,
+                                  double sameQuestionSimilarity) {
+        Optional<CachedResponse> existing = findBest(embedding)
+                .filter(c -> c.similarity() >= sameQuestionSimilarity);
+
+        if (existing.isPresent()) {
+            long id = existing.get().cacheEntryId();
+            refresh(id, result);
+            return id;
         }
-
-        CachedResponse hit = rows.get(0);
-        jdbc.update("UPDATE cache_entry SET hit_count = hit_count + 1, updated_at = now() WHERE id = ?",
-                hit.cacheEntryId());
-
-        log.info("캐시 히트 id={} similarity={}", hit.cacheEntryId(), hit.similarity());
-        return Optional.of(hit);
+        return put(question, embedding, result);
     }
 
     /**
