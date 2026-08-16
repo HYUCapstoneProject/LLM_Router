@@ -27,14 +27,14 @@
 | 구성요소 | 현재 상태 | 리소스 |
 |---|---|---|
 | 프론트엔드 | 배포·접속 정상 | Cloud Run `llm-router-frontend`, `asia-northeast3` |
-| 백엔드 | 컨테이너 실행 정상 | GCE `llm-router-workspace`, `asia-northeast3-a` |
+| 백엔드 | FastAPI 연동 컨테이너 실행 정상 | GCE `llm-router-workspace`, `asia-northeast3-a` |
 | DB | PostgreSQL/pgvector 실행 정상 | GCE Docker `llmrouter-postgres` |
 | 채팅 경로 | 정상 | Cloud Run → nginx → GCE `/api/chat` |
 | 에스컬레이션 경로 | 정상 | Cloud Run → nginx → GCE `/api/escalate` |
 | FastAPI Router | 모델 로드·계약 호출 정상 | GCE `llm-router-serving`, `10.138.0.2:8000` |
 
-운영 Spring 서버는 현재 커밋 `89874e1` 기준이다. FastAPI 연동 배포 전
-`infra/postgres/migrations/04-router-confidence.sql`을 먼저 적용해야 한다.
+운영 Spring 서버는 현재 커밋 `ff8b690` 기준이며
+`infra/postgres/migrations/04-router-confidence.sql`까지 적용됐다.
 
 ## 2. 완료된 기능
 
@@ -73,7 +73,7 @@
 
 | 항목 | 현재 상태 | 영향 |
 |---|---|---|
-| 임베딩·라우팅 | FastAPI 연동 구현·실서버 계약 확인, Spring 운영 배포 전 | 운영 게이트웨이는 재배포 전까지 stub 사용 |
+| FastAPI 계약 회귀 | Mock HTTP 계약 테스트와 실서버 smoke test 완료, 공통 fixture 미구현 | 양쪽 DTO가 따로 바뀌면 drift 가능 |
 | 분석 화면 | 미구현 | 캐시·라우팅 절감 효과를 발표 화면에서 설명하기 어려움 |
 | 실험 실행·저장 | 미구현 | Always Opus 대비 재현 가능한 비교 결과가 없음 |
 | 재학습 전달 | 설계 단계 | 에스컬레이션 1,000건 단위 배치 export·trigger 미구현 |
@@ -109,7 +109,7 @@
 - [x] `fallback_reason`, confidence, 실제 model version 기록
 - [ ] 동일 fixture 기반 Spring↔FastAPI contract test
 - [x] bge-large와 ModernBERT artifact를 GCE에 배포
-- [ ] 운영 DB에 `04-router-confidence.sql` 적용 후 Spring 백엔드 재배포
+- [x] 운영 DB에 `04-router-confidence.sql` 적용 후 Spring 백엔드 재배포
 
 ### P1 — 발표용 고정 실험 (A: 우리 시스템 ablation)
 
