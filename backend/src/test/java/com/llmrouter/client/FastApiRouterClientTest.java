@@ -6,6 +6,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.boot.convert.ApplicationConversionService;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,6 +45,20 @@ class FastApiRouterClientTest {
     @AfterEach
     void tearDown() {
         MDC.clear();
+    }
+
+    @Test
+    void springCreatesFastApiClientWithConfiguredConstructor() {
+        new ApplicationContextRunner()
+                .withInitializer(context -> context.getBeanFactory()
+                        .setConversionService(ApplicationConversionService.getSharedInstance()))
+                .withBean(RestClient.Builder.class, RestClient::builder)
+                .withUserConfiguration(FastApiRouterClient.class)
+                .withPropertyValues(
+                        "llm.router.mode=fastapi",
+                        "llm.router.token=secret-token")
+                .run(context -> assertThat(context)
+                        .hasSingleBean(FastApiRouterClient.class));
     }
 
     @Test

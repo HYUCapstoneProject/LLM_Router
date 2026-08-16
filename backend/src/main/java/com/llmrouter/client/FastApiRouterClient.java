@@ -4,6 +4,7 @@ import com.llmrouter.config.RequestIdFilter;
 import com.llmrouter.service.RouterService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
@@ -34,6 +35,7 @@ public class FastApiRouterClient implements RouterClient {
     private final AtomicReference<String> currentEmbedModelVersion;
     private final AtomicReference<String> currentRouterModelVersion;
 
+    @Autowired
     public FastApiRouterClient(
             RestClient.Builder builder,
             @Value("${llm.router.base-url:http://10.138.0.2:8000}") String baseUrl,
