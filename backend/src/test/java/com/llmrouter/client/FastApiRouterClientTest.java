@@ -52,7 +52,6 @@ class FastApiRouterClientTest {
         new ApplicationContextRunner()
                 .withInitializer(context -> context.getBeanFactory()
                         .setConversionService(ApplicationConversionService.getSharedInstance()))
-                .withBean(RestClient.Builder.class, RestClient::builder)
                 .withUserConfiguration(FastApiRouterClient.class)
                 .withPropertyValues(
                         "llm.router.mode=fastapi",

@@ -37,7 +37,6 @@ public class FastApiRouterClient implements RouterClient {
 
     @Autowired
     public FastApiRouterClient(
-            RestClient.Builder builder,
             @Value("${llm.router.base-url:http://10.138.0.2:8000}") String baseUrl,
             @Value("${llm.router.token:}") String token,
             @Value("${llm.router.connect-timeout:PT2S}") Duration connectTimeout,
@@ -47,7 +46,7 @@ public class FastApiRouterClient implements RouterClient {
             @Value("${llm.router.model-version:router-modernbert-base-routerbench-20260814-45dcc6d}")
             String routerModelVersion
     ) {
-        this(createRestClient(builder, baseUrl, connectTimeout, readTimeout), token, maxAttempts,
+        this(createRestClient(RestClient.builder(), baseUrl, connectTimeout, readTimeout), token, maxAttempts,
                 embedModelVersion, routerModelVersion);
     }
 
