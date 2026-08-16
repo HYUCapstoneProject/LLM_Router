@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import type { Conversation, Message } from '../types'
-import { ApiError, sendMessage } from '../api/chatApi'
+import { ApiError, escalate as requestEscalation, sendMessage } from '../api/chatApi'
+import { nextModel } from '../lib/models'
 
 function makeConversation(firstMessage?: string): Conversation {
   const now = Date.now()
@@ -126,6 +127,82 @@ export function useChat() {
     [activeId, isLoading, updateConversation],
   )
 
+  /**
+   * 답변이 만족스럽지 않을 때 한 단계 위 모델로 재요청한다 (기획서 4-1).
+   *
+   * submit 과 달리 <b>실패해도 기존 답변을 지우지 않는다.</b>
+   * submit 은 답이 없는 상태에서 실패하니 content 를 에러로 덮는 게 맞지만,
+   * 여기서는 이미 받아둔 답이 있다. 업그레이드가 실패했다고 그걸 잃으면 안 된다.
+   */
+  const escalate = useCallback(
+    async (messageId: string) => {
+      if (isLoading) return
+
+      const conversation = conversations.find((c) => c.id === activeId)
+      if (!conversation) return
+
+      const index = conversation.messages.findIndex((m) => m.id === messageId)
+      if (index < 0) return
+
+      const target = conversation.messages[index]
+      if (target.role !== 'assistant' || target.isStreaming || target.error) return
+      if (target.escalating || !target.requestId || !target.model) return
+
+      const upgrade = nextModel(target.model)
+      if (!upgrade) return
+
+      // 계약이 원본 질문을 요구한다. 이 답변 바로 앞의 사용자 메시지가 그것이다.
+      // (서버는 실제로 저장된 질문을 쓰지만 필수 필드라 채워 보낸다)
+      const question = conversation.messages
+        .slice(0, index)
+        .reverse()
+        .find((m) => m.role === 'user')
+      if (!question) return
+
+      const patch = (updater: (m: Message) => Message) =>
+        updateConversation(activeId, (c) => ({
+          ...c,
+          messages: c.messages.map((m) => (m.id === messageId ? updater(m) : m)),
+        }))
+
+      patch((m) => ({ ...m, escalating: true, escalationError: undefined }))
+      setIsLoading(true)
+
+      try {
+        const res = await requestEscalation({
+          requestId: target.requestId,
+          message: question.content,
+          currentModel: target.model,
+          targetModel: upgrade,
+        })
+
+        patch((m) => ({
+          ...m,
+          content: res.response,
+          model: res.finalModel,
+          tier: res.tier,
+          // 에스컬레이션은 항상 실제 LLM 호출이다
+          cacheHit: false,
+          inputTokens: res.inputTokens,
+          outputTokens: res.outputTokens,
+          latency: res.latency,
+          escalationPath: res.escalationPath,
+          escalating: false,
+        }))
+        updateConversation(activeId, (c) => ({ ...c, updatedAt: Date.now() }))
+      } catch (err) {
+        const detail =
+          err instanceof ApiError
+            ? err.message
+            : '서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.'
+        patch((m) => ({ ...m, escalating: false, escalationError: detail }))
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [activeId, conversations, isLoading, updateConversation],
+  )
+
   return {
     conversations,
     activeConversation,
@@ -133,5 +210,6 @@ export function useChat() {
     startNewConversation,
     selectConversation,
     submit,
+    escalate,
   }
 }

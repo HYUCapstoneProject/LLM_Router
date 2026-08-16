@@ -5,6 +5,7 @@ import com.llmrouter.dto.CachedResponse;
 import com.llmrouter.dto.ChatRequest;
 import com.llmrouter.dto.ChatResponse;
 import com.llmrouter.dto.LlmResult;
+import com.llmrouter.dto.RequestLogEntry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,7 +51,14 @@ class ChatServiceTest {
         assertThat(response.getInputTokens()).isZero();
         verifyNoInteractions(routerService, llmService);
         verify(cacheService, never()).put(anyString(), any(), any());
-        verify(requestLogService).record(response, "hello", null, "embed-v1", 0.97, null);
+        verify(requestLogService).record(argThat(entry ->
+                entry.requestId().equals(response.getRequestId())
+                        && entry.question().equals("hello")
+                        && entry.conversationId().equals("conversation-1")
+                        && entry.cacheHit()
+                        && entry.cacheEntryId().equals(7L)
+                        && entry.similarity().equals(0.97)
+                        && entry.origin().equals(RequestLogEntry.ORIGIN_CHAT)));
     }
 
     @Test
@@ -61,6 +69,7 @@ class ChatServiceTest {
         when(cacheService.get(embedding)).thenReturn(Optional.empty());
         when(routerService.classify("question")).thenReturn(RouterService.Tier.HARD);
         when(llmService.call(RouterService.Tier.HARD, "question")).thenReturn(result);
+        when(cacheService.put("question", embedding, result)).thenReturn(9L);
         when(routerClient.routerModelVersion()).thenReturn("router-v1");
         when(routerClient.embedModelVersion()).thenReturn("embed-v1");
 
@@ -70,7 +79,15 @@ class ChatServiceTest {
         assertThat(response.isCacheHit()).isFalse();
         assertThat(response.getTier()).isEqualTo("hard");
         verify(cacheService).put("question", embedding, result);
-        verify(requestLogService).record(response, "question", "router-v1", "embed-v1", null, null);
+        verify(requestLogService).record(argThat(entry ->
+                entry.requestId().equals(response.getRequestId())
+                        && entry.question().equals("question")
+                        && entry.conversationId().equals("conversation-1")
+                        && !entry.cacheHit()
+                        && entry.cacheEntryId().equals(9L)
+                        && entry.routerModelVersion().equals("router-v1")
+                        && entry.embedModelVersion().equals("embed-v1")
+                        && entry.origin().equals(RequestLogEntry.ORIGIN_CHAT)));
     }
 
     @Test

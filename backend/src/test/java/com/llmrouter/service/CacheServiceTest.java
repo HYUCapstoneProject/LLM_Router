@@ -52,16 +52,20 @@ class CacheServiceTest {
     @Test
     void putSerializesVectorAndUsesTierThresholds() {
         when(routerClient.embedModelVersion()).thenReturn("embed-v1");
-        service.put("q", new float[]{0.1f, -2f}, new LlmResult("a", "hard", "opus", 1, 2));
+        when(jdbc.queryForObject(anyString(), eq(Long.class), any(Object[].class))).thenReturn(11L);
+        long id = service.put("q", new float[]{0.1f, -2f}, new LlmResult("a", "hard", "opus", 1, 2));
 
         ArgumentCaptor<Object[]> args = ArgumentCaptor.forClass(Object[].class);
-        verify(jdbc).update(anyString(), args.capture());
+        verify(jdbc).queryForObject(anyString(), eq(Long.class), args.capture());
         assertThat(args.getValue()).containsExactly("q", "[0.1,-2.0]", "a", "hard", "opus", "embed-v1", 0.96);
+        assertThat(id).isEqualTo(11L);
     }
 
     @Test
     void unknownTierUsesMediumThreshold() {
+        when(jdbc.queryForObject(anyString(), eq(Long.class), any(Object[].class))).thenReturn(12L);
         service.put("q", new float[]{1f}, new LlmResult("a", "future", "m", 0, 0));
-        verify(jdbc).update(anyString(), eq("q"), eq("[1.0]"), eq("a"), eq("future"), eq("m"), any(), eq(0.93));
+        verify(jdbc).queryForObject(anyString(), eq(Long.class), eq("q"), eq("[1.0]"), eq("a"),
+                eq("future"), eq("m"), any(), eq(0.93));
     }
 }

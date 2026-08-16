@@ -1,4 +1,5 @@
 import type { ModelType } from '../types'
+import { MODEL_CONFIG } from '../lib/models'
 
 interface Props {
   model: ModelType
@@ -6,24 +7,34 @@ interface Props {
   inputTokens?: number
   outputTokens?: number
   latency?: number
+  /** 에스컬레이션 경로. 2단계 이상이면 어디서 어디로 올라왔는지 보여준다 */
+  escalationPath?: ModelType[]
 }
 
-const MODEL_CONFIG: Record<ModelType, { label: string; color: string }> = {
-  haiku: { label: 'Haiku', color: 'bg-emerald-900 text-emerald-300 border-emerald-700' },
-  sonnet: { label: 'Sonnet', color: 'bg-blue-900 text-blue-300 border-blue-700' },
-  opus: { label: 'Opus', color: 'bg-purple-900 text-purple-300 border-purple-700' },
-}
-
-export function ModelBadge({ model, cacheHit, inputTokens, outputTokens, latency }: Props) {
+export function ModelBadge({
+  model,
+  cacheHit,
+  inputTokens,
+  outputTokens,
+  latency,
+  escalationPath,
+}: Props) {
   const cfg = MODEL_CONFIG[model]
   const hasTokens = inputTokens !== undefined && outputTokens !== undefined
+  const escalated = escalationPath !== undefined && escalationPath.length > 1
 
   return (
     <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-      <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border font-medium ${cfg.color}`}>
+      <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border font-medium ${cfg.badge}`}>
         <span className="w-1.5 h-1.5 rounded-full bg-current opacity-80" />
         Claude {cfg.label}
       </span>
+      {/* 에스컬레이션이 눈에 보이는 유일한 흔적이다. 데모의 핵심 장면 */}
+      {escalated && (
+        <span className="text-xs text-gray-500">
+          ↑ {escalationPath.map((m) => MODEL_CONFIG[m].label).join(' → ')}
+        </span>
+      )}
       {cacheHit && (
         <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border bg-amber-900 text-amber-300 border-amber-700 font-medium">
           ⚡ Cache Hit

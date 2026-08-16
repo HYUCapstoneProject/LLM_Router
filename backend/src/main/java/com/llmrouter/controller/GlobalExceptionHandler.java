@@ -8,6 +8,10 @@ import com.anthropic.errors.RateLimitException;
 import com.anthropic.errors.UnauthorizedException;
 import com.llmrouter.config.RequestIdFilter;
 import com.llmrouter.dto.ErrorResponse;
+import com.llmrouter.exception.EscalationConflictException;
+import com.llmrouter.exception.EscalationInProgressException;
+import com.llmrouter.exception.EscalationNotFoundException;
+import com.llmrouter.exception.InvalidEscalationException;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
@@ -37,6 +41,49 @@ public class GlobalExceptionHandler {
 
         log.warn("요청 검증 실패 - {}", detail);
         return build(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", detail);
+    }
+
+    /** /api/escalate 가 참조한 원본 요청이 request_log 에 없다 */
+    @ExceptionHandler(EscalationNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEscalationNotFound(EscalationNotFoundException e) {
+        log.warn("에스컬레이션 대상 없음 - {}", e.getMessage());
+        return build(HttpStatus.NOT_FOUND, "ESCALATION_TARGET_NOT_FOUND",
+                "원본 요청을 찾을 수 없습니다. 질문을 다시 보내주세요.");
+    }
+
+    /**
+     * 모르는 모델 이름이거나 더 낮은 티어로 내려가려는 요청.
+     *
+     * 예외 메시지를 그대로 내보낸다. "gpt-4 는 모르는 모델"과 "opus 에서 sonnet 으로는 못 간다"는
+     * 고쳐야 할 것이 다른데, 한 문구로 뭉개면 RouterService.toTier 가 예외 대신
+     * Optional 을 돌려주며 둘을 나눈 이유가 없어진다.
+     * 내용은 요청에 실려 온 값과 허용 목록뿐이라 노출해도 안전하다.
+     */
+    @ExceptionHandler(InvalidEscalationException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidEscalation(InvalidEscalationException e) {
+        log.warn("잘못된 에스컬레이션 요청 - {}", e.getMessage());
+        return build(HttpStatus.BAD_REQUEST, "INVALID_ESCALATION", e.getMessage());
+    }
+
+    /**
+     * 클라이언트가 낡은 화면을 보고 보낸 요청.
+     *
+     * "새로고침하라"고 안내하지 않는다. 대화 상태가 메모리에만 있어(useChat)
+     * 새로고침하면 대화가 통째로 날아간다.
+     */
+    @ExceptionHandler(EscalationConflictException.class)
+    public ResponseEntity<ErrorResponse> handleEscalationConflict(EscalationConflictException e) {
+        log.warn("에스컬레이션 충돌 - {}", e.getMessage());
+        return build(HttpStatus.CONFLICT, "ESCALATION_ALREADY_APPLIED",
+                "이미 상위 모델로 답변한 요청입니다.");
+    }
+
+    /** 같은 요청이 아직 처리 중 — 기다리면 되는 상황이라 위와 안내가 달라야 한다 */
+    @ExceptionHandler(EscalationInProgressException.class)
+    public ResponseEntity<ErrorResponse> handleEscalationInProgress(EscalationInProgressException e) {
+        log.warn("에스컬레이션 처리 중 중복 요청 - {}", e.getMessage());
+        return build(HttpStatus.CONFLICT, "ESCALATION_IN_PROGRESS",
+                "같은 요청을 처리하고 있습니다. 잠시 후 다시 시도해주세요.");
     }
 
     /** Claude API rate limit */

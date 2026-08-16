@@ -6,6 +6,7 @@ import com.llmrouter.dto.CachedResponse;
 import com.llmrouter.dto.ChatRequest;
 import com.llmrouter.dto.ChatResponse;
 import com.llmrouter.dto.LlmResult;
+import com.llmrouter.dto.RequestLogEntry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -26,20 +27,17 @@ public class ChatService {
 
     public ChatResponse chat(ChatRequest request) {
         long start = System.currentTimeMillis();
-        // 성공/실패 응답이 같은 id 를 쓰도록 필터가 만든 값을 재사용한다
         String requestId = MDC.get(RequestIdFilter.REQUEST_ID);
         String message = request.getMessage();
 
-        // 실패 기록에 넘기기 위해 try 밖에 둔다.
-        // 임베딩·캐시 조회 단계에서 터지면 분류 전이라 null 로 남는다.
+        // 임베딩·캐시 조회 단계에서 실패하면 아직 분류 전이므로 null로 기록한다.
         RouterService.Tier tier = null;
 
         try {
-            // 1. 임베딩 — cache hit 여부와 무관하게 항상 필요하다.
-            //    cache 조회 자체가 벡터를 선행 요구하기 때문이다.
+            // 1. 캐시 조회를 위해 질문을 임베딩한다.
             float[] embedding = routerClient.embed(message);
 
-            // 2. 시맨틱 캐시 조회
+            // 2. 캐시 히트면 분류와 Claude 호출을 생략한다.
             Optional<CachedResponse> cached = cacheService.get(embedding);
             if (cached.isPresent()) {
                 CachedResponse hit = cached.get();
@@ -50,27 +48,36 @@ public class ChatService {
                         .tier(hit.tier())
                         .modelId(hit.modelId())
                         .cacheHit(true)
-                        .inputTokens(0)   // LLM 호출 없음 = 비용 0
+                        .inputTokens(0)
                         .outputTokens(0)
                         .latency(System.currentTimeMillis() - start)
                         .build();
 
-                requestLogService.record(response, message,
-                        null,                              // 캐시 히트면 classify 를 안 부른다
-                        routerClient.embedModelVersion(),
-                        hit.similarity(),
-                        null);
+                requestLogService.record(RequestLogEntry.builder()
+                        .requestId(requestId)
+                        .question(message)
+                        .conversationId(request.getConversationId())
+                        .tier(hit.tier())
+                        .modelId(hit.modelId())
+                        .routerModelVersion(null)
+                        .embedModelVersion(routerClient.embedModelVersion())
+                        .cacheHit(true)
+                        .similarity(hit.similarity())
+                        .cacheEntryId(hit.cacheEntryId())
+                        .inputTokens(0)
+                        .outputTokens(0)
+                        .latencyMs(response.getLatency())
+                        .origin(RequestLogEntry.ORIGIN_CHAT)
+                        .build());
                 return response;
             }
 
-            // 3. 난이도 분류 (miss 일 때만)
+            // 3. 캐시 미스일 때만 분류하고 Claude를 호출한다.
             tier = routerService.classify(message);
-
-            // 4. 티어에 맞는 Claude 호출
             LlmResult result = llmService.call(tier, message);
 
-            // 5. 캐시 적재
-            cacheService.put(message, embedding, result);
+            // 4. 생성한 캐시 행을 요청 로그와 연결해 이후 에스컬레이션에서 갱신한다.
+            long cacheEntryId = cacheService.put(message, embedding, result);
 
             ChatResponse response = ChatResponse.builder()
                     .requestId(requestId)
@@ -84,19 +91,26 @@ public class ChatService {
                     .latency(System.currentTimeMillis() - start)
                     .build();
 
-            requestLogService.record(response, message,
-                    routerClient.routerModelVersion(),
-                    routerClient.embedModelVersion(),
-                    null,
-                    null);
+            requestLogService.record(RequestLogEntry.builder()
+                    .requestId(requestId)
+                    .question(message)
+                    .conversationId(request.getConversationId())
+                    .tier(result.tier())
+                    .modelId(result.modelId())
+                    .routerModelVersion(routerClient.routerModelVersion())
+                    .embedModelVersion(routerClient.embedModelVersion())
+                    .cacheHit(false)
+                    .cacheEntryId(cacheEntryId)
+                    .inputTokens(result.inputTokens())
+                    .outputTokens(result.outputTokens())
+                    .latencyMs(response.getLatency())
+                    .origin(RequestLogEntry.ORIGIN_CHAT)
+                    .build());
             return response;
-
-        } catch (Exception e) {
-            // 실패도 기록해야 실패율과 지연 분포를 낼 수 있다.
-            // 사용자에게 나간 requestId 로 DB 조회가 되게 하는 목적도 있다.
+        } catch (Exception error) {
             requestLogService.recordFailure(requestId, message, tier,
-                    System.currentTimeMillis() - start, e);
-            throw e;
+                    System.currentTimeMillis() - start, error);
+            throw error;
         }
     }
 }
