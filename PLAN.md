@@ -288,12 +288,11 @@ difficulty_label  easy   medium   hard
    gcloud compute scp scripts/reset-demo-data.sh llm-router-workspace:/tmp/ --zone=asia-northeast3-a
    gcloud compute ssh llm-router-workspace --zone=asia-northeast3-a --command="bash /tmp/reset-demo-data.sh --warm https://llm-router-frontend-1051465904174.asia-northeast3.run.app"
    ```
-   그대로 두면 "medium 62.5%"가 라우터 판단인 것처럼 보인다.
-   ```sql
-   TRUNCATE request_log, escalation_log, cache_entry RESTART IDENTITY;
-   ```
-2. **캐시 워밍** — 4단계에서 쓸 질문(`de1`)을 미리 한 번 던져 캐시에 넣어둔다.
-3. **접속 확인** — Cloud Run URL 이 뜨는지, 첫 요청이 cold start 로 느리지 않은지.
+
+   스크립트는 지우기 전에 `pg_dump` 로 백업하고 복구 명령을 출력한다.
+   `--warm` 을 주면 4단계용 질문(`de1`)까지 캐시에 심는다 — Claude 1회 호출.
+2. **접속 확인** — Cloud Run URL 이 뜨는지, 첫 요청이 cold start 로 느리지 않은지.
+   컨테이너를 막 재시작했으면 첫 요청이 20~30초 걸린다.
 
 #### 검증된 시연 질문 (2026-08-16 실측)
 
