@@ -38,10 +38,14 @@ Spring이 결정하는 방향이다.
 현재 캐시 흐름:
 
 ```text
-질문 원문 → exact match → BGE embedding → pgvector 후보 조회
-          → cache hit이면 router/Claude 생략
+질문 원문 → BGE embedding → pgvector 후보 조회(HNSW top-5)
+          → 항목별 threshold 통과 시 cache hit, router/Claude 생략
           → miss이면 ModernBERT 분류 → Claude 호출 → cache 저장
 ```
+
+**주의: exact match 계층은 아직 없다.** 완전히 동일한 질문도 매번 FastAPI `/router/embed`
+왕복(교차 리전 약 120ms)을 거친다. 질문 원문 해시 조회를 embedding 앞에 두는 것은
+미구현 제안이며 §5 에 있다.
 
 라우팅에는 질문 평문을 넣고, embedding은 시맨틱 캐시 후보 검색에 사용한다.
 JPA가 아니라 JDBC를 쓰는 이유는 pgvector `vector(1024)`, `<=>` 연산자, HNSW 후보 조회와
@@ -69,6 +73,41 @@ JPA가 아니라 JDBC를 쓰는 이유는 pgvector `vector(1024)`, `<=>` 연산�
 이 인수인계 작성 시점에는 실제 서버 revision과 health를 다시 조회하지 않았다.
 배포 전 `gcloud`, 컨테이너 상태, DB migration `04-router-confidence.sql`, 현재 image digest를
 반드시 확인한다.
+
+## 3-1. 라우터 분류 실측 한계 (반드시 읽을 것)
+
+2026-08-16 에 실서버 `/router/classify` 로 35문항을 직접 던져 측정했다. Claude 호출은 없다.
+
+**분류가 easy 로 붕괴한다.**
+
+```text
+영어 35문항 → easy 29 / medium 2 / hard 4
+medium 후보 18개 중 17개가 easy 로 분류됨
+`Explain the CAP theorem ...` 은 confidence 0.88 로 easy 를 확신
+```
+
+| 언어 | easy 적중 | medium 적중 | hard 적중 | 전체 |
+|---|---|---|---|---|
+| 영어 | 6/7 | 0/6 | 3/6 | 47% |
+| 한국어 | 2/7 | 6/6 | **0/6** | 42% |
+
+한국어는 hard 6문항을 전부 easy 로 보낸다. bge-large-**en** 과 RouterBench 가 영어 전용이라
+**시연·평가는 영어로 진행한다.** 한국어 confidence 는 0.37~0.60 에 몰려 3-class 무작위(0.33)와
+큰 차이가 없다.
+
+원인은 학습 데이터(RouterBench)가 객관식 상식 문제에 치우친 것으로 본다. 기획서 3-3 이
+예측한 클래스 불균형 위험이 실제로 나타난 것이며, 완화는 팀원(FastAPI/재학습) 범위다 —
+클래스 가중 손실, 개방형 질문 데이터 보강, 결정 임계값 재조정.
+
+**이 결과가 갖는 의미:** 현재 `request_log` 의 티어 분포를 라우터 성능으로 해석하면 안 된다.
+비용 절감률도 라우터가 대부분 easy 로 보내서 나온 값일 수 있다.
+
+검증된 시연 질문셋과 재현 명령은 `PLAN.md` §5-0 에 있다.
+
+```bash
+python experiments/probe_router.py --questions experiments/questions-demo-en.json
+python experiments/probe_router.py --questions experiments/questions-demo-ko.json
+```
 
 ## 4. Reranker 결정과 직접 평가 결과
 
@@ -129,6 +168,12 @@ Quora 모델보다 나빴다. GPTCache 라이브러리 자체를 도입하지 �
 6. feature flag와 shadow mode 구현: 점수는 기록하되 기존 cache 결정은 바꾸지 않음
 7. 독립 test set 통과 후에만 최종 AND threshold로 활성화
 
+reranker와 별개로 먼저 넣을 수 있는 것이 하나 더 있다.
+
+8. **exact match 계층**: 질문 원문 해시를 embedding 호출 앞에 둔다. 비용 0, 오탐 0 이고
+   교차 리전 embed 왕복 약 120ms 를 건너뛴다. 시연 4단계(같은 질문 재전송)가
+   약 155ms 에서 약 5ms 로 떨어진다. 현재 미구현이다.
+
 그다음 우선순위는 `PLAN.md`의 다음 항목이다.
 
 - 발표용 Router Only / Router + Cache / Always 모델 ablation
@@ -167,8 +212,9 @@ GPTCache/albert-duplicate-onnx`로 실행한다. 모델별 threshold는 revision
 
 이번 변경에서 reranker 평가 단위 테스트 13개가 통과했다. 전체 Spring·React 테스트는
 reranker 문서/평가 변경 범위 밖이고 대형 캐시로 인한 로컬 저장공간 문제 때문에 다시
-실행하지 않았다. 임시 venv와 모델 캐시는 삭제했고 C 드라이브 여유 공간은 약 4.18GB다.
-대형 후보를 추가 평가할 때는 GCE workspace를 사용해도 된다.
+실행하지 않았다. 임시 venv와 모델 캐시는 삭제했다. 이후 WSL vhdx 압축으로 C 드라이브
+여유는 약 10.5GB로 회복됐다(2026-08-30 확인). 대형 후보를 추가 평가할 때는 GCE
+workspace를 사용해도 된다.
 
 ## 7. 일반 테스트·배포 명령
 
@@ -208,7 +254,8 @@ npm run build
 
 ## 9. 핵심 문서 지도
 
-- `PLAN.md`: 전체 진행 상태와 발표·재학습 계획
+- `PLAN.md`: 전체 진행 상태, 중간 시연 시나리오(§5-0), 검증된 시연 질문셋
+- `experiments/questions-demo-en.json` / `-ko.json` / `-en2.json`: 라우터 실측용 질문셋
 - `infra/DEPLOY.md`: GCE, Cloud Run, DB migration, smoke test runbook
 - `experiments/RERANKER_REQUEST.md`: reranker 결정 기준과 API 초안
 - `experiments/results/reranker-20260830/REPORT.md`: 직접 평가 결과
