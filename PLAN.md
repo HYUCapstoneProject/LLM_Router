@@ -279,7 +279,15 @@ difficulty_label  easy   medium   hard
 
 #### 사전 준비 (시연 당일 아침)
 
-1. **운영로그 초기화** — 지금 28행 중 11행이 stub 라우터가 만든 것이다.
+1. **운영로그 초기화** — 개발 중 쌓인 행에는 stub 라우터가 만든 티어 분포와
+   같은 질문을 반복해 만든 캐시 히트가 섞여 있다. 그대로 지표 화면을 보여주면
+   라우터 성능도 캐시 히트율도 실제보다 좋게 보인다.
+
+   `scripts/reset-demo-data.sh` 한 줄이면 백업·초기화·캐시 예열까지 끝난다.
+   ```bash
+   gcloud compute scp scripts/reset-demo-data.sh llm-router-workspace:/tmp/ --zone=asia-northeast3-a
+   gcloud compute ssh llm-router-workspace --zone=asia-northeast3-a --command="bash /tmp/reset-demo-data.sh --warm https://llm-router-frontend-1051465904174.asia-northeast3.run.app"
+   ```
    그대로 두면 "medium 62.5%"가 라우터 판단인 것처럼 보인다.
    ```sql
    TRUNCATE request_log, escalation_log, cache_entry RESTART IDENTITY;
