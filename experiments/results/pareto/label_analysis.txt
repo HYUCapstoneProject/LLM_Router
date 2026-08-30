@@ -1,12 +1,13 @@
-사다리(validation 선택)
-  ours       : zero-one-ai/Yi-34B-Chat / zero-one-ai/Yi-34B-Chat / gpt-4-1106-preview
-  tier-oracle: zero-one-ai/Yi-34B-Chat / gpt-3.5-turbo-1106 / gpt-4-1106-preview
+validation 1,000건에서 사다리 선택 · test 3,218건에서 보고
 
-  정책                                    perf     $/1k       격차
-  ours (현재 분류기)                       0.7780   1.3744  +0.0101
-  완벽한 난이도 분류기                         0.7796   1.1712  +0.0210
-  oracle — 사다리 3모델                    0.8790   0.2788  +0.1612
-  oracle — 11모델                       0.8624   0.1117  +0.3266
+사다리  ours       : zero-one-ai/Yi-34B-Chat / zero-one-ai/Yi-34B-Chat / gpt-4-1106-preview
+        tier-oracle: zero-one-ai/Yi-34B-Chat / gpt-3.5-turbo-1106 / gpt-4-1106-preview
+
+  정책                                  perf     $/1k       격차
+  ours (현재 분류기)                     0.7710   1.3667  +0.0119
+  완벽한 난이도 분류기                       0.7759   1.1597  +0.0265
+  oracle — 사다리 3모델                  0.8759   0.3143  +0.1665
+  oracle — 11모델                     0.8681   0.1321  +0.2841
 
 라벨 비교 (학습셋 25,204건)
 sufficient_tier   easy  hard  medium
@@ -15,7 +16,6 @@ easy              6806  1686     744
 hard              3447  3723     974
 medium            4033  2945     846
 일치율 45.1%
-
 분포
         difficulty_label  sufficient_tier
 easy            0.366450         0.566815

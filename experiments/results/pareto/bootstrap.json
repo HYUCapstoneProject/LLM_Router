@@ -1,0 +1,16 @@
+{
+  "queries": 3218,
+  "iterations": 2000,
+  "tier_ladder": {
+    "easy": "zero-one-ai/Yi-34B-Chat",
+    "medium": "zero-one-ai/Yi-34B-Chat",
+    "hard": "gpt-4-1106-preview"
+  },
+  "observed_gap": 0.011909375800709276,
+  "bootstrap_mean": 0.01199082066057057,
+  "ci95": [
+    0.004002899768141335,
+    0.02028417567691688
+  ],
+  "share_positive": 0.9985
+}
