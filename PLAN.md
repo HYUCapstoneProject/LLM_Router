@@ -108,8 +108,7 @@
 - [x] nginx rate limit 분리 — 지표 새로고침이 채팅 요청 한도를 먹지 않게 zone 을 나눔
 - [ ] 원문 질문이나 API key 없이 집계값만 반환하는 보안 테스트
       → DTO 에는 질문 필드가 없다. 응답 본문 검증 테스트는 미작성
-- [ ] **실 DB smoke test 미실행** — 집계 SQL 을 살아 있는 Postgres 에 한 번 돌려봐야 한다.
-      로컬 5432 가 내려가 있어 확인하지 못했다
+- [x] 실 DB smoke test — GCE Postgres 에서 집계 SQL 3종 실행, 배포 후 엔드포인트 응답 확인
 
 ### P0 — 실제 FastAPI Router 통합
 
@@ -122,6 +121,13 @@
 - [x] bge-large와 ModernBERT artifact를 GCE에 배포
 - [x] 운영 DB에 `04-router-confidence.sql` 적용 후 Spring 백엔드 재배포
 
+### 완료 — exact match 캐시 계층
+
+- [x] 질문 해시 조회를 임베딩 앞에 배치. 동일 질문은 embed 왕복(약 120ms)을 건너뛴다
+- [x] 실측 15,063ms → **5ms**. 앞뒤 공백만 다른 질문도 정규화로 히트
+- [x] `cache_match_type` 으로 exact/semantic 분리 집계. 합산 히트율은 과대평가라
+      분석 API 가 `semanticHitRate` 를 따로 내려준다
+
 ### P1 — cross-encoder reranker 도입
 
 - [x] BGE 단독 임계값에서 paraphrase와 hard negative 분포 중첩 확인
@@ -131,11 +137,18 @@
 - [x] 1차 후보 선정: Quora DistilRoBERTa + BGE joint threshold
 - [ ] 운영 모델·임계값 확정 (현재 후보는 false hit 0 기준 미통과)
 - [ ] 독립 검증셋 확장 및 group 단위 데이터 분리
-- [ ] `POST /router/rerank` 계약 확정과 Spring contract test
-- [ ] pgvector top-5 후보 반환 및 reranker 연동
-- [ ] timeout·오류 시 cache miss로 처리하는 fail-closed 폴백
-- [ ] model version·score·latency·decision reason 로그 적재
-- [ ] shadow mode 검증 후 feature flag로 운영 활성화
+- [x] `POST /router/rerank` 계약 확정 — FastAPI 구현·배포 완료 (`rerankModel: loaded`)
+- [x] 서빙 점수가 스크리닝과 동일함을 검증 — 58쌍 재현, 최대 차이 2.14e-06,
+      임계값 기준 **판정 뒤집힘 0건**. `scripts/verify_reranker_parity.py`
+- [x] shadow mode 연동 — 점수·모델버전·would_reject 를 `request_log` 에 적재,
+      `RERANK_SHADOW_ENABLED` 로 분리(기본 꺼짐), exact 히트는 건너뜀
+- [ ] **pgvector top-k 후보 반환** — 지금은 임계값을 통과한 최선 1건만 넘긴다.
+      리랭커가 거부권만 행사할 수 있고 후보 사이 순위를 다시 매기지는 못한다
+- [ ] rerank 호출 지연을 `request_log` 에 적재 (현재 점수만 남긴다)
+- [ ] Spring↔FastAPI 동일 fixture contract test
+- [ ] timeout·오류 시 cache miss 로 처리하는 fail-closed 폴백
+      (shadow 는 의도적으로 예외를 삼킨다. 판정에 쓰기 시작하면 반드시 바꿔야 한다)
+- [ ] 독립 검증셋 확장 후 운영 임계값 확정, feature flag 로 활성화
 
 결정 기준과 1차 평가 계약은 `experiments/RERANKER_REQUEST.md`를 따른다. 2026-08-30
 screening 결과는 `experiments/results/reranker-20260830/REPORT.md`에 있다. 현재 최선
