@@ -21,6 +21,7 @@ import lombok.Builder;
  * @param rerankScore     리랭커 shadow 점수. 미호출·실패면 null.
  *                        점수는 rerankModelVersion 에서만 의미가 있다.
  * @param rerankWouldReject 리랭커를 적용했다면 이 히트를 막았을지. shadow 평가의 핵심.
+ * @param rerankWouldReorder 리랭커 1등이 코사인 1등과 달랐는지. 재정렬의 값어치를 잰다.
  * @param origin          {@code chat} 또는 {@code escalate}.
  *                        에스컬레이션도 과금되는 LLM 호출이라 정상 행으로 남기고 여기서 구분한다.
  *                        비용 집계는 전체 행, 라우터 정확도 집계는 {@code origin='chat'} 만 본다.
@@ -47,7 +48,9 @@ public record RequestLogEntry(
         String cacheMatchType,
         Double rerankScore,
         String rerankModelVersion,
-        Boolean rerankWouldReject
+        Boolean rerankWouldReject,
+        Integer rerankCandidateCount,
+        Boolean rerankWouldReorder
 ) {
     public static final String ORIGIN_CHAT = "chat";
     public static final String ORIGIN_ESCALATE = "escalate";

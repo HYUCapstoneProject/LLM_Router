@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.MDC;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,9 +51,9 @@ class ChatServiceTest {
         float[] embedding = {0.1f, 0.2f};
         when(routerClient.embed("hello")).thenReturn(new RouterEmbedding(embedding, "embed-v1"));
         CachedResponse hit = new CachedResponse(7L, "hello", "cached", "easy", "model-e", 0.97);
-        when(cacheService.get(embedding)).thenReturn(Optional.of(hit));
-        when(rerankShadowService.evaluate("hello", hit))
-                .thenReturn(new RerankShadow(0.91, "rerank-v1", false));
+        when(cacheService.findCandidates(embedding)).thenReturn(List.of(hit));
+        when(rerankShadowService.evaluate("hello", List.of(hit)))
+                .thenReturn(new RerankShadow(0.91, "rerank-v1", false, 1, false));
 
         ChatResponse response = service.chat(request("hello"));
 
@@ -91,7 +92,7 @@ class ChatServiceTest {
         assertThat(response.isCacheHit()).isTrue();
         assertThat(response.getInputTokens()).isZero();
         verifyNoInteractions(routerClient, routerService, llmService);
-        verify(cacheService, never()).get(any());
+        verify(cacheService, never()).findCandidates(any());
         verify(requestLogService).record(argThat(entry ->
                 entry.cacheHit()
                         && entry.cacheMatchType().equals(RequestLogEntry.MATCH_EXACT)
@@ -106,7 +107,7 @@ class ChatServiceTest {
         float[] embedding = {0.3f};
         LlmResult result = new LlmResult("answer", "hard", "model-h", 12, 34);
         when(routerClient.embed("question")).thenReturn(new RouterEmbedding(embedding, "embed-v1"));
-        when(cacheService.get(embedding)).thenReturn(Optional.empty());
+        when(cacheService.findCandidates(embedding)).thenReturn(List.of());
         when(routerService.classify("question"))
                 .thenReturn(new RouterClassification(RouterService.Tier.HARD, 0.9, "router-v1"));
         when(llmService.call(RouterService.Tier.HARD, "question")).thenReturn(result);
@@ -155,7 +156,7 @@ class ChatServiceTest {
         // exact 조회는 DB만 보므로 임베딩 장애와 무관하게 시도된다.
         // 임베딩이 없으면 벡터 조회와 저장만 건너뛴다.
         verify(cacheService).getExact("q");
-        verify(cacheService, never()).get(any());
+        verify(cacheService, never()).findCandidates(any());
         verify(cacheService, never()).put(anyString(), any(), any(), anyString());
         verify(requestLogService).record(argThat(entry ->
                 entry.fallbackReason().equals("embed_unavailable")
@@ -168,7 +169,7 @@ class ChatServiceTest {
     void classifierApiFailureUsesMediumAndRecordsFallback() {
         float[] embedding = {1f};
         when(routerClient.embed("q")).thenReturn(new RouterEmbedding(embedding, "embed-v1"));
-        when(cacheService.get(embedding)).thenReturn(Optional.empty());
+        when(cacheService.findCandidates(embedding)).thenReturn(List.of());
         when(routerService.classify("q"))
                 .thenThrow(new RouterClientException("router down", 503));
         LlmResult result = new LlmResult("answer", "medium", "model-m", 1, 2);
@@ -189,7 +190,7 @@ class ChatServiceTest {
         RuntimeException failure = new RuntimeException("llm down");
         float[] embedding = {1f};
         when(routerClient.embed("q")).thenReturn(new RouterEmbedding(embedding, "embed-v1"));
-        when(cacheService.get(embedding)).thenReturn(Optional.empty());
+        when(cacheService.findCandidates(embedding)).thenReturn(List.of());
         when(routerService.classify("q"))
                 .thenReturn(new RouterClassification(RouterService.Tier.MEDIUM, 0.7, "router-v1"));
         when(llmService.call(RouterService.Tier.MEDIUM, "q")).thenThrow(failure);

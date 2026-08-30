@@ -71,6 +71,11 @@ llm:
     # 지금은 세 값이 같아서 고정 임계값(Level 1)과 동일하게 동작한다.
     # EXP-003 에서 QQP 로 티어별 hit/false-hit 곡선을 측정한 뒤 값을 벌린다.
     # 코드 변경 없이 설정만으로 Level 1 <-> Level 2 A/B 비교가 된다.
+    # HNSW 가 훑을 후보 수이자 리랭커에 넘길 수 있는 최대치.
+    # 키우면 리랭커가 순위를 바로잡을 기회가 늘지만 rerank 지연도 같이 는다.
+    # FastAPI 의 rerank_max_candidates(기본 16)를 넘으면 400 을 맞는다.
+    candidate-limit: 5
+
     thresholds:
       easy: 0.80
       medium: 0.80

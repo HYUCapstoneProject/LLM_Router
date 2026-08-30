@@ -28,6 +28,7 @@ class CacheServiceTest {
         ReflectionTestUtils.setField(service, "easyThreshold", 0.90);
         ReflectionTestUtils.setField(service, "mediumThreshold", 0.93);
         ReflectionTestUtils.setField(service, "hardThreshold", 0.96);
+        ReflectionTestUtils.setField(service, "candidateLimit", 5);
     }
 
     /** exact 조회는 벡터가 아니라 해시 하나만 바인딩한다 (인자 1개) */
@@ -66,7 +67,7 @@ class CacheServiceTest {
 
     @Test
     void missReturnsEmptyWithoutUpdatingHitCount() {
-        when(jdbc.query(anyString(), any(org.springframework.jdbc.core.RowMapper.class), any(), any()))
+        when(jdbc.query(anyString(), any(org.springframework.jdbc.core.RowMapper.class), any(), any(), any()))
                 .thenReturn(List.of());
         assertThat(service.get(new float[]{0.1f, -0.2f})).isEmpty();
         verify(jdbc, never()).update(startsWith("UPDATE"), anyLong());
@@ -75,7 +76,7 @@ class CacheServiceTest {
     @Test
     void hitReturnsBestRowAndIncrementsHitCount() {
         CachedResponse hit = new CachedResponse(3L, "q", "answer", "easy", "m", 0.98);
-        when(jdbc.query(anyString(), any(org.springframework.jdbc.core.RowMapper.class), any(), any()))
+        when(jdbc.query(anyString(), any(org.springframework.jdbc.core.RowMapper.class), any(), any(), any()))
                 .thenReturn(List.of(hit));
         assertThat(service.get(new float[]{1f})).contains(hit);
         verify(jdbc).update(startsWith("UPDATE"), eq(3L));

@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -48,11 +49,20 @@ public class ChatService {
             String matchType = cached.isPresent() ? RequestLogEntry.MATCH_EXACT : null;
 
             // 2. exact 미스일 때만 임베딩해서 시맨틱 캐시를 본다.
+            //    후보를 top-k 로 받아 리랭커에 전부 넘긴다. 최선 1건만 넘기면
+            //    리랭커가 거부권만 행사할 수 있고 순위를 다시 매기지 못한다.
+            List<CachedResponse> candidates = List.of();
             if (cached.isEmpty()) {
                 try {
                     embeddingResult = routerClient.embed(message);
-                    cached = cacheService.get(embeddingResult.vector());
-                    if (cached.isPresent()) {
+                    candidates = cacheService.findCandidates(embeddingResult.vector());
+                    if (!candidates.isEmpty()) {
+                        // 서빙되는 답은 여전히 코사인 1등이다. shadow 는 동작을 바꾸지 않는다.
+                        CachedResponse best = candidates.get(0);
+                        cacheService.recordHit(best.cacheEntryId());
+                        log.info("캐시 히트 id={} similarity={} 후보={}",
+                                best.cacheEntryId(), best.similarity(), candidates.size());
+                        cached = Optional.of(best);
                         matchType = RequestLogEntry.MATCH_SEMANTIC;
                     }
                 } catch (RouterClientException error) {
@@ -68,7 +78,7 @@ public class ChatService {
                 CachedResponse hit = cached.get();
                 // exact 히트는 문자열이 같아 재검증할 것이 없다. 시맨틱 히트만 관측한다.
                 RerankShadow shadow = RequestLogEntry.MATCH_SEMANTIC.equals(matchType)
-                        ? rerankShadowService.evaluate(message, hit)
+                        ? rerankShadowService.evaluate(message, candidates)
                         : RerankShadow.skipped();
 
                 ChatResponse response = ChatResponse.builder()
@@ -98,6 +108,8 @@ public class ChatService {
                         .rerankScore(shadow.score())
                         .rerankModelVersion(shadow.modelVersion())
                         .rerankWouldReject(shadow.wouldReject())
+                        .rerankCandidateCount(shadow.candidateCount())
+                        .rerankWouldReorder(shadow.wouldReorder())
                         .similarity(hit.similarity())
                         .cacheEntryId(hit.cacheEntryId())
                         .inputTokens(0)

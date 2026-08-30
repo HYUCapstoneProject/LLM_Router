@@ -34,8 +34,26 @@ public class CacheService {
     private double hardThreshold;
 
     /**
+     * HNSW 가 훑을 후보 수. 리랭커에 넘길 수 있는 최대치이기도 하다.
+     *
+     * 키우면 리랭커가 구제할 기회가 늘지만 rerank 지연도 같이 는다.
+     * FastAPI 의 rerank_max_candidates(기본 16)를 넘으면 400 을 맞는다.
+     */
+    @Value("${llm.cache.candidate-limit:5}")
+    private int candidateLimit;
+
+    /**
      * 안쪽 서브쿼리에서 HNSW 인덱스로 top-k 를 뽑고, 바깥에서 항목별 threshold 를 건다.
      * threshold 를 안쪽 WHERE 에 직접 넣으면 인덱스를 못 타고 전수 스캔이 된다.
+     */
+    /**
+     * 임계값을 통과한 후보를 유사도 내림차순으로 전부 돌려준다.
+     *
+     * 예전에는 바깥에서 LIMIT 1 을 걸어 최선 하나만 꺼냈다. 그러면 리랭커가
+     * 거부권만 행사할 수 있고 후보 사이 순위를 다시 매기지 못한다 —
+     * cross-encoder 를 쓰는 이유의 절반이 사라진다.
+     *
+     * 안쪽 LIMIT 은 HNSW 가 훑을 후보 수라 파라미터로 받는다.
      */
     private static final String SELECT_SQL = """
             SELECT * FROM (
@@ -48,11 +66,10 @@ public class CacheService {
                        1 - (embedding <=> ?::vector) AS similarity
                 FROM cache_entry
                 ORDER BY embedding <=> ?::vector
-                LIMIT 5
+                LIMIT ?
             ) t
             WHERE t.similarity >= t.threshold
             ORDER BY t.similarity DESC
-            LIMIT 1
             """;
 
     /**
@@ -113,8 +130,7 @@ public class CacheService {
                 QuestionHash.of(question)).stream().findFirst();
 
         found.ifPresent(hit -> {
-            jdbc.update("UPDATE cache_entry SET hit_count = hit_count + 1, updated_at = now() WHERE id = ?",
-                    hit.cacheEntryId());
+            recordHit(hit.cacheEntryId());
             log.info("캐시 exact 히트 id={}", hit.cacheEntryId());
         });
         return found;
@@ -127,15 +143,18 @@ public class CacheService {
         }
 
         CachedResponse hit = found.get();
-        jdbc.update("UPDATE cache_entry SET hit_count = hit_count + 1, updated_at = now() WHERE id = ?",
-                hit.cacheEntryId());
+        recordHit(hit.cacheEntryId());
 
         log.info("캐시 히트 id={} similarity={}", hit.cacheEntryId(), hit.similarity());
         return Optional.of(hit);
     }
 
-    /** hit_count 를 건드리지 않는 조회. 사용자 요청이 아닌 내부 판단용이다. */
-    private Optional<CachedResponse> findBest(float[] embedding) {
+    /**
+     * 임계값을 통과한 후보들. 유사도 내림차순이며 hit_count 는 건드리지 않는다.
+     *
+     * <p>첫 원소가 기존 정책의 캐시 히트다. 리랭커는 이 목록 전체를 본다.
+     */
+    public List<CachedResponse> findCandidates(float[] embedding) {
         String vec = PgVector.literal(embedding);
         return jdbc.query(SELECT_SQL,
                 (rs, rowNum) -> new CachedResponse(
@@ -145,7 +164,18 @@ public class CacheService {
                         rs.getString("tier"),
                         rs.getString("model_id"),
                         rs.getDouble("similarity")),
-                vec, vec).stream().findFirst();
+                vec, vec, candidateLimit);
+    }
+
+    /** hit_count 를 건드리지 않는 조회. 사용자 요청이 아닌 내부 판단용이다. */
+    private Optional<CachedResponse> findBest(float[] embedding) {
+        return findCandidates(embedding).stream().findFirst();
+    }
+
+    /** 캐시 히트로 확정된 항목의 사용 횟수를 올린다. */
+    public void recordHit(long cacheEntryId) {
+        jdbc.update("UPDATE cache_entry SET hit_count = hit_count + 1, updated_at = now() WHERE id = ?",
+                cacheEntryId);
     }
 
     /**

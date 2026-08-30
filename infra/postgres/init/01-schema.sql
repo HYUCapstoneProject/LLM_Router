@@ -107,6 +107,11 @@ CREATE TABLE request_log (
     rerank_model_version VARCHAR(64),
     rerank_would_reject  BOOLEAN,
 
+    -- 리랭커에 넘긴 후보 수와, 리랭커 1등이 코사인 1등과 달랐는지.
+    -- 후보가 1개면 재정렬은 정의상 일어날 수 없으므로 count 가 있어야 해석된다.
+    rerank_candidate_count INTEGER,
+    rerank_would_reorder   BOOLEAN,
+
     -- 이 요청이 히트했거나 새로 만든 캐시 행.
     -- /api/escalate 가 "불만족한 답이 어느 캐시 행에서 나왔는지" 를 알아야
     -- 그 행을 정확히 갱신하고(기획서 4-3), escalation_log 에 근거를 남길 수 있다.
