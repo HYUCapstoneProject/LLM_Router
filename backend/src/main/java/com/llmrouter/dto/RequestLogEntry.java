@@ -18,6 +18,9 @@ import lombok.Builder;
  * @param cacheMatchType  {@code exact} 또는 {@code semantic}. 캐시 미스면 null.
  *                        둘을 합친 히트율은 "같은 질문을 다시 쳤다"까지 포함하므로
  *                        시맨틱 캐시 성능으로 제시하면 과대평가가 된다.
+ * @param rerankScore     리랭커 shadow 점수. 미호출·실패면 null.
+ *                        점수는 rerankModelVersion 에서만 의미가 있다.
+ * @param rerankWouldReject 리랭커를 적용했다면 이 히트를 막았을지. shadow 평가의 핵심.
  * @param origin          {@code chat} 또는 {@code escalate}.
  *                        에스컬레이션도 과금되는 LLM 호출이라 정상 행으로 남기고 여기서 구분한다.
  *                        비용 집계는 전체 행, 라우터 정확도 집계는 {@code origin='chat'} 만 본다.
@@ -41,7 +44,10 @@ public record RequestLogEntry(
         String fallbackReason,
         String parentRequestId,
         String origin,
-        String cacheMatchType
+        String cacheMatchType,
+        Double rerankScore,
+        String rerankModelVersion,
+        Boolean rerankWouldReject
 ) {
     public static final String ORIGIN_CHAT = "chat";
     public static final String ORIGIN_ESCALATE = "escalate";

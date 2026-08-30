@@ -41,7 +41,7 @@ class CacheServiceTest {
 
     @Test
     void exactHitReturnsSimilarityOneAndIncrementsHitCount() {
-        CachedResponse hit = new CachedResponse(5L, "answer", "easy", "m", 1.0);
+        CachedResponse hit = new CachedResponse(5L, "q", "answer", "easy", "m", 1.0);
         when(jdbc.query(anyString(), any(org.springframework.jdbc.core.RowMapper.class), any(Object.class)))
                 .thenReturn(List.of(hit));
 
@@ -74,7 +74,7 @@ class CacheServiceTest {
 
     @Test
     void hitReturnsBestRowAndIncrementsHitCount() {
-        CachedResponse hit = new CachedResponse(3L, "answer", "easy", "m", 0.98);
+        CachedResponse hit = new CachedResponse(3L, "q", "answer", "easy", "m", 0.98);
         when(jdbc.query(anyString(), any(org.springframework.jdbc.core.RowMapper.class), any(), any()))
                 .thenReturn(List.of(hit));
         assertThat(service.get(new float[]{1f})).contains(hit);

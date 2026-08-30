@@ -76,6 +76,23 @@ llm:
       medium: 0.80
       hard: 0.80
 
+    rerank:
+      # cross-encoder 재검증. 기본값은 꺼짐이다.
+      #
+      # 두 가지 이유로 아직 판정에 쓰지 않는다.
+      #  1) 58쌍 스크리닝에서 사전 gate(false hit 0 + recall 90%)를 통과한 모델이 없다.
+      #     최선 조합조차 오탐이 2건 남았다.
+      #  2) 리랭커는 캐시 히트 경로에서 돈다 — 빠르려고 만든 그 경로다.
+      #     FastAPI 가 us-west1, 게이트웨이가 asia-northeast3 라 왕복만 약 120ms 다.
+      #
+      # 켜면 점수를 request_log 에 남기기만 하고 캐시 판정은 그대로 둔다.
+      shadow-enabled: ${RERANK_SHADOW_ENABLED:false}
+
+      # 스크리닝이 고른 AND 조건. 코사인 단독으로는 두 분포가 겹쳐 갈리지 않는다.
+      # quora-distilroberta-base@f62e7a4 에서만 유효한 값이다 — 모델이 바뀌면 재측정한다.
+      similarity-threshold: 0.8774
+      score-threshold: 0.03581769
+
   escalation:
     # LLM 을 부르기 전에 escalation_log 에 자리를 예약한다. 중복 요청은 유니크 인덱스에서
     # 막혀 요금이 나가지 않는다. 이 시간보다 오래된 미완료 예약은 프로세스가 죽어 남은

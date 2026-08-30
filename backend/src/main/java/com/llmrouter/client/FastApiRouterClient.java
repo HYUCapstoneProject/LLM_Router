@@ -126,6 +126,34 @@ public class FastApiRouterClient implements RouterClient {
         return new RouterClassification(tier, response.confidence(), response.modelVersion());
     }
 
+    @Override
+    public RouterRerank rerank(String query, java.util.List<String> candidates) {
+        if (candidates == null || candidates.isEmpty()) {
+            throw new RouterClientException("rerank candidates 가 비어 있습니다", null);
+        }
+
+        RerankResponse response = invoke("rerank", () -> restClient.post()
+                .uri("/router/rerank")
+                .headers(headers -> addHeaders(headers, requestId()))
+                .body(new RerankRequest(query, candidates))
+                .retrieve()
+                .body(RerankResponse.class));
+
+        // 길이가 어긋나면 점수를 엉뚱한 후보에 붙이게 된다. 조용히 틀리느니 실패시킨다.
+        if (response == null || response.scores() == null
+                || response.scores().length != candidates.size()
+                || response.modelVersion() == null || response.modelVersion().isBlank()) {
+            throw new RouterClientException("FastAPI rerank 응답이 계약과 다릅니다", null);
+        }
+        for (double score : response.scores()) {
+            // NaN 은 어떤 임계값과 비교해도 false 라 조용한 캐시 미스가 된다.
+            if (!Double.isFinite(score)) {
+                throw new RouterClientException("FastAPI rerank 가 유한하지 않은 점수를 반환했습니다", null);
+            }
+        }
+        return new RouterRerank(response.scores(), response.modelVersion());
+    }
+
     private void addHeaders(org.springframework.http.HttpHeaders headers, String requestId) {
         headers.setBearerAuth(token);
         headers.set("X-Request-ID", requestId);
@@ -189,5 +217,11 @@ public class FastApiRouterClient implements RouterClient {
     }
 
     private record ClassifyResponse(String tier, String model, double confidence, String modelVersion) {
+    }
+
+    private record RerankRequest(String query, java.util.List<String> candidates) {
+    }
+
+    private record RerankResponse(double[] scores, String modelVersion) {
     }
 }

@@ -10,6 +10,7 @@ import com.llmrouter.dto.ChatRequest;
 import com.llmrouter.dto.ChatResponse;
 import com.llmrouter.dto.LlmResult;
 import com.llmrouter.dto.RequestLogEntry;
+import com.llmrouter.dto.RerankShadow;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -27,6 +28,7 @@ public class ChatService {
     private final CacheService cacheService;
     private final LlmService llmService;
     private final RequestLogService requestLogService;
+    private final RerankShadowService rerankShadowService;
 
     public ChatResponse chat(ChatRequest request) {
         long start = System.currentTimeMillis();
@@ -64,6 +66,11 @@ public class ChatService {
             // 3. 캐시 히트면 분류와 Claude 호출을 생략한다.
             if (cached.isPresent()) {
                 CachedResponse hit = cached.get();
+                // exact 히트는 문자열이 같아 재검증할 것이 없다. 시맨틱 히트만 관측한다.
+                RerankShadow shadow = RequestLogEntry.MATCH_SEMANTIC.equals(matchType)
+                        ? rerankShadowService.evaluate(message, hit)
+                        : RerankShadow.skipped();
+
                 ChatResponse response = ChatResponse.builder()
                         .requestId(requestId)
                         .response(hit.text())
@@ -88,6 +95,9 @@ public class ChatService {
                         .embedModelVersion(embeddingResult == null ? null : embeddingResult.modelVersion())
                         .cacheHit(true)
                         .cacheMatchType(matchType)
+                        .rerankScore(shadow.score())
+                        .rerankModelVersion(shadow.modelVersion())
+                        .rerankWouldReject(shadow.wouldReject())
                         .similarity(hit.similarity())
                         .cacheEntryId(hit.cacheEntryId())
                         .inputTokens(0)

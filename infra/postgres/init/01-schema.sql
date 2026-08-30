@@ -100,6 +100,13 @@ CREATE TABLE request_log (
     -- 시맨틱 캐시 성능으로 제시하면 과대평가가 된다. 분석에서 나눠 본다.
     cache_match_type     VARCHAR(10),
 
+    -- 리랭커 shadow mode. 점수만 남기고 캐시 판정은 바꾸지 않는다.
+    -- would_reject 가 shadow 평가의 핵심 열이다 —
+    -- 실제로 적용했다면 이 히트를 막았을지를 뜻한다.
+    rerank_score         REAL,
+    rerank_model_version VARCHAR(64),
+    rerank_would_reject  BOOLEAN,
+
     -- 이 요청이 히트했거나 새로 만든 캐시 행.
     -- /api/escalate 가 "불만족한 답이 어느 캐시 행에서 나왔는지" 를 알아야
     -- 그 행을 정확히 갱신하고(기획서 4-3), escalation_log 에 근거를 남길 수 있다.
