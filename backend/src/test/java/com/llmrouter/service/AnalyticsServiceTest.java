@@ -45,10 +45,7 @@ class AnalyticsServiceTest {
 
     @Test
     void costCompareUsesOnlyRowsThatActuallyCalledAnLlm() throws Exception {
-        stubOverall(Map.of(
-                "total", 10L, "chat", 8L, "escalation", 2L, "success", 10L,
-                "cache_hits", 4L, "chat_success", 8L,
-                "avg_ms", 900L, "hit_ms", 12L, "miss_ms", 1_400L));
+        stubOverall(overall(10L, 8L, 2L, 10L, 4L, 1L, 3L, 8L, 900L, 12L, 1_400L));
         // easy 1M/1M → haiku 로 $6, 전부 opus 였다면 $30
         stubByTier(List.of(Map.of(
                 "tier", "easy", "model_id", "claude-haiku-4-5",
@@ -65,15 +62,17 @@ class AnalyticsServiceTest {
         // 그 효과는 "건너뛴 호출 수"로만 보고한다.
         assertThat(summary.cache().llmCallsSkipped()).isEqualTo(4);
         assertThat(summary.cache().hitRate()).isEqualTo(0.5);
+
+        // exact 1 / semantic 3. 시맨틱 히트율은 분모에서도 exact 를 뺀다: 3 / (8-1)
+        assertThat(summary.cache().exactHits()).isEqualTo(1);
+        assertThat(summary.cache().semanticHits()).isEqualTo(3);
+        assertThat(summary.cache().semanticHitRate()).isCloseTo(3.0 / 7, within(1e-4));
     }
 
     /** 히트율 분모는 전체 요청이 아니라 성공한 chat 요청이다. 에스컬레이션에는 캐시 조회가 없다. */
     @Test
     void cacheHitRateExcludesEscalations() throws Exception {
-        stubOverall(Map.of(
-                "total", 30L, "chat", 10L, "escalation", 20L, "success", 30L,
-                "cache_hits", 5L, "chat_success", 10L,
-                "avg_ms", 100L, "hit_ms", 10L, "miss_ms", 200L));
+        stubOverall(overall(30L, 10L, 20L, 30L, 5L, 0L, 5L, 10L, 100L, 10L, 200L));
         stubByTier(List.of());
         stubErrors(List.of());
 
@@ -82,10 +81,7 @@ class AnalyticsServiceTest {
 
     @Test
     void emptyPeriodDoesNotDivideByZero() throws Exception {
-        stubOverall(Map.of(
-                "total", 0L, "chat", 0L, "escalation", 0L, "success", 0L,
-                "cache_hits", 0L, "chat_success", 0L,
-                "avg_ms", 0L, "hit_ms", 0L, "miss_ms", 0L));
+        stubOverall(overall(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L));
         stubByTier(List.of());
         stubErrors(List.of());
 
@@ -99,10 +95,7 @@ class AnalyticsServiceTest {
 
     @Test
     void tierSharesSumToOneAcrossLlmCalls() throws Exception {
-        stubOverall(Map.of(
-                "total", 10L, "chat", 10L, "escalation", 0L, "success", 10L,
-                "cache_hits", 0L, "chat_success", 10L,
-                "avg_ms", 500L, "hit_ms", 0L, "miss_ms", 500L));
+        stubOverall(overall(10L, 10L, 0L, 10L, 0L, 0L, 0L, 10L, 500L, 0L, 500L));
         stubByTier(List.of(
                 row("easy", "claude-haiku-4-5", 6L),
                 row("medium", "claude-sonnet-4-6", 3L),
@@ -112,6 +105,20 @@ class AnalyticsServiceTest {
         assertThat(service.summary("all").byTier())
                 .extracting(AnalyticsSummary.TierUsage::share)
                 .containsExactly(0.6, 0.3, 0.1);
+    }
+
+    /** Map.of 는 인자 10쌍이 한계다. OVERALL_SQL 컬럼이 12개라 헬퍼로 만든다. */
+    private static Map<String, Object> overall(long total, long chat, long escalation, long success,
+                                               long cacheHits, long exactHits, long semanticHits,
+                                               long chatSuccess, long avgMs, long hitMs, long missMs) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("total", total);           m.put("chat", chat);
+        m.put("escalation", escalation); m.put("success", success);
+        m.put("cache_hits", cacheHits);  m.put("exact_hits", exactHits);
+        m.put("semantic_hits", semanticHits); m.put("chat_success", chatSuccess);
+        m.put("avg_ms", avgMs);          m.put("hit_ms", hitMs);
+        m.put("miss_ms", missMs);
+        return m;
     }
 
     private static Map<String, Object> row(String tier, String modelId, long count) {

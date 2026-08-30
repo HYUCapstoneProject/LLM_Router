@@ -54,10 +54,27 @@ public class CacheService {
             LIMIT 1
             """;
 
+    /**
+     * exact match 조회. 임베딩보다 먼저 탄다.
+     *
+     * 완전히 같은 질문이면 FastAPI 왕복(교차 리전 약 120ms)과 벡터 검색을 통째로 건너뛴다.
+     * 오탐이 원리적으로 0이라 threshold 를 보지 않는다.
+     *
+     * 같은 해시 행이 여럿일 수 있다(에스컬레이션 전후 등). 가장 최근에 갱신된 답을 쓴다.
+     */
+    private static final String SELECT_EXACT_SQL = """
+            SELECT id, response, tier, model_id
+            FROM cache_entry
+            WHERE question_hash = ?
+            ORDER BY updated_at DESC
+            LIMIT 1
+            """;
+
     private static final String INSERT_SQL = """
             INSERT INTO cache_entry
-                (question, embedding, response, tier, model_id, embed_model_version, threshold)
-            VALUES (?, ?::vector, ?, ?, ?, ?, ?)
+                (question, question_hash, embedding, response, tier, model_id,
+                 embed_model_version, threshold)
+            VALUES (?, ?, ?::vector, ?, ?, ?, ?, ?)
             RETURNING id
             """;
 
@@ -77,6 +94,29 @@ public class CacheService {
                    updated_at = now()
              WHERE id = ?
             """;
+
+    /**
+     * 질문이 완전히 같은 캐시 항목을 찾는다.
+     *
+     * @return 유사도는 1.0 으로 채운다. 실제로 같은 문자열이므로 코사인 유사도도 1.0 이다.
+     */
+    public Optional<CachedResponse> getExact(String question) {
+        Optional<CachedResponse> found = jdbc.query(SELECT_EXACT_SQL,
+                (rs, rowNum) -> new CachedResponse(
+                        rs.getLong("id"),
+                        rs.getString("response"),
+                        rs.getString("tier"),
+                        rs.getString("model_id"),
+                        1.0),
+                QuestionHash.of(question)).stream().findFirst();
+
+        found.ifPresent(hit -> {
+            jdbc.update("UPDATE cache_entry SET hit_count = hit_count + 1, updated_at = now() WHERE id = ?",
+                    hit.cacheEntryId());
+            log.info("캐시 exact 히트 id={}", hit.cacheEntryId());
+        });
+        return found;
+    }
 
     public Optional<CachedResponse> get(float[] embedding) {
         Optional<CachedResponse> found = findBest(embedding);
@@ -138,6 +178,7 @@ public class CacheService {
     public long put(String question, float[] embedding, LlmResult result, String embedModelVersion) {
         Long id = jdbc.queryForObject(INSERT_SQL, Long.class,
                 question,
+                QuestionHash.of(question),
                 PgVector.literal(embedding),
                 result.text(),
                 result.tier(),

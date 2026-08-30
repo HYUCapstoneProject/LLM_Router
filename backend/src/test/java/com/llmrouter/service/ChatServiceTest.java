@@ -37,6 +37,9 @@ class ChatServiceTest {
     void setUp() {
         service = new ChatService(routerClient, routerService, cacheService, llmService, requestLogService);
         MDC.put("requestId", "00000000-0000-0000-0000-000000000001");
+        // exact match 는 이제 모든 요청의 첫 단계다. 기본값은 미스로 두고
+        // exact 를 검증하는 테스트에서만 따로 덮어쓴다.
+        when(cacheService.getExact(anyString())).thenReturn(Optional.empty());
     }
 
     @Test
@@ -60,7 +63,34 @@ class ChatServiceTest {
                         && entry.cacheHit()
                         && entry.cacheEntryId().equals(7L)
                         && entry.similarity().equals(0.97)
+                        && entry.cacheMatchType().equals(RequestLogEntry.MATCH_SEMANTIC)
+                        && entry.embedModelVersion().equals("embed-v1")
                         && entry.origin().equals(RequestLogEntry.ORIGIN_CHAT)));
+    }
+
+    /**
+     * exact 히트는 임베딩 호출 자체를 건너뛴다. 이게 이 계층의 존재 이유다 —
+     * FastAPI 가 다른 리전이라 embed 왕복만 약 120ms 다.
+     */
+    @Test
+    void exactMatchSkipsEmbeddingEntirely() {
+        when(cacheService.getExact("hello")).thenReturn(Optional.of(
+                new CachedResponse(3L, "cached", "easy", "model-e", 1.0)));
+
+        ChatResponse response = service.chat(request("hello"));
+
+        assertThat(response.getResponse()).isEqualTo("cached");
+        assertThat(response.isCacheHit()).isTrue();
+        assertThat(response.getInputTokens()).isZero();
+        verifyNoInteractions(routerClient, routerService, llmService);
+        verify(cacheService, never()).get(any());
+        verify(requestLogService).record(argThat(entry ->
+                entry.cacheHit()
+                        && entry.cacheMatchType().equals(RequestLogEntry.MATCH_EXACT)
+                        // 임베딩을 부르지 않았으므로 버전이 없다
+                        && entry.embedModelVersion() == null
+                        && entry.similarity().equals(1.0)
+                        && entry.cacheEntryId().equals(3L)));
     }
 
     @Test
@@ -114,7 +144,11 @@ class ChatServiceTest {
         ChatResponse response = service.chat(request("q"));
 
         assertThat(response.getResponse()).isEqualTo("answer");
-        verifyNoInteractions(cacheService);
+        // exact 조회는 DB만 보므로 임베딩 장애와 무관하게 시도된다.
+        // 임베딩이 없으면 벡터 조회와 저장만 건너뛴다.
+        verify(cacheService).getExact("q");
+        verify(cacheService, never()).get(any());
+        verify(cacheService, never()).put(anyString(), any(), any(), anyString());
         verify(requestLogService).record(argThat(entry ->
                 entry.fallbackReason().equals("embed_unavailable")
                         && entry.embedModelVersion() == null

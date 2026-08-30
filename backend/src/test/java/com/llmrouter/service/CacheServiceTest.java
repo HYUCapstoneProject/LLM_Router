@@ -30,6 +30,40 @@ class CacheServiceTest {
         ReflectionTestUtils.setField(service, "hardThreshold", 0.96);
     }
 
+    /** exact 조회는 벡터가 아니라 해시 하나만 바인딩한다 (인자 1개) */
+    @Test
+    void exactMissReturnsEmptyWithoutUpdatingHitCount() {
+        when(jdbc.query(anyString(), any(org.springframework.jdbc.core.RowMapper.class), any(Object.class)))
+                .thenReturn(List.of());
+        assertThat(service.getExact("처음 보는 질문")).isEmpty();
+        verify(jdbc, never()).update(startsWith("UPDATE"), anyLong());
+    }
+
+    @Test
+    void exactHitReturnsSimilarityOneAndIncrementsHitCount() {
+        CachedResponse hit = new CachedResponse(5L, "answer", "easy", "m", 1.0);
+        when(jdbc.query(anyString(), any(org.springframework.jdbc.core.RowMapper.class), any(Object.class)))
+                .thenReturn(List.of(hit));
+
+        assertThat(service.getExact("같은 질문")).contains(hit);
+        verify(jdbc).update(startsWith("UPDATE"), eq(5L));
+    }
+
+    /** 정규화가 Java 한 곳에만 있으므로, 바인딩되는 값은 해시여야 한다 */
+    @Test
+    void exactLookupBindsHashNotRawQuestion() {
+        when(jdbc.query(anyString(), any(org.springframework.jdbc.core.RowMapper.class), any(Object.class)))
+                .thenReturn(List.of());
+
+        service.getExact("  같은   질문  ");
+
+        ArgumentCaptor<Object> bound = ArgumentCaptor.forClass(Object.class);
+        verify(jdbc).query(anyString(), any(org.springframework.jdbc.core.RowMapper.class), bound.capture());
+        assertThat(bound.getValue())
+                .isEqualTo(QuestionHash.of("같은 질문"))
+                .asString().hasSize(64);
+    }
+
     @Test
     void missReturnsEmptyWithoutUpdatingHitCount() {
         when(jdbc.query(anyString(), any(org.springframework.jdbc.core.RowMapper.class), any(), any()))
@@ -55,7 +89,9 @@ class CacheServiceTest {
 
         ArgumentCaptor<Object[]> args = ArgumentCaptor.forClass(Object[].class);
         verify(jdbc).queryForObject(anyString(), eq(Long.class), args.capture());
-        assertThat(args.getValue()).containsExactly("q", "[0.1,-2.0]", "a", "hard", "opus", "embed-v1", 0.96);
+        // question, question_hash, embedding, response, tier, model_id, embed_model_version, threshold
+        assertThat(args.getValue()).containsExactly(
+                "q", QuestionHash.of("q"), "[0.1,-2.0]", "a", "hard", "opus", "embed-v1", 0.96);
         assertThat(id).isEqualTo(11L);
     }
 
@@ -63,7 +99,7 @@ class CacheServiceTest {
     void unknownTierUsesMediumThreshold() {
         when(jdbc.queryForObject(anyString(), eq(Long.class), any(Object[].class))).thenReturn(12L);
         service.put("q", new float[]{1f}, new LlmResult("a", "future", "m", 0, 0), "embed-v1");
-        verify(jdbc).queryForObject(anyString(), eq(Long.class), eq("q"), eq("[1.0]"), eq("a"),
-                eq("future"), eq("m"), any(), eq(0.93));
+        verify(jdbc).queryForObject(anyString(), eq(Long.class), eq("q"), eq(QuestionHash.of("q")),
+                eq("[1.0]"), eq("a"), eq("future"), eq("m"), any(), eq(0.93));
     }
 }

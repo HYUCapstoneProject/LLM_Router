@@ -39,19 +39,29 @@ public class ChatService {
         String fallbackReason = null;
 
         try {
-            // 1. 캐시 조회를 위해 질문을 임베딩한다.
-            Optional<CachedResponse> cached = Optional.empty();
-            try {
-                embeddingResult = routerClient.embed(message);
-                cached = cacheService.get(embeddingResult.vector());
-            } catch (RouterClientException error) {
-                // 임베딩 서버가 죽어도 Claude 응답까지 막지는 않는다. 캐시만 우회한다.
-                fallbackReason = "embed_unavailable";
-                log.warn("임베딩 실패로 캐시를 우회한다 requestId={} status={}",
-                        requestId, error.statusCode(), error);
+            // 1. exact match 를 먼저 본다. 글자까지 같은 질문이면 임베딩 호출 자체가 필요 없다.
+            //    FastAPI 가 us-west1, 게이트웨이가 asia-northeast3 라 embed 왕복만 약 120ms 다.
+            //    오탐이 원리적으로 0 이라 임계값도 보지 않는다.
+            Optional<CachedResponse> cached = cacheService.getExact(message);
+            String matchType = cached.isPresent() ? RequestLogEntry.MATCH_EXACT : null;
+
+            // 2. exact 미스일 때만 임베딩해서 시맨틱 캐시를 본다.
+            if (cached.isEmpty()) {
+                try {
+                    embeddingResult = routerClient.embed(message);
+                    cached = cacheService.get(embeddingResult.vector());
+                    if (cached.isPresent()) {
+                        matchType = RequestLogEntry.MATCH_SEMANTIC;
+                    }
+                } catch (RouterClientException error) {
+                    // 임베딩 서버가 죽어도 Claude 응답까지 막지는 않는다. 캐시만 우회한다.
+                    fallbackReason = "embed_unavailable";
+                    log.warn("임베딩 실패로 캐시를 우회한다 requestId={} status={}",
+                            requestId, error.statusCode(), error);
+                }
             }
 
-            // 2. 캐시 히트면 분류와 Claude 호출을 생략한다.
+            // 3. 캐시 히트면 분류와 Claude 호출을 생략한다.
             if (cached.isPresent()) {
                 CachedResponse hit = cached.get();
                 ChatResponse response = ChatResponse.builder()
@@ -74,8 +84,10 @@ public class ChatService {
                         .modelId(hit.modelId())
                         .routerModelVersion(null)
                         .routerConfidence(null)
-                        .embedModelVersion(embeddingResult.modelVersion())
+                        // exact 히트는 임베딩을 부르지 않았으므로 버전이 없다.
+                        .embedModelVersion(embeddingResult == null ? null : embeddingResult.modelVersion())
                         .cacheHit(true)
+                        .cacheMatchType(matchType)
                         .similarity(hit.similarity())
                         .cacheEntryId(hit.cacheEntryId())
                         .inputTokens(0)
@@ -86,7 +98,7 @@ public class ChatService {
                 return response;
             }
 
-            // 3. 캐시 미스일 때만 분류하고 Claude를 호출한다.
+            // 4. 캐시 미스일 때만 분류하고 Claude를 호출한다.
             RouterClassification classification = null;
             try {
                 classification = routerService.classify(message);
@@ -102,7 +114,7 @@ public class ChatService {
             }
             LlmResult result = llmService.call(tier, message);
 
-            // 4. 생성한 캐시 행을 요청 로그와 연결해 이후 에스컬레이션에서 갱신한다.
+            // 5. 생성한 캐시 행을 요청 로그와 연결해 이후 에스컬레이션에서 갱신한다.
             Long cacheEntryId = embeddingResult == null
                     ? null
                     : cacheService.put(message, embeddingResult.vector(), result,
