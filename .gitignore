@@ -46,3 +46,6 @@ __pycache__/
 !backend/gradle/
 !backend/gradlew
 !backend/gradlew.bat
+
+# 파레토 실험용 venv 와 내려받은 데이터셋 (수백 MB)
+.venv-experiments/

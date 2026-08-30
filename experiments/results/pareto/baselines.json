@@ -1,0 +1,230 @@
+{
+  "dataset": {
+    "path": ".venv-experiments\\data\\routerbench_0shot.pkl",
+    "queries": 1000,
+    "models": [
+      "mistralai/mistral-7b-chat",
+      "WizardLM/WizardLM-13B-V1.2",
+      "mistralai/mixtral-8x7b-chat",
+      "meta/code-llama-instruct-34b-chat",
+      "zero-one-ai/Yi-34B-Chat",
+      "meta/llama-2-70b-chat",
+      "claude-instant-v1",
+      "gpt-3.5-turbo-1106",
+      "claude-v1",
+      "claude-v2",
+      "gpt-4-1106-preview"
+    ]
+  },
+  "seed": 20260830,
+  "results": [
+    {
+      "policy": "always:mistralai/mistral-7b-chat",
+      "kind": "fixed",
+      "performance": 0.28755000000000003,
+      "cost_per_query": 4.6875e-05,
+      "total_cost": 0.046875
+    },
+    {
+      "policy": "always:WizardLM/WizardLM-13B-V1.2",
+      "kind": "fixed",
+      "performance": 0.44215,
+      "cost_per_query": 7.343669999999999e-05,
+      "total_cost": 0.0734367
+    },
+    {
+      "policy": "always:mistralai/mixtral-8x7b-chat",
+      "kind": "fixed",
+      "performance": 0.5839500000000001,
+      "cost_per_query": 0.00013467059999999997,
+      "total_cost": 0.13467059999999997
+    },
+    {
+      "policy": "always:meta/code-llama-instruct-34b-chat",
+      "kind": "fixed",
+      "performance": 0.18965,
+      "cost_per_query": 0.000172420992,
+      "total_cost": 0.172420992
+    },
+    {
+      "policy": "always:zero-one-ai/Yi-34B-Chat",
+      "kind": "fixed",
+      "performance": 0.7135,
+      "cost_per_query": 0.00018423280000000002,
+      "total_cost": 0.18423280000000003
+    },
+    {
+      "policy": "always:meta/llama-2-70b-chat",
+      "kind": "fixed",
+      "performance": 0.36715,
+      "cost_per_query": 0.00020092409999999998,
+      "total_cost": 0.2009241
+    },
+    {
+      "policy": "always:claude-instant-v1",
+      "kind": "fixed",
+      "performance": 0.6505,
+      "cost_per_query": 0.0002332592,
+      "total_cost": 0.2332592
+    },
+    {
+      "policy": "always:gpt-3.5-turbo-1106",
+      "kind": "fixed",
+      "performance": 0.67615,
+      "cost_per_query": 0.000243552,
+      "total_cost": 0.243552
+    },
+    {
+      "policy": "always:claude-v1",
+      "kind": "fixed",
+      "performance": 0.6821499999999999,
+      "cost_per_query": 0.002120312,
+      "total_cost": 2.120312
+    },
+    {
+      "policy": "always:claude-v2",
+      "kind": "fixed",
+      "performance": 0.69055,
+      "cost_per_query": 0.002350712,
+      "total_cost": 2.350712
+    },
+    {
+      "policy": "always:gpt-4-1106-preview",
+      "kind": "fixed",
+      "performance": 0.85265,
+      "cost_per_query": 0.0032265700000000002,
+      "total_cost": 3.22657
+    },
+    {
+      "policy": "random",
+      "kind": "baseline",
+      "performance": 0.5625,
+      "cost_per_query": 0.0007528606599999999,
+      "total_cost": 0.75286066,
+      "frontier_performance": 0.7395078227748719,
+      "frontier_gap": -0.17700782277487193
+    },
+    {
+      "policy": "rule-based:length",
+      "kind": "baseline",
+      "performance": 0.6862999999999999,
+      "cost_per_query": 0.001034219,
+      "total_cost": 1.034219,
+      "frontier_performance": 0.7523765517937986,
+      "frontier_gap": -0.06607655179379868
+    },
+    {
+      "policy": "oracle",
+      "kind": "upper-bound",
+      "performance": 0.8623999999999999,
+      "cost_per_query": 0.00011167804,
+      "total_cost": 0.11167804,
+      "frontier_performance": 0.535806614348339,
+      "frontier_gap": 0.32659338565166096
+    },
+    {
+      "policy": "ours:modernbert",
+      "kind": "ours",
+      "performance": 0.778,
+      "cost_per_query": 0.0013744328000000001,
+      "total_cost": 1.3744328000000001,
+      "frontier_performance": 0.7679372037392831,
+      "frontier_gap": 0.010062796260716933
+    },
+    {
+      "policy": "tier-oracle:perfect-label",
+      "kind": "upper-bound",
+      "performance": 0.77425,
+      "cost_per_query": 0.0011524532,
+      "total_cost": 1.1524532,
+      "frontier_performance": 0.7577843313555118,
+      "frontier_gap": 0.016465668644488174
+    }
+  ],
+  "non_adaptive_frontier": [
+    "always:mistralai/mistral-7b-chat",
+    "always:WizardLM/WizardLM-13B-V1.2",
+    "always:zero-one-ai/Yi-34B-Chat",
+    "always:gpt-4-1106-preview"
+  ],
+  "tier_ladder": {
+    "easy": "zero-one-ai/Yi-34B-Chat",
+    "medium": "zero-one-ai/Yi-34B-Chat",
+    "hard": "gpt-4-1106-preview"
+  },
+  "tier_ladder_source": "validation 1,000건에서 선택 (격차 +0.0283)",
+  "ladder_sweep": [
+    {
+      "easy": "zero-one-ai/Yi-34B-Chat",
+      "medium": "gpt-3.5-turbo-1106",
+      "hard": "gpt-4-1106-preview",
+      "performance": 0.78375,
+      "cost_per_query": 0.0013959556,
+      "frontier_performance": 0.7689216106025328,
+      "frontier_gap": 0.014828389397467112
+    },
+    {
+      "easy": "zero-one-ai/Yi-34B-Chat",
+      "medium": "zero-one-ai/Yi-34B-Chat",
+      "hard": "gpt-4-1106-preview",
+      "performance": 0.778,
+      "cost_per_query": 0.0013744328000000001,
+      "frontier_performance": 0.7679372037392831,
+      "frontier_gap": 0.010062796260716933
+    },
+    {
+      "easy": "zero-one-ai/Yi-34B-Chat",
+      "medium": "claude-instant-v1",
+      "hard": "gpt-4-1106-preview",
+      "performance": 0.7735,
+      "cost_per_query": 0.0013996552000000002,
+      "frontier_performance": 0.7690908223979906,
+      "frontier_gap": 0.004409177602009318
+    },
+    {
+      "easy": "mistralai/mistral-7b-chat",
+      "medium": "mistralai/mistral-7b-chat",
+      "hard": "WizardLM/WizardLM-13B-V1.2",
+      "performance": 0.34955,
+      "cost_per_query": 5.69328e-05,
+      "frontier_performance": 0.3460905256440665,
+      "frontier_gap": 0.003459474355933523
+    },
+    {
+      "easy": "zero-one-ai/Yi-34B-Chat",
+      "medium": "gpt-4-1106-preview",
+      "hard": "gpt-4-1106-preview",
+      "performance": 0.82025,
+      "cost_per_query": 0.0024773436,
+      "frontier_performance": 0.8183819860665018,
+      "frontier_gap": 0.0018680139334982249
+    },
+    {
+      "easy": "mistralai/mistral-7b-chat",
+      "medium": "mistralai/mistral-7b-chat",
+      "hard": "mistralai/mistral-7b-chat",
+      "performance": 0.28755000000000003,
+      "cost_per_query": 4.6875e-05,
+      "frontier_performance": 0.28755000000000003,
+      "frontier_gap": 0.0
+    },
+    {
+      "easy": "WizardLM/WizardLM-13B-V1.2",
+      "medium": "WizardLM/WizardLM-13B-V1.2",
+      "hard": "WizardLM/WizardLM-13B-V1.2",
+      "performance": 0.44215,
+      "cost_per_query": 7.343669999999999e-05,
+      "frontier_performance": 0.44215,
+      "frontier_gap": 0.0
+    },
+    {
+      "easy": "zero-one-ai/Yi-34B-Chat",
+      "medium": "zero-one-ai/Yi-34B-Chat",
+      "hard": "zero-one-ai/Yi-34B-Chat",
+      "performance": 0.7135,
+      "cost_per_query": 0.00018423280000000002,
+      "frontier_performance": 0.7135,
+      "frontier_gap": 0.0
+    }
+  ]
+}
