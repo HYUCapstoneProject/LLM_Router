@@ -95,6 +95,25 @@ export function AnalyticsPanel() {
                 sub={`${usd(data.cost.actual)} vs ${usd(data.cost.alwaysOpus)}`} />
             </div>
 
+            {data.cache.hits > 0 && (
+              <Section title="캐시" hint="exact = 글자까지 같은 질문">
+                <div className="grid grid-cols-3 gap-3 mb-3">
+                  <Stat label="시맨틱 히트" value={data.cache.semanticHits.toLocaleString()}
+                    sub={`히트율 ${pct(data.cache.semanticHitRate)}`} />
+                  <Stat label="exact 히트" value={data.cache.exactHits.toLocaleString()}
+                    sub="임베딩 호출도 생략" />
+                  <Stat label="전체" value={data.cache.hits.toLocaleString()}
+                    sub={`히트율 ${pct(data.cache.hitRate)}`} />
+                </div>
+                {/* 두 값을 합친 히트율을 시맨틱 캐시 성능으로 제시하면 과대평가가 된다.
+                    시연에서 나올 질문이라 화면에 미리 적어둔다. */}
+                <p className="text-xs text-gray-600 leading-relaxed">
+                  exact 히트는 질문이 글자까지 같아 임베딩 없이 답한 경우다. 시맨틱 캐시의
+                  성능은 이를 분자·분모에서 모두 제외한 {pct(data.cache.semanticHitRate)} 로 본다.
+                </p>
+              </Section>
+            )}
+
             <Section title="라우팅 분포" hint="LLM 을 실제 호출한 요청 기준 (캐시 히트 제외)">
               <div className="space-y-2">
                 {data.byTier.map((t) => {

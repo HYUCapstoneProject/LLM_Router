@@ -15,6 +15,9 @@ import lombok.Builder;
  *                        이 값은 재학습 배치로 나가므로 그 전제를 알고 있어야 한다.
  * @param cacheEntryId    이 요청이 히트했거나 새로 만든 캐시 행. 없으면 null.
  * @param parentRequestId 에스컬레이션이면 원본 chat 의 requestId, 아니면 null.
+ * @param cacheMatchType  {@code exact} 또는 {@code semantic}. 캐시 미스면 null.
+ *                        둘을 합친 히트율은 "같은 질문을 다시 쳤다"까지 포함하므로
+ *                        시맨틱 캐시 성능으로 제시하면 과대평가가 된다.
  * @param origin          {@code chat} 또는 {@code escalate}.
  *                        에스컬레이션도 과금되는 LLM 호출이라 정상 행으로 남기고 여기서 구분한다.
  *                        비용 집계는 전체 행, 라우터 정확도 집계는 {@code origin='chat'} 만 본다.
@@ -37,8 +40,14 @@ public record RequestLogEntry(
         long latencyMs,
         String fallbackReason,
         String parentRequestId,
-        String origin
+        String origin,
+        String cacheMatchType
 ) {
     public static final String ORIGIN_CHAT = "chat";
     public static final String ORIGIN_ESCALATE = "escalate";
+
+    /** 질문이 글자까지 같아서 임베딩 없이 히트한 경우 */
+    public static final String MATCH_EXACT = "exact";
+    /** 임베딩 유사도로 히트한 경우 */
+    public static final String MATCH_SEMANTIC = "semantic";
 }

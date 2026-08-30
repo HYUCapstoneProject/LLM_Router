@@ -39,6 +39,7 @@ class RequestLogServiceTest {
                 .outputTokens(20)
                 .latencyMs(30)
                 .origin(RequestLogEntry.ORIGIN_CHAT)
+                .cacheMatchType(RequestLogEntry.MATCH_SEMANTIC)
                 .build();
 
         service.record(entry);
@@ -49,6 +50,7 @@ class RequestLogServiceTest {
         assertThat(args.getValue()[16]).isEqualTo(RequestLogEntry.ORIGIN_CHAT);
         assertThat(args.getValue()[17]).isEqualTo("success");
         assertThat(args.getValue()[18]).isNull();
+        assertThat(args.getValue()[19]).isEqualTo(RequestLogEntry.MATCH_SEMANTIC);
     }
 
     @Test

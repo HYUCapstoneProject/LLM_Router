@@ -75,6 +75,12 @@ export interface AnalyticsSummary {
     hitRate: number
     /** 캐시 히트로 아예 건너뛴 LLM 호출 수 */
     llmCallsSkipped: number
+    /** 질문이 글자까지 같아 임베딩 호출도 건너뛴 히트 */
+    exactHits: number
+    /** 임베딩 유사도로 잡은 히트 */
+    semanticHits: number
+    /** exact 를 분자·분모에서 모두 뺀 히트율. 발표에는 이 값을 쓴다 */
+    semanticHitRate: number
   }
   byTier: Array<{
     tier: TierType

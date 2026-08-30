@@ -36,7 +36,18 @@ public record AnalyticsSummary(
             long hits,
             double hitRate,
             /** 캐시 히트로 아예 건너뛴 LLM 호출 수 */
-            long llmCallsSkipped
+            long llmCallsSkipped,
+            /** 질문이 글자까지 같아 임베딩 호출도 건너뛴 히트 */
+            long exactHits,
+            /** 임베딩 유사도로 잡은 히트 */
+            long semanticHits,
+            /**
+             * exact 를 제외한 히트율.
+             *
+             * 전체 히트율은 "같은 질문을 다시 쳤다"까지 포함하므로 시맨틱 캐시의
+             * 성능으로 제시하면 과대평가가 된다. 발표에는 이 값을 쓴다.
+             */
+            double semanticHitRate
     ) {}
 
     @Builder

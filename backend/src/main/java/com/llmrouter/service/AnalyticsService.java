@@ -33,6 +33,8 @@ public class AnalyticsService {
                 count(*) FILTER (WHERE origin = 'escalate')                    AS escalation,
                 count(*) FILTER (WHERE status = 'success')                     AS success,
                 count(*) FILTER (WHERE cache_hit)                              AS cache_hits,
+                count(*) FILTER (WHERE cache_match_type = 'exact')             AS exact_hits,
+                count(*) FILTER (WHERE cache_match_type = 'semantic')          AS semantic_hits,
                 count(*) FILTER (WHERE origin = 'chat' AND status = 'success') AS chat_success,
                 -- avg 는 numeric 을 돌려준다. 소수점이 붙은 numeric 에 getLong 을 쓰면
                 -- pgjdbc 가 "Bad value for type long" 을 던지므로 SQL 에서 정수로 만든다.
@@ -77,6 +79,8 @@ public class AnalyticsService {
                 rs.getLong("escalation"),
                 rs.getLong("success"),
                 rs.getLong("cache_hits"),
+                rs.getLong("exact_hits"),
+                rs.getLong("semantic_hits"),
                 rs.getLong("chat_success"),
                 rs.getLong("avg_ms"),
                 rs.getLong("hit_ms"),
@@ -129,6 +133,12 @@ public class AnalyticsService {
                         .hits(overall.cacheHits())
                         .hitRate(ratio(overall.cacheHits(), overall.chatSuccess()))
                         .llmCallsSkipped(overall.cacheHits())
+                        .exactHits(overall.exactHits())
+                        .semanticHits(overall.semanticHits())
+                        // 분모에서도 exact 를 뺀다. exact 히트였던 요청은 시맨틱 캐시가
+                        // 판단할 기회조차 없었으므로 그 분모에 넣으면 안 된다.
+                        .semanticHitRate(ratio(overall.semanticHits(),
+                                overall.chatSuccess() - overall.exactHits()))
                         .build())
                 .byTier(byTier)
                 .cost(AnalyticsSummary.Cost.builder()
@@ -167,7 +177,7 @@ public class AnalyticsService {
     }
 
     private record Row(long total, long chat, long escalation, long success,
-                       long cacheHits, long chatSuccess,
+                       long cacheHits, long exactHits, long semanticHits, long chatSuccess,
                        long avgMs, long hitMs, long missMs) {}
 
     private record TierRow(String tier, String modelId, long count, long inputTokens, long outputTokens) {}

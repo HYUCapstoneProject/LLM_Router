@@ -9,6 +9,16 @@ CREATE EXTENSION IF NOT EXISTS vector;
 CREATE TABLE cache_entry (
     id                  BIGSERIAL PRIMARY KEY,
     question            TEXT         NOT NULL,
+
+    -- 정규화한 질문의 SHA-256(hex). exact match 계층이 쓴다.
+    -- 완전히 동일한 질문이면 임베딩 호출 없이 여기서 끝난다 —
+    -- FastAPI가 us-west1, 게이트웨이가 asia-northeast3라 embed 왕복이 약 120ms다.
+    --
+    -- 정규화와 해시는 Java(QuestionHash)에서만 계산한다. SQL에서도 정규화하면
+    -- 두 구현이 어긋났을 때 인덱스 조회가 조용히 빗나간다.
+    -- NULL 허용: 05 마이그레이션 이전 행은 해시가 없고 시맨틱 경로로만 히트한다.
+    question_hash       CHAR(64),
+
     embedding           vector(1024) NOT NULL,
     response            TEXT         NOT NULL,
 
@@ -43,6 +53,10 @@ CREATE TABLE cache_entry (
 -- 그 경우 `유사도 = 1 - (a <=> b)` 가 그대로 성립한다.
 CREATE INDEX idx_cache_entry_embedding
     ON cache_entry USING hnsw (embedding vector_cosine_ops);
+
+-- exact match 조회용. 벡터 인덱스보다 먼저 타는 경로다.
+CREATE INDEX idx_cache_entry_question_hash
+    ON cache_entry (question_hash);
 
 -- 조회 쿼리 형태 (Gateway 가 이 모양으로 질의한다):
 --
@@ -80,6 +94,11 @@ CREATE TABLE request_log (
 
     cache_hit            BOOLEAN      NOT NULL,
     similarity           REAL,                     -- 캐시 조회 시 최고 유사도 (임계값 튜닝용)
+
+    -- exact | semantic | NULL(미스)
+    -- 둘을 합친 히트율은 "같은 질문을 다시 쳤다"까지 포함하므로
+    -- 시맨틱 캐시 성능으로 제시하면 과대평가가 된다. 분석에서 나눠 본다.
+    cache_match_type     VARCHAR(10),
 
     -- 이 요청이 히트했거나 새로 만든 캐시 행.
     -- /api/escalate 가 "불만족한 답이 어느 캐시 행에서 나왔는지" 를 알아야
