@@ -9,6 +9,7 @@ import com.llmrouter.dto.ChatRequest;
 import com.llmrouter.dto.ChatResponse;
 import com.llmrouter.dto.LlmResult;
 import com.llmrouter.dto.RequestLogEntry;
+import com.llmrouter.dto.RerankShadow;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,11 +32,13 @@ class ChatServiceTest {
     @Mock RouterService routerService;
     @Mock LlmService llmService;
     @Mock RequestLogService requestLogService;
+    @Mock RerankShadowService rerankShadowService;
     ChatService service;
 
     @BeforeEach
     void setUp() {
-        service = new ChatService(routerClient, routerService, cacheService, llmService, requestLogService);
+        service = new ChatService(routerClient, routerService, cacheService, llmService,
+                requestLogService, rerankShadowService);
         MDC.put("requestId", "00000000-0000-0000-0000-000000000001");
         // exact match 는 이제 모든 요청의 첫 단계다. 기본값은 미스로 두고
         // exact 를 검증하는 테스트에서만 따로 덮어쓴다.
@@ -46,8 +49,10 @@ class ChatServiceTest {
     void cacheHitSkipsClassifierAndLlmAndRecordsSimilarity() {
         float[] embedding = {0.1f, 0.2f};
         when(routerClient.embed("hello")).thenReturn(new RouterEmbedding(embedding, "embed-v1"));
-        when(cacheService.get(embedding)).thenReturn(Optional.of(
-                new CachedResponse(7L, "cached", "easy", "model-e", 0.97)));
+        CachedResponse hit = new CachedResponse(7L, "hello", "cached", "easy", "model-e", 0.97);
+        when(cacheService.get(embedding)).thenReturn(Optional.of(hit));
+        when(rerankShadowService.evaluate("hello", hit))
+                .thenReturn(new RerankShadow(0.91, "rerank-v1", false));
 
         ChatResponse response = service.chat(request("hello"));
 
@@ -64,6 +69,9 @@ class ChatServiceTest {
                         && entry.cacheEntryId().equals(7L)
                         && entry.similarity().equals(0.97)
                         && entry.cacheMatchType().equals(RequestLogEntry.MATCH_SEMANTIC)
+                        && entry.rerankScore().equals(0.91)
+                        && entry.rerankModelVersion().equals("rerank-v1")
+                        && !entry.rerankWouldReject()
                         && entry.embedModelVersion().equals("embed-v1")
                         && entry.origin().equals(RequestLogEntry.ORIGIN_CHAT)));
     }
@@ -75,7 +83,7 @@ class ChatServiceTest {
     @Test
     void exactMatchSkipsEmbeddingEntirely() {
         when(cacheService.getExact("hello")).thenReturn(Optional.of(
-                new CachedResponse(3L, "cached", "easy", "model-e", 1.0)));
+                new CachedResponse(3L, "hello", "cached", "easy", "model-e", 1.0)));
 
         ChatResponse response = service.chat(request("hello"));
 

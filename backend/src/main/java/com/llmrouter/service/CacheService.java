@@ -40,6 +40,7 @@ public class CacheService {
     private static final String SELECT_SQL = """
             SELECT * FROM (
                 SELECT id,
+                       question,
                        response,
                        tier,
                        model_id,
@@ -63,7 +64,7 @@ public class CacheService {
      * 같은 해시 행이 여럿일 수 있다(에스컬레이션 전후 등). 가장 최근에 갱신된 답을 쓴다.
      */
     private static final String SELECT_EXACT_SQL = """
-            SELECT id, response, tier, model_id
+            SELECT id, question, response, tier, model_id
             FROM cache_entry
             WHERE question_hash = ?
             ORDER BY updated_at DESC
@@ -104,6 +105,7 @@ public class CacheService {
         Optional<CachedResponse> found = jdbc.query(SELECT_EXACT_SQL,
                 (rs, rowNum) -> new CachedResponse(
                         rs.getLong("id"),
+                        rs.getString("question"),
                         rs.getString("response"),
                         rs.getString("tier"),
                         rs.getString("model_id"),
@@ -138,6 +140,7 @@ public class CacheService {
         return jdbc.query(SELECT_SQL,
                 (rs, rowNum) -> new CachedResponse(
                         rs.getLong("id"),
+                        rs.getString("question"),
                         rs.getString("response"),
                         rs.getString("tier"),
                         rs.getString("model_id"),

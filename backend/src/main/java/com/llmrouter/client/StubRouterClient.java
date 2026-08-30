@@ -56,6 +56,27 @@ public class StubRouterClient implements RouterClient {
         return new RouterClassification(RouterService.Tier.MEDIUM, 1.0, routerModelVersion());
     }
 
+    /**
+     * 후보와 질문이 공유하는 단어 비율. 결정적이고 모델이 필요 없다.
+     *
+     * ⚠️ 실제 cross-encoder 점수와 아무 관계가 없다. 이 값으로 임계값을 정하면 안 된다.
+     * 여기서 검증되는 건 호출·기록 경로뿐이다.
+     */
+    @Override
+    public RouterRerank rerank(String query, java.util.List<String> candidates) {
+        java.util.Set<String> queryWords =
+                new java.util.HashSet<>(java.util.Arrays.asList(query.toLowerCase().split("[^a-zA-Z0-9_]+")));
+        double[] scores = new double[candidates.size()];
+        for (int i = 0; i < candidates.size(); i++) {
+            java.util.Set<String> shared =
+                    new java.util.HashSet<>(java.util.Arrays.asList(
+                            candidates.get(i).toLowerCase().split("[^a-zA-Z0-9_]+")));
+            shared.retainAll(queryWords);
+            scores[i] = queryWords.isEmpty() ? 0.0 : (double) shared.size() / queryWords.size();
+        }
+        return new RouterRerank(scores, "stub-rerank-v0");
+    }
+
     @Override
     public String embedModelVersion() {
         return "stub-hash-v0";

@@ -23,8 +23,9 @@ public class RequestLogService {
                  router_model_version, router_confidence, embed_model_version,
                  cache_hit, similarity, cache_entry_id,
                  input_tokens, output_tokens, latency_ms, fallback_reason,
-                 parent_request_id, origin, status, error_type, cache_match_type)
-            VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::uuid, ?, ?, ?, ?)
+                 parent_request_id, origin, status, error_type, cache_match_type,
+                 rerank_score, rerank_model_version, rerank_would_reject)
+            VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::uuid, ?, ?, ?, ?, ?, ?, ?)
             """;
 
     private static final String INSERT_FAILURE_SQL = """
@@ -56,7 +57,10 @@ public class RequestLogService {
                     entry.origin(),
                     "success",
                     null,
-                    entry.cacheMatchType());
+                    entry.cacheMatchType(),
+                    entry.rerankScore(),
+                    entry.rerankModelVersion(),
+                    entry.rerankWouldReject());
         } catch (Exception error) {
             // 관측 로그 적재 실패가 사용자 응답을 막으면 안 된다.
             log.error("request_log 적재 실패 requestId={} origin={}",
