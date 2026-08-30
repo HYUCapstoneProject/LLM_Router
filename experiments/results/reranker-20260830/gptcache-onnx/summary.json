@@ -1,0 +1,88 @@
+[
+  {
+    "generated_at": "2026-08-30T07:15:20.451581+00:00",
+    "dataset": {
+      "pairs": 58,
+      "positive": 21,
+      "negative": 37
+    },
+    "runtime": {
+      "model": "GPTCache/albert-duplicate-onnx",
+      "revision": "4298cbbdba96523eb34a4c5bbcf5e935848793bc",
+      "device": "cpu",
+      "batch_size": 1,
+      "backend": "gptcache-onnx",
+      "load_seconds": 2.4398875000188127,
+      "inference_seconds": 1.7613486999762245,
+      "latency_ms": {
+        "mean_per_pair": 30.36263793132846,
+        "p50_per_pair": 26.725600007921457,
+        "p95_per_pair": 48.10169996926561
+      },
+      "rss_mb": {
+        "before_load": 375.3984375,
+        "after_load": 471.65234375,
+        "after_inference": 478.2109375
+      }
+    },
+    "score_distribution": {
+      "positive": {
+        "min": 0.0006009655771777034,
+        "mean": 0.4655487665496323,
+        "max": 0.9703318476676941
+      },
+      "negative": {
+        "min": 0.0003413513768464327,
+        "mean": 0.13281589495553006,
+        "max": 0.963336169719696
+      }
+    },
+    "selected_threshold": null,
+    "best_zero_false_hit_threshold": {
+      "threshold": 0.9698362350463867,
+      "tp": 2,
+      "fp": 0,
+      "tn": 37,
+      "fn": 19,
+      "precision": 1.0,
+      "recall": 0.09523809523809523,
+      "false_hit_rate": 0.0,
+      "f1": 0.17391304347826084
+    },
+    "best_at_recall_gate": {
+      "threshold": 0.004276788793504238,
+      "tp": 20,
+      "fp": 17,
+      "tn": 20,
+      "fn": 1,
+      "precision": 0.5405405405405406,
+      "recall": 0.9523809523809523,
+      "false_hit_rate": 0.4594594594594595,
+      "f1": 0.6896551724137931
+    },
+    "best_f1_threshold": {
+      "threshold": 0.004276788793504238,
+      "tp": 20,
+      "fp": 17,
+      "tn": 20,
+      "fn": 1,
+      "precision": 0.5405405405405406,
+      "recall": 0.9523809523809523,
+      "false_hit_rate": 0.4594594594594595,
+      "f1": 0.6896551724137931
+    },
+    "selected_joint_thresholds": null,
+    "best_joint_at_recall_gate": {
+      "similarity_threshold": 0.8738,
+      "reranker_threshold": 0.0023219934664666653,
+      "tp": 19,
+      "fp": 7,
+      "tn": 30,
+      "fn": 2,
+      "precision": 0.7307692307692307,
+      "recall": 0.9047619047619048,
+      "false_hit_rate": 0.1891891891891892,
+      "f1": 0.8085106382978723
+    }
+  }
+]

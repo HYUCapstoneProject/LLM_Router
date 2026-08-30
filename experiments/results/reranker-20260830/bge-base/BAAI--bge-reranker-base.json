@@ -1,0 +1,61 @@
+{
+  "generated_at": "2026-08-30T06:57:15.883855+00:00",
+  "dataset": {
+    "pairs": 58,
+    "positive": 21,
+    "negative": 37
+  },
+  "runtime": {
+    "model": "BAAI/bge-reranker-base",
+    "revision": "2cfc18c9415c912f9d8155881c133215df768a70",
+    "device": "cpu",
+    "batch_size": 8,
+    "load_seconds": 126.2426214000443,
+    "inference_seconds": 3.0934217000030912,
+    "latency_ms": {
+      "mean_per_pair": 53.331296551763884,
+      "p50_per_pair": 54.13661250349833,
+      "p95_per_pair": 64.53239999973448
+    },
+    "rss_mb": {
+      "before_load": 374.25390625,
+      "after_load": 730.59375,
+      "after_inference": 1089.10546875
+    }
+  },
+  "score_distribution": {
+    "positive": {
+      "min": 0.5418404936790466,
+      "mean": 0.960955160004752,
+      "max": 0.9999198913574219
+    },
+    "negative": {
+      "min": 3.730416938196868e-05,
+      "mean": 0.40495695721325026,
+      "max": 0.9998921155929565
+    }
+  },
+  "selected_threshold": null,
+  "best_zero_false_hit_threshold": {
+    "threshold": 0.9999198913574219,
+    "tp": 1,
+    "fp": 0,
+    "tn": 37,
+    "fn": 20,
+    "precision": 1.0,
+    "recall": 0.047619047619047616,
+    "false_hit_rate": 0.0,
+    "f1": 0.0909090909090909
+  },
+  "best_f1_threshold": {
+    "threshold": 0.989747166633606,
+    "tp": 17,
+    "fp": 1,
+    "tn": 36,
+    "fn": 4,
+    "precision": 0.9444444444444444,
+    "recall": 0.8095238095238095,
+    "false_hit_rate": 0.02702702702702703,
+    "f1": 0.8717948717948718
+  }
+}

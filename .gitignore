@@ -34,6 +34,10 @@ backend/.env
 # Local Codex Gradle cache
 .gradle-codex/
 
+# Local Python/model caches for reranker evaluation
+.venv-reranker/
+.hf-cache/
+
 # Gradle wrapper (선택: 팀 공유 시 아래 두 줄 주석 처리)
 !backend/gradle/
 !backend/gradlew

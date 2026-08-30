@@ -1,6 +1,6 @@
 # LLM Router 작업 계획
 
-> 기준일: 2026-08-16
+> 기준일: 2026-08-30
 >
 > 범위: React 프론트엔드, Spring Boot 게이트웨이, PostgreSQL/pgvector 캐시, 배포 및 발표용 분석 기능
 >
@@ -10,7 +10,8 @@
 
 ### 소스 코드
 
-현재 로컬 `main`에 통합할 범위는 다음과 같다.
+현재 저장소 기준선은 `main`의 `e299772`와 시연 문서 브랜치
+`docs/demo-questions`의 `9325cba`다. 통합된 기능 범위는 다음과 같다.
 
 - React 채팅 UI와 모델·티어·토큰·지연시간·캐시 히트 표시
 - Spring Boot `POST /api/chat`과 Anthropic Claude 호출
@@ -33,8 +34,9 @@
 | 에스컬레이션 경로 | 정상 | Cloud Run → nginx → GCE `/api/escalate` |
 | FastAPI Router | 모델 로드·계약 호출 정상 | GCE `llm-router-serving`, `10.138.0.2:8000` |
 
-운영 Spring 서버는 현재 커밋 `ff8b690` 기준이며
-`infra/postgres/migrations/04-router-confidence.sql`까지 적용됐다.
+마지막 문서화 기준으로 `infra/postgres/migrations/04-router-confidence.sql`까지 적용됐다.
+실제 운영 image revision과 health는 이번 문서 갱신에서 다시 확인하지 않았으므로 다음
+배포 전에 GCE·Cloud Run·DB에서 확인한다.
 
 ## 2. 완료된 기능
 
@@ -74,7 +76,7 @@
 | 항목 | 현재 상태 | 영향 |
 |---|---|---|
 | FastAPI 계약 회귀 | Mock HTTP 계약 테스트와 실서버 smoke test 완료, 공통 fixture 미구현 | 양쪽 DTO가 따로 바뀌면 drift 가능 |
-| 분석 화면 | 미구현 | 캐시·라우팅 절감 효과를 발표 화면에서 설명하기 어려움 |
+| 분석 화면 | 누적 summary API와 React 대시보드 구현 | 실 DB 최신 smoke test와 발표 데이터 적재 필요 |
 | 실험 실행·저장 | 미구현 | Always Opus 대비 재현 가능한 비교 결과가 없음 |
 | 재학습 전달 | 설계 단계 | 에스컬레이션 1,000건 단위 배치 export·trigger 미구현 |
 | 대화 유지 | React 메모리 상태 | 새로고침 시 대화가 사라짐 |
@@ -119,6 +121,26 @@
 - [ ] 동일 fixture 기반 Spring↔FastAPI contract test
 - [x] bge-large와 ModernBERT artifact를 GCE에 배포
 - [x] 운영 DB에 `04-router-confidence.sql` 적용 후 Spring 백엔드 재배포
+
+### P1 — cross-encoder reranker 도입
+
+- [x] BGE 단독 임계값에서 paraphrase와 hard negative 분포 중첩 확인
+- [x] cross-encoder 재검증 계층 채택 결정
+- [x] screening 평가셋 58쌍 구성 (positive 21, negative 37)
+- [x] 후보 모델 4개를 동일 CPU 환경에서 평가 (GPTCache 공식 ONNX 포함)
+- [x] 1차 후보 선정: Quora DistilRoBERTa + BGE joint threshold
+- [ ] 운영 모델·임계값 확정 (현재 후보는 false hit 0 기준 미통과)
+- [ ] 독립 검증셋 확장 및 group 단위 데이터 분리
+- [ ] `POST /router/rerank` 계약 확정과 Spring contract test
+- [ ] pgvector top-5 후보 반환 및 reranker 연동
+- [ ] timeout·오류 시 cache miss로 처리하는 fail-closed 폴백
+- [ ] model version·score·latency·decision reason 로그 적재
+- [ ] shadow mode 검증 후 feature flag로 운영 활성화
+
+결정 기준과 1차 평가 계약은 `experiments/RERANKER_REQUEST.md`를 따른다. 2026-08-30
+screening 결과는 `experiments/results/reranker-20260830/REPORT.md`에 있다. 현재 최선
+후보와 임계값은 shadow mode용이며 독립 검증 전까지 운영 확정값으로 표현하지 않는다.
+GPTCache 구현 비교는 `experiments/GPTCACHE_COMPARISON.md`에 정리했다.
 
 ### P1 — 발표용 고정 실험 (A: 우리 시스템 ablation)
 
@@ -290,7 +312,8 @@ python experiments/probe_router.py --questions experiments/questions-demo-en2.js
    완화안: 클래스 가중 손실, 개방형 질문 데이터 보강, 결정 임계값 재조정.
 2. **캐시 임계값이 아직 안전하지 않다.** 92문항 실측에서 paraphrase 최소 0.8621 <
    hard_negative 최대 0.9371 로 두 분포가 겹친다. 현재 0.80 은 오탐을 낸다.
-   → cross-encoder 리랭커 도입을 팀원에게 요청해 둔 상태 (`experiments/RERANKER_REQUEST.md`)
+   → cross-encoder 재검증 계층은 채택했고 모델·임계값을 screening 평가 중이다
+   (`experiments/RERANKER_REQUEST.md`).
 3. **지연 숫자에 배포 아티팩트가 섞여 있다.** 라우터가 us-west1, 게이트웨이가
    asia-northeast3 라 왕복 120ms 가 매 요청에 붙는다. 같은 리전으로 옮기면 사라진다.
 
