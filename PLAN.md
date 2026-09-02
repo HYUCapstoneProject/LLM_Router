@@ -135,13 +135,18 @@
 - [x] screening 평가셋 58쌍 구성 (positive 21, negative 37)
 - [x] 후보 모델 4개를 동일 CPU 환경에서 평가 (GPTCache 공식 ONNX 포함)
 - [x] 1차 후보 선정: Quora DistilRoBERTa + BGE joint threshold
-- [ ] 운영 모델·임계값 확정 (현재 후보는 false hit 0 기준 미통과)
-- [ ] 독립 검증셋 확장 및 group 단위 데이터 분리
+- [x] **운영 적용 확정** — 오프라인 스크리닝은 사전 기준(오탐 0 + recall 90%)을
+      통과하지 못했으나, 배포된 스택에서 73문항으로 직접 검증해 근거를 만들었다.
+      오탐 19→1, 정탐 21→19. `experiments/results/rerank-endtoend/REPORT.md`
+- [ ] 독립 검증셋 확장 및 group 단위 데이터 분리 — 현재 검증셋은 약점을 노려 만든
+      것이라 오탐률 절대값을 인용할 수 없다
 - [x] `POST /router/rerank` 계약 확정 — FastAPI 구현·배포 완료 (`rerankModel: loaded`)
 - [x] 서빙 점수가 스크리닝과 동일함을 검증 — 58쌍 재현, 최대 차이 2.14e-06,
       임계값 기준 **판정 뒤집힘 0건**. `scripts/verify_reranker_parity.py`
-- [x] shadow mode 연동 — 점수·모델버전·would_reject 를 `request_log` 에 적재,
-      `RERANK_SHADOW_ENABLED` 로 분리(기본 꺼짐), exact 히트는 건너뜀
+- [x] shadow mode 연동 — 점수·모델버전·would_reject 를 `request_log` 에 적재
+- [x] **`mode: off|shadow|enforce` 로 확장하고 `enforce` 로 배포**(`badc528`).
+      리랭커가 캐시 판정을 실제로 한다. 모드 오타는 조용히 off 로 떨어지지 않고
+      기동에 실패한다. exact 히트는 문자열이 같아 재검증하지 않는다
 - [x] **pgvector top-k 후보 반환** — 임계값을 통과한 후보를 전부 넘긴다.
       `rerank_candidate_count`, `rerank_would_reorder` 로 재정렬 여부를 관측한다.
       단 실측에서는 후보가 항상 1건이었다 — 캐시 항목끼리 최대 0.66 밖에 안 되기
@@ -149,13 +154,16 @@
       훨씬 조밀해지기 전에는 일어나지 않는다.** 리랭커의 실질 가치는 오탐 거부다
 - [ ] rerank 호출 지연을 `request_log` 에 적재 (현재 점수만 남긴다)
 - [ ] Spring↔FastAPI 동일 fixture contract test
-- [ ] timeout·오류 시 cache miss 로 처리하는 fail-closed 폴백
-      (shadow 는 의도적으로 예외를 삼킨다. 판정에 쓰기 시작하면 반드시 바꿔야 한다)
-- [ ] 독립 검증셋 확장 후 운영 임계값 확정, feature flag 로 활성화
+- [x] **fail-closed 폴백** — enforce 에서 리랭커 장애 시 캐시 미스로 떨어뜨린다.
+      검증할 수 없는 캐시 답을 내보내는 것보다 Claude 를 한 번 더 부르는 편이 싸다.
+      shadow 는 반대로 예외를 삼킨다(관측이 서비스를 막으면 안 된다)
+- [ ] 리랭커가 못 막는 유형 보강 — `inverted`(insertion↔deletion) 1건이 점수 0.113 으로
+      통과했다. 임계값(0.0358)의 3배라 값 조정으로는 못 막는다
 
 결정 기준과 1차 평가 계약은 `experiments/RERANKER_REQUEST.md`를 따른다. 2026-08-30
-screening 결과는 `experiments/results/reranker-20260830/REPORT.md`에 있다. 현재 최선
-후보와 임계값은 shadow mode용이며 독립 검증 전까지 운영 확정값으로 표현하지 않는다.
+screening 결과는 `experiments/results/reranker-20260830/REPORT.md`에 있다. 실적용 검증은
+`experiments/results/rerank-endtoend/REPORT.md` 에 있다. 임계값은 현재 검증셋 기준이며
+독립 검증셋으로 다시 확인해야 한다.
 GPTCache 구현 비교는 `experiments/GPTCACHE_COMPARISON.md`에 정리했다.
 
 ### P1 — 발표용 고정 실험 (A: 우리 시스템 ablation)
@@ -198,7 +206,8 @@ Notion `06 Decision Log` 2026-08-03 및 `05 Experiment Log` EXP-004 에 있다.
       유지됐고 신뢰구간이 0 을 넘지 않는다
 - [ ] validation 도 전량으로 — 사다리 선택은 아직 1,000건 표본에서 한다
 
-결과와 방법론은 `experiments/results/pareto/REPORT.md` 에 있다.
+결과와 방법론은 `experiments/results/pareto/REPORT.md` 에 있고,
+전체 측정 목록과 "인용 시 주의"는 `experiments/results/README.md` 에 있다.
 
 **실제 Claude 호출이 필요 없다.** RouterBench 에 11개 모델의 정오답과 비용이 이미
 들어 있으므로, 라우팅 정책 함수만 교체해 오프라인으로 전부 계산한다.
@@ -373,12 +382,20 @@ python experiments/probe_router.py --questions experiments/questions-demo-en2.js
 
 방어하려 하지 말고 측정한 결과를 그대로 내는 편이 유리하다.
 
-1. **라우터가 easy 로 붕괴한다.** 영어 35문항에서 easy 29 / medium 2 / hard 4 로
-   분류됐다. medium 후보 18개 중 17개가 easy 로 갔고, `Explain the CAP theorem …`
-   같은 질문에 confidence 0.88 로 easy 를 확신했다. 원인은 학습 데이터
-   (RouterBench)가 객관식 상식 문제에 치우친 것으로 본다 —
+1. **라우터가 학습 분포를 벗어나면 무너진다.** 두 데이터에서 다르게 행동한다.
+
+   | 평가셋 | n | 일치율 | 예측 분포 |
+   |---|---:|---:|---|
+   | RouterBench held-out (학습 도메인) | 3,218 | 47.5% | 균형 (easy 1157 / medium 801 / hard 1260) |
+   | 개방형 영어 질문 (도메인 밖) | 35 | 31.4% | **easy 29 / medium 2 / hard 4** |
+
+   개방형 질문에서만 easy 로 쏠린다. `Explain the CAP theorem …` 같은 질문에
+   confidence 0.88 로 easy 를 확신했다. RouterBench 36,497건 중 hellaswag 10,042 +
+   grade-school-math 7,450 으로 절반이 객관식이라, 서술형이 학습 분포 밖이다.
    **기획서 3-3 이 예측한 클래스 불균형 위험이 실제로 나타났다.**
-   완화안: 클래스 가중 손실, 개방형 질문 데이터 보강, 결정 임계값 재조정.
+   완화안: 개방형 질문 데이터 보강, 클래스 가중 손실, 결정 임계값 재조정.
+
+   상세: `experiments/results/router-classification/REPORT.md`
 2. **캐시 임계값이 아직 안전하지 않다.** 92문항 실측에서 paraphrase 최소 0.8621 <
    hard_negative 최대 0.9371 로 두 분포가 겹친다. 현재 0.80 은 오탐을 낸다.
    → cross-encoder 재검증 계층은 채택했고 모델·임계값을 screening 평가 중이다
