@@ -1,8 +1,12 @@
 # RouterBench Data Labeling Specification and Checklist
 
-기준일: 2026-08-08
+기준일: 2026-08-14
 상위 문서: `docs/mvp-scope-and-checklist.md`
 작업 브랜치: `feat/data-labeling-training`
+
+> 현행 운영 계약은 14장의 `minimum-sufficient-tier-v2`와
+> `routerbench-training-preprocess-v2-balanced`다. 11~13장은 비교와 재현을 위해
+> 보존한 v1 실행 기록이며 새 학습 입력으로 사용하지 않는다.
 
 ## 1. 목표와 완료 정의
 
@@ -110,15 +114,18 @@ if low_success_rate >= 0.67:
 elif medium_success_rate >= 0.67:
     label = "medium"
     reason = "medium_tier_consensus"
-elif high_success_rate >= 0.50:
+elif high_success_rate >= (1 / 3):
     label = "hard"
     reason = "strong_only"
 else:
-    label = "hard"
-    reason = "unsolved"
+    label = "unresolved"
+    reason = "unresolved"
 ```
 
-low와 medium의 합의 임계값을 높게 두어 under-routing을 보수적으로 제한한다. `strong_only`와 `unsolved`는 운영 라벨은 같지만 분석 필드는 분리한다.
+low와 medium의 합의 임계값을 높게 두어 under-routing을 보수적으로 제한한다.
+`unresolved`는 현재 high tier조차 해결 근거가 없는 질문이므로 라벨 산출물에는 남기되
+3-class ModernBERT 학습과 split 대상에서는 제외한다. GSM8K partial-credit 점수는
+continuous score로 해석해 `0.70` 이상일 때 성공으로 센다.
 
 ### 신뢰도
 
@@ -202,9 +209,8 @@ validation/test에는 oversampling이나 class balancing을 적용하지 않는�
 | `medium` | 0.5 | 포함하되 가중치 축소 |
 | `low` | 0.0 | 학습 projection에서 제외, metadata에는 보존 |
 
-`hard/strong_only`와 `hard/unsolved`는 모두 hard로 유지하지만 metadata와 평가에서는
-분리한다. `unsolved`의 추가 감쇠 또는 제외는 전체 분포와 실제 Claude 검증 후 별도
-실험 설정으로 결정한다. RAG 포함 여부도 `include_retrieval` 설정으로 고정한다.
+`hard/strong_only`만 3-class hard에 포함한다. `unresolved`는 metadata에 보존하되
+학습 projection에서는 제외한다. RAG 포함 여부는 `include_retrieval` 설정으로 고정한다.
 
 ### 7-4. 학습 projection과 분석 metadata 분리
 
@@ -233,7 +239,7 @@ cost는 training projection에 존재해서는 안 된다.
 
 ### 7-5. 코드와 Kubeflow의 책임 경계
 
-Python 패키지는 로컬과 GKE에서 동일하게 실행할 수 있는 데이터 의미론을 담당한다.
+Python 패키지는 로컬과 Vertex AI Pipelines에서 동일하게 실행할 수 있는 데이터 의미론을 담당한다.
 
 - 텍스트 정제와 검증
 - 중복 cluster와 group-aware split 산정
@@ -244,8 +250,8 @@ Kubeflow Pipeline은 이 로직을 다시 구현하지 않고 독립 컴포넌�
 
 - 원본 및 설정 Artifact 전달, ML Metadata 계보 기록
 - 입력 checksum과 parameter 기반 step caching
-- 라벨링 CPU component와 전처리 CPU component 분리
-- ModernBERT tokenizer/train GPU component 분리
+- RouterBench v2 라벨링·전처리 CPU component와 학습 단계 분리
+- ModernBERT 학습은 Google Cloud Pipeline Components의 Vertex AI CustomJob wrapper로 분리
 - retry, resource request, GCS output 경로와 버전 관리
 - threshold/split 정책 비교 시 parameterized run 또는 병렬 실험 구성
 
@@ -283,16 +289,16 @@ ml/artifacts/routerbench-training/
 이 문서는 라벨 판정식과 전처리 근거만 관리한다. 완료 상태와 남은 작업은
 `docs/ml/workstream-checklist.md`의 단일 체크리스트에서 관리한다.
 
-## 10. 미확정 사항
+## 10. 후속 실험 사항
 
-- continuous performance의 최종 acceptance threshold
 - RAG를 초기 3-class 학습에 포함할지 여부
 - capability tier의 모델 수를 균등 분할할지 Pareto frontier로 보정할지 여부
-- `medium_confidence` 행의 최종 sample weight
+- v2의 `0.70`, `0.67`, `1/3` 임계값과 confidence weight에 대한 sensitivity 비교
 
-이 값들은 smoke test만으로 확정하지 않고 전체 분포와 Claude 검증 결과를 근거로 버전업한다.
+현행 v2 값은 재현 가능한 baseline으로 고정한다. 위 항목을 바꾸는 실험은 기존 artifact를
+덮어쓰지 않고 label/preprocessing version을 올린다.
 
-## 11. 100행 labeling smoke 결과
+## 11. v1 100행 labeling smoke 결과 (역사 기록)
 
 실행 설정:
 
@@ -348,7 +354,7 @@ sampling: eval별 최소 1행 + 가능한 도메인별 최소 10행 + seeded fil
 
 Smoke 결과는 파이프라인 실행 가능성을 확인했지만 threshold와 tier 경계를 확정하지는 않는다. 특히 GPT-3.5와 Mixtral이 medium/high 경계에 있으므로 전체 데이터 sensitivity 분석에서 경계 안정성을 확인해야 한다.
 
-## 12. 100행 preprocessing smoke 결과
+## 12. v1 100행 preprocessing smoke 결과 (역사 기록)
 
 `routerbench-training-preprocess-v1`, seed `42`, split `80/10/10`으로 labeling smoke
 산출물 100행을 전처리했다.
@@ -376,7 +382,7 @@ extractor가 첫 list item의 마지막 demonstration을 target으로 오인한 
 것을 확인했다. `metadata.parquet`은 원문, label 근거, tier 성공률, 텍스트 길이와 버전을
 보존한다.
 
-## 13. 전체 데이터 labeling 및 preprocessing 결과
+## 13. v1 전체 데이터 labeling 및 preprocessing 결과 (역사 기록)
 
 2026-08-08에 smoke와 같은 `minimum-sufficient-tier-v1` 규칙으로 MVP 핵심 범위
 34,778행 전체를 실행했다. `label`은 범위 전체를 `sample_id` 순으로 결정적으로
@@ -411,3 +417,72 @@ split은 학습 포함 행 기준 정확히 80/10/10이며, 각 duplicate group�
 속한다. RouterArena full도 이 전체 `training.parquet`을 기준으로 다시 전처리했고,
 정규화 텍스트가 정확히 겹치는 22행을 평가에서 제외했다. 따라서 RouterArena full
 평가 가능 행은 8,375행이다.
+
+## 14. v2 라벨 및 균형 train 계약
+
+`minimum-sufficient-tier-v2`는 v1 산출물을 덮어쓰지 않는 별도 버전이다.
+
+- GSM8K/grade-school-math의 `0.00/0.25/0.50/0.75/1.00` 점수는 continuous score로
+  해석하고 `0.70` 이상을 성공으로 본다.
+- low tier 성공률 `>= 0.67`은 easy, 그렇지 않고 medium tier 성공률 `>= 0.67`은
+  medium, 그렇지 않고 high tier 성공률 `>= 1/3`은 hard다.
+- high tier도 한 모델도 성공하지 못한 질문은 `unresolved`로 기록하고 3-class
+  학습에서 제외한다.
+- confidence weight가 0인 행도 split 전에 제외한다.
+- eligible 전체에 duplicate-group 단위 `80/10/10` 자연분포 split을 먼저 만들고,
+  validation/test는 줄이거나 균형화하지 않는다.
+- train만 easy/medium/hard 각 6,256행으로 선택한다. duplicate group을 쪼개지 않고,
+  label×domain 분포를 최대한 유지하며 code/conversation을 우선 보존한다. hard는 같은
+  domain 안에서 high tier 성공률 `>= 2/3`인 행을 먼저 선택하고 `1/3` 행으로 채운다.
+
+실제 전체 데이터 결과:
+
+| 단계 | easy | medium | hard | unresolved | 합계 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| v2 라벨 | 14,906 | 7,835 | 9,430 | 2,607 | 34,778 |
+| 자연분포 train | 11,926 | 6,256 | 7,542 | - | 25,724 |
+| 최종 균형 train | 6,256 | 6,256 | 6,256 | - | 18,768 |
+| validation | 1,490 | 784 | 944 | - | 3,218 |
+| test | 1,490 | 784 | 944 | - | 3,218 |
+
+학습 artifact 전체는 train 18,768 + validation 3,218 + test 3,218 = 25,204행이다.
+전처리 metadata에는 unresolved 2,607행, confidence weight 0인 11행, 균형 선택에서
+제외된 train 6,956행의 사유를 각각 보존한다.
+
+## 15. v3 solve-rate 라벨 실험 계약
+
+2026-09-02부터 v2를 덮어쓰지 않는 `overall-solve-rate-v3-probe-selected` 실험
+프로파일을 둔다. v2 학습 결과에서 tier당 유효 모델이 3~4개뿐이라 모델 한 개의
+우연한 정오답이 라벨을 뒤집고, medium이 두 tier threshold 사이의 잔여 구간이 되는
+문제를 확인했기 때문이다.
+
+v3는 11개 모델 전체의 성공 비율을 사용한다.
+
+```python
+if overall_solve_rate >= 0.64:
+    label = "easy"
+elif overall_solve_rate >= 0.27:
+    label = "medium"
+else:
+    label = "hard"
+```
+
+경계는 임의 삼분위가 아니다. label과 무관하게 고정한 RouterBench duplicate-group
+split에서 TF-IDF + LogisticRegression probe로 E(`0.73/0.36`), F(`0.82/0.45`),
+G(`0.64/0.27`)를 비교했고, Cohen's kappa가 가장 높은 G(`0.2095`)를 선택했다.
+RouterArena는 독립 평가셋이므로 이 선택에 사용하지 않았다. 이 규칙은 질문의
+`최소 충분 tier` 대신 `11개 모델 전체가 관측한 내재 난이도`를 근사한다는 의미 변화가
+있으므로, Claude Haiku/Sonnet/Opus 표본 검증 전까지 production 라벨을 대체하지 않는다.
+
+v2의 전역 클래스 균형화가 도메인 신호를 훼손한 진단 결과도 함께 반영해 v3 train은
+자연분포 전체를 유지한다. 실제 생성 결과는 다음과 같다.
+
+| 단계 | easy | medium | hard | 합계 |
+| --- | ---: | ---: | ---: | ---: |
+| v3 라벨 | 16,739 | 14,128 | 3,911 | 34,778 |
+| train | 13,383 | 11,300 | 3,124 | 27,807 |
+| validation | 1,673 | 1,414 | 391 | 3,478 |
+| test | 1,672 | 1,414 | 393 | 3,479 |
+
+유효 모델 수가 8개 미만인 14행은 low confidence(weight 0)로 제외한다. 실행 config는
+`ml/config/routerbench_labeling_v3.json`, 산출물은 versioned v3 디렉터리에 저장한다.
