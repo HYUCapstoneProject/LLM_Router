@@ -142,8 +142,11 @@
       임계값 기준 **판정 뒤집힘 0건**. `scripts/verify_reranker_parity.py`
 - [x] shadow mode 연동 — 점수·모델버전·would_reject 를 `request_log` 에 적재,
       `RERANK_SHADOW_ENABLED` 로 분리(기본 꺼짐), exact 히트는 건너뜀
-- [ ] **pgvector top-k 후보 반환** — 지금은 임계값을 통과한 최선 1건만 넘긴다.
-      리랭커가 거부권만 행사할 수 있고 후보 사이 순위를 다시 매기지는 못한다
+- [x] **pgvector top-k 후보 반환** — 임계값을 통과한 후보를 전부 넘긴다.
+      `rerank_candidate_count`, `rerank_would_reorder` 로 재정렬 여부를 관측한다.
+      단 실측에서는 후보가 항상 1건이었다 — 캐시 항목끼리 최대 0.66 밖에 안 되기
+      때문이다(0.80 을 넘는 두 항목은 애초에 생기지 않는다). **재정렬은 캐시가
+      훨씬 조밀해지기 전에는 일어나지 않는다.** 리랭커의 실질 가치는 오탐 거부다
 - [ ] rerank 호출 지연을 `request_log` 에 적재 (현재 점수만 남긴다)
 - [ ] Spring↔FastAPI 동일 fixture contract test
 - [ ] timeout·오류 시 cache miss 로 처리하는 fail-closed 폴백
@@ -180,12 +183,22 @@ Notion `06 Decision Log` 2026-08-03 및 `05 Experiment Log` EXP-004 에 있다.
 5배 싸므로 무작위로 라우팅해도 비용은 내려간다. Always-Opus 비교만으로는
 "우리 라우터가 좋다"가 아니라 "싼 모델이 싸다"를 보여줄 뿐이다.
 
-- [ ] **Random (동일 분포)** — 분류기가 학습한 게 있는지 증명하는 최소 조건
-- [ ] **Rule-based (길이/토큰 기반 if문)** — ModernBERT 학습이 값어치를 하는지
-- [ ] **Oracle router** — 상한선 대비 달성률. RouterBench §4.4 에 정의가 있다
-- [ ] **always-Haiku / always-Sonnet / always-Opus** — 비용 하한선과 품질 손실
-- [ ] **RouteLLM BERT 분류기** — 선행연구 대비 개선폭
-- [ ] 결과를 **비용-정확도 파레토 곡선 한 장**으로 산출
+- [x] **Random (동일 분포)** — 프런티어 대비 −0.1818
+- [x] **Rule-based (길이 기반 if문)** — 프런티어 대비 −0.0580
+- [x] **Oracle router** — 모델 11개 +0.2841, 사다리 3모델 +0.1665
+- [x] **always-\<model\> 11종** — 비적응 프런티어를 여기서 만든다
+- [x] **우리 라우터** — 프런티어 대비 **+0.0119**, 95% CI [+0.0040, +0.0203]
+      (부트스트랩 2,000회, 구간이 0 을 넘지 않는다)
+- [x] 결과를 **비용-정확도 파레토 곡선 한 장**으로 산출 →
+      `experiments/results/pareto/pareto.png`
+- [ ] **RouteLLM BERT 분류기** — 선행연구 대비 개선폭. 공개 체크포인트를 그대로 쓰면
+      학습 도메인이 달라(Chatbot Arena 선호 vs RouterBench solve rate) 불리하게 나오므로
+      같은 RouterBench 라벨로 재학습해야 한다. **팀원 담당**
+- [x] 표본을 test split 전량(3,218건)으로 확대 — 마진이 +0.0101 → +0.0119 로
+      유지됐고 신뢰구간이 0 을 넘지 않는다
+- [ ] validation 도 전량으로 — 사다리 선택은 아직 1,000건 표본에서 한다
+
+결과와 방법론은 `experiments/results/pareto/REPORT.md` 에 있다.
 
 **실제 Claude 호출이 필요 없다.** RouterBench 에 11개 모델의 정오답과 비용이 이미
 들어 있으므로, 라우팅 정책 함수만 교체해 오프라인으로 전부 계산한다.
@@ -201,6 +214,42 @@ Notion `06 Decision Log` 2026-08-03 및 `05 Experiment Log` EXP-004 에 있다.
 > 비공개라 같은 테스트셋의 정오답을 얻을 수 없어 정량 비교가 불가능하다.
 
 담당: RouterBench 데이터와 평가 스크립트를 가진 팀원. 게이트웨이는 이 실험에 관여하지 않는다.
+
+### P1 — 라벨 재정의 (파레토에서 나온 후속 과제)
+
+파레토 분석에서 나온 결과다. **분류기 정확도가 아니라 라벨 정의가 병목이다.**
+
+| | 프런티어 대비 |
+|---|---:|
+| 현재 분류기 (난이도 라벨, 일치율 47.5%) | +0.0119 |
+| 완벽한 **난이도** 분류기 | +0.0265 ← 현재 라벨의 천장 |
+| 같은 모델 3개로 질의별 최적 선택 | **+0.1665** |
+
+분류 정확도를 100% 로 올려도 +0.0265 에서 멈춘다. 그런데 **모델을 늘리지 않고도**
++0.14 가 남아 있다. 원인은 라벨이 배포 모델과 다른 기준으로 만들어진 것이다.
+
+```
+                 실제로 충분한 티어 (사다리 3모델 기준)
+difficulty_label  easy   medium   hard
+  easy           6806      744   1686
+  medium         4033      846   2945
+  hard           3447      974   3723      일치율 45.1%
+```
+
+`hard` 라벨의 42% 를 가장 싼 티어가 이미 맞힌다. 이유는 두 가지다 —
+라벨이 11개 모델 기준으로 만들어졌고, 학습셋이 밸런싱되어 자연 분포(easy 57%)에서
+멀어졌다(easy 37%).
+
+- [ ] 전처리에서 라벨을 `sufficient_tier` 로 재계산:
+      {Haiku, Sonnet, Opus} 중 그 질문을 맞히는 가장 싼 것
+- [ ] 재학습 후 새 라벨의 예측 정확도 측정 — **더 어려울 수 있다.**
+      객관식에서 찍어 맞은 경우도 easy 가 되어 잡음이 섞인다
+- [ ] 파레토에서 실제 개선폭 확인 (+0.0265 → ? )
+
+모델 구조도 3-class 형태도 그대로다. **라벨 컬럼만 바꾸는 변경**이라 티어를 늘리거나
+모델을 추가하는 것보다 훨씬 싸다. 담당은 학습 파이프라인을 가진 팀원이다.
+
+확인된 것은 "천장이 올라간다"까지이고 "실제로 도달한다"는 아니다.
 
 ### P1 — 피드백 배치와 재학습 연동
 
@@ -232,13 +281,20 @@ Notion `06 Decision Log` 2026-08-03 및 `05 Experiment Log` EXP-004 에 있다.
 
 #### 사전 준비 (시연 당일 아침)
 
-1. **운영로그 초기화** — 지금 28행 중 11행이 stub 라우터가 만든 것이다.
-   그대로 두면 "medium 62.5%"가 라우터 판단인 것처럼 보인다.
-   ```sql
-   TRUNCATE request_log, escalation_log, cache_entry RESTART IDENTITY;
+1. **운영로그 초기화** — 개발 중 쌓인 행에는 stub 라우터가 만든 티어 분포와
+   같은 질문을 반복해 만든 캐시 히트가 섞여 있다. 그대로 지표 화면을 보여주면
+   라우터 성능도 캐시 히트율도 실제보다 좋게 보인다.
+
+   `scripts/reset-demo-data.sh` 한 줄이면 백업·초기화·캐시 예열까지 끝난다.
+   ```bash
+   gcloud compute scp scripts/reset-demo-data.sh llm-router-workspace:/tmp/ --zone=asia-northeast3-a
+   gcloud compute ssh llm-router-workspace --zone=asia-northeast3-a --command="bash /tmp/reset-demo-data.sh --warm https://llm-router-frontend-1051465904174.asia-northeast3.run.app"
    ```
-2. **캐시 워밍** — 4단계에서 쓸 질문(`de1`)을 미리 한 번 던져 캐시에 넣어둔다.
-3. **접속 확인** — Cloud Run URL 이 뜨는지, 첫 요청이 cold start 로 느리지 않은지.
+
+   스크립트는 지우기 전에 `pg_dump` 로 백업하고 복구 명령을 출력한다.
+   `--warm` 을 주면 4단계용 질문(`de1`)까지 캐시에 심는다 — Claude 1회 호출.
+2. **접속 확인** — Cloud Run URL 이 뜨는지, 첫 요청이 cold start 로 느리지 않은지.
+   컨테이너를 막 재시작했으면 첫 요청이 20~30초 걸린다.
 
 #### 검증된 시연 질문 (2026-08-16 실측)
 

@@ -9,7 +9,7 @@ import com.llmrouter.dto.ChatRequest;
 import com.llmrouter.dto.ChatResponse;
 import com.llmrouter.dto.LlmResult;
 import com.llmrouter.dto.RequestLogEntry;
-import com.llmrouter.dto.RerankShadow;
+import com.llmrouter.dto.RerankDecision;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,13 +33,13 @@ class ChatServiceTest {
     @Mock RouterService routerService;
     @Mock LlmService llmService;
     @Mock RequestLogService requestLogService;
-    @Mock RerankShadowService rerankShadowService;
+    @Mock RerankGateService rerankGateService;
     ChatService service;
 
     @BeforeEach
     void setUp() {
         service = new ChatService(routerClient, routerService, cacheService, llmService,
-                requestLogService, rerankShadowService);
+                requestLogService, rerankGateService);
         MDC.put("requestId", "00000000-0000-0000-0000-000000000001");
         // exact match 는 이제 모든 요청의 첫 단계다. 기본값은 미스로 두고
         // exact 를 검증하는 테스트에서만 따로 덮어쓴다.
@@ -52,8 +52,8 @@ class ChatServiceTest {
         when(routerClient.embed("hello")).thenReturn(new RouterEmbedding(embedding, "embed-v1"));
         CachedResponse hit = new CachedResponse(7L, "hello", "cached", "easy", "model-e", 0.97);
         when(cacheService.findCandidates(embedding)).thenReturn(List.of(hit));
-        when(rerankShadowService.evaluate("hello", List.of(hit)))
-                .thenReturn(new RerankShadow(0.91, "rerank-v1", false, 1, false));
+        when(rerankGateService.evaluate("hello", List.of(hit)))
+                .thenReturn(new RerankDecision(hit, 0.91, "rerank-v1", false, 1, false, "accepted"));
 
         ChatResponse response = service.chat(request("hello"));
 
@@ -108,6 +108,8 @@ class ChatServiceTest {
         LlmResult result = new LlmResult("answer", "hard", "model-h", 12, 34);
         when(routerClient.embed("question")).thenReturn(new RouterEmbedding(embedding, "embed-v1"));
         when(cacheService.findCandidates(embedding)).thenReturn(List.of());
+        when(rerankGateService.evaluate(anyString(), any()))
+                .thenReturn(RerankDecision.passthrough(null, "no_candidates"));
         when(routerService.classify("question"))
                 .thenReturn(new RouterClassification(RouterService.Tier.HARD, 0.9, "router-v1"));
         when(llmService.call(RouterService.Tier.HARD, "question")).thenReturn(result);
@@ -170,6 +172,8 @@ class ChatServiceTest {
         float[] embedding = {1f};
         when(routerClient.embed("q")).thenReturn(new RouterEmbedding(embedding, "embed-v1"));
         when(cacheService.findCandidates(embedding)).thenReturn(List.of());
+        when(rerankGateService.evaluate(anyString(), any()))
+                .thenReturn(RerankDecision.passthrough(null, "no_candidates"));
         when(routerService.classify("q"))
                 .thenThrow(new RouterClientException("router down", 503));
         LlmResult result = new LlmResult("answer", "medium", "model-m", 1, 2);
@@ -191,6 +195,8 @@ class ChatServiceTest {
         float[] embedding = {1f};
         when(routerClient.embed("q")).thenReturn(new RouterEmbedding(embedding, "embed-v1"));
         when(cacheService.findCandidates(embedding)).thenReturn(List.of());
+        when(rerankGateService.evaluate(anyString(), any()))
+                .thenReturn(RerankDecision.passthrough(null, "no_candidates"));
         when(routerService.classify("q"))
                 .thenReturn(new RouterClassification(RouterService.Tier.MEDIUM, 0.7, "router-v1"));
         when(llmService.call(RouterService.Tier.MEDIUM, "q")).thenThrow(failure);

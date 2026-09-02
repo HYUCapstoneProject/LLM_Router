@@ -10,7 +10,7 @@ import com.llmrouter.dto.ChatRequest;
 import com.llmrouter.dto.ChatResponse;
 import com.llmrouter.dto.LlmResult;
 import com.llmrouter.dto.RequestLogEntry;
-import com.llmrouter.dto.RerankShadow;
+import com.llmrouter.dto.RerankDecision;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -29,7 +29,7 @@ public class ChatService {
     private final CacheService cacheService;
     private final LlmService llmService;
     private final RequestLogService requestLogService;
-    private final RerankShadowService rerankShadowService;
+    private final RerankGateService rerankGateService;
 
     public ChatResponse chat(ChatRequest request) {
         long start = System.currentTimeMillis();
@@ -51,19 +51,27 @@ public class ChatService {
             // 2. exact 미스일 때만 임베딩해서 시맨틱 캐시를 본다.
             //    후보를 top-k 로 받아 리랭커에 전부 넘긴다. 최선 1건만 넘기면
             //    리랭커가 거부권만 행사할 수 있고 순위를 다시 매기지 못한다.
-            List<CachedResponse> candidates = List.of();
+            RerankDecision rerank = RerankDecision.passthrough(null, "not_evaluated");
             if (cached.isEmpty()) {
                 try {
                     embeddingResult = routerClient.embed(message);
-                    candidates = cacheService.findCandidates(embeddingResult.vector());
-                    if (!candidates.isEmpty()) {
-                        // 서빙되는 답은 여전히 코사인 1등이다. shadow 는 동작을 바꾸지 않는다.
-                        CachedResponse best = candidates.get(0);
+                    List<CachedResponse> candidates =
+                            cacheService.findCandidates(embeddingResult.vector());
+                    // 리랭커가 최종 판정을 한다. 거부하면 accepted 가 null 이고
+                    // 아래에서 캐시 미스로 떨어져 Claude 를 부른다.
+                    rerank = rerankGateService.evaluate(message, candidates);
+                    if (rerank.accepted() != null) {
+                        CachedResponse best = rerank.accepted();
                         cacheService.recordHit(best.cacheEntryId());
-                        log.info("캐시 히트 id={} similarity={} 후보={}",
-                                best.cacheEntryId(), best.similarity(), candidates.size());
+                        log.info("캐시 히트 id={} similarity={} 후보={} 판정={}",
+                                best.cacheEntryId(), best.similarity(),
+                                candidates.size(), rerank.reason());
                         cached = Optional.of(best);
                         matchType = RequestLogEntry.MATCH_SEMANTIC;
+                    } else if (!candidates.isEmpty()) {
+                        // 코사인은 통과했는데 리랭커가 막았다. 오탐을 피한 대가로
+                        // LLM 을 한 번 부른다.
+                        fallbackReason = "rerank_" + rerank.reason();
                     }
                 } catch (RouterClientException error) {
                     // 임베딩 서버가 죽어도 Claude 응답까지 막지는 않는다. 캐시만 우회한다.
@@ -76,10 +84,6 @@ public class ChatService {
             // 3. 캐시 히트면 분류와 Claude 호출을 생략한다.
             if (cached.isPresent()) {
                 CachedResponse hit = cached.get();
-                // exact 히트는 문자열이 같아 재검증할 것이 없다. 시맨틱 히트만 관측한다.
-                RerankShadow shadow = RequestLogEntry.MATCH_SEMANTIC.equals(matchType)
-                        ? rerankShadowService.evaluate(message, candidates)
-                        : RerankShadow.skipped();
 
                 ChatResponse response = ChatResponse.builder()
                         .requestId(requestId)
@@ -105,11 +109,11 @@ public class ChatService {
                         .embedModelVersion(embeddingResult == null ? null : embeddingResult.modelVersion())
                         .cacheHit(true)
                         .cacheMatchType(matchType)
-                        .rerankScore(shadow.score())
-                        .rerankModelVersion(shadow.modelVersion())
-                        .rerankWouldReject(shadow.wouldReject())
-                        .rerankCandidateCount(shadow.candidateCount())
-                        .rerankWouldReorder(shadow.wouldReorder())
+                        .rerankScore(rerank.score())
+                        .rerankModelVersion(rerank.modelVersion())
+                        .rerankWouldReject(rerank.wouldReject())
+                        .rerankCandidateCount(rerank.candidateCount())
+                        .rerankWouldReorder(rerank.wouldReorder())
                         .similarity(hit.similarity())
                         .cacheEntryId(hit.cacheEntryId())
                         .inputTokens(0)
@@ -164,6 +168,11 @@ public class ChatService {
                     .routerConfidence(classification == null ? null : classification.confidence())
                     .embedModelVersion(embeddingResult == null ? null : embeddingResult.modelVersion())
                     .cacheHit(false)
+                    .rerankScore(rerank.score())
+                    .rerankModelVersion(rerank.modelVersion())
+                    .rerankWouldReject(rerank.wouldReject())
+                    .rerankCandidateCount(rerank.candidateCount())
+                    .rerankWouldReorder(rerank.wouldReorder())
                     .cacheEntryId(cacheEntryId)
                     .inputTokens(result.inputTokens())
                     .outputTokens(result.outputTokens())
