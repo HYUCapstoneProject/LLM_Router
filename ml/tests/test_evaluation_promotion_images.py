@@ -36,7 +36,7 @@ class EvaluationPromotionImageContractTest(unittest.TestCase):
         )
         self.assertEqual(
             set(package["project"]["scripts"]),
-            {"modernbert-package", "modernbert-deploy-gate"},
+            {"modernbert-package", "modernbert-deploy-gate", "modernbert-publish"},
         )
         dockerfile = (ml_root / "docker" / "model-promotion.Dockerfile").read_text(
             encoding="utf-8"

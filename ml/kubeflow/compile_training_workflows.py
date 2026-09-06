@@ -9,11 +9,19 @@ from ml.kubeflow.components.feedback_retraining import (
     feedback_merge_component,
     feedback_prepare_component,
 )
-from ml.kubeflow.components.modernbert_training import modernbert_training_component
 from ml.kubeflow.components.model_evaluation_promotion import (
     deploy_gate_component,
+    model_auto_approve_component,
     model_package_component,
+    model_publish_component,
     routerarena_evaluation_component,
+)
+from ml.kubeflow.components.routerbench_preprocessing import (
+    routerbench_v2_preprocessing_component,
+)
+from ml.kubeflow.components.vertex_training import (
+    vertex_modernbert_continual_training_job_component,
+    vertex_modernbert_training_job_component,
 )
 from ml.kubeflow.pipelines.model_qualification import model_qualification_pipeline
 from ml.kubeflow.pipelines.modernbert_retraining import (
@@ -37,6 +45,10 @@ def build_parser() -> argparse.ArgumentParser:
 def compile_workflows(output_dir: Path) -> dict[str, Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
     definitions = {
+        "routerbench_v2_preprocessing_component": (
+            routerbench_v2_preprocessing_component,
+            output_dir / "routerbench-v2-preprocessing-component.yaml",
+        ),
         "feedback_prepare_component": (
             feedback_prepare_component,
             output_dir / "feedback-prepare-component.yaml",
@@ -45,9 +57,13 @@ def compile_workflows(output_dir: Path) -> dict[str, Path]:
             feedback_merge_component,
             output_dir / "feedback-merge-component.yaml",
         ),
-        "modernbert_training_component": (
-            modernbert_training_component,
-            output_dir / "modernbert-training-component.yaml",
+        "vertex_modernbert_training_job_component": (
+            vertex_modernbert_training_job_component,
+            output_dir / "vertex-modernbert-training-job-component.yaml",
+        ),
+        "vertex_modernbert_continual_training_job_component": (
+            vertex_modernbert_continual_training_job_component,
+            output_dir / "vertex-modernbert-continual-training-job-component.yaml",
         ),
         "routerarena_evaluation_component": (
             routerarena_evaluation_component,
@@ -60,6 +76,14 @@ def compile_workflows(output_dir: Path) -> dict[str, Path]:
         "deploy_gate_component": (
             deploy_gate_component,
             output_dir / "deploy-gate-component.yaml",
+        ),
+        "model_publish_component": (
+            model_publish_component,
+            output_dir / "model-publish-component.yaml",
+        ),
+        "model_auto_approve_component": (
+            model_auto_approve_component,
+            output_dir / "model-auto-approve-component.yaml",
         ),
         "initial_training_pipeline": (
             modernbert_training_pipeline,
