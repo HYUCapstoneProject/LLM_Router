@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from collections import Counter
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -12,7 +14,6 @@ import pandas as pd
 from ..shared.dataset_io import sha256_file
 from ..shared.text_normalization import normalize_for_duplicate_detection
 from .routerbench_preprocessing import TRAINING_COLUMNS
-
 
 REQUIRED_MANIFEST_FIELDS = (
     "schema_version",
@@ -92,14 +93,18 @@ def validate_feedback_manifest(
     try:
         event_count = int(manifest["event_count"])
     except (TypeError, ValueError) as error:
-        raise FeedbackDataError("Feedback manifest event_count must be an integer") from error
+        raise FeedbackDataError(
+            "Feedback manifest event_count must be an integer"
+        ) from error
     if event_count < 0:
         raise FeedbackDataError("Feedback manifest event_count must be non-negative")
     timestamps = {
         field: pd.to_datetime(manifest[field], utc=True, errors="coerce")
         for field in ("created_at", "window_start", "window_end")
     }
-    invalid_timestamps = [field for field, value in timestamps.items() if pd.isna(value)]
+    invalid_timestamps = [
+        field for field, value in timestamps.items() if pd.isna(value)
+    ]
     if invalid_timestamps:
         raise FeedbackDataError(
             f"Feedback manifest has invalid UTC timestamps: {invalid_timestamps}"
@@ -126,6 +131,29 @@ def _is_boolean(value: object) -> bool:
 
 def _question_hash(normalized_question: str) -> str:
     return hashlib.sha256(normalized_question.encode("utf-8")).hexdigest()
+
+
+def canonical_training_digest(training: pd.DataFrame) -> str:
+    """Hash only the canonical learning content, independent of event identity/order."""
+    rows = [
+        {
+            "normalized_question": normalize_for_duplicate_detection(
+                str(row["model_input_text"])
+            ),
+            "final_label": str(row["difficulty_label"]),
+            "sample_weight": float(row["sample_weight"]),
+        }
+        for _, row in training.iterrows()
+    ]
+    rows.sort(
+        key=lambda row: (
+            row["normalized_question"],
+            row["final_label"],
+            row["sample_weight"],
+        )
+    )
+    encoded = json.dumps(rows, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
 def prepare_feedback_training_dataset(
@@ -260,24 +288,34 @@ def prepare_feedback_training_dataset(
         "accepted_event_count": int(metadata["acceptance_status"].eq("accepted").sum()),
         "excluded_event_count": int(metadata["acceptance_status"].eq("excluded").sum()),
         "training_row_count": len(training),
+        "canonical_batch_digest": canonical_training_digest(training),
         "exclusion_distribution": dict(sorted(exclusion_distribution.items())),
         "label_distribution": {
             str(label): int(count)
-            for label, count in training["difficulty_label"].value_counts().sort_index().items()
+            for label, count in training["difficulty_label"]
+            .value_counts()
+            .sort_index()
+            .items()
         },
     }
-    return FeedbackPreparationResult(training=training, metadata=metadata, metrics=metrics)
+    return FeedbackPreparationResult(
+        training=training, metadata=metadata, metrics=metrics
+    )
 
 
 def _validate_training_projection(dataframe: pd.DataFrame, name: str) -> None:
     missing = sorted(set(TRAINING_COLUMNS) - set(dataframe.columns))
     if missing:
-        raise FeedbackDataError(f"{name} training artifact is missing columns: {missing}")
+        raise FeedbackDataError(
+            f"{name} training artifact is missing columns: {missing}"
+        )
     invalid_labels = sorted(
         set(dataframe["difficulty_label"].astype(str)) - {"easy", "medium", "hard"}
     )
     if invalid_labels:
-        raise FeedbackDataError(f"{name} has invalid difficulty labels: {invalid_labels}")
+        raise FeedbackDataError(
+            f"{name} has invalid difficulty labels: {invalid_labels}"
+        )
     invalid_splits = sorted(
         set(dataframe["split"].astype(str)) - {"train", "validation", "test"}
     )
@@ -298,6 +336,8 @@ def merge_feedback_with_base_training(
     base_training: pd.DataFrame,
     feedback_training: pd.DataFrame,
     config: Mapping[str, Any],
+    *,
+    training_data_strategy: str = "full_base",
 ) -> FeedbackMergeResult:
     merge_config = config["merge"]
     if merge_config["base_train_conflict_policy"] != "replace_exact_train_rows":
@@ -333,9 +373,12 @@ def merge_feedback_with_base_training(
             if overlap_splits - {"train"}:
                 include = False
                 decision = "excluded_base_holdout_overlap"
-            elif overlaps["difficulty_label"].astype(str).eq(
-                str(row["difficulty_label"])
-            ).any():
+            elif (
+                overlaps["difficulty_label"]
+                .astype(str)
+                .eq(str(row["difficulty_label"]))
+                .any()
+            ):
                 include = False
                 decision = "excluded_same_label_already_in_base"
             else:
@@ -361,15 +404,29 @@ def merge_feedback_with_base_training(
 
     retained_base = base[~base.index.isin(replace_base_indices)]
     retained_base = retained_base.drop(columns=["_normalized_question"])
-    accepted_feedback = pd.DataFrame.from_records(accepted_rows, columns=TRAINING_COLUMNS)
+    replaced_base_row_count = len(base_training) - len(retained_base)
+    rehearsal_input_row_count = len(retained_base)
+    if training_data_strategy == "compact_rehearsal":
+        retained_base = _compact_rehearsal(retained_base, merge_config)
+    elif training_data_strategy != "full_base":
+        raise FeedbackDataError(
+            f"Unsupported training_data_strategy: {training_data_strategy!r}"
+        )
+    accepted_feedback = pd.DataFrame.from_records(
+        accepted_rows, columns=TRAINING_COLUMNS
+    )
     merged = pd.concat([retained_base, accepted_feedback], ignore_index=True)
     metadata = pd.DataFrame.from_records(merge_records)
     decision_distribution = Counter(metadata["merge_decision"].astype(str))
     metrics = {
         "merge_version": str(config["merge_version"]),
+        "base_dataset_contract": config.get("base_dataset_contract", {}),
         "base_input_row_count": len(base_training),
         "feedback_input_row_count": len(feedback_training),
-        "replaced_base_row_count": len(base_training) - len(retained_base),
+        "replaced_base_row_count": replaced_base_row_count,
+        "training_data_strategy": training_data_strategy,
+        "rehearsal_input_row_count": rehearsal_input_row_count,
+        "rehearsal_output_row_count": len(retained_base),
         "accepted_feedback_row_count": len(accepted_feedback),
         "excluded_feedback_row_count": len(feedback_training) - len(accepted_feedback),
         "merged_training_row_count": len(merged),
@@ -380,3 +437,38 @@ def merge_feedback_with_base_training(
         },
     }
     return FeedbackMergeResult(training=merged, metadata=metadata, metrics=metrics)
+
+
+def _compact_rehearsal(
+    retained_base: pd.DataFrame,
+    merge_config: Mapping[str, Any],
+) -> pd.DataFrame:
+    settings = merge_config.get("compact_rehearsal")
+    if not isinstance(settings, Mapping):
+        raise FeedbackDataError("merge.compact_rehearsal configuration is required")
+    seed = int(settings["seed"])
+    limits = {
+        "train": int(settings["train_rows_per_label"]),
+        "validation": int(settings["validation_rows_per_label"]),
+    }
+    if any(value < 1 for value in limits.values()):
+        raise FeedbackDataError("Compact rehearsal limits must be positive")
+
+    selected: list[pd.DataFrame] = []
+    for split, limit in limits.items():
+        split_rows = retained_base[retained_base["split"].eq(split)]
+        for label in ("easy", "medium", "hard"):
+            candidates = split_rows[split_rows["difficulty_label"].eq(label)].copy()
+            if candidates.empty:
+                raise FeedbackDataError(
+                    f"Compact rehearsal has no {split}/{label} base rows"
+                )
+            candidates["_rehearsal_rank"] = candidates["sample_id"].map(
+                lambda value: hashlib.sha256(f"{seed}:{value}".encode()).hexdigest()
+            )
+            selected.append(
+                candidates.sort_values("_rehearsal_rank", kind="stable")
+                .head(limit)
+                .drop(columns=["_rehearsal_rank"])
+            )
+    return pd.concat(selected, ignore_index=True).loc[:, TRAINING_COLUMNS]
