@@ -1,0 +1,41 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --file=ml/docker/data-processing.Dockerfile
+      - --build-arg=VCS_REF=${_VCS_REF}
+      - --tag=us-west1-docker.pkg.dev/$PROJECT_ID/llm-router/llm-router-data-processing:${_RELEASE_TAG}
+      - .
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --file=ml/docker/modernbert-training.Dockerfile
+      - --build-arg=VCS_REF=${_VCS_REF}
+      - --tag=us-west1-docker.pkg.dev/$PROJECT_ID/llm-router/llm-router-modernbert-training:${_RELEASE_TAG}
+      - .
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --file=ml/docker/modernbert-evaluation.Dockerfile
+      - --build-arg=VCS_REF=${_VCS_REF}
+      - --tag=us-west1-docker.pkg.dev/$PROJECT_ID/llm-router/llm-router-modernbert-evaluation:${_RELEASE_TAG}
+      - .
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --file=ml/docker/model-promotion.Dockerfile
+      - --build-arg=VCS_REF=${_VCS_REF}
+      - --tag=us-west1-docker.pkg.dev/$PROJECT_ID/llm-router/llm-router-model-promotion:${_RELEASE_TAG}
+      - .
+
+images:
+  - us-west1-docker.pkg.dev/$PROJECT_ID/llm-router/llm-router-data-processing:${_RELEASE_TAG}
+  - us-west1-docker.pkg.dev/$PROJECT_ID/llm-router/llm-router-modernbert-training:${_RELEASE_TAG}
+  - us-west1-docker.pkg.dev/$PROJECT_ID/llm-router/llm-router-modernbert-evaluation:${_RELEASE_TAG}
+  - us-west1-docker.pkg.dev/$PROJECT_ID/llm-router/llm-router-model-promotion:${_RELEASE_TAG}
+
+options:
+  machineType: E2_HIGHCPU_8
+  diskSizeGb: 200
+
+timeout: 3600s

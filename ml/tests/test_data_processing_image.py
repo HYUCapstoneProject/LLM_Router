@@ -27,6 +27,7 @@ class DataProcessingImageContractTest(unittest.TestCase):
         self.assertIn("routerbench_labeling.py", dockerfile)
         self.assertIn("routerarena_preprocessing.py", dockerfile)
         self.assertIn("feedback_retraining_preprocessing.py", dockerfile)
+        self.assertIn("routerbench_labeling_v2.json", dockerfile)
         self.assertNotIn("modernbert_training.py", dockerfile)
         self.assertNotIn("routerarena_routing_evaluator.py", dockerfile)
         self.assertNotIn("torch", dockerfile)

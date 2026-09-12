@@ -4,7 +4,7 @@ FROM ${PYTORCH_IMAGE}
 ARG VCS_REF=unknown
 
 LABEL org.opencontainers.image.title="LLM Router ModernBERT Evaluation"
-LABEL org.opencontainers.image.description="RouterArena evaluation runtime for Kubeflow/GKE"
+LABEL org.opencontainers.image.description="RouterArena CPU evaluation runtime for Vertex AI Pipelines"
 LABEL org.opencontainers.image.source="https://github.com/HYUCapstoneProject/LLM_Router"
 LABEL org.opencontainers.image.revision="${VCS_REF}"
 
@@ -17,7 +17,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /opt/llm-router
 
 COPY ml/requirements-training.lock /tmp/requirements/requirements-evaluation.lock
-RUN python -m pip install --requirement /tmp/requirements/requirements-evaluation.lock
+RUN python -m pip install --requirement /tmp/requirements/requirements-evaluation.lock \
+    && python -m pip install "google-cloud-storage>=3.0,<4.0"
 
 COPY ml/docker/modernbert-evaluation.pyproject.toml /opt/llm-router/ml/pyproject.toml
 RUN mkdir -p \
@@ -33,6 +34,8 @@ COPY ml/src/llm_router_labeling/evaluation/routerarena_preprocessing.py /opt/llm
 COPY ml/src/llm_router_labeling/shared/__init__.py /opt/llm-router/ml/src/llm_router_labeling/shared/__init__.py
 COPY ml/src/llm_router_labeling/shared/dataset_io.py /opt/llm-router/ml/src/llm_router_labeling/shared/dataset_io.py
 COPY ml/src/llm_router_labeling/shared/text_normalization.py /opt/llm-router/ml/src/llm_router_labeling/shared/text_normalization.py
+COPY ml/src/llm_router_labeling/shared/object_store.py /opt/llm-router/ml/src/llm_router_labeling/shared/object_store.py
+COPY ml/src/llm_router_labeling/shared/observability.py /opt/llm-router/ml/src/llm_router_labeling/shared/observability.py
 COPY ml/config/routerarena_evaluation.json /workspace/ml/config/routerarena_evaluation.json
 
 RUN python -m pip install --no-deps /opt/llm-router/ml \

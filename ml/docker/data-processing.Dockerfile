@@ -19,7 +19,8 @@ WORKDIR /opt/llm-router
 
 COPY ml/requirements-lock.txt /tmp/requirements/requirements-lock.txt
 RUN python -m pip install \
-        --requirement /tmp/requirements/requirements-lock.txt
+        --requirement /tmp/requirements/requirements-lock.txt \
+    && python -m pip install "google-cloud-storage>=3.0,<4.0"
 
 COPY ml/docker/data-processing.pyproject.toml /opt/llm-router/ml/pyproject.toml
 RUN mkdir -p \
@@ -41,7 +42,10 @@ COPY ml/src/llm_router_labeling/evaluation/routerarena_preprocessing.py /opt/llm
 COPY ml/src/llm_router_labeling/shared/__init__.py /opt/llm-router/ml/src/llm_router_labeling/shared/__init__.py
 COPY ml/src/llm_router_labeling/shared/dataset_io.py /opt/llm-router/ml/src/llm_router_labeling/shared/dataset_io.py
 COPY ml/src/llm_router_labeling/shared/text_normalization.py /opt/llm-router/ml/src/llm_router_labeling/shared/text_normalization.py
+COPY ml/src/llm_router_labeling/shared/object_store.py /opt/llm-router/ml/src/llm_router_labeling/shared/object_store.py
+COPY ml/src/llm_router_labeling/shared/observability.py /opt/llm-router/ml/src/llm_router_labeling/shared/observability.py
 COPY ml/config/routerbench_labeling.json /workspace/ml/config/routerbench_labeling.json
+COPY ml/config/routerbench_labeling_v2.json /workspace/ml/config/routerbench_labeling_v2.json
 COPY ml/config/routerarena_preprocessing.json /workspace/ml/config/routerarena_preprocessing.json
 COPY ml/config/feedback_retraining_preprocessing.json /workspace/ml/config/feedback_retraining_preprocessing.json
 
