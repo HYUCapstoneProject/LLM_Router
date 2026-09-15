@@ -56,12 +56,19 @@ llm:
 
   # 티어 → Claude 모델 매핑 (기획서 2장 기술 스택)
   # 실험 중 재컴파일 없이 바꿀 수 있도록 설정으로 뺌
+  # 환경변수로 덮을 수 있게 둔다. 발표용 ablation(실험 A)에서 코드를 고치지 않고
+  # 세 티어를 전부 Opus 로 돌려 Always-Opus 구성을 만든다. 실험이 실험용 코드가 아니라
+  # 실제 배포본에서 돌아야 숫자를 인용할 수 있다.
   models:
-    easy: claude-haiku-4-5
-    medium: claude-sonnet-4-6
-    hard: claude-opus-4-8
+    easy: ${LLM_MODEL_EASY:claude-haiku-4-5}
+    medium: ${LLM_MODEL_MEDIUM:claude-sonnet-4-6}
+    hard: ${LLM_MODEL_HARD:claude-opus-4-8}
   max-tokens: 4096
   cache:
+    # 캐시 계층 전체 on/off. 끄면 조회도 저장도 하지 않는다.
+    # 발표용 ablation 에서 "Router Only"(캐시 없는 라우팅만) 구성을 만들 때 쓴다.
+    enabled: ${CACHE_ENABLED:true}
+
     # 티어별 캐시 임계값 (적응형 임계값 Level 2).
     #
     # 저장 시점에 해당 항목의 tier 로 threshold 를 정해 cache_entry 에 박아둔다.
@@ -106,6 +113,44 @@ llm:
       # quora-distilroberta-base@f62e7a4 에서만 유효한 값이다 — 모델이 바뀌면 재측정한다.
       similarity-threshold: 0.8774
       score-threshold: 0.03581769
+
+  retraining:
+    # 에스컬레이션 정정 라벨을 FastAPI 로 보내 재학습을 트리거한다 (04 API Contract).
+    #
+    # ⚠️ 성공한 배치 하나가 팀원 쪽 모델 버전을 한 칸 올린다.
+    #    계약: 승격까지 성공한 고유 HTTP batch 3회가 한 major cycle (n.1 -> n.2 -> (n+1).0).
+    #    같은 batchId 재시도는 멱등이라 버전을 소모하지 않지만, batchId 를 바꾸면 새 배치다.
+    #    그래서 개발·테스트는 ROUTER_MODE=stub 으로 하고, 실연동은 명시적으로 전환한다.
+
+    # 한 배치에 담을 최대 이벤트 수.
+    # 계약은 최소 1건이고 상한이 없지만, 큰 payload 를 자동 분할하지 말라고 못 박는다.
+    # 그래서 "쪼개서 여러 번"이 아니라 "한 번에 이만큼, 나머지는 다음 배치"로 동작한다.
+    batch-size: ${RETRAINING_BATCH_SIZE:1000}
+
+    # 임계값 도달 시 자동 제출. 기본은 꺼 둔다.
+    #
+    # 실사용자가 없어 이벤트가 천천히 쌓이는데, 자동으로 나가면 팀원 쪽 파이프라인이
+    # 예고 없이 돈다. 시점은 대시보드의 강제 실행 버튼으로 사람이 정한다.
+    auto-submit: ${RETRAINING_AUTO_SUBMIT:false}
+
+    # 이 배포가 실제 PII 제거를 요구하는가.
+    #
+    # 우리가 보내는 piiRedacted 는 항상 true 지만, 그것은 "제거했다"가 아니라
+    # "PII 가 유입되지 않는 실험 경로다"라는 선언이다.
+    #
+    # true 로 두면 제출이 거부된다. 실사용자에게 열거나 실제 상담 로그를 넣게 되면
+    # 이 스위치로 먼저 막고, 마스킹을 구현한 뒤 검사를 redactor 호출로 바꾼다.
+    require-pii-redaction: ${RETRAINING_REQUIRE_PII_REDACTION:false}
+
+    # 제출은 GCS artifact 생성과 Vertex PipelineJob 제출까지 기다린다.
+    # 추론(15초)과 같은 타임아웃을 쓰면 정상 제출이 끊긴다.
+    read-timeout: ${RETRAINING_READ_TIMEOUT:PT60S}
+
+    # 주기 작업. 폴링 간격 자체는 계약의 backoff(10s -> 15s -> 30s -> 60s)를
+    # SQL 에서 계산하므로, 여기 값은 "차례가 된 것이 있나" 확인 주기다.
+    submit-interval-ms: ${RETRAINING_SUBMIT_INTERVAL_MS:300000}
+    retry-interval-ms: ${RETRAINING_RETRY_INTERVAL_MS:60000}
+    poll-interval-ms: ${RETRAINING_POLL_INTERVAL_MS:10000}
 
   escalation:
     # LLM 을 부르기 전에 escalation_log 에 자리를 예약한다. 중복 요청은 유니크 인덱스에서

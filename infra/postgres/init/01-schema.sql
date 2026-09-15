@@ -219,3 +219,57 @@ CREATE INDEX idx_escalation_log_request_id ON escalation_log (request_id);
 --                                 체인이 단조 증가라 각 티어는 최대 1회만 도달 가능하다.
 CREATE UNIQUE INDEX uq_escalation_log_step ON escalation_log (request_id, escalation_seq);
 CREATE UNIQUE INDEX uq_escalation_log_tier ON escalation_log (request_id, final_tier);
+
+-- ─────────────────────────────────────────────────────────────
+-- 재학습 피드백 배치 (04 API Contract)
+-- migrations/08-feedback-batch.sql 과 같은 내용이다. 둘은 항상 같이 고친다.
+-- ─────────────────────────────────────────────────────────────
+
+-- 어느 배치로 나갔는가. NULL = 아직 안 나감.
+-- 이 컬럼이 없으면 같은 이벤트가 매 배치에 다시 실린다. FastAPI 는 batchId 가 다르면
+-- 다른 배치로 받으므로 중복을 막아주지 않는다 — 전적으로 게이트웨이 책임이다.
+ALTER TABLE escalation_log ADD COLUMN exported_batch_id VARCHAR(200);
+
+CREATE INDEX idx_escalation_log_unexported
+    ON escalation_log (created_at)
+    WHERE exported_batch_id IS NULL;
+
+-- 제출 기록과 재학습 진행 상태.
+-- 202 Accepted 는 "제출됐다"이지 "학습이 끝났다"가 아니므로, 제출 시점 정보와
+-- 폴링으로 갱신되는 진행 상태를 한 행에 두되 의미를 분리한다.
+CREATE TABLE feedback_batch (
+    batch_id                VARCHAR(200) PRIMARY KEY,
+    event_count             INTEGER      NOT NULL,
+    events_fingerprint      CHAR(64),
+
+    -- 202 응답에서 받은 값
+    pipeline_run_id         TEXT,          -- Google resource name. URL 이 아니다.
+    logical_model_version   VARCHAR(64),
+    candidate_model_version VARCHAR(200),
+    training_mode           VARCHAR(64),
+    version_policy_mode     VARCHAR(64),
+    status_url              TEXT,
+
+    -- 폴링으로 갱신되는 값. 'submitted' 는 202 이전의 로컬 상태로 계약에는 없다.
+    pipeline_status         VARCHAR(32)  NOT NULL DEFAULT 'submitted',
+    pipeline_stage          VARCHAR(32),
+    result_outcome          VARCHAR(32),
+    failure_code            VARCHAR(64),
+    retryable               BOOLEAN,
+
+    -- 학습 성공과 serving 활성화 성공은 다른 사건이다.
+    activation_status       VARCHAR(32),
+
+    submitted_at            TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    completed_at            TIMESTAMPTZ,
+    last_polled_at          TIMESTAMPTZ,
+
+    -- 자동 임계값 도달과 수동 강제 실행을 구분한다.
+    triggered_by            VARCHAR(16)  NOT NULL DEFAULT 'auto'
+);
+
+CREATE INDEX idx_feedback_batch_pending
+    ON feedback_batch (last_polled_at NULLS FIRST)
+    WHERE pipeline_status NOT IN ('succeeded', 'rejected', 'failed', 'cancelled');
+
+CREATE INDEX idx_feedback_batch_submitted_at ON feedback_batch (submitted_at DESC);
