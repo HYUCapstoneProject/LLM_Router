@@ -100,6 +100,23 @@ routing_delta = predicted_rank - routerarena_rank
 `hard -> easy`는 tier distance 2인 severe under-routing proxy로 별도 집계한다.
 accuracy, macro-F1과 방향성 지표는 주 분석을 보완하는 alignment metric으로 해석한다.
 
+### 4-3. Colab baseline의 epoch별 관찰
+
+RouterBench 전체 학습 epoch 1·2·3 종료 모델을 같은 RouterArena full 데이터로 추론해
+변화 곡선을 만든다. 이는 학습 중간 상태를 설명하기 위한 **단방향 관찰**이다.
+
+더 촘촘한 epoch 내부 진행 곡선은 RouterBench validation split을 33%·66%·100%에서
+측정해 총 9개 점으로 만든다. RouterArena full은 학습 데이터와 다른 외부평가이므로
+횟수를 늘리지 않고 epoch 종료 시 총 3회만 유지한다.
+
+- RouterArena 질문과 라벨은 학습 DataLoader에 들어가지 않는다.
+- RouterArena metric은 loss, gradient, optimizer, scheduler와 early stopping을 바꾸지
+  않는다.
+- best checkpoint를 고르지 않으며 최종 모델은 사전에 고정한 3 epoch 마지막 모델이다.
+- 관찰 callback 전후의 Python·NumPy·PyTorch·CUDA RNG 상태를 동일하게 복구한다.
+- 그래프를 보고 hyperparameter를 조정하면 RouterArena가 개발 데이터가 되므로, 현재
+  baseline에서는 설명·보고 이외의 의사결정에 쓰지 않는다.
+
 ## 5. 산출물
 
 ```text
@@ -141,6 +158,23 @@ domain, category, source_dataset, label_source  # metadata가 있을 때
 - model-forward latency mean/p50/p95
 - 모델 경로, device, batch size, max length와 label order
 
+Colab epoch 관찰은 아래처럼 별도 저장한다.
+
+```text
+<Drive run>/routerarena-epoch-evaluations/
+├── epoch-01..03/
+│   ├── predictions.parquet
+│   ├── metrics.json
+│   ├── model_info.json
+│   ├── usage_contract.json
+│   ├── predicted_group_distribution.svg
+│   ├── predicted_group_heatmap.svg
+│   ├── artifact_manifest.json
+│   └── _SUCCESS
+├── epoch_progress.json
+└── epoch_progress.svg
+```
+
 ## 6. 실행
 
 PyTorch는 CPU/CUDA 이미지별 배포 방식이 달라 기본 전처리 의존성과 분리했다.
@@ -166,7 +200,7 @@ PyTorch는 CPU/CUDA 이미지별 배포 방식이 달라 기본 전처리 의존
 - RouterBench checkpoint와 RouterArena evaluation artifact 전달
 - full/robustness 평가 병렬 실행
 - model/data/evaluation version ML Metadata 계보
-- CPU/GPU resource, retry, cache 설정
+- Vertex AI Pipelines CPU resource·batch·timeout, retry와 cache 설정
 - 현재 배포 모델과 후보 모델 metric 비교
 - 승인된 gate 기준에 따른 배포 또는 보류
 
