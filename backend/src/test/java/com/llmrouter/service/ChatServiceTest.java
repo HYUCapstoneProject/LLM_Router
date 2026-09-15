@@ -41,9 +41,12 @@ class ChatServiceTest {
         service = new ChatService(routerClient, routerService, cacheService, llmService,
                 requestLogService, rerankGateService);
         MDC.put("requestId", "00000000-0000-0000-0000-000000000001");
+        // @Value 필드는 직접 생성한 인스턴스에 주입되지 않는다. 기본값(false)으로
+        // 두면 캐시 경로가 통째로 꺼져 아래 테스트들이 의미를 잃는다.
+        ReflectionTestUtils.setField(service, "cacheEnabled", true);
         // exact match 는 이제 모든 요청의 첫 단계다. 기본값은 미스로 두고
         // exact 를 검증하는 테스트에서만 따로 덮어쓴다.
-        when(cacheService.getExact(anyString())).thenReturn(Optional.empty());
+        lenient().when(cacheService.getExact(anyString())).thenReturn(Optional.empty());
     }
 
     @Test
@@ -205,6 +208,29 @@ class ChatServiceTest {
         verify(requestLogService).recordFailure(eq("00000000-0000-0000-0000-000000000001"),
                 eq("q"), eq(RouterService.Tier.MEDIUM), anyLong(), same(failure));
         verify(cacheService, never()).put(anyString(), any(), any(), anyString());
+    }
+
+    /**
+     * ablation 의 "Router Only" 구성. 캐시를 끄면 조회도 저장도 하지 않고
+     * 라우팅과 Claude 호출만 남는다.
+     */
+    @Test
+    void disabledCacheSkipsLookupAndStoreEntirely() {
+        ReflectionTestUtils.setField(service, "cacheEnabled", false);
+        LlmResult result = new LlmResult("answer", "hard", "model-h", 12, 34);
+        when(routerService.classify("question"))
+                .thenReturn(new RouterClassification(RouterService.Tier.HARD, 0.9, "router-v1"));
+        when(llmService.call(RouterService.Tier.HARD, "question")).thenReturn(result);
+
+        ChatResponse response = service.chat(request("question"));
+
+        assertThat(response.isCacheHit()).isFalse();
+        // 임베딩은 캐시 조회 전용이므로 캐시를 끄면 부를 이유가 없다.
+        // 그만큼 Router Only 구성은 교차 리전 왕복 한 번을 덜 쓴다.
+        verifyNoInteractions(cacheService, rerankGateService, routerClient);
+        verify(requestLogService).record(argThat(entry ->
+                !entry.cacheHit() && entry.cacheEntryId() == null
+                        && entry.embedModelVersion() == null));
     }
 
     private ChatRequest request(String message) {
