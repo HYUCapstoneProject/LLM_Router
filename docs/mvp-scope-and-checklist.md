@@ -2,10 +2,53 @@
 
 기준일: 2026-07-08
 
+현행 인프라 보정일: 2026-08-14
+
 이 문서는 2026-07-08 당시 stub 상태를 기준으로 MVP와 최종 목표를 구분한 과거 범위
 초안이다. 현행 ML 구조, 백엔드 협의 사항과 작업 상태는
 `docs/ml/workstream-checklist.md`를 유일한 기준으로 사용한다.
 상세 일정은 `docs/timeline.md`, 배경 설계는 `docs/졸업프로젝트 개요.md`를 기준으로 한다.
+
+## 0. 2026-08-14 확정 인프라 보정
+
+아래 항목은 역사적 MVP 범위를 넓히는 뜻이 아니라, MVP 이후 ML 학습·재학습을 어떤
+환경에서 실행할지 확정한 현행 기준이다. 팀 회의의 선택지가 아니며 구현 영향만 공유한다.
+
+```text
+GCS 데이터·config
+  -> Vertex AI Pipelines (KFP v2 IR)
+       -> 관리형 CPU component: 검증·라벨링·전처리·병합·평가·package·gate
+       -> Vertex AI Custom Training: ModernBERT T4 GPU 1장 학습
+       -> GCS checkpoint·metric 반환
+       -> Vertex ML Metadata에 CustomJob resource·image digest·GCS URI 기록
+```
+
+확정 원칙은 다음과 같다.
+
+- Google Cloud project는 `project-763753da-fa8f-4afd-b31`(`HYUCapstone`)을 사용한다.
+- GKE와 자체 설치 Kubeflow는 사용하지 않는다. KFP SDK로 컴파일한 IR YAML을
+  관리형 Vertex AI Pipelines에서 실행한다.
+- ModernBERT 학습만 Vertex AI Custom Training의 `NVIDIA_TESLA_T4` 1장을 사용한다.
+  초기 학습과 feedback 재학습 모두 Google Cloud Pipeline Components의 CustomJob
+  wrapper가 Vertex job을 제출하고 완료 상태를 감시한다.
+- RouterBench 라벨링·전처리와 RouterArena 평가를 포함한 나머지 단계는 CPU로 실행한다.
+  로컬 실행은 개발·smoke와 비상 재현용이고, 공식 cloud run은 Vertex PipelineJob으로
+  시작한다.
+- production 학습 job을 콘솔이나 CLI에서 직접 제출하지 않는다. KFP run이 job ID,
+  container image digest, 입력·출력 GCS URI와 결과 상태를 MLMD에 남겨야 한다.
+- image는 Artifact Registry, dataset·checkpoint·metric은 GCS에 저장한다. GCS와
+  Vertex resource는 `us-central1`을 기본으로 한다.
+- 목표는 **프로모션 크레딧과 Always Free 범위 안에서 실제 카드 청구액 0원**이다.
+  Vertex Pipeline/CustomJob 자원은 영구 무료 자원이 아니므로, GPU quota 1·동시 실행
+  1·재시도 0·
+  최대 실행 6시간·예산 알림·가능한 Spend Cap·실행 후 자원 정리를 필수 안전장치로 둔다.
+- billing 활성 상태와 남은 Welcome Credit의 잔액·원래 만료일 확인 없이는 GPU cloud
+  smoke와 전체 학습을 시작하지 않는다. 예산 알림은 비용을 자동 차단하지 않는다는 점도
+  운영자가 인지해야 한다.
+
+GCS Always Free도 대상 region과 월별 한도 안에서만 적용된다. 근거는
+[Google Cloud 무료 프로그램](https://docs.cloud.google.com/free/docs/free-cloud-features),
+[Cloud Storage 가격 정책](https://cloud.google.com/storage/pricing)을 따른다.
 
 ## 1. 현재 stub 목록
 
@@ -37,7 +80,7 @@ MVP 목표는 "한 번의 사용자 질문이 실제 캐시, 라우터, Claude A
 
 - 사용자 피드백 기반 자동 재학습 루프
 - Kubeflow Pipelines 전체 자동화와 MLMD 계보 추적
-- GCE/Cloud Run/GKE 운영 배포 완성
+- GCE/Cloud Run/Vertex AI 운영 배포 완성
 - adaptive cache threshold
 - 대규모 반복 실험과 최종 보고서용 그래프 freeze
 - streaming 응답
@@ -51,7 +94,8 @@ MVP 목표는 "한 번의 사용자 질문이 실제 캐시, 라우터, Claude A
 - 사용자가 불만족하면 상위 모델로 에스컬레이션하고, 최종 만족 티어를 정정 라벨로 기록한다.
 - 정정 라벨이 누적되면 Kubeflow Pipeline이 재학습, 평가, 배포 게이트를 수행한다.
 - RouterBench 재라벨링, RouterArena 일반화 테스트, QQP cache threshold 평가가 재현 가능하게 실행된다.
-- GCE Gateway/pgvector, FastAPI Router, Cloud Run Frontend, GKE/Kubeflow 학습 파이프라인이 배포 가능한 형태로 정리된다.
+- GCE Gateway/pgvector, FastAPI Router, Cloud Run Frontend와 Vertex AI Pipelines CPU
+  단계 → Vertex AI Custom Training GPU 학습 파이프라인이 배포 가능한 형태로 정리된다.
 - 최종 보고서에는 비용 절감, 품질 유지, cache 효과, latency, 재학습 효과가 정량 결과로 들어간다.
 
 ## 4. 평가 지표 초안
@@ -102,7 +146,8 @@ RouterBench의 `easy/medium/hard`는 추상적인 지식 난이도가 아니라 
 | --- | --- | --- |
 | `easy` | low-capability 모델군으로 안정적으로 해결 가능 | Claude Haiku |
 | `medium` | low 모델군은 불충분하고 medium-capability 모델군이 필요 | Claude Sonnet |
-| `hard` | medium 모델군까지 불충분하여 high-capability 모델이 필요하거나 모든 모델이 실패 | Claude Opus |
+| `hard` | medium 모델군까지 불충분하고 high-capability 모델 중 하나 이상이 해결 | Claude Opus |
+| `unresolved` | high 모델군도 아무도 해결하지 못해 최소 충분 tier를 정할 수 없음 | 3-class 학습 제외, 감사 metadata 보존 |
 
 RouterBench 모델은 Claude 제품군의 프록시이므로, 이 매핑은 클래스 및 도메인별 Claude 샘플 검증으로 보정한다. 품질 손실 위험이 비용 증가보다 크므로 라벨 경계와 모델 선택 임계값은 under-routing에 더 큰 페널티를 주도록 조정한다.
 
@@ -127,7 +172,10 @@ RouterBench 모델은 Claude 제품군의 프록시이므로, 이 매핑은 클�
 
 ### 5-4. 모델 응답의 성공 판정
 
-- exact-match 계열은 `performance == 1`을 성공으로 본다.
+- MMLU, HellaSwag, ARC-Challenge, WinoGrande exact-match 계열은
+  `performance == 1`을 성공으로 본다.
+- GSM8K/grade-school-math의 `0/0.25/0.5/0.75/1.0`은 partial-credit 연속 점수로
+  해석하고 `performance >= 0.70`을 성공으로 본다.
 - judge 또는 연속 점수 계열은 `performance >= acceptance_threshold[dataset]`을 성공으로 본다.
 - 연속 점수 임계값은 초기 후보 `0.60`, `0.70`, `0.80`을 비교하고 Claude 검증 및 quality retention 결과로 확정한다.
 - 결측 응답은 오답으로 단정하지 않고 해당 tier의 유효 모델 수에서 제외하며, 유효 모델 수가 부족하면 `low_confidence`로 기록한다.
@@ -141,7 +189,8 @@ tier_success(q, t)
 
 ### 5-5. easy/medium/hard 판정 규칙
 
-초기 합의 임계값은 low와 medium 티어에 `0.67`, high 티어에 `0.50`을 적용한다.
+확정된 `minimum-sufficient-tier-v2`는 low와 medium 티어에 `0.67`, high 티어에
+`1/3`을 적용한다.
 
 ```python
 if low_success_rate >= 0.67:
@@ -150,15 +199,16 @@ if low_success_rate >= 0.67:
 elif medium_success_rate >= 0.67:
     difficulty_label = "medium"
     label_reason = "medium_tier_consensus"
-elif high_success_rate >= 0.50:
+elif high_success_rate >= 1 / 3:
     difficulty_label = "hard"
     label_reason = "strong_only"
 else:
-    difficulty_label = "hard"
-    label_reason = "unsolved"
+    difficulty_label = "unresolved"
+    label_reason = "unresolved"
 ```
 
-`strong_only`와 `unsolved`는 운영상 모두 가장 안전한 티어로 보내기 위해 `hard`로 합치되, 분석과 재학습에서는 반드시 구분한다. `unsolved`는 Opus가 해결할 수 있다는 보장이 아니라 현재 선택지 중 가장 강한 모델을 사용해야 한다는 의미다.
+`unresolved`는 Opus가 해결할 수 있다는 근거가 없으므로 RouterBench 3-class 정답으로
+강제하지 않는다. 라벨 산출물에는 보존하지만 ModernBERT 학습에서는 제외한다.
 
 ### 5-6. 보조 신호와 라벨 신뢰도
 
@@ -198,11 +248,16 @@ label_rule_version
 
 ```text
 ingest -> canonicalize -> calibrate tiers -> relabel -> split
-       -> local smoke train -> evaluate
-       -> GCS artifact upload -> Kubeflow/GKE train -> deploy gate
+       -> local smoke train
+       -> GCS artifact upload -> Vertex AI PipelineJob
+       -> Vertex CPU data steps -> Vertex AI T4 CustomJob train
+       -> Vertex CPU evaluate/package/deploy gate
 ```
 
-로컬 smoke test는 소량 샘플로 전처리, tokenizer, forward/backward, checkpoint 저장 및 평가 metric 생성을 검증한다. GCP/GKE 단계는 동일한 데이터·라벨·학습 설정을 사용하고 실행 환경만 확장하며, 라벨링 CPU 작업과 ModernBERT GPU 학습 작업을 별도 컴포넌트로 분리한다.
+로컬 smoke test는 소량 샘플로 전처리, tokenizer, forward/backward, checkpoint 저장 및
+평가 metric 생성을 검증한다. cloud 단계도 동일한 데이터·라벨·학습 설정과 공통 CLI를
+사용한다. Vertex AI Pipelines의 일반 component는 CPU 작업과 orchestration을 맡고,
+학습 단계만 동일 GPU image를 Vertex AI Custom Training으로 실행한다.
 
 ### 5-9. RouterBench 학습 전처리
 
@@ -216,17 +271,30 @@ truncation은 ModernBERT tokenizer가 확정된 학습 컴포넌트에서 수행
 분포를 함께 고려하며 같은 group이 여러 split에 나타나면 파이프라인을 실패시킨다.
 
 초기 표본 정책은 high confidence weight `1.0`, medium `0.5`, low `0.0`이다.
-low confidence는 학습에서는 제외하지만 metadata에는 보존한다. `hard/strong_only`와
-`hard/unsolved`, RAG 포함 여부는 분석 가능한 별도 필드와 versioned config로 유지한다.
+low confidence는 학습에서는 제외하지만 metadata에는 보존한다. `hard/strong_only`,
+`unresolved`, RAG 포함 여부는 분석 가능한 별도 필드와 versioned config로 유지한다.
 
 학습 projection에는 `model_input_text`, `difficulty_label`, `sample_weight`와 split/group
 식별자만 둔다. tier 성공률과 cheapest-correct tier는 별도 metadata artifact에 두고,
 모델별 원시 성능·응답·비용은 라벨 산출물에만 남겨 라벨 누수를 방지한다.
 
 Kubeflow는 전처리 규칙 자체를 소유하지 않는다. 동일한 Python 전처리 component를
-로컬과 GKE에서 실행하고, Kubeflow는 Artifact 전달, caching, ML Metadata 계보,
-retry, CPU/GPU resource 분리, GCS 경로와 parameterized 실험을 담당한다. 생성된 split
-artifact는 downstream 학습에서 재사용하며 학습 Pod 내부에서 다시 만들지 않는다.
+로컬과 Vertex AI Pipelines에서 실행하고, KFP는 Artifact 전달, caching, ML Metadata 계보,
+CPU component 자원, Vertex AI 학습 job 연결, GCS 경로와 parameterized 실험을
+담당한다. 생성된 split artifact는 downstream 학습에서 재사용하며 Vertex 학습
+container 내부에서 다시 만들지 않는다.
+
+v2 전체 라벨 분포는 easy 14,906 / medium 7,835 / hard 9,430 / unresolved 2,607이다.
+unresolved와 confidence weight 0을 제외한 뒤 duplicate group 및 label×domain 기준으로
+자연분포 `80/10/10` split을 먼저 만든다. 자연분포 train은 25,724행,
+validation/test는 각각 3,218행이다. validation/test는 균형화하지 않는다.
+
+train만 duplicate group을 쪼개지 않고 easy/medium/hard 각 6,256행으로 선택한다.
+code/conversation을 우선 보존하고 hard는 high tier 성공률 `>=2/3`을 먼저 선택한 뒤
+`1/3`로 채운다. T4 micro-batch 1, accumulation 8의 optimizer 단위는 항상 `3/3/2`이며
+추가 두 자리를 받는 클래스가 순환한다. feedback 병합으로 클래스 수가 달라지면 모든
+feedback을 보존하고 부족한 클래스 sampler pool만 결정적으로 순환하여 같은 단위 균형을
+유지한다.
 
 ## 6. 현행 작업 추적
 
@@ -247,10 +315,13 @@ backend와 배포 일정은 GitHub issue/milestone에서 관리한다.
 
 ## 8. 최종 완료 기준
 
-- 버전이 고정된 RouterBench 라벨 산출물로 로컬과 GKE의 ModernBERT 학습이 재현 가능하다.
+- 버전이 고정된 RouterBench 라벨 산출물로 로컬 smoke와 Vertex PipelineJob이 제출한
+  Vertex AI
+  ModernBERT 학습이 재현 가능하다.
 - always-Opus 대비 비용/품질 트레이드오프 결과가 있다.
 - QQP 기반 cache threshold sweep 결과가 있다.
 - RouterArena 일반화 평가 결과가 있다.
 - 에스컬레이션 기록이 DB에 저장되고 정정 라벨로 재학습 입력에 들어간다.
-- Kubeflow Pipeline이 학습, 평가, artifact 업로드, 배포 게이트를 수행한다.
+- Vertex AI Pipeline이 CPU 전처리·평가·artifact·배포 게이트를 관리하고 GPU
+  학습 job의 제출·감시·계보 기록까지 수행한다.
 - 최종 보고서와 발표자료에 들어갈 표, 그래프, 데모 시나리오가 freeze되어 있다.
