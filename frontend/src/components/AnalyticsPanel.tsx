@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { AnalyticsPeriod, AnalyticsSummary, ModelType, TierType } from '../types'
 import { fetchAnalytics, ApiError } from '../api/chatApi'
+import { RetrainingPanel } from './RetrainingPanel'
 import { MODEL_CONFIG } from '../lib/models'
 
 /** 티어 → 그 티어가 실제로 호출하는 모델. 배지 색을 채팅 화면과 맞춘다 */
@@ -163,6 +164,12 @@ export function AnalyticsPanel() {
             )}
           </>
         )}
+
+        {/* 재학습은 요청 집계와 달리 기간 필터를 받지 않는다. 배치는 누적 이력이라
+            "오늘"로 잘라 보면 진행 중인 배치가 화면에서 사라진다. */}
+        <Section title="재학습 피드백" hint="에스컬레이션 정정 라벨 → FastAPI">
+          <RetrainingPanel />
+        </Section>
       </div>
     </div>
   )

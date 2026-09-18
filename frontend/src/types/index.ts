@@ -133,3 +133,43 @@ export interface EscalateResponse {
   inputTokens: number
   outputTokens: number
 }
+
+/** 재학습 피드백 배치 한 건 (04 API Contract) */
+export interface RetrainingBatch {
+  batchId: string
+  eventCount: number
+  /**
+   * submitted | queued | running | cancelling | paused
+   * | succeeded | rejected | failed | cancelled | unknown
+   *
+   * 'submitted' 는 202 를 받기 전의 로컬 상태로 계약에는 없다.
+   */
+  status: string
+  stage: string | null
+  failureCode: string | null
+  /**
+   * pending | active | loadFailed | superseded | notApplicable
+   *
+   * status 가 succeeded 여도 이 값이 active 가 아니면 새 모델이 아직 서빙되지 않는다.
+   * 학습 성공과 반영 성공은 다른 사건이라 화면에서도 분리해 보여준다.
+   */
+  activationStatus: string | null
+  candidateModelVersion: string | null
+  /** auto(임계값 도달) | manual(강제 실행 버튼) */
+  triggeredBy: string
+  submittedAt: string
+  completedAt: string | null
+}
+
+export interface RetrainingOverview {
+  pendingEvents: number
+  recentBatches: RetrainingBatch[]
+}
+
+export interface RetrainingSubmission {
+  batchId: string
+  eventCount: number
+  /** 202 를 받았다는 뜻이지 학습이 성공했다는 뜻이 아니다 */
+  accepted: boolean
+  failureCode: string | null
+}

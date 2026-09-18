@@ -5,6 +5,8 @@ import type {
   ChatResponse,
   EscalateRequest,
   EscalateResponse,
+  RetrainingOverview,
+  RetrainingSubmission,
 } from '../types'
 
 /** 백엔드 ErrorResponse(04 API Contract)를 담아 UI 까지 전달한다 */
@@ -86,4 +88,25 @@ export async function escalate(req: EscalateRequest): Promise<EscalateResponse> 
  */
 export async function fetchAnalytics(period: AnalyticsPeriod): Promise<AnalyticsSummary> {
   return parse<AnalyticsSummary>(await fetch(`/api/analytics/summary?period=${period}`))
+}
+
+/** 재학습 대기 건수와 최근 배치 이력을 가져온다 */
+export async function fetchRetrainingStatus(): Promise<RetrainingOverview> {
+  return parse<RetrainingOverview>(await fetch('/api/retraining/status'))
+}
+
+/**
+ * 대기 중인 에스컬레이션을 지금 재학습으로 내보낸다 (강제 실행).
+ *
+ * ⚠️ 성공하면 팀원 쪽 모델 버전이 한 칸 올라간다. 계약상 승격까지 성공한 고유 batch
+ * 3회가 한 major cycle 이라, 시험 삼아 반복하면 버전이 소모되고 되돌릴 수 없다.
+ * 호출부에서 반드시 확인을 받는다.
+ *
+ * @returns 보낼 이벤트가 없으면 null (서버가 204 를 준다)
+ */
+export async function submitRetraining(): Promise<RetrainingSubmission | null> {
+  const res = await fetch('/api/retraining/submit', { method: 'POST' })
+  // 204 는 본문이 없다. parse() 를 그대로 태우면 JSON 파싱에서 터진다.
+  if (res.status === 204) return null
+  return parse<RetrainingSubmission>(res)
 }

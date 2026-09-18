@@ -254,6 +254,8 @@ npm run build
 
 ## 9. 핵심 문서 지도
 
+- `experiments/results/README.md`: **성능 평가 색인.** 무엇을 언제 왜 쟀고
+  어떤 수치를 조심해야 하는지. 숫자를 인용하기 전에 먼저 읽는다
 - `PLAN.md`: 전체 진행 상태, 중간 시연 시나리오(§5-0), 검증된 시연 질문셋
 - `experiments/questions-demo-en.json` / `-ko.json` / `-en2.json`: 라우터 실측용 질문셋
 - `infra/DEPLOY.md`: GCE, Cloud Run, DB migration, smoke test runbook
