@@ -103,7 +103,7 @@ public class RetrainingScheduler {
                 // activation 이 active 가 아니면 우리가 받는 분류는 아직 옛 모델의 것이다.
                 if ("active".equals(activation)) {
                     log.info("재학습 성공·반영 완료 batchId={} model={}",
-                            batchId, status.activation().modelVersion());
+                            batchId, status.activation().servingModelVersion());
                 } else {
                     log.warn("재학습은 성공했으나 serving 반영이 끝나지 않았습니다 "
                             + "batchId={} activation={}", batchId, activation);

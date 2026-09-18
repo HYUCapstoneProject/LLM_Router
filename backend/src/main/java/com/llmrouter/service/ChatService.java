@@ -14,6 +14,7 @@ import com.llmrouter.dto.RerankDecision;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,6 +32,13 @@ public class ChatService {
     private final RequestLogService requestLogService;
     private final RerankGateService rerankGateService;
 
+    /**
+     * 캐시 계층 전체 on/off. 끄면 조회도 저장도 하지 않는다.
+     * 발표용 ablation 에서 "Router Only" 구성을 만들 때만 끈다.
+     */
+    @Value("${llm.cache.enabled:true}")
+    private boolean cacheEnabled;
+
     public ChatResponse chat(ChatRequest request) {
         long start = System.currentTimeMillis();
         String requestId = MDC.get(RequestIdFilter.REQUEST_ID);
@@ -45,14 +53,16 @@ public class ChatService {
             // 1. exact match 를 먼저 본다. 글자까지 같은 질문이면 임베딩 호출 자체가 필요 없다.
             //    FastAPI 가 us-west1, 게이트웨이가 asia-northeast3 라 embed 왕복만 약 120ms 다.
             //    오탐이 원리적으로 0 이라 임계값도 보지 않는다.
-            Optional<CachedResponse> cached = cacheService.getExact(message);
+            Optional<CachedResponse> cached = cacheEnabled
+                    ? cacheService.getExact(message)
+                    : Optional.empty();
             String matchType = cached.isPresent() ? RequestLogEntry.MATCH_EXACT : null;
 
             // 2. exact 미스일 때만 임베딩해서 시맨틱 캐시를 본다.
             //    후보를 top-k 로 받아 리랭커에 전부 넘긴다. 최선 1건만 넘기면
             //    리랭커가 거부권만 행사할 수 있고 순위를 다시 매기지 못한다.
             RerankDecision rerank = RerankDecision.passthrough(null, "not_evaluated");
-            if (cached.isEmpty()) {
+            if (cached.isEmpty() && cacheEnabled) {
                 try {
                     embeddingResult = routerClient.embed(message);
                     List<CachedResponse> candidates =
@@ -141,7 +151,7 @@ public class ChatService {
             LlmResult result = llmService.call(tier, message);
 
             // 5. 생성한 캐시 행을 요청 로그와 연결해 이후 에스컬레이션에서 갱신한다.
-            Long cacheEntryId = embeddingResult == null
+            Long cacheEntryId = (embeddingResult == null || !cacheEnabled)
                     ? null
                     : cacheService.put(message, embeddingResult.vector(), result,
                             embeddingResult.modelVersion());

@@ -73,18 +73,19 @@ public class StubRetrainingClient implements RetrainingClient {
             return new RetrainingStatus("retraining-status-v1", batchId, "failed", "training",
                     true, false,
                     new RetrainingStatus.Result("failure", "TRAINING_FAILED", true),
-                    new RetrainingStatus.Activation("notApplicable", null));
+                    new RetrainingStatus.Activation("notApplicable", null, null));
         }
         if (batchId.endsWith("-reject")) {
             return new RetrainingStatus("retraining-status-v1", batchId, "rejected", "gate",
                     true, false,
                     new RetrainingStatus.Result("rejected", "DEPLOY_GATE_REJECTED", false),
-                    new RetrainingStatus.Activation("notApplicable", null));
+                    new RetrainingStatus.Activation("notApplicable", null, null));
         }
         return new RetrainingStatus("retraining-status-v1", batchId, "succeeded", "complete",
                 true, false,
                 new RetrainingStatus.Result("succeeded", null, null),
-                new RetrainingStatus.Activation("active", "router-modernbert-stub-" + batchId));
+                new RetrainingStatus.Activation("active", "router-modernbert-stub-" + batchId,
+                        "router-modernbert-stub-" + batchId));
     }
 
     @Override

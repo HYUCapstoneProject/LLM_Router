@@ -43,10 +43,15 @@ public record RetrainingStatus(
      * {@code status=succeeded} 인데 {@code activation=loadFailed} 면 gate 는 통과했지만
      * FastAPI 는 이전 known-good 모델로 계속 응답하고 있다는 뜻이다.
      *
+     * <p>필드 이름이 {@code desired}/{@code serving} 으로 나뉘어 있는 것이 핵심이다.
+     * 승인된 모델과 실제로 메모리에 올라간 모델이 다를 수 있어서, 하나로 합친
+     * {@code modelVersion} 같은 필드는 FastAPI 응답에 아예 없다.
+     *
      * @param status pending | active | loadFailed | superseded | notApplicable
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record Activation(String status, String modelVersion) {
+    public record Activation(String status, String desiredModelVersion,
+                             String servingModelVersion) {
     }
 
     /**

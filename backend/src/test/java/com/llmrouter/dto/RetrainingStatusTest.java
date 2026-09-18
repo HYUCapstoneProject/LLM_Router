@@ -56,7 +56,7 @@ class RetrainingStatusTest {
         RetrainingStatus loadFailed = new RetrainingStatus("v1", "b-1", "succeeded", "complete",
                 true, false,
                 new RetrainingStatus.Result("succeeded", null, null),
-                new RetrainingStatus.Activation("loadFailed", null));
+                new RetrainingStatus.Activation("loadFailed", "router-v2", "router-v1"));
 
         assertThat(loadFailed.isTerminal()).isTrue();
         // gate 는 통과했지만 FastAPI 는 이전 known-good 모델로 응답하고 있다.
