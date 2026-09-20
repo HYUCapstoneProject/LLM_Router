@@ -5,14 +5,14 @@
 현행 인프라 보정일: 2026-08-14
 
 이 문서는 2026-07-08 당시 stub 상태를 기준으로 MVP와 최종 목표를 구분한 과거 범위
-초안이다. 현행 ML 구조, 백엔드 협의 사항과 작업 상태는
-`docs/ml/workstream-checklist.md`를 유일한 기준으로 사용한다.
+초안이다. 현행 ML 구조와 실험 계약은 [ML 최종 실험 문서](ml/README.md),
+구현 상태는 [실행·산출물 관리](ml/execution-and-artifacts.md)를 기준으로 사용한다.
 상세 일정은 `docs/timeline.md`, 배경 설계는 `docs/졸업프로젝트 개요.md`를 기준으로 한다.
 
 ## 0. 2026-08-14 확정 인프라 보정
 
-아래 항목은 역사적 MVP 범위를 넓히는 뜻이 아니라, MVP 이후 ML 학습·재학습을 어떤
-환경에서 실행할지 확정한 현행 기준이다. 팀 회의의 선택지가 아니며 구현 영향만 공유한다.
+아래 항목은 2026-08-14 당시 인프라 결정의 기록이다. 이후 초기학습·비교는 Colab,
+운영 feedback 재학습은 Vertex로 분리되었으므로 새 실행에는 최신 ML 문서를 적용한다.
 
 ```text
 GCS 데이터·config
@@ -299,8 +299,8 @@ feedback을 보존하고 부족한 클래스 sampler pool만 결정적으로 순
 ## 6. 현행 작업 추적
 
 이 절에 있던 구현 체크리스트는 2026-07 시점의 초안이라 현재 코드와 크게 달라졌다.
-ML 진행 상태와 온라인 팀 협의 agenda는
-`docs/ml/workstream-checklist.md`로 통합했다. 팀 전체의 frontend,
+ML 실험 계약은 [ML 최종 실험 문서](ml/README.md), 진행 상태는
+[실행·산출물 관리](ml/execution-and-artifacts.md)로 통합했다. 팀 전체의 frontend,
 backend와 배포 일정은 GitHub issue/milestone에서 관리한다.
 
 ## 7. MVP 완료 기준
