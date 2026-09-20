@@ -546,6 +546,23 @@ gs://<bucket>/pipeline-root/
 - [ ] 비교 winner와 Pareto 권고를 보고하되 이번 continual pipeline·자동 승격은
   ModernBERT만 유지한다. 통합 ModernBERT package-v1과 hot-swap/rollback을 검증하고,
   다른 family serving adapter는 구현 범위에서 제외한다.
+- [x] backbone 비교와 분리된 라우팅 목적함수 비교 계획을
+  `routing-objective-comparison-experiment-plan.md`에 사전등록하고, cache 유사도 검색형과
+  response verifier/cascade형을 주 비교군에서 제외한다.
+- [x] 동일한 통합 split과 query×model 결과로 train-only Pareto `low/medium/high` arm,
+  tier별 quality/success/decision cost/actual cost를 만드는 outcome-matrix CLI를 구현하고
+  로컬 전체 데이터 생성을 검증한다.
+- [x] R0 ordinal, R1 pointwise success, R2 pairwise preference, R3 direct regret의 공통
+  ModernBERT head·loss·validation budget lock·sealed test·RouterArena alignment CLI와 단위
+  테스트를 구현한다.
+- [x] `ml/notebooks/routing_objective_comparison/`에 outcome matrix `00`, smoke `01`,
+  목적함수별 full run `02~05`, finalist seed/validation lock `06`, sealed test/RouterArena `07`
+  Colab notebook을 구현한다.
+- [ ] 목적함수 비교 Colab `01`에서 네 loss의 T4 smoke와 Drive 원자 게시를 검증한다.
+- [ ] R0~R3 seed 42 full run 후 validation NAUC 상위 두 방법을 provisional finalist로 동결한다.
+- [ ] finalist seed 17/73을 실행하고 final validation lock을 만든다.
+- [ ] 고정 penalty로 네 canonical run의 RouterBench+xRouteBench sealed test와 RouterArena
+  label-alignment를 한 번 실행하고 목적함수 winner·동급 범위를 보고한다.
 
 ### E. 확정 인프라 전환 코드 체크리스트
 
@@ -724,5 +741,7 @@ gs://<bucket>/pipeline-root/
 - `docs/ml/integrated-routing-data-and-model-comparison-plan.md`: 신규 실험의 전체 flow,
   RouterBench+xRouteBench 통합, threshold 후보·목적함수, 최종 모델군, Vertex/GCS,
   FastAPI·API 실행 계약
+- `docs/ml/routing-objective-comparison-experiment-plan.md`: 동일 원천 outcome matrix에서
+  ordinal·pointwise·pairwise·regret 라우팅 목적함수를 공정하게 비교하는 별도 실험 계약
 - `docs/mvp-scope-and-checklist.md`: 2026-07 시점의 프로젝트 범위 초안
 - `ml/README.md`: 실제 로컬 CLI와 Docker 실행 명령

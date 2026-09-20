@@ -1,5 +1,11 @@
 # ModernBERT continual retraining strategy
 
+> 2026-09-20 실험 명세 추가: [offline escalation 실험](escalation-offline-experiment-plan.md)은
+> 아래의 3-success cycle·anchor·replay·5-major rebase 정책을 재사용한다. 연구용 승격 gate는
+> 별도 내부 검증 데이터로 분리해야 하며 RouterArena를 반복 승격 의사결정에 사용하지 않는다.
+> 이는 현재 배포 gate가 변경됐다는 뜻이 아니다. strict upward feedback에서는 final easy가
+> 나오지 않으므로 label당 32행 replay의 실제 가능한 상한은 medium/hard 합계 64행이다.
+
 > 2026-09-16 통합 주석: continual retraining과 자동 승격은 ModernBERT만 대상으로 한다.
 > 다른 모델군은 Colab notebook의 offline 비교 결과와 차기 권고에만 사용하며 KFP/Vertex에
 > 올리지 않는다. ModernBERT 운영 초기학습도 Colab에서 수행하고, Vertex T4 학습은 이
