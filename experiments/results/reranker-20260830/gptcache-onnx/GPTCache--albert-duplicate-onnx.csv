@@ -1,0 +1,59 @@
+pair_id,label,neg_type,tier,query,candidate,bi_encoder_similarity,reranker_score
+g01~g01p1,positive,,easy,What is the capital of France?,Which city is the capital of France?,0.9746,0.89509976
+g01~g01p2,positive,,easy,What is the capital of France?,France's capital city is what?,0.9480,0.92057437
+g01~g01n1,negative,entity_swap,easy,What is the capital of France?,What is the capital of Germany?,0.7009,0.00040375
+g01~g01n2,negative,same_domain,easy,What is the capital of France?,What is the population of France?,0.6619,0.00809687
+g02~g02p1,positive,,easy,What does HTTP stand for?,What is the full form of the acronym HTTP?,0.8621,0.00427679
+g02~g02n1,negative,entity_swap,easy,What does HTTP stand for?,What does HTTPS stand for?,0.8559,0.96333617
+g02~g02n2,negative,same_domain,easy,What does HTTP stand for?,What port does HTTP use by default?,0.7168,0.07266074
+g03~g03p1,positive,,easy,What is the boiling point of water in Celsius?,At what temperature in Celsius does water boil?,0.9146,0.08913454
+g03~g03n1,negative,entity_swap,easy,What is the boiling point of water in Celsius?,What is the freezing point of water in Celsius?,0.8776,0.00050806
+g03~g03n2,negative,entity_swap,easy,What is the boiling point of water in Celsius?,What is the boiling point of water in Fahrenheit?,0.9026,0.00597500
+g04~g04p1,positive,,easy,Who wrote Romeo and Juliet?,Which author is Romeo and Juliet by?,0.9021,0.24949928
+g04~g04n1,negative,entity_swap,easy,Who wrote Romeo and Juliet?,Who wrote Hamlet?,0.6834,0.02587464
+g04~g04n2,negative,same_domain,easy,Who wrote Romeo and Juliet?,When was Romeo and Juliet first performed?,0.7489,0.00076737
+g05~g05p1,positive,,easy,How many days are in a leap year?,A leap year has how many days?,0.9807,0.97033185
+g05~g05n1,negative,adjacent_concept,easy,How many days are in a leap year?,How do you determine whether a year is a leap year?,0.7834,0.25502375
+h01~h01p1,positive,,hard,"Design a distributed rate limiter that works across multiple servers, and explain the consistency and availability tradeoffs of your approach.","How would you build a rate limiter spanning several servers, and what consistency versus availability tradeoffs does it involve?",0.9039,0.03433667
+h01~h01n1,negative,adjacent_concept,hard,"Design a distributed rate limiter that works across multiple servers, and explain the consistency and availability tradeoffs of your approach.","Design a distributed lock that works across multiple servers, and explain the failure modes that remain under network partition.",0.8011,0.01480188
+h01~h01n2,negative,scope_shift,hard,"Design a distributed rate limiter that works across multiple servers, and explain the consistency and availability tradeoffs of your approach.",Design a rate limiter for a single-process application and explain the memory tradeoffs.,0.7480,0.00040978
+h02~h02p1,positive,,hard,"Prove that the halting problem is undecidable, and explain why the diagonalization argument is necessary.",Give a proof of the undecidability of the halting problem and justify the use of diagonalization.,0.9837,0.80077440
+h02~h02n1,negative,adjacent_concept,hard,"Prove that the halting problem is undecidable, and explain why the diagonalization argument is necessary.",Explain why the P versus NP question remains open and what a proof would require.,0.7344,0.00036007
+h02~h02n2,negative,adjacent_concept,hard,"Prove that the halting problem is undecidable, and explain why the diagonalization argument is necessary.",Prove that the set of real numbers is uncountable using a diagonalization argument.,0.7724,0.00035191
+h03~h03p1,positive,,hard,Explain the CAP theorem and why partition tolerance cannot be sacrificed in practice.,"What does the CAP theorem state, and why must real systems accept partition tolerance?",0.9062,0.88234162
+h03~h03n1,negative,adjacent_concept,hard,Explain the CAP theorem and why partition tolerance cannot be sacrificed in practice.,Explain the PACELC theorem and how it extends beyond CAP.,0.7615,0.03700179
+h03~h03n2,negative,same_domain,hard,Explain the CAP theorem and why partition tolerance cannot be sacrificed in practice.,Compare strong consistency and eventual consistency in terms of client-observable behavior.,0.6253,0.00034297
+h04~h04p1,positive,,hard,"Analyze the time and space complexity of a red-black tree deletion, and explain why the rebalancing cases are exhaustive.","What is the complexity of deleting from a red-black tree, and why do the rebalancing cases cover every situation?",0.9092,0.05638210
+h04~h04n1,negative,inverted,hard,"Analyze the time and space complexity of a red-black tree deletion, and explain why the rebalancing cases are exhaustive.",Analyze the time and space complexity of a red-black tree insertion and its rebalancing cases.,0.8947,0.65895092
+h04~h04n2,negative,entity_swap,hard,"Analyze the time and space complexity of a red-black tree deletion, and explain why the rebalancing cases are exhaustive.",Analyze the time and space complexity of an AVL tree deletion and its rotation cases.,0.8780,0.02243051
+h05~h05p1,positive,,hard,"Derive the backpropagation update rule for a two-layer network with cross-entropy loss and softmax output, showing each gradient step.",Work through the gradient derivation for backpropagation in a two-layer softmax network trained with cross-entropy.,0.9301,0.00060097
+h05~h05n1,negative,inverted,hard,"Derive the backpropagation update rule for a two-layer network with cross-entropy loss and softmax output, showing each gradient step.",Describe the forward pass of a two-layer network with softmax output and cross-entropy loss.,0.8647,0.00412134
+h05~h05n2,negative,entity_swap,hard,"Derive the backpropagation update rule for a two-layer network with cross-entropy loss and softmax output, showing each gradient step.",Derive the gradient update rule for a two-layer network using mean squared error loss.,0.8977,0.02088224
+h06~h06p1,positive,,hard,"Design a schema migration strategy for a live service with zero downtime, covering rollback, dual-write, and backfill ordering.","How do you migrate a database schema on a running service without downtime, including rollback and backfill order?",0.8824,0.01330428
+h06~h06n1,negative,adjacent_concept,hard,"Design a schema migration strategy for a live service with zero downtime, covering rollback, dual-write, and backfill ordering.",Design a blue-green deployment strategy for a live service and explain traffic cutover and rollback.,0.7446,0.00232199
+h06~h06n2,negative,scope_shift,hard,"Design a schema migration strategy for a live service with zero downtime, covering rollback, dual-write, and backfill ordering.",Design a one-time bulk data migration between two databases during a scheduled maintenance window.,0.7779,0.00034514
+n01~n01p1,positive,,medium,Explain the difference between TCP and UDP.,What's the difference between TCP and UDP protocols?,0.9295,0.94643366
+n01~n01p2,positive,,medium,Explain the difference between TCP and UDP.,How do TCP and UDP differ from each other?,0.9303,0.93391329
+n01~n01n1,negative,same_domain,medium,Explain the difference between TCP and UDP.,Explain the steps of the TCP three-way handshake.,0.7282,0.00133141
+n01~n01n2,negative,entity_swap,medium,Explain the difference between TCP and UDP.,Explain the difference between TCP and QUIC.,0.8578,0.00071771
+n02~n02p1,positive,,medium,How does a hash table handle collisions?,What strategies does a hash table use when two keys collide?,0.9079,0.80366808
+n02~n02n1,negative,adjacent_concept,medium,How does a hash table handle collisions?,How does a hash function avoid producing collisions?,0.8977,0.09141964
+n02~n02n2,negative,same_domain,medium,How does a hash table handle collisions?,What is the average time complexity of a hash table lookup?,0.7728,0.00037465
+n03~n03p1,positive,,medium,Explain how database indexes speed up queries.,Why do queries run faster when a database index exists?,0.8774,0.00569127
+n03~n03n1,negative,inverted,medium,Explain how database indexes speed up queries.,When do database indexes make performance worse?,0.8663,0.00047241
+n03~n03n2,negative,adjacent_concept,medium,Explain how database indexes speed up queries.,How does a database query planner decide which index to use?,0.7856,0.00047781
+n04~n04p1,positive,,medium,What causes a deadlock and how can it be prevented?,Why do deadlocks happen and what prevents them?,0.9433,0.02591001
+n04~n04n1,negative,adjacent_concept,medium,What causes a deadlock and how can it be prevented?,What causes a livelock and how is it different from starvation?,0.7451,0.81753373
+n04~n04n2,negative,adjacent_concept,medium,What causes a deadlock and how can it be prevented?,How does a database detect and resolve deadlocks at runtime?,0.8012,0.00035198
+n05~n05p1,positive,,medium,What are the tradeoffs between REST and GraphQL for a mobile client?,"For a mobile app, what are the pros and cons of REST versus GraphQL?",0.9499,0.26934087
+n05~n05n1,negative,entity_swap,medium,What are the tradeoffs between REST and GraphQL for a mobile client?,What are the tradeoffs between REST and gRPC for a mobile client?,0.8738,0.00096088
+n05~n05n2,negative,scope_shift,medium,What are the tradeoffs between REST and GraphQL for a mobile client?,What are the tradeoffs between REST and GraphQL for a public third-party API?,0.8920,0.83168977
+n06~n06p1,positive,,medium,How does garbage collection work in the JVM?,Explain the JVM's garbage collection mechanism.,0.9525,0.96983624
+n06~n06n1,negative,entity_swap,medium,How does garbage collection work in the JVM?,How does garbage collection work in CPython?,0.8059,0.00750751
+n06~n06n2,negative,adjacent_concept,medium,How does garbage collection work in the JVM?,How do you tune JVM heap size to reduce GC pauses?,0.7727,0.00034135
+n07~n07p1,positive,,medium,Why does quicksort have O(n log n) average time complexity?,Explain why quicksort averages O(n log n) running time.,0.9458,0.00728280
+n07~n07n1,negative,inverted,medium,Why does quicksort have O(n log n) average time complexity?,Why does quicksort degrade to O(n squared) in the worst case?,0.8774,0.00048289
+n07~n07n2,negative,entity_swap,medium,Why does quicksort have O(n log n) average time complexity?,Why does mergesort have O(n log n) time complexity in all cases?,0.8932,0.84606451
+n08~n08p1,positive,,medium,Write a Python function that returns the longest common prefix of a list of strings.,"In Python, how do I compute the longest common prefix across several strings?",0.9085,0.89779127
+n08~n08n1,negative,adjacent_concept,medium,Write a Python function that returns the longest common prefix of a list of strings.,Write a Python function that returns the longest common subsequence of two strings.,0.8735,0.21750563
+n08~n08n2,negative,entity_swap,medium,Write a Python function that returns the longest common prefix of a list of strings.,Write a Java function that returns the longest common prefix of an array of strings.,0.9371,0.00198934

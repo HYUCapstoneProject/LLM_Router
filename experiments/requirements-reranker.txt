@@ -1,0 +1,4 @@
+# Install CPU PyTorch first from https://download.pytorch.org/whl/cpu
+sentence-transformers==6.0.0
+psutil==7.2.2
+onnxruntime==1.24.2

@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-08-30T06:54:05.765257+00:00",
+  "dataset": {
+    "pairs": 58,
+    "positive": 21,
+    "negative": 37
+  },
+  "runtime": {
+    "model": "cross-encoder/ms-marco-MiniLM-L6-v2",
+    "revision": "233902d25c440f23af6f7d6e94d2946bac0bee0a",
+    "device": "cpu",
+    "batch_size": 8,
+    "load_seconds": 18.39720250002574,
+    "inference_seconds": 0.37922870001057163,
+    "latency_ms": {
+      "mean_per_pair": 6.535065517929414,
+      "p50_per_pair": 6.619812498684041,
+      "p95_per_pair": 8.85270000435412
+    },
+    "rss_mb": {
+      "before_load": 375.82421875,
+      "after_load": 414.33203125,
+      "after_inference": 485.55859375
+    }
+  },
+  "score_distribution": {
+    "positive": {
+      "min": -0.0747566968202591,
+      "mean": 3.8466531740767613,
+      "max": 6.987659931182861
+    },
+    "negative": {
+      "min": -11.118048667907715,
+      "mean": -0.1840798411820386,
+      "max": 8.081995964050293
+    }
+  },
+  "selected_threshold": null,
+  "best_zero_false_hit_threshold": null,
+  "best_f1_threshold": {
+    "threshold": 1.7751879692077637,
+    "tp": 20,
+    "fp": 17,
+    "tn": 20,
+    "fn": 1,
+    "precision": 0.5405405405405406,
+    "recall": 0.9523809523809523,
+    "false_hit_rate": 0.4594594594594595,
+    "f1": 0.6896551724137931
+  }
+}

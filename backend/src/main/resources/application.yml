@@ -5,8 +5,171 @@ spring:
   application:
     name: llm-router
 
+  # 로컬은 docker-compose 의 pgvector 컨테이너.
+  # 배포(M5) 때는 게이트웨이와 같은 GCE VM 에 두므로 host 는 localhost 그대로다.
+  datasource:
+    url: jdbc:postgresql://localhost:5432/llmrouter
+    username: llmrouter
+    password: ${POSTGRES_PASSWORD:localdev}
+    hikari:
+      maximum-pool-size: 10
+
+logging:
+  pattern:
+    # %X{requestId} — RequestIdFilter 가 MDC 에 넣은 값.
+    # 한 요청의 라우팅·캐시·LLM 로그를 이 값으로 묶어서 볼 수 있다.
+    console: "%d{HH:mm:ss.SSS} %-5level [%X{requestId:-no-request}] %logger{30} - %msg%n"
+
 llm:
+  gateway:
+    # 프론트 nginx 가 X-Gateway-Key 헤더로 보내는 공유 시크릿.
+    # 비워두면 검증을 건너뛴다(로컬 개발).
+    # 배포 시에는 반드시 환경변수로 설정한다 — 안 하면 GCE 8080 이 무방비로 열린다.
+    key: ${GATEWAY_KEY:}
+
   router:
-    routing-threshold: 0.7
+    # 로컬은 결정적인 가짜 벡터/medium 분류를 사용한다. 배포 환경에서만 fastapi로 전환한다.
+    # fastapi 모드는 토큰이 비어 있으면 기동에 실패해 무인증 오배포를 막는다.
+    mode: ${ROUTER_MODE:stub}
+    base-url: ${ROUTER_BASE_URL:http://10.138.0.2:8000}
+    token: ${ROUTER_API_TOKEN:}
+    connect-timeout: ${ROUTER_CONNECT_TIMEOUT:PT2S}
+    read-timeout: ${ROUTER_READ_TIMEOUT:PT15S}
+    # embed/classify는 멱등 요청이다. 연결 오류와 FastAPI 500/503만 한 번 재시도한다.
+    max-attempts: ${ROUTER_MAX_ATTEMPTS:2}
+    embed-model-version: ${ROUTER_EMBED_MODEL_VERSION:bge-large-en-v1.5}
+    model-version: ${ROUTER_MODEL_VERSION:router-modernbert-base-routerbench-20260814-45dcc6d}
+
+  pricing:
+    # 100만 토큰당 USD. 가격이 개정되면 version 을 올리고 값을 바꾼다.
+    # 실험 결과에는 이 version 을 같이 남겨야 나중에 숫자를 재현할 수 있다.
+    version: "2026-06"
+    haiku:
+      input: 1.0
+      output: 5.0
+    sonnet:
+      input: 3.0
+      output: 15.0
+    opus:
+      input: 5.0
+      output: 25.0
+
+  # 티어 → Claude 모델 매핑 (기획서 2장 기술 스택)
+  # 실험 중 재컴파일 없이 바꿀 수 있도록 설정으로 뺌
+  # 환경변수로 덮을 수 있게 둔다. 발표용 ablation(실험 A)에서 코드를 고치지 않고
+  # 세 티어를 전부 Opus 로 돌려 Always-Opus 구성을 만든다. 실험이 실험용 코드가 아니라
+  # 실제 배포본에서 돌아야 숫자를 인용할 수 있다.
+  models:
+    easy: ${LLM_MODEL_EASY:claude-haiku-4-5}
+    medium: ${LLM_MODEL_MEDIUM:claude-sonnet-4-6}
+    hard: ${LLM_MODEL_HARD:claude-opus-4-8}
+  max-tokens: 4096
   cache:
-    similarity-threshold: 0.8
+    # 캐시 계층 전체 on/off. 끄면 조회도 저장도 하지 않는다.
+    # 발표용 ablation 에서 "Router Only"(캐시 없는 라우팅만) 구성을 만들 때 쓴다.
+    enabled: ${CACHE_ENABLED:true}
+
+    # 티어별 캐시 임계값 (적응형 임계값 Level 2).
+    #
+    # 저장 시점에 해당 항목의 tier 로 threshold 를 정해 cache_entry 에 박아둔다.
+    # 조회 시점에는 들어온 질문의 tier 를 알 수 없기 때문이다 —
+    # classify 는 cache miss 일 때만 호출한다.
+    #
+    # 지금은 세 값이 같아서 고정 임계값(Level 1)과 동일하게 동작한다.
+    # EXP-003 에서 QQP 로 티어별 hit/false-hit 곡선을 측정한 뒤 값을 벌린다.
+    # 코드 변경 없이 설정만으로 Level 1 <-> Level 2 A/B 비교가 된다.
+    # HNSW 가 훑을 후보 수이자 리랭커에 넘길 수 있는 최대치.
+    # 키우면 리랭커가 순위를 바로잡을 기회가 늘지만 rerank 지연도 같이 는다.
+    # FastAPI 의 rerank_max_candidates(기본 16)를 넘으면 400 을 맞는다.
+    candidate-limit: 5
+
+    thresholds:
+      easy: 0.80
+      medium: 0.80
+      hard: 0.80
+
+    rerank:
+      # cross-encoder 로 캐시 히트를 재검증한다.
+      #
+      # 대가가 있다. 리랭커는 캐시 히트 경로에서 돈다 — 빠르려고 만든 그 경로다.
+      # FastAPI 가 us-west1, 게이트웨이가 asia-northeast3 라 시맨틱 히트에
+      # 약 500ms 가 붙는다. exact 히트는 영향이 없다(문자열이 같아 재검증 불필요).
+      #
+      #   off     : 부르지 않는다. 코사인 임계값만으로 판정한다
+      #   shadow  : 점수만 기록하고 캐시 판정은 바꾸지 않는다
+      #   enforce : 판정에 실제로 쓴다. 통과 못 하면 캐시 미스로 떨어진다
+      #
+      # 배포된 서버에 92문항을 던져 측정한 결과로 enforce 를 택했다.
+      #
+      #                        recall    오탐    오탐률
+      #   코사인 단독(0.80)     100.0%     19     36.5%
+      #   코사인 AND 리랭커      90.5%      1      1.9%
+      #
+      # 정탐 2건을 잃고 오탐 18건을 막는다. 잃은 2건은 Claude 를 한 번 더 부를 뿐
+      # 사용자는 정상 답변을 받지만, 막지 못한 오탐은 틀린 답이 그대로 나간다.
+      mode: ${RERANK_MODE:enforce}
+
+      # 스크리닝이 고른 AND 조건. 코사인 단독으로는 두 분포가 겹쳐 갈리지 않는다.
+      # quora-distilroberta-base@f62e7a4 에서만 유효한 값이다 — 모델이 바뀌면 재측정한다.
+      similarity-threshold: 0.8774
+      score-threshold: 0.03581769
+
+  retraining:
+    # 에스컬레이션 정정 라벨을 FastAPI 로 보내 재학습을 트리거한다 (04 API Contract).
+    #
+    # ⚠️ 성공한 배치 하나가 팀원 쪽 모델 버전을 한 칸 올린다.
+    #    계약: 승격까지 성공한 고유 HTTP batch 3회가 한 major cycle (n.1 -> n.2 -> (n+1).0).
+    #    같은 batchId 재시도는 멱등이라 버전을 소모하지 않지만, batchId 를 바꾸면 새 배치다.
+    #    그래서 개발·테스트는 ROUTER_MODE=stub 으로 하고, 실연동은 명시적으로 전환한다.
+
+    # 한 배치에 담을 최대 이벤트 수.
+    # 계약은 최소 1건이고 상한이 없지만, 큰 payload 를 자동 분할하지 말라고 못 박는다.
+    # 그래서 "쪼개서 여러 번"이 아니라 "한 번에 이만큼, 나머지는 다음 배치"로 동작한다.
+    batch-size: ${RETRAINING_BATCH_SIZE:1000}
+
+    # 임계값 도달 시 자동 제출. 기본은 꺼 둔다.
+    #
+    # 실사용자가 없어 이벤트가 천천히 쌓이는데, 자동으로 나가면 팀원 쪽 파이프라인이
+    # 예고 없이 돈다. 시점은 대시보드의 강제 실행 버튼으로 사람이 정한다.
+    auto-submit: ${RETRAINING_AUTO_SUBMIT:false}
+
+    # 이 배포가 실제 PII 제거를 요구하는가.
+    #
+    # 우리가 보내는 piiRedacted 는 항상 true 지만, 그것은 "제거했다"가 아니라
+    # "PII 가 유입되지 않는 실험 경로다"라는 선언이다.
+    #
+    # true 로 두면 제출이 거부된다. 실사용자에게 열거나 실제 상담 로그를 넣게 되면
+    # 이 스위치로 먼저 막고, 마스킹을 구현한 뒤 검사를 redactor 호출로 바꾼다.
+    require-pii-redaction: ${RETRAINING_REQUIRE_PII_REDACTION:false}
+
+    # 제출은 GCS artifact 생성과 Vertex PipelineJob 제출까지 기다린다.
+    # 추론(15초)과 같은 타임아웃을 쓰면 정상 제출이 끊긴다.
+    read-timeout: ${RETRAINING_READ_TIMEOUT:PT60S}
+
+    # 주기 작업. 폴링 간격 자체는 계약의 backoff(10s -> 15s -> 30s -> 60s)를
+    # SQL 에서 계산하므로, 여기 값은 "차례가 된 것이 있나" 확인 주기다.
+    submit-interval-ms: ${RETRAINING_SUBMIT_INTERVAL_MS:300000}
+    retry-interval-ms: ${RETRAINING_RETRY_INTERVAL_MS:60000}
+    poll-interval-ms: ${RETRAINING_POLL_INTERVAL_MS:10000}
+
+  escalation:
+    # LLM 을 부르기 전에 escalation_log 에 자리를 예약한다. 중복 요청은 유니크 인덱스에서
+    # 막혀 요금이 나가지 않는다. 이 시간보다 오래된 미완료 예약은 프로세스가 죽어 남은
+    # 유령으로 보고 인수한다 — 안 그러면 그 질문이 영구히 막힌다.
+    #
+    # ⚠️ 반드시 Anthropic SDK 의 요청 타임아웃(기본 10분)보다 길어야 한다.
+    #    짧으면 "느리지만 살아 있는" 호출의 예약을 다른 요청이 가로채 LLM 을 또 부른다.
+    #    예약을 먼저 잡는 설계가 막으려던 이중 과금이 바로 그 지점에서 되살아난다.
+    reservation-timeout: PT15M
+
+    cache-refresh:
+      # 에스컬레이션으로 만족한 답을 얻으면 캐시를 갱신한다 (기획서 4-3).
+      # 갱신하지 않으면 이후 유사 질문에 불만족스러웠던 답이 다시 나간다.
+      enabled: true
+
+      # 원본이 캐시 히트였을 때만 쓰는 안전장치.
+      #
+      # 캐시 히트 유래라는 건 그 cache_entry.question 이 "다른 사용자의 질문"이라는 뜻이다.
+      # 유사도가 이 값 미만이면 남의 질문에 달린 답을 갈아치우지 않고 새 행을 만든다.
+      # 기획서 4-3 은 "갱신하라"고만 하고 히트 유래와 미스 유래를 구분하지 않아 여기서 나눈다.
+      overwrite-similarity: 0.95

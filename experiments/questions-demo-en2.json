@@ -1,0 +1,23 @@
+{
+  "version": "demo-en-v2",
+  "note": "1차에서 medium 이 6/6 전부 easy 로 갔다. medium 으로 실제로 분류되는 문형을 찾기 위한 2차 후보. hard 예비 후보도 함께 던진다.",
+  "questions": [
+    { "id": "m01", "expectedTier": "medium", "kind": "base", "group": "e01", "text": "Implement a thread-safe LRU cache with O(1) get and put, and explain how you keep it correct under concurrent access." },
+    { "id": "m02", "expectedTier": "medium", "kind": "base", "group": "e02", "text": "Write a SQL query that returns the second highest salary in each department, and explain the window function you used." },
+    { "id": "m03", "expectedTier": "medium", "kind": "base", "group": "e03", "text": "Refactor callback-based Node.js code into async/await and explain what changes about error handling." },
+    { "id": "m04", "expectedTier": "medium", "kind": "base", "group": "e04", "text": "Given an array of intervals, merge the overlapping ones and analyze the time and space complexity of your solution." },
+    { "id": "m05", "expectedTier": "medium", "kind": "base", "group": "e05", "text": "Explain the CAP theorem and give a concrete example of a production system that chooses availability over consistency." },
+    { "id": "m06", "expectedTier": "medium", "kind": "base", "group": "e06", "text": "Walk through step by step what happens when you type a URL into a browser and press enter." },
+    { "id": "m07", "expectedTier": "medium", "kind": "base", "group": "e07", "text": "Compare REST and GraphQL for a mobile client on an intermittent network connection." },
+    { "id": "m08", "expectedTier": "medium", "kind": "base", "group": "e08", "text": "A Spring Boot application throws LazyInitializationException when serializing an entity. Explain the cause and give two different fixes with their trade-offs." },
+    { "id": "m09", "expectedTier": "medium", "kind": "base", "group": "e09", "text": "Write a function that detects a cycle in a directed graph and returns the nodes on the cycle." },
+    { "id": "m10", "expectedTier": "medium", "kind": "base", "group": "e10", "text": "Explain how garbage collection works in the JVM and why G1 replaced CMS as the default collector." },
+    { "id": "m11", "expectedTier": "medium", "kind": "base", "group": "e11", "text": "Design a database schema for a simple e-commerce order system covering products, orders, and inventory." },
+    { "id": "m12", "expectedTier": "medium", "kind": "base", "group": "e12", "text": "How would you unit test a function that depends on the current system time? Show the approach in code." },
+
+    { "id": "h01", "expectedTier": "hard", "kind": "base", "group": "e21", "text": "Prove the correctness of Dijkstra's algorithm using a loop invariant, then explain exactly where the proof breaks once negative edge weights are allowed." },
+    { "id": "h02", "expectedTier": "hard", "kind": "base", "group": "e22", "text": "Design a globally distributed strongly consistent counter. Analyze the latency lower bound imposed by the speed of light between regions and justify the consistency model you pick." },
+    { "id": "h03", "expectedTier": "hard", "kind": "base", "group": "e23", "text": "Compare Raft and Paxos in detail, explain why Raft's leader-based design simplifies implementation but constrains throughput, and propose a concrete modification that relaxes that constraint." },
+    { "id": "h04", "expectedTier": "hard", "kind": "base", "group": "e24", "text": "Given a 10TB dataset that no longer fits in memory, design an external sorting pipeline, derive its I/O complexity, and explain how you would tune the merge fan-in against available RAM and disk seek cost." }
+  ]
+}

@@ -1,0 +1,23 @@
+validation 1,000건에서 사다리 선택 · test 3,218건에서 보고
+
+사다리  ours       : zero-one-ai/Yi-34B-Chat / zero-one-ai/Yi-34B-Chat / gpt-4-1106-preview
+        tier-oracle: zero-one-ai/Yi-34B-Chat / gpt-3.5-turbo-1106 / gpt-4-1106-preview
+
+  정책                                  perf     $/1k       격차
+  ours (현재 분류기)                     0.7710   1.3667  +0.0119
+  완벽한 난이도 분류기                       0.7759   1.1597  +0.0265
+  oracle — 사다리 3모델                  0.8759   0.3143  +0.1665
+  oracle — 11모델                     0.8681   0.1321  +0.2841
+
+라벨 비교 (학습셋 25,204건)
+sufficient_tier   easy  hard  medium
+difficulty_label                    
+easy              6806  1686     744
+hard              3447  3723     974
+medium            4033  2945     846
+일치율 45.1%
+분포
+        difficulty_label  sufficient_tier
+easy            0.366450         0.566815
+hard            0.323123         0.331455
+medium          0.310427         0.101730

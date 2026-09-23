@@ -61,12 +61,6 @@ export function Sidebar({ conversations, activeId, onSelect, onNew }: Props) {
         )}
       </div>
 
-      <div className="p-3 border-t border-gray-800">
-        <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-gray-600">
-          <div className="w-2 h-2 rounded-full bg-emerald-500" />
-          <span>Mock 모드 활성</span>
-        </div>
-      </div>
     </aside>
   )
 }

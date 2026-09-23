@@ -7,9 +7,18 @@
 .DS_Store
 Thumbs.db
 
+# ── Docker / 로컬 인프라 ──────────────────────────────────────────────
+.env
+
+# ── 개인 도구 설정 / JVM 크래시 산출물 ───────────────────────────────
+.claude/
+hs_err_pid*.log
+replay_pid*.log
+
 # ── Frontend (Vite / Node) ───────────────────────────────────────────
 frontend/node_modules/
 frontend/dist/
+frontend/coverage/
 frontend/.env
 frontend/.env.local
 frontend/.env.*.local
@@ -18,7 +27,20 @@ frontend/.env.*.local
 backend/.gradle/
 backend/build/
 backend/out/
+backend/hs_err_pid*.log
+backend/replay_pid*.log
 backend/.env
+
+# Local Codex Gradle cache
+.gradle-codex/
+
+# Local Python/model caches for reranker evaluation
+.venv-reranker/
+.hf-cache/
+
+# 평가 스크립트 실행 시 생성됨
+__pycache__/
+*.pyc
 
 # Gradle wrapper (선택: 팀 공유 시 아래 두 줄 주석 처리)
 !backend/gradle/
@@ -40,3 +62,6 @@ __pycache__/
 ml/data/
 ml/artifacts/
 ml/.cache/
+
+# 파레토 실험용 venv 와 내려받은 데이터셋 (수백 MB)
+.venv-experiments/

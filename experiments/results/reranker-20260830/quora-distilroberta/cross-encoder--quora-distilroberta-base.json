@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-08-30T06:59:15.752368+00:00",
+  "dataset": {
+    "pairs": 58,
+    "positive": 21,
+    "negative": 37
+  },
+  "runtime": {
+    "model": "cross-encoder/quora-distilroberta-base",
+    "revision": "f62e7a4b20b97195c2868e53ec59126df5eac743",
+    "device": "cpu",
+    "batch_size": 8,
+    "load_seconds": 45.30716329999268,
+    "inference_seconds": 1.266102499968838,
+    "latency_ms": {
+      "mean_per_pair": 21.826065516757684,
+      "p50_per_pair": 22.020987496944144,
+      "p95_per_pair": 29.44541249598842
+    },
+    "rss_mb": {
+      "before_load": 374.5625,
+      "after_load": 430.4765625,
+      "after_inference": 640.14453125
+    }
+  },
+  "score_distribution": {
+    "positive": {
+      "min": 0.008883345872163773,
+      "mean": 0.617338801955893,
+      "max": 0.9876140356063843
+    },
+    "negative": {
+      "min": 0.00023499618691857904,
+      "mean": 0.03683823436369641,
+      "max": 0.9899813532829285
+    }
+  },
+  "selected_threshold": null,
+  "best_zero_false_hit_threshold": null,
+  "best_f1_threshold": {
+    "threshold": 0.035817693918943405,
+    "tp": 20,
+    "fp": 3,
+    "tn": 34,
+    "fn": 1,
+    "precision": 0.8695652173913043,
+    "recall": 0.9523809523809523,
+    "false_hit_rate": 0.08108108108108109,
+    "f1": 0.909090909090909
+  }
+}
