@@ -1,0 +1,5 @@
+# Keep Cloud Build uploads aligned with the files available to the Docker builds.
+.gcloudignore
+.git
+.gitignore
+#!include:.dockerignore

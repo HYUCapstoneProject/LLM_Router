@@ -1,0 +1,11 @@
+{
+  "model_version": "replace-at-package-time",
+  "base_model": "answerdotai/ModernBERT-base@8949b909ec900327062f0ebf497f51aef5e6f0c8",
+  "dataset_version": "withmartian-routerbench-2024-03-27__minimum-sufficient-tier-v2__routerbench-training-preprocess-v2-balanced",
+  "preprocessing_version": "routerbench-training-preprocess-v2-balanced",
+  "label_rule_version": "minimum-sufficient-tier-v2",
+  "training_version": "modernbert-router-t4-balanced-v2",
+  "evaluation_version": "routerarena-routing-evaluation-v2",
+  "tokenizer_max_length": 8192,
+  "code_commit": "45dcc6d"
+}

@@ -12,6 +12,27 @@ Thumbs.db
 
 # ── 개인 도구 설정 / JVM 크래시 산출물 ───────────────────────────────
 .claude/
+.codex/
+.agents/
+.cursor/
+.continue/
+.windsurf/
+.gemini/
+.aider/
+AGENTS.md
+AGENTS.override.md
+CLAUDE.md
+GEMINI.md
+.cursorrules
+.windsurfrules
+.aider.conf.yml
+.aider.input.history
+.aider.chat.history.md
+.mcp.json
+.github/copilot-instructions.md
+.github/instructions/
+.github/agents/
+.github/prompts/
 hs_err_pid*.log
 replay_pid*.log
 
@@ -46,6 +67,22 @@ __pycache__/
 !backend/gradle/
 !backend/gradlew
 !backend/gradlew.bat
+
+# ── Local project memory state ───────────────────────────────────────
+.memorize/
+
+# ── ML / Python ──────────────────────────────────────────────────────
+.venv/
+.venv-training/
+.tools/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+ml/data/
+ml/artifacts/
+ml/.cache/
 
 # 파레토 실험용 venv 와 내려받은 데이터셋 (수백 MB)
 .venv-experiments/

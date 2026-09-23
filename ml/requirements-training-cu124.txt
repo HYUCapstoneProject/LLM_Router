@@ -1,0 +1,5 @@
+# ModernBERT training only needs torch. torchvision and torchaudio are omitted to
+# reduce Colab download time, disk use, and dependency conflicts.
+# Install with the PyTorch CUDA 12.4 index and PyPI as an extra index. PyPI is
+# needed when the mirrored NVIDIA index omits an older pinned CUDA dependency.
+torch==2.5.1

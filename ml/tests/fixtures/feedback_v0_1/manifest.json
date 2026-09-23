@@ -1,0 +1,13 @@
+{
+  "schema_version": "feedback-export-v0.1",
+  "batch_id": "feedback-fixture-001",
+  "created_at": "2026-08-02T00:00:00Z",
+  "window_start": "2026-08-01T00:00:00Z",
+  "window_end": "2026-08-02T00:00:00Z",
+  "event_count": 8,
+  "data_format": "jsonl",
+  "data_uri": "fixture://feedback_v0_1/events.jsonl",
+  "sha256": "fd5e1d4d09a300ae45c1a9d7c3380b4cc6673115c48f9c727a59a93f98583a96",
+  "producer_version": "feedback-fixture-v0.1",
+  "watermark": "fixture-watermark-008"
+}

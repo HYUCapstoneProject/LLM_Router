@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-router-modernbert-training"
+version = "0.1.0"
+description = "ModernBERT training-only runtime for the LLM Router"
+requires-python = ">=3.11,<3.13"
+dependencies = []
+
+[project.scripts]
+modernbert-train = "llm_router_labeling.training.modernbert_training_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

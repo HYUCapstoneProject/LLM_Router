@@ -1,0 +1,38 @@
+{
+  "dataset_version": "routeworks-routerarena-a4a062ce3313b56bb09c042e1bc37b61d34e3bd8",
+  "preprocessing_version": "routerarena-evaluation-preprocess-v2",
+  "repository": "RouteWorks/RouterArena",
+  "revision": "a4a062ce3313b56bb09c042e1bc37b61d34e3bd8",
+  "sources": {
+    "full": {
+      "filename": "full-00000-of-00001.parquet",
+      "url": "https://huggingface.co/datasets/RouteWorks/RouterArena/resolve/a4a062ce3313b56bb09c042e1bc37b61d34e3bd8/data/full-00000-of-00001.parquet",
+      "size_bytes": 3674459,
+      "sha256": "358a6bb4160320b5cb5b68d6d0a885c89b128b06d3dea267d77ed6daeebe4369",
+      "row_count": 8400
+    },
+    "sub_10": {
+      "filename": "sub_10-00000-of-00001.parquet",
+      "url": "https://huggingface.co/datasets/RouteWorks/RouterArena/resolve/a4a062ce3313b56bb09c042e1bc37b61d34e3bd8/data/sub_10-00000-of-00001.parquet",
+      "size_bytes": 380482,
+      "sha256": "e7b4b7579e98df0b83202324357d0b91af78666ddbf1038a513d19edaf58efd5",
+      "row_count": 809
+    },
+    "robustness": {
+      "filename": "robustness-00000-of-00001.parquet",
+      "url": "https://huggingface.co/datasets/RouteWorks/RouterArena/resolve/a4a062ce3313b56bb09c042e1bc37b61d34e3bd8/data/robustness-00000-of-00001.parquet",
+      "size_bytes": 233165,
+      "sha256": "6012eeea11e2d7b2018155e65c35ad887e9daa70e45aa38a40321da74d0cc2e9",
+      "row_count": 420
+    }
+  },
+  "preprocessing": {
+    "exclude_exact_training_overlap": true,
+    "exclude_exact_source_duplicates": true
+  },
+  "smoke": {
+    "split": "sub_10",
+    "sample_size": 100,
+    "seed": 42
+  }
+}

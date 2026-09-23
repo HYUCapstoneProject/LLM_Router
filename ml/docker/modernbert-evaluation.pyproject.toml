@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-router-modernbert-evaluation"
+version = "0.1.0"
+description = "ModernBERT RouterArena evaluation runtime"
+requires-python = ">=3.11,<3.13"
+dependencies = []
+
+[project.scripts]
+routerarena-evaluate = "llm_router_labeling.evaluation.routerarena_evaluation_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

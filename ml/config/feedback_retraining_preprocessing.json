@@ -1,0 +1,33 @@
+{
+  "schema_version": "feedback-export-v0.1",
+  "adapter_version": "feedback-retraining-adapter-v0.1",
+  "merge_version": "feedback-routerbench-v2-merge-v0.2",
+  "base_dataset_contract": {
+    "dataset_version": "withmartian-routerbench-2024-03-27",
+    "label_rule_version": "minimum-sufficient-tier-v2",
+    "preprocessing_version": "routerbench-training-preprocess-v2-balanced",
+    "initial_train_rows_per_class": 6256,
+    "holdout_policy": "preserve-natural-validation-and-test"
+  },
+  "label_order": ["easy", "medium", "hard"],
+  "acceptance": {
+    "require_pii_redacted": true,
+    "require_user_satisfied": true,
+    "minimum_escalation_count": 1,
+    "require_strict_tier_increase": true
+  },
+  "sample_weight": {
+    "base": 1.0,
+    "repeat_increment": 0.25,
+    "maximum": 2.0
+  },
+  "merge": {
+    "base_train_conflict_policy": "replace_exact_train_rows",
+    "base_holdout_overlap_policy": "exclude_feedback",
+    "compact_rehearsal": {
+      "seed": 20260912,
+      "train_rows_per_label": 32,
+      "validation_rows_per_label": 16
+    }
+  }
+}

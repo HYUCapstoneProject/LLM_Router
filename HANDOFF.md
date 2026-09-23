@@ -1,5 +1,11 @@
 # LLM Router 개발 인수인계
 
+> **과거 인수인계 보존 — 2026-09-23 통합 안내**
+>
+> 아래 본문은 당시 담당자의 작업·판단을 보존한 기록이며 현재 인수인계 기준은 [문서 시작점](docs/README.md)이다. 최신 연구 계약은 [ML 최종 실험 명세](docs/ml/README.md), 설정 전환은 [변경 이력](docs/deprecated-settings.md), 배포 절차는 [배포 안내](infra/DEPLOY.md)를 따른다.
+>
+> 본문의 “exact 미구현”, “reranker 미정”, “1,000건 GCS URI 전달”은 현재 코드 설명이 아니다. 통합 코드에서는 exact miss 후에만 embedding을 호출하며, Spring rerank 설정 기본은 `enforce`다. FastAPI reranker 모델 미설정 시 비활성과 구분한다. 현재 feedback은 inline 계약이다. “easy 붕괴”도 당시 개방형 표본의 관측으로 한정하며, [후속 측정 색인](experiments/results/README.md)의 데이터별 해석을 함께 읽는다. 아래 원문과 재현 자료는 그대로 보존한다.
+
 기준일: 2026-08-30
 
 이 문서는 다른 AI/개발자가 현재 저장소에서 바로 작업을 이어가기 위한 기준 문서다.
