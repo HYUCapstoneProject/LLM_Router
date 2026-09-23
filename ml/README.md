@@ -4,7 +4,7 @@
 
 ## 환경
 
-저장소 루트에서 Python 3.11–3.13 환경을 사용한다. Colab/GPU runtime의 고정 버전과 실행 위치는 [실행·산출물 관리](../docs/ml/execution-and-artifacts.md)를 따른다.
+저장소 루트에서 Python 3.11–3.13 환경을 사용한다. Colab/GPU runtime의 고정 버전과 실행 위치는 [실행·산출물 관리](../docs/ml/README.md#execution)를 따른다.
 
 ```bash
 python3.12 -m venv .venv
@@ -13,6 +13,12 @@ python3.12 -m venv .venv
 ```
 
 학습·평가·게시 의존성은 [pyproject.toml](pyproject.toml)의 optional dependency와 해당 runtime lock을 확인해 실행 환경별로 설치한다. 문서 정리만으로 dependency를 갱신하지 않는다.
+
+선택 실행용 비교 실험은 기본 환경에 [requirements-comparison.lock](requirements-comparison.lock)을 추가 설치한다. scikit-learn 계열은 `comparison` extra로 분리되어 있으며 기존 CPU 전처리 이미지의 기본 lock에는 포함하지 않는다.
+
+```bash
+.venv/bin/pip install -r ml/requirements-comparison.lock
+```
 
 ## 코드 구조
 
@@ -31,7 +37,7 @@ python3.12 -m venv .venv
 
 ## CLI 목록
 
-진입점 등록의 기준은 [pyproject.toml](pyproject.toml)이다. 학습·외부 호출을 시작하기 전에 각 명령의 `--help`와 [구현 보완 항목](../docs/ml/execution-and-artifacts.md)을 확인한다.
+진입점 등록의 기준은 [pyproject.toml](pyproject.toml)이다. 학습·외부 호출을 시작하기 전에 각 명령의 `--help`와 [구현 보완 항목](../docs/ml/README.md#implementation-gaps)을 확인한다.
 
 | 명령 | 역할 |
 |---|---|
@@ -74,7 +80,7 @@ PYTHONPATH=ml/src .venv/bin/python -m llm_router_labeling.objective_comparison.c
 .venv/bin/python -m unittest discover -s ml/tests -v
 ```
 
-Docker build context는 저장소 루트이며 image 역할·digest·IR 갱신과 Vertex 실행은 [실행·산출물 관리](../docs/ml/execution-and-artifacts.md), 온라인 계약과 version 정책은 [재학습 파이프라인](../docs/ml/retraining-pipeline.md)에 정의한다.
+Docker build context는 저장소 루트이며 image 역할·digest·IR 갱신과 Vertex 실행은 [실행·산출물 관리](../docs/ml/README.md#execution), 온라인 계약과 version 정책은 [재학습 파이프라인](../docs/ml/README.md#retraining)에 정의한다.
 
 ## 산출물과 과거 실행
 
