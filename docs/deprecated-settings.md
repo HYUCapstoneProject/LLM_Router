@@ -50,7 +50,7 @@
 | Serving `cb28bf7` → `24e226f` / `eb3bacb` | 상태·current-model·개발자 정책 API가 없다는 gap, inline/status fixture를 앞으로 교체할 목표로만 설명 | endpoint·schema·SQLite 정책·GCS 관측 reader는 존재한다. 옛 rollout 단계 대신 현재 계약을 읽는다. fixture는 실제 배포 응답이나 GPU E2E 완료 로그가 아니다. | 계획 대체됨 |
 | 2026-09-23 source 대조 | 상태 조회의 상세 task 추적·10초 TTL·완전 snapshot·heartbeat 단조/10분 stale 검사·publish-result 필수 검증을 완료처럼 서술 | 이 보장은 현재 구현되어 있지 않다. API 소비자가 의존할 수 있는 동작은 [관측 구현 범위](../../LLM_Router-serving/docs/api-contract.md#implementation)에 모았다. | **설명 정정·구현 보완** |
 | 2026-09-23 source 대조 | classify confidence를 validation 보정값으로 설명, developer PUT을 2필드 초안으로 설명 | confidence는 raw softmax다. PUT은 mode·activation·expectedRevision·reason 네 필드와 다음 major 경계 예약을 요구한다. 코드·schema를 바꾼 것이 아니라 문서 오류를 고쳤다. | 설명 정정 |
-| Serving `b967496`·`b31ff2e` → `6c673f3` | cross-encoder 추가·sentence-transformers 의존 및 점수 parity 실험 설명이 여러 파일에 분산 | 현행 transformers reranker와 고정 image weights를 유지한다. 기본은 비활성이며 cache threshold는 Spring 소유다. backbone 비교가 ModernBERT 전용 자동배포 경로를 확장한 것은 아니다. | 실험 이력 압축·현행 기능 보존 |
+| Serving `b967496`·`b31ff2e` → `6c673f3` | cross-encoder 추가·sentence-transformers 의존 및 점수 parity 실험 설명이 여러 파일에 분산 | 현행 transformers reranker와 고정 image weights를 유지한다. FastAPI 모델 ID 미설정 시 비활성이며 cache threshold는 Spring 소유다. Spring의 `RERANK_MODE=enforce` 기본과 구분한다. backbone 비교가 ModernBERT 전용 자동배포 경로를 확장한 것은 아니다. | 실험 이력 압축·현행 기능 보존 |
 | 현행 `.env.example` | 날짜·commit·bucket·v2 path, 빈 baseline·smoke gate 예시를 운영 기본값으로 오해 | 설정 항목·코드 호환 예시는 남겼다. 실제 승인 package·baseline·gate·data/IR 계약을 실행 전에 채운다. 이번 문서 정리가 배포 설정 교체를 의미하지 않는다. | 호환 예시 보존 |
 
 이 절의 `Serving` commit은 LLM_Router-serving 저장소 기준이다. Inline 전환의 serving 근거는 `8fa3672`·`526a820` → 2026-09-12 `24e226f`다. 현재 endpoint와 오류 조건은 API 계약을 우선한다.
@@ -67,6 +67,9 @@
 | 2026-08-16 최초 package | `router-modernbert-base-routerbench-20260814-45dcc6d`, v2 epoch3. 당시 baseline·정식 규칙 부재로 최초 gate 생략 |
 | 재현 공백 | epoch2 weight는 최근 checkpoint 2개 retention으로 삭제됐다. 학습 당시 일부 코드가 untracked여서 `45dcc6d` SHA만으로 전체 재현할 수 없다. |
 | 배포·smoke 기록 | 08-16 GCE 호출, 08-17 compiler 추가 후 GPU smoke, 09-12~16 API/version/모델 동기화 기록. 최신 유효 feedback GPU E2E·현재 live health 증명과 구분한다. |
+| 기존 gateway 실험 | `main`의 [기존 평가 색인](../experiments/results/README.md)과 원본 REPORT·CSV·JSON·그림을 보존했다. 파레토 +0.0119는 Yi/Yi/gpt-4 배정이며 서로 다른 세 모델 배정은 +0.0079다. 당시 uniform random·v2 split·소규모 cache 관측을 최신 공통 실험의 결과로 바꾸지 않는다. |
+
+2026-09-23 `main` 통합에서 [PLAN](../PLAN.md)·[HANDOFF](../HANDOFF.md)의 원문을 당시 계획·시연·인수인계 증거로 보존하고 현행 우선권을 표시했다. Exact cache 미구현, reranker 미정, URI batch·수동 승격, Claude 대량 호출 실험 제안은 현재 지시가 아니다. 통합 소스에는 exact-first와 Spring rerank 모드, inline feedback 연동이 있다. Spring의 batch-size 1,000은 최대 전송 크기, auto-submit은 기본 false이며 FastAPI 최소 1건 계약과 충돌하지 않는다. 실제 배포 설정·health를 이번 통합에서 확인한 것은 아니다.
 
 ## 6. 문서 통합과 원문 조회
 

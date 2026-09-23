@@ -12,6 +12,27 @@ Thumbs.db
 
 # ── 개인 도구 설정 / JVM 크래시 산출물 ───────────────────────────────
 .claude/
+.codex/
+.agents/
+.cursor/
+.continue/
+.windsurf/
+.gemini/
+.aider/
+AGENTS.md
+AGENTS.override.md
+CLAUDE.md
+GEMINI.md
+.cursorrules
+.windsurfrules
+.aider.conf.yml
+.aider.input.history
+.aider.chat.history.md
+.mcp.json
+.github/copilot-instructions.md
+.github/instructions/
+.github/agents/
+.github/prompts/
 hs_err_pid*.log
 replay_pid*.log
 

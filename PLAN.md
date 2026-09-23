@@ -1,5 +1,11 @@
 # LLM Router 작업 계획
 
+> **과거 계획 보존 — 2026-09-23 통합 안내**
+>
+> 아래 본문은 2026년 8월의 계획·시연·관측 기록이다. 본문의 “현재”, 완료 표시, 다음 작업은 작성 당시를 가리키며, 최신 실행 지시로 사용하지 않는다. 현재 기준은 [문서 시작점](docs/README.md), [ML 최종 실험 명세](docs/ml/README.md), [변경 이력](docs/deprecated-settings.md)이다. 기존 실측 보고서와 산출물은 [평가 색인](experiments/results/README.md)에 보존한다.
+>
+> 통합 코드에는 임베딩 앞의 exact cache와 Spring의 rerank `off/shadow/enforce`가 있다. Spring 설정 기본은 `enforce`이며 FastAPI의 모델 미설정 시 비활성과 별개다. Feedback은 최소 1건의 inline 전달 계약이며, Spring의 최대 batch 1,000건·자동 제출 기본 off를 API 최소 조건과 혼동하지 않는다. 아래의 Claude 대량 호출 실험, `sufficient_tier` 단일 라벨 전환, URI batch·수동 승격 제안은 최신 ML 명세를 대체하지 않는다. 운영 배포 상태는 이번 통합에서 재조회하지 않았다.
+
 > 기준일: 2026-08-30
 >
 > 범위: React 프론트엔드, Spring Boot 게이트웨이, PostgreSQL/pgvector 캐시, 배포 및 발표용 분석 기능

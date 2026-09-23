@@ -704,8 +704,10 @@ run별 `predictions.parquet`, `metrics.json`, `model_info.json`, dataset/validat
 ```mermaid
 flowchart TB
   U[사용자 요청] --> S[Spring Gateway]
-  S --> E[FastAPI BGE embedding]
-  E --> C[Spring pgvector 조회·캐시 판단]
+  S --> X[Spring exact cache]
+  X -->|hit| A[저장 답변 반환]
+  X -->|miss| E[FastAPI BGE embedding]
+  E --> C[Spring pgvector 후보·모드별 rerank 판단]
   C -->|hit| A[저장 답변 반환]
   C -->|miss| R[FastAPI ModernBERT 분류]
   R --> L[Spring Claude 선택·호출·로그]
@@ -728,7 +730,7 @@ flowchart TB
 | ML pipeline | canonical 전처리·holdout 보호, 재학습, 평가·gate, package·승격·rollback 도구, 실험 계보 |
 | GCS | versioned 데이터·config·IR·model·평가·관측 artifact와 control ledger |
 
-Spring은 학습용 Parquet·manifest·GCS URI를 만들지 않고 재학습용 GCS 권한을 갖지 않는다. Pipeline은 Spring DB를 직접 읽지 않는다. cache는 [독립 실험](#cache)이며 학습 DAG에 넣지 않는다. 위 순서는 합의한 시스템 경계이며 Spring 서비스 전체의 현재 통합 완료를 의미하지 않는다.
+Spring은 학습용 Parquet·manifest·GCS URI를 만들지 않고 재학습용 GCS 권한을 갖지 않는다. Pipeline은 Spring DB를 직접 읽지 않는다. cache는 [독립 실험](#cache)이며 학습 DAG에 넣지 않는다. 도식은 캐시가 켜진 경로이며, cache off에서는 임베딩·캐시 조회·저장을 생략한다. 위 순서는 합의한 시스템 경계이며 Spring 서비스 전체의 현재 통합 완료를 의미하지 않는다.
 
 <a id="retraining-2"></a>
 ### 5.2. 내부 API와 인증 계약
@@ -738,7 +740,7 @@ Spring은 학습용 Parquet·manifest·GCS URI를 만들지 않고 재학습용 
 | API | 목적·핵심 계약 |
 |---|---|
 | `POST /router/embed` | `{message}` → `embedding`, `dim`, `modelVersion`; BGE 기본 1,024차원·512 token |
-| `POST /router/rerank` | query와 조회된 후보를 받아 점수만 반환; hit/miss는 Spring이 결정; 기본 비활성 |
+| `POST /router/rerank` | query와 조회된 후보를 받아 점수만 반환; hit/miss는 Spring이 결정; FastAPI 모델 ID 미설정 시 비활성, Spring 모드와 별도 |
 | `POST /router/classify` | `{message}` → `tier`, `model`, `confidence`, `modelVersion`; tier는 easy/medium/hard, model은 haiku/sonnet/opus의 논리 이름 |
 | `GET /health` | embedding과 router readiness; 선택적 reranker는 전체 readiness 조건에 포함하지 않음 |
 | `POST /escalate` | `feedback-inline-v1` 접수, 비동기 재학습 제출; `202`는 완료·승격을 뜻하지 않음 |
@@ -911,7 +913,9 @@ C0/C1/C2가 최소 실험이다. 첫 실험의 router는 ModernBERT 하나로 �
 
 현재 serving 계약은 `BAAI/bge-large-en-v1.5`, revision `d4aa6901d3a41ba39fb536a557fa166f842b0e09`, CLS pooling, L2 정규화, 1024차원, 최대 512 tokens다. FastAPI는 embedding·선택적 reranker 점수를 제공하고 Spring이 pgvector 검색·threshold·hit/miss·저장을 소유한다. 실제 Spring/DB 연결 구현과 simulator를 구분해 보고한다.
 
-C3 후보 `cross-encoder/quora-distilroberta-base`는 현재 기본 off다. 기존 screening에서 false-hit gate를 통과했다고 간주하지 않는다. 런타임의 최대 후보 수 기본은 16, reranker max length는 512다. model revision과 threshold를 함께 봉인하며, 모델 미로딩·오류이면 miss로 처리한다. 실험 설계만으로 운영 reranker를 켜지 않는다.
+C3 후보는 `cross-encoder/quora-distilroberta-base`다. FastAPI는 `rerank_model_id` 미설정 시 비활성이지만, 통합된 Spring [설정](../../backend/src/main/resources/application.yml)의 `RERANK_MODE` 기본은 `enforce`다. 현재 코드의 캐시 경로는 exact miss 뒤에만 embedding과 semantic 후보 검색을 실행한다. 연구 C0/C1/C2/C3는 각 arm의 모드·exact shortcut 여부를 명시적으로 고정하며 운영 기본값을 암묵 적용하지 않는다.
+
+기존 screening은 false-hit gate를 통과하지 못했다. 이후 서비스 실측은 [기존 결과 색인](../../experiments/results/README.md)의 별도 관측이며 최종 독립 검증을 대신하지 않는다. FastAPI 런타임의 최대 후보 수 기본은 16, reranker max length는 512다. model revision과 threshold를 함께 봉인하며, 연구 C3는 모델 미로딩·오류·채점 불가능한 후보를 miss로 처리한다. 현재 Spring enforce는 일반 오류에서 miss로 처리하지만 후보 원문이 전부 비어 있으면 통과시키는 `no_scorable_candidate` 예외가 있어 연구 실행 시 배제·검증해야 한다. 이번 문서 통합으로 운영 모드나 코드를 바꾸지 않는다.
 
 <a id="cache-2"></a>
 ### 6.2. 데이터와 주장 범위
@@ -1114,7 +1118,7 @@ Colab 초기학습이 공식 경로다. 기존 `initial-training-pipeline.yaml`�
 <a id="execution-3"></a>
 ### 7.3. Colab, runtime, checkpoint
 
-학습 environment는 data-only environment와 분리한다. ModernBERT 운영 runtime은 [runtime contract](../../ml/config/modernbert_runtime_cu124_v1.json)와 [training lock](../../ml/requirements-training.lock)의 Python 3.11/3.12, PyTorch 2.5.1, Transformers 4.48.3, CUDA 12.4 기준이다. Colab의 당일 preinstalled 버전이 맞는지 확인하고, 실제 runtime fingerprint를 기록한다. 새 모델에 별도 dependency가 필요하면 environment를 version으로 분리한다.
+학습 environment는 data-only environment와 분리한다. 비교 실험의 scikit-learn 계열은 `comparison` extra와 [비교 전용 lock](../../ml/requirements-comparison.lock)으로 설치하며, 기존 CPU 전처리 이미지의 [기본 lock](../../ml/requirements-lock.txt)에 추가하지 않는다. ModernBERT 운영 runtime은 [runtime contract](../../ml/config/modernbert_runtime_cu124_v1.json)와 [training lock](../../ml/requirements-training.lock)의 Python 3.11/3.12, PyTorch 2.5.1, Transformers 4.48.3, CUDA 12.4 기준이다. Colab의 당일 preinstalled 버전이 맞는지 확인하고, 실제 runtime fingerprint를 기록한다. 새 모델에 별도 dependency가 필요하면 environment를 version으로 분리한다.
 
 | Archive 생성기 | 용도 |
 |---|---|
@@ -1249,7 +1253,7 @@ ML 항목은 2026-09-20 로컬 코드 확인 기준이며, serving 관측 계약
 | 연구 feedback | F0/F1/F2·6기회 사양 | fresh continual split, frozen logger·shared batch harness, F1/F2 공통 shuffle·실제 step 일치·공통 validation48 |
 | 연구 승격 gate | 운영 DAG는 RouterArena gate | D_gate schema·metric adapter와 별도 root; D_dev로 고른 임계값 freeze; 통합 base contract 새 version |
 | Canonical uniqueness | whole-batch digest 예약/commit 구현 | merge 후 nonempty·novel 정보 검증을 연구 harness에 추가; 중복 mode가 이를 보장한다고 가정하지 않음 |
-| 캐시 | BGE/선택 rerank serving 경계, 별도 실험 사양 | exact replay·semantic reuse trace, human/정답 검증, 비용·지연 ledger; reranker default off 유지 |
+| 캐시 | Spring exact-first·기본 enforce 설정, FastAPI reranker 모델 미설정 시 비활성, 별도 실험 사양 | exact replay·semantic reuse trace, human/정답 검증, 비용·지연 ledger; arm별 모드 고정, 채점 불가능 후보의 운영 호환 bypass 배제·검증 |
 | Colab→운영 인수 | checksum checkpoint와 package CLI 있음 | 통합 데이터 초기 모델의 검증된 인수 manifest·gate·baseline; 자동 importer의 검증 범위 확인 |
 | 운영 복구·효율 | SQLite lease, atomic CURRENT, load-before-swap, rollback 코드 | state 유실 복구 migration, 상태 polling 부하, evaluation CPU image 경량화는 별도 후속; 관측 보장의 현재 한계는 [Serving 구현 범위](../../../LLM_Router-serving/docs/api-contract.md#implementation) 참조 |
 
