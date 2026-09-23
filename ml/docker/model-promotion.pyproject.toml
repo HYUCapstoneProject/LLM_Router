@@ -16,4 +16,3 @@ modernbert-publish = "llm_router_labeling.deployment.model_publish_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-

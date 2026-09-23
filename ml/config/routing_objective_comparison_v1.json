@@ -1,0 +1,75 @@
+{
+  "experiment_version": "routing-objective-comparison-v1",
+  "dataset_version": "routing-objective-outcomes-v1",
+  "base_dataset_dir": "ml/artifacts/router-model-comparison-v1/dataset",
+  "seed": 42,
+  "finalist_seeds": [17, 73],
+  "tiers": ["low", "medium", "high"],
+  "arm_selection": {
+    "rule": "train-only-pareto-extremes-knee-v1",
+    "quality_tolerance": 1e-12,
+    "minimum_frontier_size": 3
+  },
+  "routerbench": {
+    "labeled_path": "ml/artifacts/routerbench-labeled/withmartian-routerbench-2024-03-27__routerbench-capability-tier-v1__overall-solve-rate-v3-probe-selected/labeled.parquet",
+    "metadata_path": "ml/artifacts/routerbench-training/withmartian-routerbench-2024-03-27__overall-solve-rate-v3-probe-selected__routerbench-training-preprocess-v3-natural/metadata.parquet",
+    "model_tiers_path": "ml/artifacts/routerbench-labeled/withmartian-routerbench-2024-03-27__routerbench-capability-tier-v1__overall-solve-rate-v3-probe-selected/model_tiers.json"
+  },
+  "xroutebench": {
+    "revision": "ea4b6e1b29d9a734f55f0a637baf326bad6aa681",
+    "data_dir": "ml/data/raw/xroutebench/ea4b6e1b29d9a734f55f0a637baf326bad6aa681",
+    "train_file": "llmrouter_generic-train.parquet",
+    "test_file": "llmrouter_generic-test.parquet",
+    "candidates_file": "llm_candidates.parquet",
+    "exact_metrics": ["em_mc", "GSM8K", "MATH", "code_eval"],
+    "continuous_metrics": ["f1_score"],
+    "continuous_acceptance_threshold": 0.7
+  },
+  "backbone": {
+    "model_id": "answerdotai/ModernBERT-base",
+    "revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+    "max_length": 512,
+    "num_labels": 3
+  },
+  "training": {
+    "epochs": 3,
+    "train_batch_size": 8,
+    "eval_batch_size": 16,
+    "gradient_accumulation_steps": 4,
+    "learning_rate": 2e-5,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.1,
+    "gradient_clip_norm": 1.0,
+    "precision": "fp16",
+    "pairwise_tie_weight": 0.25,
+    "regret_lambdas": [0.0, 0.05, 0.1, 0.2, 0.4, 0.8, 1.6, 3.2]
+  },
+  "evaluation": {
+    "penalty_grid": [
+      0.0,
+      0.0001,
+      0.0003,
+      0.001,
+      0.003,
+      0.01,
+      0.03,
+      0.1,
+      0.3,
+      1.0,
+      3.0,
+      10.0,
+      30.0,
+      100.0
+    ],
+    "relative_cost_budgets": [0.0, 0.1, 0.25, 0.5, 0.75, 1.0],
+    "quality_retention_targets": [0.95, 0.98],
+    "bootstrap_iterations": 2000,
+    "selection_metric": "quality_cost_nauc",
+    "default_relative_cost_budget": 0.5
+  },
+  "smoke": {
+    "maximum_train_rows": 1200,
+    "maximum_validation_rows": 300,
+    "maximum_train_steps": 40
+  }
+}

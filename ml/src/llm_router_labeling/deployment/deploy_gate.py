@@ -115,4 +115,3 @@ def evaluate_deploy_gate(
         "checks": checks,
         "failed_checks": failed_checks,
     }
-

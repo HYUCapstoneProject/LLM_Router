@@ -14,4 +14,3 @@ routerarena-evaluate = "llm_router_labeling.evaluation.routerarena_evaluation_cl
 
 [tool.setuptools.packages.find]
 where = ["src"]
-

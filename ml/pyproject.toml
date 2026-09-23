@@ -14,6 +14,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+comparison = [
+  "scikit-learn>=1.5,<2.0",
+]
 model-evaluation = [
   "torch==2.5.1",
   "transformers==4.48.3",
@@ -36,6 +39,9 @@ modernbert-colab-train = "llm_router_labeling.training.modernbert_colab_training
 modernbert-package = "llm_router_labeling.deployment.model_package_cli:main"
 modernbert-deploy-gate = "llm_router_labeling.deployment.deploy_gate_cli:main"
 modernbert-publish = "llm_router_labeling.deployment.model_publish_cli:main"
+routing-comparison-data = "llm_router_labeling.routing_data.cli:main"
+routing-tfidf-baseline = "llm_router_labeling.comparison.tfidf_cli:main"
+routing-objective-comparison = "llm_router_labeling.objective_comparison.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
