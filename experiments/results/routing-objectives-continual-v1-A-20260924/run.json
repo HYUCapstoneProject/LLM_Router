@@ -1,0 +1,347 @@
+{
+  "schema_version": "llm-router-experiment-run-v1",
+  "run_id": "routing-objectives-continual-v1-A-20260924",
+  "intended_logical_model_version": "1.0",
+  "logical_model_version": null,
+  "experiment_question": "Compare R0/R1/R2 on identical inputs and select a three-stage initial model before production handoff.",
+  "comparison_scope": {
+    "experiment": "A_integrated_source_local_symbolic_tiers",
+    "methods": [
+      "ordinal",
+      "pointwise",
+      "pairwise"
+    ],
+    "training_seeds": [
+      42
+    ],
+    "independent_repetitions": 1,
+    "service_claude_evaluated": false
+  },
+  "status": {
+    "training": "all_three_full_runs_completed_2007_steps",
+    "selection": "R1_pointwise_locked_on_D_dev",
+    "sealed_test_evaluation": "completed_fixed_policies_7202_questions",
+    "model_package_published": false,
+    "current_pointer_updated": false,
+    "serving_activated": false,
+    "personal_drive_copy_verified": true
+  },
+  "code": {
+    "archive_sha256": "7ce814776dd9c4875bcc4907a880f3c13411a36f96d9c1667f083219f472fbe0",
+    "size_bytes": 30388710,
+    "code_commit": "85c422c9af4c51a51ba5eb45a0ec957b836e02d2",
+    "source_files_dirty": false
+  },
+  "common_training_config": {
+    "attention_implementation": "eager",
+    "device": "cuda",
+    "epochs": 3,
+    "eval_batch_size": 16,
+    "gradient_accumulation_steps": 4,
+    "gradient_checkpointing": true,
+    "gradient_clip_norm": 1.0,
+    "learning_rate": 2e-05,
+    "max_length": 512,
+    "max_train_steps": null,
+    "model_id": "answerdotai/ModernBERT-base",
+    "model_revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+    "precision": "fp16",
+    "seed": 42,
+    "train_batch_size": 8,
+    "train_sampling_strategy": "shuffle",
+    "train_split": "train",
+    "training_version": "modernbert-r0-initial-v1.0",
+    "truncation": true,
+    "validation_split": "validation",
+    "warmup_ratio": 0.1,
+    "weight_decay": 0.01
+  },
+  "data_contract": {
+    "base_training_sha256": "8e382ee84419aa881ea0c4a68fabb0103945ab3452cdbc98720c149e36eb09ab",
+    "outcome_manifest_sha256": "28cbc342c510fee7589151f99cdfe440281bfbe6288abd749eac9fd52f4c0b19",
+    "validation_data_sha256": "aa9d973fcf886c7465fbf9e06701984d099cd74a5eabf508cc610845613edef8",
+    "runtime_contract_sha256": "c2b98693b58b70ecdb065b8a0e6f0928e3b3e0ee5bfaa7727b4f3bbf1cac349c"
+  },
+  "selection": {
+    "method": "pointwise",
+    "split": "validation_only",
+    "metric": "source_macro_quality_cost_nauc",
+    "nauc": {
+      "ordinal": 0.1661154599092283,
+      "pairwise": 0.8338740417605066,
+      "pointwise": 0.8631791002863535
+    },
+    "validation_lock_sha256": "ddae362cb6e826376383427933deae22bab1061390709be8f781345caa608e5f",
+    "selected_checkpoint": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/pointwise/final-results.tar",
+      "size_bytes": 620574720,
+      "sha256": "0da9d3dc3b845642bf0b8201758308a4d21a3c66fd7582468b46a0ea328a7d8d",
+      "crc32c": "UBpSzQ==",
+      "generation": "1790235615460862",
+      "verified_at_unix": 1790235615.5804164
+    }
+  },
+  "artifact_receipts": {
+    "input": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/colab-input.tar.gz",
+      "size_bytes": 30388710,
+      "sha256": "7ce814776dd9c4875bcc4907a880f3c13411a36f96d9c1667f083219f472fbe0",
+      "crc32c": "2414ZQ==",
+      "generation": "1790231879198302",
+      "verified_at_unix": 1790231879.3087096
+    },
+    "r0": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/ordinal/validation-results.tar",
+      "size_bytes": 18503680,
+      "sha256": "1b437a4f7df88ad6e083a977477a585ece7a9e7646e16ada98115fb0eafa0b90",
+      "crc32c": "7EBFkQ==",
+      "generation": "1790231986652826",
+      "verified_at_unix": 1790231986.7650266
+    },
+    "pointwise-pilot": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/pointwise/pilot-results.tar",
+      "size_bytes": 603392000,
+      "sha256": "bd00dd67c009fe5a131ac87f3040c4cf0c51cd04f7fc1ba2096dd3107154f048",
+      "crc32c": "5sbaUw==",
+      "generation": "1790232180931572",
+      "verified_at_unix": 1790232181.0557005
+    },
+    "pairwise-pilot": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/pairwise/pilot-results.tar",
+      "size_bytes": 603392000,
+      "sha256": "9dfbad70e248cceb6e65f4c85c077aae15da082c08a715ee1598bb4a720b2a37",
+      "crc32c": "Nwpfzw==",
+      "generation": "1790232388900220",
+      "verified_at_unix": 1790232389.0230935
+    },
+    "pointwise-step500": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/pointwise/checkpoint-step500.tar",
+      "size_bytes": 1799065600,
+      "sha256": "c6f1edc2a656e80bdf6e3ab63382eb32ef51d2c0f9e3c7202bde7972bade7d34",
+      "crc32c": "slF+DQ==",
+      "generation": "1790233292244871",
+      "verified_at_unix": 1790233292.384905
+    },
+    "pointwise-step1000": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/pointwise/checkpoint-step1000.tar",
+      "size_bytes": 1799065600,
+      "sha256": "59a2e6156c92ea61c4c89e6c579ae4f8c691266effdbe0da0577f6a3aa01f227",
+      "crc32c": "GdW8rw==",
+      "generation": "1790234004453069",
+      "verified_at_unix": 1790234004.5823274
+    },
+    "pointwise-step1500": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/pointwise/checkpoint-step1500.tar",
+      "size_bytes": 1799065600,
+      "sha256": "3f9892029386055c0e45eb42094d4e52d9f3cae94a7aa6930ae5d926999d0a0d",
+      "crc32c": "Jsd2gg==",
+      "generation": "1790234764644728",
+      "verified_at_unix": 1790234764.7834299
+    },
+    "pointwise-step2007": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/pointwise/checkpoint-step2007.tar",
+      "size_bytes": 1799065600,
+      "sha256": "8e378a07b223aeb113ffdea93c11ff05139b51607404ba35b0d02c673e4e3739",
+      "crc32c": "cThdZg==",
+      "generation": "1790235525636375",
+      "verified_at_unix": 1790235525.7432318
+    },
+    "pointwise-final": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/pointwise/final-results.tar",
+      "size_bytes": 620574720,
+      "sha256": "0da9d3dc3b845642bf0b8201758308a4d21a3c66fd7582468b46a0ea328a7d8d",
+      "crc32c": "UBpSzQ==",
+      "generation": "1790235615460862",
+      "verified_at_unix": 1790235615.5804164
+    },
+    "pairwise-step500": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/pairwise/checkpoint-step500.tar",
+      "size_bytes": 1799065600,
+      "sha256": "2ffe57cf03b2d6c19363c662fbd7ab4ae519ca4a455341f1f9bcec9551de5f7d",
+      "crc32c": "PwUNtw==",
+      "generation": "1790236489046920",
+      "verified_at_unix": 1790236489.1764655
+    },
+    "pairwise-step1000": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/pairwise/checkpoint-step1000.tar",
+      "size_bytes": 1799065600,
+      "sha256": "9d0325799b268a349d42bbe4b5a94f291bde4e240bb638f6d1d88bb0e3551c2d",
+      "crc32c": "tSzhuA==",
+      "generation": "1790237188091472",
+      "verified_at_unix": 1790237188.2220175
+    },
+    "pairwise-step1500": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/pairwise/checkpoint-step1500.tar",
+      "size_bytes": 1799065600,
+      "sha256": "34bb5bb5e8b8346f5325a32d8c736d7e34964d7a2358cca3a6fc08b2fdf4e417",
+      "crc32c": "czo8SQ==",
+      "generation": "1790237890278312",
+      "verified_at_unix": 1790237890.4050183
+    },
+    "pairwise-step2007": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/pairwise/checkpoint-step2007.tar",
+      "size_bytes": 1799065600,
+      "sha256": "ac239b6ee897336cb8a0b9ecca2ef418f9c73cd0036cc94c56dc1110d7132b35",
+      "crc32c": "ehNKZw==",
+      "generation": "1790238776501602",
+      "verified_at_unix": 1790238776.6446111
+    },
+    "pairwise-final": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/pairwise/final-results.tar",
+      "size_bytes": 620574720,
+      "sha256": "0cc85b221227c7b139123c0d5451c1b06232f3cbeffc0e8ebc2bb886c3038ef7",
+      "crc32c": "gle/qA==",
+      "generation": "1790238862818926",
+      "verified_at_unix": 1790238862.9395087
+    },
+    "comparison": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/comparison-results.tar",
+      "size_bytes": 583680,
+      "sha256": "c3b844dbe003a4d209e7d304ca72ab3d38f7e780a85dd17d0de2d79f3aac67b1",
+      "crc32c": "dPyXow==",
+      "generation": "1790238880869764",
+      "verified_at_unix": 1790238880.985566
+    }
+  },
+  "personal_drive": {
+    "status": "verified_after_flush_and_remount",
+    "root": "/content/drive/MyDrive/LLM_Router/routing-objectives-continual-v1-A-20260924",
+    "files": {
+      "objective-colab-input.tar.gz": {
+        "size_bytes": 30388710,
+        "sha256": "7ce814776dd9c4875bcc4907a880f3c13411a36f96d9c1667f083219f472fbe0"
+      },
+      "r0-results.tar": {
+        "size_bytes": 18503680,
+        "sha256": "1b437a4f7df88ad6e083a977477a585ece7a9e7646e16ada98115fb0eafa0b90"
+      },
+      "pointwise-pilot-results.tar": {
+        "size_bytes": 603392000,
+        "sha256": "bd00dd67c009fe5a131ac87f3040c4cf0c51cd04f7fc1ba2096dd3107154f048"
+      },
+      "pairwise-pilot-results.tar": {
+        "size_bytes": 603392000,
+        "sha256": "9dfbad70e248cceb6e65f4c85c077aae15da082c08a715ee1598bb4a720b2a37"
+      },
+      "pointwise-step500.tar": {
+        "size_bytes": 1799065600,
+        "sha256": "c6f1edc2a656e80bdf6e3ab63382eb32ef51d2c0f9e3c7202bde7972bade7d34"
+      },
+      "pointwise-step1000.tar": {
+        "size_bytes": 1799065600,
+        "sha256": "59a2e6156c92ea61c4c89e6c579ae4f8c691266effdbe0da0577f6a3aa01f227"
+      },
+      "pointwise-step1500.tar": {
+        "size_bytes": 1799065600,
+        "sha256": "3f9892029386055c0e45eb42094d4e52d9f3cae94a7aa6930ae5d926999d0a0d"
+      },
+      "pointwise-step2007.tar": {
+        "size_bytes": 1799065600,
+        "sha256": "8e378a07b223aeb113ffdea93c11ff05139b51607404ba35b0d02c673e4e3739"
+      },
+      "pointwise-final-results.tar": {
+        "size_bytes": 620574720,
+        "sha256": "0da9d3dc3b845642bf0b8201758308a4d21a3c66fd7582468b46a0ea328a7d8d"
+      },
+      "pairwise-step500.tar": {
+        "size_bytes": 1799065600,
+        "sha256": "2ffe57cf03b2d6c19363c662fbd7ab4ae519ca4a455341f1f9bcec9551de5f7d"
+      },
+      "pairwise-step1000.tar": {
+        "size_bytes": 1799065600,
+        "sha256": "9d0325799b268a349d42bbe4b5a94f291bde4e240bb638f6d1d88bb0e3551c2d"
+      },
+      "pairwise-step1500.tar": {
+        "size_bytes": 1799065600,
+        "sha256": "34bb5bb5e8b8346f5325a32d8c736d7e34964d7a2358cca3a6fc08b2fdf4e417"
+      },
+      "pairwise-step2007.tar": {
+        "size_bytes": 1799065600,
+        "sha256": "ac239b6ee897336cb8a0b9ecca2ef418f9c73cd0036cc94c56dc1110d7132b35"
+      },
+      "pairwise-final-results.tar": {
+        "size_bytes": 620574720,
+        "sha256": "0cc85b221227c7b139123c0d5451c1b06232f3cbeffc0e8ebc2bb886c3038ef7"
+      },
+      "comparison-results.tar": {
+        "size_bytes": 583680,
+        "sha256": "c3b844dbe003a4d209e7d304ca72ab3d38f7e780a85dd17d0de2d79f3aac67b1"
+      }
+    },
+    "staging_errors": {}
+  },
+  "sealed_evaluation": {
+    "role": "research_only_not_deployment_gate",
+    "receipts": {
+      "input": {
+        "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/sealed-tests-v1/sealed-input.tar.gz",
+        "size_bytes": 10782517,
+        "sha256": "67a0afd8cf8b78209e552f72389cffcad9a61449743952a7b91392831ab98f4c",
+        "crc32c": "50AvKA==",
+        "generation": "1790247616949326",
+        "verified_at_unix": 1790247617.0631075
+      },
+      "protocol": {
+        "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/sealed-tests-v1/sealed-protocol.tar",
+        "size_bytes": 40960,
+        "sha256": "b42ecde5bfd0fec288833ee23a021b9a8978cab25ca08e34b53f8fe871cb7976",
+        "crc32c": "PWsXtQ==",
+        "generation": "1790247633873933",
+        "verified_at_unix": 1790247633.9683821
+      },
+      "inference": {
+        "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/sealed-tests-v1/sealed-inference.tar",
+        "size_bytes": 1085440,
+        "sha256": "828337557ae691df0aa35bd3dc200ad2b911a503fa278a804947d67583f4d462",
+        "crc32c": "6yBsQw==",
+        "generation": "1790248072366763",
+        "verified_at_unix": 1790248072.4801514
+      },
+      "results": {
+        "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/sealed-tests-v1/sealed-evaluation.tar",
+        "size_bytes": 2293760,
+        "sha256": "ad4b52f7ae3dcb6931475b5e780c71f30d16d697a1af4f7f0b184477f8eaaf8f",
+        "crc32c": "XFtgog==",
+        "generation": "1790248097882032",
+        "verified_at_unix": 1790248097.9907641
+      }
+    },
+    "personal_drive": {
+      "status": "verified_after_flush_and_remount",
+      "root": "/content/drive/MyDrive/LLM_Router/routing-objectives-continual-v1-A-20260924/sealed-tests",
+      "files": {
+        "sealed-input.tar.gz": {
+          "size_bytes": 10782517,
+          "sha256": "67a0afd8cf8b78209e552f72389cffcad9a61449743952a7b91392831ab98f4c"
+        },
+        "sealed-protocol.tar": {
+          "size_bytes": 40960,
+          "sha256": "b42ecde5bfd0fec288833ee23a021b9a8978cab25ca08e34b53f8fe871cb7976"
+        },
+        "sealed-inference.tar": {
+          "size_bytes": 1085440,
+          "sha256": "828337557ae691df0aa35bd3dc200ad2b911a503fa278a804947d67583f4d462"
+        },
+        "sealed-evaluation.tar": {
+          "size_bytes": 2293760,
+          "sha256": "ad4b52f7ae3dcb6931475b5e780c71f30d16d697a1af4f7f0b184477f8eaaf8f"
+        }
+      },
+      "copy_errors": {}
+    },
+    "report": "sealed-tests/REPORT.md",
+    "test_used_for_selection": false
+  },
+  "production_handoff": {
+    "status": "pending_service_policy_and_observed_feedback_contract",
+    "tier_mapping": {
+      "low": "easy/haiku",
+      "medium": "medium/sonnet",
+      "high": "hard/opus"
+    },
+    "service_policy": null,
+    "feedback_target_contract": null,
+    "deployment_gate": null,
+    "reason": "Current userSatisfied denotes implicit chain completion; service candidate outcomes and R1 masked targets are not established."
+  }
+}

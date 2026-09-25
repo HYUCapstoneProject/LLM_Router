@@ -3,13 +3,14 @@ from __future__ import annotations
 import json
 import math
 import shutil
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Literal
 
 import pandas as pd
 
 from ..evaluation.routerarena_epoch_evaluation import RouterArenaEpochEvaluator
+from ..shared.dataset_io import sha256_file
 from .modernbert_checkpointing import (
     ARTIFACT_MANIFEST_NAME,
     CHECKPOINT_MANIFEST_NAME,
@@ -20,6 +21,7 @@ from .modernbert_checkpointing import (
     latest_completed_checkpoint,
     prune_checkpoints,
     seal_artifact_directory,
+    training_fingerprint,
     verify_artifact_directory,
 )
 from .modernbert_runtime import RuntimeContract
@@ -164,10 +166,22 @@ def run_colab_training(
 
     local_final = local_run_dir / "final-model"
     persistent_final = persistent_run_dir / "final-model"
+    expected_fingerprint = training_fingerprint(
+        training_data_sha256=sha256_file(training_path),
+        config=asdict(config),
+        maximum_steps=(
+            max_train_steps_override
+            if max_train_steps_override is not None
+            else config.max_train_steps
+        ),
+        runtime_version=runtime_contract.runtime_version,
+    )
     if _completed_final_model(persistent_final):
         final_metrics = _load_metrics(persistent_final)
         manifest = verify_artifact_directory(
-            persistent_final, manifest_name=ARTIFACT_MANIFEST_NAME
+            persistent_final,
+            manifest_name=ARTIFACT_MANIFEST_NAME,
+            expected_fingerprint=expected_fingerprint,
         )
         if epoch_evaluator is not None:
             epoch_evaluator.require_all_epochs(
@@ -189,7 +203,9 @@ def run_colab_training(
     if _completed_final_model(local_final):
         final_metrics = _load_metrics(local_final)
         manifest = verify_artifact_directory(
-            local_final, manifest_name=ARTIFACT_MANIFEST_NAME
+            local_final,
+            manifest_name=ARTIFACT_MANIFEST_NAME,
+            expected_fingerprint=expected_fingerprint,
         )
         fingerprint = str(manifest["metadata"]["training_fingerprint"])
         if epoch_evaluator is not None:

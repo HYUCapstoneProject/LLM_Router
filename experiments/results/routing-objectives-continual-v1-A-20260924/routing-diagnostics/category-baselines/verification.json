@@ -1,0 +1,14 @@
+{
+  "schema_version": "r0-category-baseline-visuals-v1",
+  "new_inference": false,
+  "train_prior_reconstruction": true,
+  "dev_ids_and_metadata_verified": true,
+  "r0_raw_argmax_verified": true,
+  "pooled_and_source_metrics_recomputed": true,
+  "source_input_sha256": {
+    "train": "d9b0db47defd1d7162c1cf70059a6db806d743641d094c1e84b4c696bcbd56bf",
+    "dev": "aa9d973fcf886c7465fbf9e06701984d099cd74a5eabf508cc610845613edef8",
+    "r0_raw_scores": "c7cde5f2f69336f6c0b4f9faefcd35cbf1bd56de1b6f79d8bcea8779799ea776"
+  },
+  "original_audit_sha256": "d52487630d16bc74a8de17e021e598dd892ccf16de8d8df765b36b786c331d8d"
+}

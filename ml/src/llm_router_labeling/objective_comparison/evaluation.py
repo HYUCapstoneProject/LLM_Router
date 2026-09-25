@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from typing import Any, Iterable, Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
+from typing import Any
 
 import numpy as np
 import pandas as pd
 
 from .data import TIERS
+from .objectives import METHODS
 
 
 class ObjectiveEvaluationError(ValueError):
@@ -30,8 +32,21 @@ def route_actions(
 ) -> np.ndarray:
     scores = np.asarray(scores, dtype=float)
     decision_costs = np.asarray(decision_costs, dtype=float)
+    if method not in METHODS:
+        raise ObjectiveEvaluationError(f"Unknown objective method: {method}")
     if scores.shape != decision_costs.shape or scores.ndim != 2 or scores.shape[1] != 3:
-        raise ObjectiveEvaluationError("scores and decision_costs must both have shape (N, 3)")
+        raise ObjectiveEvaluationError(
+            "scores and decision_costs must both have shape (N, 3)"
+        )
+    if (
+        not np.isfinite(scores).all()
+        or not np.isfinite(decision_costs).all()
+        or not np.isfinite(penalty)
+        or penalty < 0
+    ):
+        raise ObjectiveEvaluationError(
+            "Scores, costs and non-negative penalty must be finite"
+        )
     transformed = _score_transform(method, scores)
     return np.argmax(transformed - float(penalty) * decision_costs, axis=1)
 
@@ -50,15 +65,17 @@ def evaluate_penalty_curve(
     if len(frame) != len(scores):
         raise ObjectiveEvaluationError("Prediction and outcome row counts differ")
     quality = frame.loc[:, [f"quality_{tier}" for tier in TIERS]].to_numpy(float)
-    actual_cost = frame.loc[:, [f"actual_cost_{tier}" for tier in TIERS]].to_numpy(float)
-    decision_cost = frame.loc[:, [f"decision_cost_{tier}" for tier in TIERS]].to_numpy(float)
+    actual_cost = frame.loc[:, [f"actual_cost_{tier}" for tier in TIERS]].to_numpy(
+        float
+    )
+    decision_cost = frame.loc[:, [f"decision_cost_{tier}" for tier in TIERS]].to_numpy(
+        float
+    )
     source = frame["source_dataset"].astype(str).to_numpy()
     rows: list[dict[str, Any]] = []
     always_low_cost = float(actual_cost[:, 0].mean())
     always_high_cost = float(actual_cost[:, 2].mean())
     cost_span = always_high_cost - always_low_cost
-    if cost_span <= 0:
-        raise ObjectiveEvaluationError("Always-high mean cost must exceed always-low mean cost")
     for penalty in penalties:
         actions = route_actions(method, scores, decision_cost, float(penalty))
         selected_quality = _selected(quality, actions)
@@ -71,18 +88,20 @@ def evaluate_penalty_curve(
             {
                 "penalty": float(penalty),
                 "mean_quality": float(selected_quality.mean()),
-                "source_macro_quality": float(np.mean(list(per_source_quality.values()))),
+                "source_macro_quality": float(
+                    np.mean(list(per_source_quality.values()))
+                ),
                 "mean_actual_cost": float(selected_cost.mean()),
-                "relative_cost": float((selected_cost.mean() - always_low_cost) / cost_span),
+                "relative_cost": (
+                    float((selected_cost.mean() - always_low_cost) / cost_span)
+                    if cost_span > 0
+                    else None
+                ),
                 "low_rate": float((actions == 0).mean()),
                 "medium_rate": float((actions == 1).mean()),
                 "high_rate": float((actions == 2).mean()),
-                "routerbench_quality": float(
-                    selected_quality[source == "routerbench"].mean()
-                ),
-                "xroutebench_quality": float(
-                    selected_quality[source == "xroutebench"].mean()
-                ),
+                "routerbench_quality": per_source_quality.get("routerbench"),
+                "xroutebench_quality": per_source_quality.get("xroutebench"),
             }
         )
     curve = pd.DataFrame(rows).sort_values(
@@ -90,7 +109,9 @@ def evaluate_penalty_curve(
         ascending=[True, False, True],
         kind="stable",
     )
-    return curve.drop_duplicates("relative_cost", keep="first").reset_index(drop=True)
+    if cost_span > 0:
+        curve = curve.drop_duplicates("relative_cost", keep="first")
+    return curve.reset_index(drop=True)
 
 
 def _quality_at_budget(curve: pd.DataFrame, budget: float) -> tuple[float, float]:
@@ -117,37 +138,86 @@ def summarize_curve(
     low_quality = float(quality[:, 0].mean())
     high_quality = float(quality[:, 2].mean())
     oracle_quality = float(quality.max(axis=1).mean())
-    budget_quality: dict[str, float] = {}
+    budget_quality: dict[str, float | None] = {}
     budget_penalties: dict[str, float] = {}
+    cost_is_valid = curve["relative_cost"].notna().all()
     for budget in budgets:
-        value, penalty = _quality_at_budget(curve, float(budget))
         key = f"{float(budget):.4f}"
-        budget_quality[key] = value
-        budget_penalties[key] = penalty
+        if cost_is_valid:
+            value, penalty = _quality_at_budget(curve, float(budget))
+            budget_quality[key] = value
+            budget_penalties[key] = penalty
+        else:
+            budget_quality[key] = None
     ordered_budgets = np.array([float(value) for value in budgets], dtype=float)
     ordered_quality = np.array(
         [budget_quality[f"{value:.4f}"] for value in ordered_budgets], dtype=float
     )
-    quality_span = max(high_quality - low_quality, 1e-12)
-    recovered = np.clip((ordered_quality - low_quality) / quality_span, 0.0, 1.0)
-    nauc = float(np.trapezoid(recovered, ordered_budgets) / max(np.ptp(ordered_budgets), 1e-12))
+    quality_span = high_quality - low_quality
+    nauc = None
+    if cost_is_valid and quality_span > 0 and np.ptp(ordered_budgets) > 0:
+        recovered = np.clip((ordered_quality - low_quality) / quality_span, 0.0, 1.0)
+        nauc = float(np.trapezoid(recovered, ordered_budgets) / np.ptp(ordered_budgets))
     minimum_cost_for_retention: dict[str, float | None] = {}
     for target in retention_targets:
         required = high_quality * float(target)
         eligible = curve.loc[curve["mean_quality"].ge(required)]
         minimum_cost_for_retention[f"{float(target):.4f}"] = (
-            None if eligible.empty else float(eligible["relative_cost"].min())
+            None
+            if not cost_is_valid or eligible.empty
+            else float(eligible["relative_cost"].min())
         )
     summary = {
         "quality_cost_nauc": nauc,
         "always_low_quality": low_quality,
         "always_high_quality": high_quality,
         "oracle_quality": oracle_quality,
-        "oracle_gap": float(oracle_quality - max(ordered_quality)),
+        "oracle_gap": float(oracle_quality - curve["mean_quality"].max()),
+        "normalization_valid": bool(cost_is_valid and quality_span > 0),
         "quality_at_relative_cost_budget": budget_quality,
         "minimum_relative_cost_for_quality_retention": minimum_cost_for_retention,
     }
     return summary, budget_penalties
+
+
+def summarize_source_curves(
+    frame: pd.DataFrame,
+    scores: np.ndarray,
+    *,
+    method: str,
+    penalties: Sequence[float],
+    budgets: Sequence[float],
+    retention_targets: Sequence[float],
+) -> tuple[dict[str, Any], dict[str, dict[str, float]], pd.DataFrame]:
+    """Normalize within each actual candidate pool, then macro-average nAUC."""
+    summaries, locked_penalties, curves = {}, {}, []
+    for source in sorted(frame["source_dataset"].unique()):
+        mask = frame["source_dataset"].eq(source).to_numpy()
+        rows = frame.loc[mask].reset_index(drop=True)
+        curve = evaluate_penalty_curve(
+            rows, np.asarray(scores)[mask], method=method, penalties=penalties
+        )
+        summary, locked = summarize_curve(
+            rows, curve, budgets=budgets, retention_targets=retention_targets
+        )
+        summaries[str(source)] = {"row_count": len(rows), **summary}
+        locked_penalties[str(source)] = locked
+        curves.append(curve.assign(source_dataset=str(source)))
+    values = [item["quality_cost_nauc"] for item in summaries.values()]
+    macro = (
+        float(np.mean(values))
+        if values and all(value is not None for value in values)
+        else None
+    )
+    return (
+        {
+            "source_macro_quality_cost_nauc": macro,
+            "per_source": summaries,
+            "normalization": "source_local_always_low_and_high",
+        },
+        locked_penalties,
+        pd.concat(curves, ignore_index=True),
+    )
 
 
 def predictions_frame(
@@ -157,11 +227,17 @@ def predictions_frame(
     method: str,
     penalty: float,
 ) -> pd.DataFrame:
-    decision_cost = frame.loc[:, [f"decision_cost_{tier}" for tier in TIERS]].to_numpy(float)
+    decision_cost = frame.loc[:, [f"decision_cost_{tier}" for tier in TIERS]].to_numpy(
+        float
+    )
     quality = frame.loc[:, [f"quality_{tier}" for tier in TIERS]].to_numpy(float)
-    actual_cost = frame.loc[:, [f"actual_cost_{tier}" for tier in TIERS]].to_numpy(float)
+    actual_cost = frame.loc[:, [f"actual_cost_{tier}" for tier in TIERS]].to_numpy(
+        float
+    )
     actions = route_actions(method, scores, decision_cost, penalty)
-    output = frame.loc[:, ["sample_id", "source_dataset", "category", "difficulty_label"]].copy()
+    output = frame.loc[
+        :, ["sample_id", "source_dataset", "category", "difficulty_label"]
+    ].copy()
     output["selected_tier"] = [TIERS[index] for index in actions]
     output["selected_quality"] = _selected(quality, actions)
     output["selected_actual_cost"] = _selected(actual_cost, actions)
@@ -176,7 +252,7 @@ def aggregate_seed_summaries(summaries: Sequence[Mapping[str, Any]]) -> dict[str
         raise ObjectiveEvaluationError("At least one seed summary is required")
     values = np.array([float(item["quality_cost_nauc"]) for item in summaries])
     return {
-        "seed_count": int(len(values)),
+        "seed_count": len(values),
         "quality_cost_nauc_mean": float(values.mean()),
         "quality_cost_nauc_std": float(values.std(ddof=1)) if len(values) > 1 else 0.0,
         "quality_cost_nauc_min": float(values.min()),

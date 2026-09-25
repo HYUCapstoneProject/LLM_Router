@@ -1,0 +1,40 @@
+{
+  "files": {
+    "ordinal-scores.parquet": {
+      "sha256": "a989e5846cbd860fe1877fae9df9a0da4e1afef54c49b4f6927188872e0b76a2",
+      "size_bytes": 235509
+    },
+    "pairwise-scores.parquet": {
+      "sha256": "c70992b528a7375f86b571eb34e151ae09574c807492c0a4526abadbd2fe5874",
+      "size_bytes": 235505
+    },
+    "pointwise-scores.parquet": {
+      "sha256": "6fa687b92c9db2fb4e979116c3bbb639a2bfc1aaec4b92a6737d649ec942cfde",
+      "size_bytes": 235509
+    }
+  },
+  "prepared_manifest_sha256": "5b51c5c6aca5d2acbd4ab364b348d67b3c5d961e068eac666cdd3fc81176c161",
+  "protocol_sha256": "c5df5af139a778402986d60b1f63726b5470b1cb42bf47c3433cb0e17f0af9fa",
+  "role": "scores",
+  "runtime": {
+    "ordinal": {
+      "device": "cuda",
+      "rows": 8791,
+      "seconds_including_model_load_and_tokenization": 246.85520094599997,
+      "truncated_rows": 788
+    },
+    "pairwise": {
+      "device": "cuda",
+      "rows": 8791,
+      "seconds_including_model_load_and_tokenization": 244.78308761299968,
+      "truncated_rows": 788
+    },
+    "pointwise": {
+      "device": "cuda",
+      "rows": 8791,
+      "seconds_including_model_load_and_tokenization": 244.85630434600034,
+      "truncated_rows": 788
+    }
+  },
+  "schema_version": "routing-arena-diagnostics-v1"
+}

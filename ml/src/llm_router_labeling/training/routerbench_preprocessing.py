@@ -6,7 +6,7 @@ import re
 import unicodedata
 from collections import Counter, defaultdict
 from dataclasses import dataclass
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 import pandas as pd
 
@@ -142,10 +142,12 @@ def assign_duplicate_groups(
     jaccard_threshold: float,
     minimum_tokens: int,
     maximum_bucket_size: int,
+    normalizer: Callable[[str], str] = normalize_for_duplicate_detection,
+    near_duplicate_guard: Callable[[str, str], bool] | None = None,
 ) -> tuple[pd.Series, dict[str, int]]:
     if not 0.0 <= jaccard_threshold <= 1.0:
         raise ValueError("jaccard_threshold must be in [0, 1]")
-    normalized = texts.astype(str).map(normalize_for_duplicate_detection)
+    normalized = texts.astype(str).map(normalizer)
     if normalized.eq("").any():
         raise RouterBenchError("Preprocessing produced an empty duplicate key")
 
@@ -178,6 +180,8 @@ def assign_duplicate_groups(
 
     near_duplicate_pair_count = 0
     for left, right in sorted(candidate_pairs):
+        if near_duplicate_guard is not None and not near_duplicate_guard(unique_texts[left], unique_texts[right]):
+            continue
         if min(token_counts[left], token_counts[right]) < minimum_tokens:
             continue
         length_ratio = min(token_counts[left], token_counts[right]) / max(

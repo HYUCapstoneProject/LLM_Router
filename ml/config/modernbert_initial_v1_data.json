@@ -1,0 +1,128 @@
+{
+  "experiment_version": "modernbert-initial-v1.0",
+  "dataset_version": "routerbench-xroutebench-continual-v1",
+  "label_rule_version": "overall-solve-rate-grid-v1",
+  "preprocessing_version": "integrated-routing-preprocess-v2-structure",
+  "split_version": "continual-60-10-10-15-5-v1-seed-42",
+  "seed": 42,
+  "routerbench": {
+    "labeled_path": "ml/artifacts/routerbench-labeled/withmartian-routerbench-2024-03-27__routerbench-capability-tier-v1__overall-solve-rate-v3-probe-selected/labeled.parquet",
+    "metadata_path": "ml/artifacts/routerbench-training/withmartian-routerbench-2024-03-27__overall-solve-rate-v3-probe-selected__routerbench-training-preprocess-v3-natural/metadata.parquet",
+    "model_tiers_path": "ml/artifacts/routerbench-labeled/withmartian-routerbench-2024-03-27__routerbench-capability-tier-v1__overall-solve-rate-v3-probe-selected/model_tiers.json",
+    "raw_sources": {
+      "0shot": {
+        "filename": "routerbench_0shot.pkl",
+        "url": "https://huggingface.co/datasets/withmartian/routerbench/resolve/main/routerbench_0shot.pkl?download=true",
+        "size_bytes": 99567659,
+        "sha256": "ba4f77f19517610a707c374e99322d7750c30fc4ae7ff5527888595a1e65d36d",
+        "local_path": "ml/data/raw/routerbench_0shot.pkl"
+      },
+      "5shot": {
+        "filename": "routerbench_5shot.pkl",
+        "url": "https://huggingface.co/datasets/withmartian/routerbench/resolve/main/routerbench_5shot.pkl?download=true",
+        "size_bytes": 171091324,
+        "sha256": "fbd7d3d16fba2759a18fa0ad44409d3e0e92ba80d03d90827eed1a6d084c9ffe",
+        "local_path": "ml/data/raw/routerbench_5shot.pkl"
+      }
+    }
+  },
+  "xroutebench": {
+    "repo_id": "ulab-ai/xRouteBench",
+    "revision": "ea4b6e1b29d9a734f55f0a637baf326bad6aa681",
+    "candidate_count": 18,
+    "minimum_valid_models": 12,
+    "continuous_acceptance_threshold": 0.7,
+    "train_validation_fraction": 0.1,
+    "sources": {
+      "train": {
+        "filename": "llmrouter_generic-train.parquet",
+        "path": "llmrouter_generic/train.parquet",
+        "size_bytes": 10917678,
+        "sha256": "6ae53d6b619396271e345a242bd32c253fc9796a45a75d3c122ad74843f8a7ef"
+      },
+      "test": {
+        "filename": "llmrouter_generic-test.parquet",
+        "path": "llmrouter_generic/test.parquet",
+        "size_bytes": 10484956,
+        "sha256": "cc7f33f03298c734c1f4b3c380d8d9b84dc8723eb0d08f850de033d2645778f4"
+      },
+      "candidates": {
+        "filename": "llm_candidates.parquet",
+        "path": "llm_candidates/train.parquet",
+        "size_bytes": 8450,
+        "sha256": "ba72146533ae68641e382759c90ff5bc53eb903956d4e748b7f3c0111907541f"
+      }
+    },
+    "exact_metrics": [
+      "em_mc",
+      "GSM8K",
+      "MATH",
+      "code_eval"
+    ],
+    "continuous_metrics": [
+      "f1_score"
+    ]
+  },
+  "deduplication": {
+    "near_duplicate_jaccard_threshold": 0.9,
+    "near_duplicate_min_tokens": 5,
+    "near_duplicate_max_bucket_size": 200
+  },
+  "thresholds": {
+    "hard": [
+      0.18,
+      0.27,
+      0.36
+    ],
+    "easy": [
+      0.55,
+      0.64,
+      0.73
+    ],
+    "tie_tolerance": 0.005,
+    "t2_minimum_disagreement": 0.05,
+    "bootstrap_iterations": 1000,
+    "oof_folds": 5
+  },
+  "coverage": {
+    "core_category_minimum_rows": 300,
+    "green_minimum_share": 0.15,
+    "green_maximum_share": 0.7,
+    "green_minimum_cell_rows": 100,
+    "yellow_minimum_share": 0.05,
+    "yellow_maximum_share": 0.85,
+    "yellow_minimum_cell_rows": 30
+  },
+  "tfidf": {
+    "ngram_range": [
+      1,
+      2
+    ],
+    "min_df": 2,
+    "sublinear_tf": true,
+    "max_features": 100000,
+    "C": 1.0,
+    "class_weight": null,
+    "max_iter": 2000
+  },
+  "input_contract": "structure-preserving-v2",
+  "effective_sample_weight": 1.0,
+  "require_routerarena_overlap_check": true,
+  "continual_split": {
+    "fractions": {
+      "train": 0.6,
+      "validation": 0.1,
+      "gate": 0.1,
+      "stream": 0.15,
+      "retention_test": 0.05
+    },
+    "roles": {
+      "train": "D_initial_train",
+      "validation": "D_dev",
+      "gate": "D_gate",
+      "stream": "D_stream",
+      "retention_test": "D_retention_test"
+    },
+    "test_policy": "preserve_routerbench_fixed_and_xroute_official_test"
+  }
+}

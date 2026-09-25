@@ -21,7 +21,11 @@ def write_observability_json(
 ) -> None:
     """Publish a privacy-safe stage snapshot to its deterministic run URI."""
     store = object_store or build_object_store(uri)
-    value = {"schema_version": "retraining-observability-v1", **dict(payload)}
+    value = dict(payload)
+    source_schema = value.get("schema_version")
+    if source_schema and source_schema != "retraining-observability-v1":
+        value.setdefault("source_schema_version", source_schema)
+    value["schema_version"] = "retraining-observability-v1"
     value.setdefault("updated_at", utc_now())
     text = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     existing = store.read_text(uri)

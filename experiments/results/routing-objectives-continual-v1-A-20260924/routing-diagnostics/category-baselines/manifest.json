@@ -1,0 +1,45 @@
+{
+  "schema_version": "r0-category-baseline-artifacts-v1",
+  "files": {
+    "category-differences.csv": {
+      "sha256": "1bf3b0383aa0b20872b500aa8e4ca1852d956cd709191f0edd1c828cc140abec",
+      "size_bytes": 719
+    },
+    "metrics.csv": {
+      "sha256": "b1597289c86d3a6b492c6ac96e72161e99ecb6319b1afd4e984c3f080408b271",
+      "size_bytes": 2081
+    },
+    "original-audit.json": {
+      "sha256": "d52487630d16bc74a8de17e021e598dd892ccf16de8d8df765b36b786c331d8d",
+      "size_bytes": 63525
+    },
+    "original-audit.md": {
+      "sha256": "32ec37a3043c0909e12af9a22327f8166269999ba90960acfebc6b9beea5b784",
+      "size_bytes": 3510
+    },
+    "original-audit.parquet": {
+      "sha256": "1130cb722b934c1e2813e451b385805698d8d46df892b2028e95e95e494f7421",
+      "size_bytes": 102680
+    },
+    "original-audit.py": {
+      "sha256": "0c7e53a2a158f68dfdff9c287446e16cb16db51597fe2f6a89127deb243ffe94",
+      "size_bytes": 7018
+    },
+    "r0-category-differences.png": {
+      "sha256": "d03d0bdd82b8487423a85ceefed038dc41f6ff858abe192a2dca3698443da563",
+      "size_bytes": 115175
+    },
+    "r0-train-category-baselines.png": {
+      "sha256": "61c24e84e81a5b9dc5a524e86d38c980f462490d57430e43b2dfa4c93bedb43e",
+      "size_bytes": 126377
+    },
+    "render.py": {
+      "sha256": "263401b0b84c45983ff71a998bc8e26ddaa98354f3281a00435ed96d20a72360",
+      "size_bytes": 9471
+    },
+    "verification.json": {
+      "sha256": "63cd88cca144a58bc84d93ba897f5872585c240caadaba4955d8acd9f33c9aa7",
+      "size_bytes": 620
+    }
+  }
+}

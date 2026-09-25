@@ -1,13 +1,22 @@
 from __future__ import annotations
 
-from typing import Any, Mapping
-
+from collections.abc import Mapping
+from typing import Any
 
 SCHEMA_VERSION = "deploy-gate-result-v1"
 
 
 class DeployGateError(RuntimeError):
     """Raised when gate inputs are malformed or a metric cannot be resolved."""
+
+
+def _contract_value(metrics: Mapping[str, Any], path: str) -> Any:
+    current: Any = metrics
+    for part in path.split("."):
+        if not isinstance(current, Mapping) or part not in current:
+            raise DeployGateError(f"Evaluation contract path not found: {path}")
+        current = current[part]
+    return current
 
 
 def _metric(metrics: Mapping[str, Any], path: str) -> float:
@@ -56,6 +65,26 @@ def evaluate_deploy_gate(
             "passed": True,
         },
     ]
+    expected_contract = rules.get("required_evaluation_contract", {})
+    if not isinstance(expected_contract, Mapping):
+        raise DeployGateError("required_evaluation_contract must be an object")
+    for path, expected in sorted(expected_contract.items()):
+        for role, metrics in (
+            ("candidate", candidate_metrics),
+            ("baseline", baseline_metrics),
+        ):
+            if metrics is None:
+                continue
+            actual = _contract_value(metrics, str(path))
+            checks.append(
+                {
+                    "name": f"{role}.evaluation_contract.{path}",
+                    "operator": "==",
+                    "actual": actual,
+                    "threshold": expected,
+                    "passed": actual == expected,
+                }
+            )
 
     rule_groups = (
         ("minimum_metrics", ">=", lambda actual, threshold: actual >= threshold),

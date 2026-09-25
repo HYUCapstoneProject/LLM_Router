@@ -1,0 +1,71 @@
+{
+  "arena_helper_sha256": "714d782cdc4ed21788fe45730d471489ceb86481332837293e3bf2ee47b12ed0",
+  "arena_prepared_manifest_sha256": "5b51c5c6aca5d2acbd4ab364b348d67b3c5d961e068eac666cdd3fc81176c161",
+  "arm_selected_on_arena": false,
+  "attention_implementation": "eager",
+  "batch_size": 16,
+  "candidate_pools": {
+    "scope": "source-local-public-pools",
+    "selection_role": "train",
+    "sources": {
+      "routerbench": {
+        "decision_costs": {
+          "high": 1.0,
+          "low": 0.0,
+          "medium": 0.05453665967302355
+        },
+        "excluded_incomplete_train_candidates": [],
+        "selected_models": {
+          "high": "gpt-4-1106-preview",
+          "low": "mistralai/mistral-7b-chat",
+          "medium": "zero-one-ai/Yi-34B-Chat"
+        },
+        "train_rows": 16616,
+        "train_sample_ids_sha256": "d7c532e353123407fea407e29881d8e7e28f0941dfc7628c1c40289fffa06446"
+      },
+      "xroutebench": {
+        "decision_costs": {
+          "high": 1.0,
+          "low": 0.0,
+          "medium": 0.1233947592899033
+        },
+        "excluded_incomplete_train_candidates": [],
+        "selected_models": {
+          "high": "llama-4-maverick",
+          "low": "gpt-oss-20b",
+          "medium": "gpt-oss-120b"
+        },
+        "train_rows": 1975,
+        "train_sample_ids_sha256": "9d8cac28587847f13f4e64e004bd0a9ad86f6f1c57357161e01a2d62efdc7102"
+      }
+    }
+  },
+  "development_metadata_sha256": "f516805774cd336d2c69f5b39d3bf357b598c7f11809966546f1136a61542740",
+  "dtype": "float32",
+  "g1_overlap_reference_subset_rows": {
+    "calibration": 2275,
+    "selection": 2314,
+    "task_holdout": 1807,
+    "train": 18591
+  },
+  "g1_run_manifest_sha256": "526e3eca394e18a93a8bdec62d15f36baf5eee3260e21e056feda025c7452991",
+  "interpretation": "Historical Arena difficulty-label alignment of action slots; not model-pool routing performance",
+  "lambda_tuned_on_arena": false,
+  "max_length": 512,
+  "production_approved": false,
+  "projection": "lambda_zero_action_slot_argmax",
+  "quality_cost_or_arena_score_claim_allowed": false,
+  "schema_version": "g1-arena-action-slot-stress-v1",
+  "score_semantics": {
+    "pointwise": "independent_success_sigmoid",
+    "regret": "raw_relative_scores_not_probabilities"
+  },
+  "selected_arm_unchanged": "r1-natural",
+  "selection_lock_sha256": "c6fad17c23390305d62769e30f213c8381db620679c949ac6a80bd3695ee75f3",
+  "slot_to_label": [
+    "easy",
+    "medium",
+    "hard"
+  ],
+  "source_specific_locked_policy_applied": false
+}

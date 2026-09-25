@@ -1,0 +1,22 @@
+{
+  "files": {
+    "evaluation.parquet": {
+      "sha256": "d84be2fdad3ed9753d2cba93fdbe479025800b762d13b5b2c92565573e32925f",
+      "size_bytes": 4289920
+    },
+    "metadata.parquet": {
+      "sha256": "080c358f730a488204d6c41f219015d75e799e1acac5677a81fdfd87cb944c6a",
+      "size_bytes": 4618166
+    },
+    "overlap-audit.json": {
+      "sha256": "f333ccbfd87a8b3bd72692d093bedf9af9fd118c662923bef4516379c6c27b89",
+      "size_bytes": 6606
+    },
+    "protocol.json": {
+      "sha256": "7709e0fc7c0407b1f1107bd93fe042460504aa0680406be5f9a547e1fd1ec449",
+      "size_bytes": 2510
+    }
+  },
+  "schema_version": "g1-arena-stress-prepared-v1",
+  "selection_lock_sha256": "c6fad17c23390305d62769e30f213c8381db620679c949ac6a80bd3695ee75f3"
+}

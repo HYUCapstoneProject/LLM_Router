@@ -1,0 +1,83 @@
+{
+  "schema_version": "sealed-report-local-verification-v1",
+  "status": "passed",
+  "protocol_sha256": "133c093cd569e4d699439585037aa28e8843365e0297aedf8f2c797833114f6b",
+  "inference_manifest_sha256": "1ebcba56c737a61575c7a3a5ec996eb9fb686d8b6c22fcc689674e00481df1eb",
+  "evaluation_manifest_sha256": "4ed8c992247db8e02ea1a2780f7c135be039c1d98a02e5a2c58b680b72e421c3",
+  "summary_sha256": "29108d02c4f37967ce1bcc69351b56c54cc9df98fcbc601c2b0cd4d5546f254f",
+  "transfer_report_sha256": "003e49c75f7c55853ea4c51531a5fc0e1b36bbf9ab67bfacaacfcd874615e9eb",
+  "results_archive_sha256": "ad4b52f7ae3dcb6931475b5e780c71f30d16d697a1af4f7f0b184477f8eaaf8f",
+  "results_archive_size_bytes": 2293760,
+  "local_artifacts_verified": {
+    "inference/ordinal/test_routerbench-scores.parquet": {
+      "sha256": "fafecd0b0892e79d866d5b6a771af25827e6b93708816bb76a612bb458f1a937",
+      "size_bytes": 138317
+    },
+    "inference/ordinal/test_xroutebench-scores.parquet": {
+      "sha256": "d28ed3101cc6665511f895fb336be2ed57b2fb383f78bee70566908dbcfc4a70",
+      "size_bytes": 202129
+    },
+    "inference/pairwise/test_routerbench-scores.parquet": {
+      "sha256": "69f9698388a975508469699f9d26b493db814f2d92e42afde0175e2a23a25e83",
+      "size_bytes": 138317
+    },
+    "inference/pairwise/test_xroutebench-scores.parquet": {
+      "sha256": "35e27c12706c162a4c276d28586679aa2cef65db292b7c4ccc06c784c277babe",
+      "size_bytes": 202129
+    },
+    "inference/pointwise/test_routerbench-scores.parquet": {
+      "sha256": "2b0ed365810eae187823d8ed6c96f74aea383f6c089f5bd8e3a6b94827693719",
+      "size_bytes": 138317
+    },
+    "inference/pointwise/test_xroutebench-scores.parquet": {
+      "sha256": "c9e292a3cb4d266bf4da808be679ff72092196cdeacd040511833ffd4751dabc",
+      "size_bytes": 202125
+    },
+    "evaluation/matched-random-runs.parquet": {
+      "sha256": "c6776c798d00a405cffdaf2009ff4236c3cbb1200998fe29e04f114c5492082e",
+      "size_bytes": 79804
+    },
+    "evaluation/predictions.parquet": {
+      "sha256": "f94229fd2ca05272551bb2ca3f9543f689a68107f25bca638e73518c072b0b1a",
+      "size_bytes": 983229
+    },
+    "evaluation/summary.json": {
+      "sha256": "29108d02c4f37967ce1bcc69351b56c54cc9df98fcbc601c2b0cd4d5546f254f",
+      "size_bytes": 133993
+    }
+  },
+  "expected_partition_rows": {
+    "test_routerbench": 3473,
+    "test_xroutebench": 3729
+  },
+  "score_row_count": 21606,
+  "unique_test_rows": 7202,
+  "unique_test_groups": 7202,
+  "prediction_rows": 129636,
+  "matched_random_rows": 5400,
+  "method_budget_source_policies_recomputed": 36,
+  "locked_penalties_match_validation_lock": true,
+  "winner_unchanged": "pointwise",
+  "matched_random_summary_recomputed": true,
+  "paired_ci_estimates_recomputed": true,
+  "bootstrap_bounds_source": "hash-verified original summary; bootstrap draws not rerun",
+  "external_model_weights_reverified": false,
+  "original_outcome_projection_files_reverified": false,
+  "verification_scope": "Included inference/evaluation files verified; embedded outcomes equal across methods; actions and means recomputed from sealed scores. Referenced model weights and original source datasets are not in this archive.",
+  "gcs_receipts_remote_checked_by": "parent task, all four objects size/CRC32C/generation",
+  "personal_drive_status": "verified_after_flush_and_remount",
+  "personal_drive_receipts_match_gcs": true,
+  "training_inference_or_policy_selection_performed": false,
+  "old_report_sha256_unchanged": {
+    "experiments/results/routing-objectives-continual-v1-A-20260924/report.json": "6461eaf061bc5d551ef63139935dfbf418ce9ebedf79d3686d72f52d949ed43c",
+    "experiments/results/routing-objectives-continual-v1-A-20260924/REPORT.md": "1987c767f237c57eb279730b31254a364d92bb789d5f1c988e3ba38484499d7a",
+    "experiments/results/routing-objectives-continual-v1-A-20260924/nauc-comparison.png": "208cc2d19b3414df7a9250621455ca7aeeefb9ef241e5e71643730ce0df1d4a3",
+    "experiments/results/routing-objectives-continual-v1-A-20260924/quality-cost-curves.png": "be884e6a6a45ef7d00b52d59903145a24849e23ce6573c26c5759b782d6ae6f2",
+    "experiments/results/routing-objectives-continual-v1-A-20260924/ANALYSIS.md": "ae5abd15f5077d16ca0ff8a50e6177320770852fc012c34ed4a6f88867ba69fc",
+    "experiments/results/routing-objectives-continual-v1-A-20260924/analysis.json": "f9c3abee0351425db18ee26ec00de4f60bda6292bc6f808c855bd2af1eea478f",
+    "experiments/results/routing-objectives-continual-v1-A-20260924/evidence/transfer-summary.json": "15bdea8e3d733b92e11edfce943c72d0b32a8a48076e84257542c633b9e8d2e4",
+    "experiments/results/routing-objectives-continual-v1-A-20260924/evidence/validation-lock.json": "ddae362cb6e826376383427933deae22bab1061390709be8f781345caa608e5f",
+    "experiments/results/routing-objectives-continual-v1-A-20260924/evidence/arms.json": "47052a8a02820804e3091f7b60aad25a06e8d0fe75eb1b974a23414b10ff4b20"
+  },
+  "old_report_hash_scope": "Snapshot verified unchanged by this sealed-report task before the parent-owned run-record and archive-status refresh; subsequent parent edits are outside this verification scope."
+}

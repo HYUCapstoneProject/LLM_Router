@@ -1,0 +1,37 @@
+{
+  "protocol_sha256": "133c093cd569e4d699439585037aa28e8843365e0297aedf8f2c797833114f6b",
+  "role": "sealed_test",
+  "schema_version": "routing-sealed-inference-v1",
+  "scores": {
+    "ordinal/test_routerbench": {
+      "path": "/content/router-sealed-eval-results-v1/inference/ordinal/test_routerbench-scores.parquet",
+      "sha256": "fafecd0b0892e79d866d5b6a771af25827e6b93708816bb76a612bb458f1a937",
+      "size_bytes": 138317
+    },
+    "ordinal/test_xroutebench": {
+      "path": "/content/router-sealed-eval-results-v1/inference/ordinal/test_xroutebench-scores.parquet",
+      "sha256": "d28ed3101cc6665511f895fb336be2ed57b2fb383f78bee70566908dbcfc4a70",
+      "size_bytes": 202129
+    },
+    "pairwise/test_routerbench": {
+      "path": "/content/router-sealed-eval-results-v1/inference/pairwise/test_routerbench-scores.parquet",
+      "sha256": "69f9698388a975508469699f9d26b493db814f2d92e42afde0175e2a23a25e83",
+      "size_bytes": 138317
+    },
+    "pairwise/test_xroutebench": {
+      "path": "/content/router-sealed-eval-results-v1/inference/pairwise/test_xroutebench-scores.parquet",
+      "sha256": "35e27c12706c162a4c276d28586679aa2cef65db292b7c4ccc06c784c277babe",
+      "size_bytes": 202129
+    },
+    "pointwise/test_routerbench": {
+      "path": "/content/router-sealed-eval-results-v1/inference/pointwise/test_routerbench-scores.parquet",
+      "sha256": "2b0ed365810eae187823d8ed6c96f74aea383f6c089f5bd8e3a6b94827693719",
+      "size_bytes": 138317
+    },
+    "pointwise/test_xroutebench": {
+      "path": "/content/router-sealed-eval-results-v1/inference/pointwise/test_xroutebench-scores.parquet",
+      "sha256": "c9e292a3cb4d266bf4da808be679ff72092196cdeacd040511833ffd4751dabc",
+      "size_bytes": 202125
+    }
+  }
+}

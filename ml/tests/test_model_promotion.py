@@ -51,6 +51,24 @@ def _metadata() -> dict[str, object]:
 
 
 class ModelPackageTest(unittest.TestCase):
+    def test_candidate_heads_cannot_be_promoted_as_difficulty_classifiers(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            checkpoint = Path(directory)
+            _checkpoint(checkpoint)
+            for objective in ("pointwise", "pairwise"):
+                with self.subTest(objective=objective):
+                    # Even a mislabeled head must not silently enter the CE gate.
+                    _write_json(
+                        checkpoint / "config.json",
+                        {
+                            "id2label": {"0": "easy", "1": "medium", "2": "hard"},
+                            "label2id": {"easy": 0, "medium": 1, "hard": 2},
+                            "router_objective": objective,
+                        },
+                    )
+                    with self.assertRaisesRegex(ModelPackageError, "only supports.*R0"):
+                        create_model_manifest(checkpoint, _metadata())
+
     def test_manifest_records_and_verifies_required_file_hashes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             package_dir = Path(directory)
@@ -94,7 +112,9 @@ class ModelPackageTest(unittest.TestCase):
             report = validate_model_package(package_dir)
             self.assertIn("routerarena_metrics.json", report["verified_files"])
 
-    def test_assemble_overrides_static_metadata_with_the_run_candidate_version(self) -> None:
+    def test_assemble_overrides_static_metadata_with_the_run_candidate_version(
+        self,
+    ) -> None:
         # package_metadata_uri is one static file shared by every pipeline run, so
         # its own model_version cannot vary per run without this override.
         with tempfile.TemporaryDirectory() as directory:
@@ -112,11 +132,80 @@ class ModelPackageTest(unittest.TestCase):
             )
 
             self.assertEqual(
-                manifest["model_version"], "router-modernbert-base-feedback-20260901-a1b2c3d"
+                manifest["model_version"],
+                "router-modernbert-base-feedback-20260901-a1b2c3d",
             )
+
+    def test_gate_metrics_are_named_and_bound_to_their_evaluation_role(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            checkpoint = root / "checkpoint"
+            checkpoint.mkdir()
+            _checkpoint(checkpoint)
+            metrics = root / "metrics.json"
+            metadata = {
+                **_metadata(),
+                "evaluation_role": "continual_gate",
+                "split_version": "fixed-split",
+                "logical_model_version": "1.1",
+            }
+            _write_json(metrics, {"evaluation_role": "development_calibration"})
+            with self.assertRaisesRegex(ModelPackageError, "role does not match"):
+                assemble_model_package(checkpoint, root / "bad", metadata, metrics)
+            _write_json(metrics, {"evaluation_role": "continual_gate", "macro_f1": 0.5})
+            manifest = assemble_model_package(
+                checkpoint, root / "good", metadata, metrics
+            )
+            self.assertEqual(manifest["evaluation_role"], "continual_gate")
+            self.assertEqual(manifest["logical_model_version"], "1.1")
+            self.assertIn("gate_metrics.json", manifest["files"])
+            self.assertNotIn("routerarena_metrics.json", manifest["files"])
+            validate_model_package(root / "good")
 
 
 class DeployGateTest(unittest.TestCase):
+    def test_contract_mismatch_rejects_good_scores_for_candidate_and_baseline(
+        self,
+    ) -> None:
+        metrics = {
+            "macro_f1": 0.99,
+            "evaluation_role": "continual_gate",
+            "dataset_sha256": "frozen-gate-sha",
+            "dataset_contract": {"split_version": "frozen-split"},
+        }
+        rules = {
+            "minimum_metrics": {"macro_f1": 0.8},
+            "required_evaluation_contract": {
+                "evaluation_role": "continual_gate",
+                "dataset_sha256": "frozen-gate-sha",
+                "dataset_contract.split_version": "frozen-split",
+            },
+        }
+        for subject in ("candidate", "baseline"):
+            with self.subTest(subject=subject):
+                changed = {**metrics, "evaluation_role": "development_calibration"}
+                result = evaluate_deploy_gate(
+                    changed if subject == "candidate" else metrics,
+                    rules,
+                    candidate_model_version="candidate",
+                    package_validation={"valid": True, "model_version": "candidate"},
+                    baseline_metrics=changed if subject == "baseline" else metrics,
+                    baseline_model_version="baseline",
+                )
+                self.assertFalse(result["passed"])
+                self.assertEqual(
+                    [check["name"] for check in result["failed_checks"]],
+                    [f"{subject}.evaluation_contract.evaluation_role"],
+                )
+        missing = {**metrics, "dataset_contract": {}}
+        with self.assertRaisesRegex(DeployGateError, "contract path not found"):
+            evaluate_deploy_gate(
+                missing,
+                rules,
+                candidate_model_version="candidate",
+                package_validation={"valid": True, "model_version": "candidate"},
+            )
+
     def test_absolute_and_baseline_rules_are_auditable(self) -> None:
         result = evaluate_deploy_gate(
             {

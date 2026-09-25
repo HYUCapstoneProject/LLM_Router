@@ -1,0 +1,52 @@
+{
+  "arms": [
+    "r1-natural",
+    "r1-balanced",
+    "r3-natural",
+    "r3-balanced"
+  ],
+  "artifacts": {
+    "r1-balanced/_SUCCESS": {
+      "sha256": "b5d5c3e7aef6602cb38e1acce643de7e681cea1aa5aebcc04501c565844a5e2f",
+      "size_bytes": 65
+    },
+    "r1-balanced/manifest.json": {
+      "sha256": "6521920e33f9eca418a50b0a107349f72b86fe27ecaf811c0b138652efa6c426",
+      "size_bytes": 2179
+    },
+    "r1-natural/_SUCCESS": {
+      "sha256": "46fb7bcfd769df89d700eb3641a473317b48e97a8eba8a9f827735ebeb015785",
+      "size_bytes": 65
+    },
+    "r1-natural/manifest.json": {
+      "sha256": "6298f108810fde84f468e173786892d0103ab6949f8d71805999d770f3930520",
+      "size_bytes": 2177
+    },
+    "r3-balanced/_SUCCESS": {
+      "sha256": "33b6a97e716f22220e3c338588acb67b4b4dbd516a3aec6960dc82d488d59c77",
+      "size_bytes": 65
+    },
+    "r3-balanced/manifest.json": {
+      "sha256": "8b8517f504b4a962dbf044db4b8609682f8a421813611148cdc5b65c6966e280",
+      "size_bytes": 2176
+    },
+    "r3-natural/_SUCCESS": {
+      "sha256": "4127f1a60d08e8bd9753afd2c36de4b7aa11c33bbe74e6f08f9c53873a027278",
+      "size_bytes": 65
+    },
+    "r3-natural/manifest.json": {
+      "sha256": "93fe4726ee0017b6e8fbdb810ae7cbf355dbc29a46bb40ac427978695c81b5c4",
+      "size_bytes": 2174
+    },
+    "run-plan.json": {
+      "sha256": "2af44383db60b190692bf4ad7378f1d012551d7cb709b1d85078159457286be9",
+      "size_bytes": 6522
+    }
+  },
+  "comparison_complete": true,
+  "policy_or_arm_selected": false,
+  "production_approved": false,
+  "run_plan_sha256": "2af44383db60b190692bf4ad7378f1d012551d7cb709b1d85078159457286be9",
+  "schema_version": "generalization-four-arm-comparison-v1",
+  "task_holdout_accessed": false
+}

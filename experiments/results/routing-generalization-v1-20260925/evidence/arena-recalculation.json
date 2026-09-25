@@ -1,0 +1,65 @@
+{
+  "schema_version": "g1-independent-arena-recalculation-v1",
+  "verified": true,
+  "method": "Independent NumPy confusion, support, F1, QWK and paired agreement; sklearn secondary F1/QWK check. No original metrics helper imported.",
+  "tolerance": 1e-12,
+  "numeric_comparisons": 8212,
+  "maximum_absolute_difference": 3.3306690738754696e-16,
+  "artifact_checks": [
+    {
+      "path": "/private/tmp/g1-gpu-eval-progress/arena-stress",
+      "manifest_sha256": "1c00f1c58f617d21d5a96220298cd81c88c96214ff221ad579a1eba0305dfb5c",
+      "all_files_verified": true
+    },
+    {
+      "path": "/private/tmp/g1-gpu-eval-progress/arena-stress/results",
+      "manifest_sha256": "f6eed290d4981880e0bbf4d152da945cc97549f22f9b703da048eba29f2a4e43",
+      "all_files_verified": true
+    }
+  ],
+  "selection_lock_sha256": "c6fad17c23390305d62769e30f213c8381db620679c949ac6a80bd3695ee75f3",
+  "selected_arm_unchanged": "r1-natural",
+  "summary": {
+    "r1-balanced": {
+      "full_rows": 8379,
+      "paired_rows": 412,
+      "categories": 28,
+      "domains": 9,
+      "accuracy": 0.21040696980546605,
+      "macro_f1": 0.17264496475663174,
+      "same_action_rate": 0.8009708737864077
+    },
+    "r1-natural": {
+      "full_rows": 8379,
+      "paired_rows": 412,
+      "categories": 28,
+      "domains": 9,
+      "accuracy": 0.23570831841508533,
+      "macro_f1": 0.19533719587593593,
+      "same_action_rate": 0.720873786407767
+    },
+    "r3-balanced": {
+      "full_rows": 8379,
+      "paired_rows": 412,
+      "categories": 28,
+      "domains": 9,
+      "accuracy": 0.3135218999880654,
+      "macro_f1": 0.30937450359728597,
+      "same_action_rate": 0.5995145631067961
+    },
+    "r3-natural": {
+      "full_rows": 8379,
+      "paired_rows": 412,
+      "categories": 28,
+      "domains": 9,
+      "accuracy": 0.3157894736842105,
+      "macro_f1": 0.3148878704396983,
+      "same_action_rate": 0.5169902912621359
+    }
+  },
+  "limitations": [
+    "Action-slot stress diagnostic only; no candidate-pool routing quality or cost claims.",
+    "Local model weights absent; inference not rerun. Parent separately verified remote model artifacts."
+  ],
+  "medium_share_analysis_included": false
+}

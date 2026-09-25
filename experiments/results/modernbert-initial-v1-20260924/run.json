@@ -1,0 +1,728 @@
+{
+  "schema_version": "llm-router-experiment-run-v1",
+  "run_id": "modernbert-initial-v1-20260924",
+  "logical_model_version": null,
+  "experiment_question": "Recover and preserve the R0 candidate for the common R0/R1/R2 integrated-A comparison before selecting the production 1.0 objective.",
+  "comparison_scope": {
+    "method": "R0_3class_CE",
+    "seeds": [
+      42
+    ],
+    "independent_repetitions": 1,
+    "competing_methods_evaluated": [],
+    "experiment_id": "A_integrated_source_local_symbolic_tiers",
+    "candidate_role": "R0_candidate_not_selected_production_anchor"
+  },
+  "status": {
+    "training": "completed_recovery",
+    "artifact_durability": "final_model_and_checkpoints_verified_in_gcs_and_personal_drive",
+    "model_package_published": false,
+    "current_pointer_updated": false,
+    "serving_activated": false,
+    "personal_drive_copy_verified": true,
+    "personal_drive_mount": "connected_using_preexisting_permissions"
+  },
+  "data": {
+    "manifest_uri": "gs://llm-router-mlserver/datasets/routerbench-xroutebench/continual-v1-20260924-f6a4cff1684b/dataset/manifest.json",
+    "manifest_sha256": "f6a4cff1684bc2626a8901dbfda9f81e7d5d7e8753e5f48320cb1ada44c8cca4",
+    "dataset_version": "routerbench-xroutebench-continual-v1",
+    "label_rule_version": "overall-solve-rate-grid-v1",
+    "preprocessing_version": "integrated-routing-preprocess-v2-structure",
+    "split_version": "continual-60-10-10-15-5-v1-seed-42",
+    "input_contract": "structure-preserving-v2",
+    "continual_split": {
+      "fractions": {
+        "gate": 0.1,
+        "retention_test": 0.05,
+        "stream": 0.15,
+        "train": 0.6,
+        "validation": 0.1
+      },
+      "roles": {
+        "gate": "D_gate",
+        "retention_test": "D_retention_test",
+        "stream": "D_stream",
+        "train": "D_initial_train",
+        "validation": "D_dev"
+      },
+      "test_policy": "preserve_routerbench_fixed_and_xroute_official_test"
+    },
+    "source_artifacts": {
+      "ml/artifacts/routerbench-labeled/withmartian-routerbench-2024-03-27__routerbench-capability-tier-v1__overall-solve-rate-v3-probe-selected/labeled.parquet": {
+        "sha256": "33fb6a8fd198d79b8adb86e644dfae0d7569c4b36df7b104f023f5ba8be50748",
+        "size_bytes": 28263921
+      },
+      "ml/artifacts/routerbench-labeled/withmartian-routerbench-2024-03-27__routerbench-capability-tier-v1__overall-solve-rate-v3-probe-selected/model_tiers.json": {
+        "sha256": "a88ce8a77e6ea14901601809a9cf2bc936d13addacd476185089fdb7a2d2e11e",
+        "size_bytes": 2120
+      },
+      "ml/artifacts/routerbench-training/withmartian-routerbench-2024-03-27__overall-solve-rate-v3-probe-selected__routerbench-training-preprocess-v3-natural/metadata.parquet": {
+        "sha256": "1777423a3864844eb08f3e0862abceb80fcf560ab1e9927c3a7a5ce02c725410",
+        "size_bytes": 20032275
+      },
+      "ml/data/raw/routerbench_0shot.pkl": {
+        "sha256": "ba4f77f19517610a707c374e99322d7750c30fc4ae7ff5527888595a1e65d36d",
+        "size_bytes": 99567659
+      },
+      "ml/data/raw/routerbench_5shot.pkl": {
+        "sha256": "fbd7d3d16fba2759a18fa0ad44409d3e0e92ba80d03d90827eed1a6d084c9ffe",
+        "size_bytes": 171091324
+      },
+      "ml/data/raw/xroutebench/ea4b6e1b29d9a734f55f0a637baf326bad6aa681/llm_candidates.parquet": {
+        "sha256": "ba72146533ae68641e382759c90ff5bc53eb903956d4e748b7f3c0111907541f",
+        "size_bytes": 8450
+      },
+      "ml/data/raw/xroutebench/ea4b6e1b29d9a734f55f0a637baf326bad6aa681/llmrouter_generic-test.parquet": {
+        "sha256": "cc7f33f03298c734c1f4b3c380d8d9b84dc8723eb0d08f850de033d2645778f4",
+        "size_bytes": 10484956
+      },
+      "ml/data/raw/xroutebench/ea4b6e1b29d9a734f55f0a637baf326bad6aa681/llmrouter_generic-train.parquet": {
+        "sha256": "6ae53d6b619396271e345a242bd32c253fc9796a45a75d3c122ad74843f8a7ef",
+        "size_bytes": 10917678
+      }
+    },
+    "selected_thresholds": {
+      "routerarena_used_for_selection": false,
+      "selection_data": "train_only_group_oof",
+      "t1": {
+        "candidate_id": "h0.27-e0.64",
+        "easy_threshold": 0.64,
+        "hard_threshold": 0.27,
+        "j_threshold": 0.577183731099587
+      },
+      "t2": {
+        "candidate_id": "h0.27-e0.55",
+        "easy_threshold": 0.55,
+        "hard_threshold": 0.27,
+        "j_threshold": 0.534673493511616,
+        "t1_label_disagreement": 0.10310193403718583
+      }
+    },
+    "threshold_selection_partition": "D_initial_train",
+    "deduplication": {
+      "cross_source_duplicate_group_count": 0,
+      "dropped_by_source_split": {
+        "routerbench|test": 2,
+        "routerbench|train": 6,
+        "routerbench|validation": 2,
+        "xroutebench|train": 4,
+        "xroutebench|validation": 1
+      },
+      "dropped_rows": 15,
+      "input_rows": 42950,
+      "output_rows": 42935
+    },
+    "effective_sample_weight": 1.0,
+    "partitions": {
+      "D_initial_train": {
+        "uri": "gs://llm-router-mlserver/datasets/routerbench-xroutebench/continual-v1-20260924-f6a4cff1684b/dataset/train/training.parquet",
+        "sha256": "9c8a1fc0cce11888f4a66b2c120b227b14eab6408cef944d2a7d746a1a3505db",
+        "size_bytes": 15520866,
+        "rows": 21406,
+        "by_source": {
+          "routerbench": 18765,
+          "xroutebench": 2641
+        },
+        "by_label": {
+          "easy": 10608,
+          "medium": 8121,
+          "hard": 2677
+        },
+        "role": "initial_training_and_train_only_threshold_selection",
+        "evaluation_status": "trained"
+      },
+      "D_dev": {
+        "uri": "gs://llm-router-mlserver/datasets/routerbench-xroutebench/continual-v1-20260924-f6a4cff1684b/dataset/validation/validation.parquet",
+        "sha256": "fb698a992f05b88bfd4488c7de0abe515e52107c8435a46fa9a45bfb63b7f4d0",
+        "size_bytes": 2646031,
+        "rows": 3581,
+        "by_source": {
+          "routerbench": 3122,
+          "xroutebench": 459
+        },
+        "by_label": {
+          "easy": 1768,
+          "medium": 1360,
+          "hard": 453
+        },
+        "role": "development_validation",
+        "evaluation_status": "recovered_classification_and_common_routing_evaluation_complete"
+      },
+      "D_gate": {
+        "uri": "gs://llm-router-mlserver/datasets/routerbench-xroutebench/continual-v1-20260924-f6a4cff1684b/dataset/sealed/gate.parquet",
+        "sha256": "94ed6c7be5966b37d7bb24aa5d37d35d1aed5e245b3a5b97b18a80cc944f4187",
+        "size_bytes": 2671496,
+        "rows": 3581,
+        "by_source": {
+          "routerbench": 3122,
+          "xroutebench": 459
+        },
+        "by_label": {
+          "easy": 1767,
+          "medium": 1363,
+          "hard": 451
+        },
+        "role": "repeated_promotion_gate",
+        "evaluation_status": "prepared_not_evaluated"
+      },
+      "D_stream": {
+        "uri": "gs://llm-router-mlserver/datasets/routerbench-xroutebench/continual-v1-20260924-f6a4cff1684b/dataset/sealed/stream.parquet",
+        "sha256": "8ace7c4d02f2809a546fa99e62bbb939439e7fcbd26ca103091a369ab7e223bb",
+        "size_bytes": 3967942,
+        "rows": 5368,
+        "by_source": {
+          "routerbench": 4684,
+          "xroutebench": 684
+        },
+        "by_label": {
+          "easy": 2651,
+          "medium": 2040,
+          "hard": 677
+        },
+        "role": "feedback_arrival_replay",
+        "evaluation_status": "prepared_not_used"
+      },
+      "D_retention_test": {
+        "uri": "gs://llm-router-mlserver/datasets/routerbench-xroutebench/continual-v1-20260924-f6a4cff1684b/dataset/sealed/retention_test.parquet",
+        "sha256": "2b7d1cde5d1a08865cf082f09f5c4168bd9c5bc795ff1ff9dbb0f45309a70cec",
+        "size_bytes": 1363659,
+        "rows": 1797,
+        "by_source": {
+          "routerbench": 1556,
+          "xroutebench": 241
+        },
+        "by_label": {
+          "easy": 882,
+          "medium": 685,
+          "hard": 230
+        },
+        "role": "final_forgetting_diagnostic",
+        "evaluation_status": "prepared_not_evaluated"
+      },
+      "routerbench_fixed_test": {
+        "uri": "gs://llm-router-mlserver/datasets/routerbench-xroutebench/continual-v1-20260924-f6a4cff1684b/dataset/test/routerbench.parquet",
+        "sha256": "77634c4990dd8d11434979bd97a9676b06fba4ce13e8083b4328da34c32c6de1",
+        "size_bytes": 2505571,
+        "rows": 3473,
+        "by_source": {
+          "routerbench": 3473
+        },
+        "by_label": {
+          "easy": 1669,
+          "medium": 1412,
+          "hard": 392
+        },
+        "role": "final_held_out_evaluation",
+        "evaluation_status": "completed_in_frozen_three_method_sealed_protocol"
+      },
+      "xroutebench_official_test": {
+        "uri": "gs://llm-router-mlserver/datasets/routerbench-xroutebench/continual-v1-20260924-f6a4cff1684b/dataset/test/xroutebench.parquet",
+        "sha256": "72fede6e92b152e4790e8fb57059cb360a6c2cf425428c91baaf7e78a7e55368",
+        "size_bytes": 2194476,
+        "rows": 3729,
+        "by_source": {
+          "xroutebench": 3729
+        },
+        "by_label": {
+          "easy": 2156,
+          "medium": 829,
+          "hard": 744
+        },
+        "role": "final_held_out_evaluation",
+        "evaluation_status": "completed_in_frozen_three_method_sealed_protocol"
+      }
+    }
+  },
+  "external_evaluation": {
+    "routerarena": {
+      "repository": "https://github.com/RouteWorks/RouterArena",
+      "revision": "a4a062ce3313b56bb09c042e1bc37b61d34e3bd8",
+      "raw_full_rows": 8400,
+      "final_clean_rows": null,
+      "status": "final_adapter_and_audit_pending",
+      "metric_meaning": "difficulty_label_alignment_not_Arena_Score"
+    },
+    "blind_cognitive_audit": {
+      "proposed_rows": 300,
+      "proposed_human_rows": 60,
+      "status": "proposed_not_executed"
+    }
+  },
+  "training_config": {
+    "training_version": "modernbert-r0-initial-v1.0",
+    "model_id": "answerdotai/ModernBERT-base",
+    "model_revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+    "label2id": {
+      "easy": 0,
+      "medium": 1,
+      "hard": 2
+    },
+    "id2label": {
+      "0": "easy",
+      "1": "medium",
+      "2": "hard"
+    },
+    "train_split": "train",
+    "validation_split": "validation",
+    "max_length": 512,
+    "truncation": true,
+    "train_batch_size": 8,
+    "eval_batch_size": 16,
+    "epochs": 3,
+    "max_train_steps": null,
+    "gradient_accumulation_steps": 4,
+    "train_sampling_strategy": "shuffle",
+    "gradient_checkpointing": true,
+    "learning_rate": 2e-05,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.1,
+    "seed": 42,
+    "device": "cuda",
+    "precision": "fp16",
+    "attention_implementation": "eager",
+    "gradient_clip_norm": 1.0
+  },
+  "code": {
+    "commit": "2cee27ef3e7556e5d06dd09626e6f25a31983e42",
+    "dirty": false,
+    "archive_sha256": "f235696e6661d19225afab973322a831ca23dd7ee7b906a83f95d7ac584d7d9e",
+    "entrypoint": "ml/scripts/run-modernbert-initial-v1.py"
+  },
+  "runtime": {
+    "contract": "ml/config/modernbert_runtime_cu124_v1.json",
+    "python": "3.12.14",
+    "torch": "2.5.1+cu124",
+    "transformers": "4.48.3",
+    "gpu": "NVIDIA Tesla T4",
+    "training_fingerprint": "85ce726e524c369379b2acc01c55e71affa6119c5cc3e4af6835b21008bcc9f1"
+  },
+  "attempts": [
+    {
+      "attempt_id": "initial-full",
+      "evidence": "observed_colab_stdout_final_files_not_durable",
+      "execution_status": "succeeded",
+      "artifact_status": "final_model_missing_after_runtime_replacement",
+      "exit_code": 0,
+      "optimizer_steps": 2007,
+      "planned_steps": 2007,
+      "train_seconds": 5665.158,
+      "total_seconds": 5750.7573,
+      "attributed_compute_units": null,
+      "actual_cost": null,
+      "epoch_metrics": [
+        {
+          "epoch": 1,
+          "optimizer_steps": 669,
+          "train_loss": 0.8938194957613043,
+          "validation_loss": 0.8636016195228532,
+          "accuracy": 0.6093270036302709,
+          "macro_f1": 0.49163998062392866
+        },
+        {
+          "epoch": 2,
+          "optimizer_steps": 1338,
+          "train_loss": 0.8066611776817049,
+          "validation_loss": 0.834429204014552,
+          "accuracy": 0.6090477520245742,
+          "macro_f1": 0.5178788678081446
+        },
+        {
+          "epoch": 3,
+          "optimizer_steps": 2007,
+          "train_loss": 0.7095714616383457,
+          "validation_loss": 0.8736271340232493,
+          "accuracy": 0.6051382295448199,
+          "macro_f1": 0.516109561293964
+        }
+      ],
+      "final_dev": {
+        "rows": 3581,
+        "accuracy": 0.6051382295448199,
+        "macro_f1": 0.516109561293964,
+        "per_class": {
+          "easy": {
+            "support": 1768,
+            "precision": 0.6412944393801276,
+            "recall": 0.795814479638009,
+            "f1": 0.7102473498233216
+          },
+          "medium": {
+            "support": 1360,
+            "precision": 0.5567890691716482,
+            "recall": 0.47941176470588237,
+            "f1": 0.5152113789016199
+          },
+          "hard": {
+            "support": 453,
+            "precision": 0.5,
+            "recall": 0.23841059602649006,
+            "f1": 0.32286995515695066
+          }
+        },
+        "hard_to_easy_rate": null,
+        "per_source_metrics": null,
+        "predictions_uri": null,
+        "group_bootstrap_ci": null
+      },
+      "tokenization": {
+        "rows": 24987,
+        "truncated_rows": 95,
+        "length_median": 79,
+        "length_min": 10,
+        "length_max": 986
+      }
+    },
+    {
+      "attempt_id": "recovery-from-step500",
+      "parent_attempt_id": "initial-full",
+      "resume_optimizer_step": 500,
+      "planned_steps": 2007,
+      "execution_status": "failed_before_first_resumed_step",
+      "final_metrics": null,
+      "final_model_uri": null,
+      "error": "GPU resume loaded CPU RNG state onto CUDA; torch.set_rng_state rejected it.",
+      "code_commit": "2cee27ef3e7556e5d06dd09626e6f25a31983e42",
+      "exit_code": 1
+    },
+    {
+      "attempt_id": "recovery-from-step500-cpu-rng-fix",
+      "parent_attempt_id": "initial-full",
+      "resume_optimizer_step": 500,
+      "planned_steps": 2007,
+      "execution_status": "succeeded",
+      "started_at_unix": 1790225767.9540143,
+      "code_commit": "eb016ac8183b1f4ef90a752153476a17898b3ed5",
+      "code_archive_sha256": "7f1ce642921b86feba5f0f6d043ebba924c290c13fc8a315ec2054ee33b5a4d8",
+      "uncommitted_source_changes": false,
+      "training_contract_changed": false,
+      "regression_check": "Actual T4 interrupted/resumed training produced bitwise-equal weights; CPU and CUDA RNG states restored.",
+      "final_metrics": {
+        "checkpoint": {
+          "id2label": {
+            "0": "easy",
+            "1": "medium",
+            "2": "hard"
+          },
+          "label2id": {
+            "easy": 0,
+            "hard": 2,
+            "medium": 1
+          },
+          "model_weight_files": [
+            "model.safetensors"
+          ],
+          "reload_smoke_passed": true,
+          "reload_smoke_prediction": "easy"
+        },
+        "data": {
+          "input_row_count": 24987,
+          "label_distribution": {
+            "easy": 12376,
+            "hard": 3130,
+            "medium": 9481
+          },
+          "sampled_train_row_count_per_epoch": 21406,
+          "train_row_count": 21406,
+          "training_data_sha256": "8e382ee84419aa881ea0c4a68fabb0103945ab3452cdbc98720c149e36eb09ab",
+          "validation_row_count": 3581
+        },
+        "model": {
+          "attention_implementation": "eager",
+          "device": "cuda",
+          "model_id": "answerdotai/ModernBERT-base",
+          "model_revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+          "precision": "fp16"
+        },
+        "optimization": {
+          "effective_batch_size": 32,
+          "gradient_accumulation_steps": 4,
+          "gradient_clip_norm": 1.0,
+          "learning_rate": 2e-05,
+          "max_train_steps": null,
+          "mean_train_loss": 0.8073374996553894,
+          "mean_weighted_train_loss": 0.8073374996553894,
+          "optimizer_steps": 2007,
+          "planned_steps": 2007,
+          "resumed_from_step": 500,
+          "train_sample_weight_mean": 1.0,
+          "train_sampling_strategy": "shuffle",
+          "training_fingerprint": "85ce726e524c369379b2acc01c55e71affa6119c5cc3e4af6835b21008bcc9f1",
+          "training_seconds": 6653.121922649999,
+          "warmup_steps": 200,
+          "weight_decay": 0.01
+        },
+        "runtime": {
+          "contract_passed": true,
+          "cuda_available": true,
+          "cuda_version": "12.4",
+          "mismatches": {},
+          "numpy_version": "2.1.2",
+          "pandas_version": "2.3.3",
+          "pyarrow_version": "21.0.0",
+          "python_minor": "3.12",
+          "python_version": "3.12.14",
+          "runtime_version": "modernbert-runtime-cu124-v1",
+          "torch_base_version": "2.5.1",
+          "torch_version": "2.5.1+cu124",
+          "transformers_version": "4.48.3"
+        },
+        "tokenization": {
+          "max_length": 512,
+          "token_count_max": 986,
+          "token_count_median": 79.0,
+          "token_count_min": 10,
+          "truncated_row_count": 95,
+          "truncation": true
+        },
+        "training_version": "modernbert-r0-initial-v1.0",
+        "validation": {
+          "accuracy": 0.6045797263334264,
+          "loss": 0.8605578283263597,
+          "macro_f1": 0.5182958887817696,
+          "per_class": {
+            "easy": {
+              "f1": 0.7091694183388366,
+              "precision": 0.6436145689257723,
+              "recall": 0.7895927601809954,
+              "support": 1768
+            },
+            "hard": {
+              "f1": 0.3294117647058824,
+              "precision": 0.4933920704845815,
+              "recall": 0.24724061810154527,
+              "support": 453
+            },
+            "medium": {
+              "f1": 0.5163064833005895,
+              "precision": 0.5544303797468354,
+              "recall": 0.48308823529411765,
+              "support": 1360
+            }
+          },
+          "row_count": 3581,
+          "weighted_loss": 0.8605578283263597
+        }
+      },
+      "final_model_uri": "gs://llm-router-mlserver/training-runs/initial-v1-20260924-2cee27e/final-model.tar",
+      "exit_code": 0,
+      "optimizer_steps": 2007,
+      "artifact_status": "all_final_files_and_gcs_metadata_verified_personal_drive_remount_verified",
+      "wrapper_seconds": 5519.281574010849,
+      "metrics_sha256": "a3b6b0b2a1e876280faf42b1a1c4e39c303c947e77aeb05918a9755ee86c7fa0"
+    }
+  ],
+  "verified_artifacts": {
+    "recovery_step500": {
+      "uri": "gs://llm-router-mlserver/training-runs/initial-v1-20260924-2cee27e/recovery-step500.tar",
+      "size_bytes": 1814169600,
+      "sha256": "d1373c1737a61d7b72fac08d88993701b76553bf11fabac4a209c3314bbe2f40",
+      "generation": "1790220566576829",
+      "crc32c": "dNxk0A==",
+      "verification": [
+        "all_checkpoint_files_sha256",
+        "gcs_upload_response",
+        "independent_gcs_metadata",
+        "downloaded_archive_sha256"
+      ]
+    },
+    "recovery_step1000": {
+      "uri": "gs://llm-router-mlserver/training-runs/initial-v1-20260924-2cee27e/checkpoint-step1000.tar",
+      "size_bytes": 1799096320,
+      "sha256": "76a18220c577dcb4e29d957abcdb6c544931fbb5275122c0ac8134f6caa62cfb",
+      "crc32c": "F4/ZTQ==",
+      "generation": "1790227744090851",
+      "verification": [
+        "checkpoint_files_sha256",
+        "gcs_upload_response_size_crc32c"
+      ],
+      "verified_at_unix": 1790227744.2263408
+    },
+    "recovery_step1500": {
+      "uri": "gs://llm-router-mlserver/training-runs/initial-v1-20260924-2cee27e/checkpoint-step1500.tar",
+      "size_bytes": 1799106560,
+      "sha256": "8d11ccf2804e8f31db51c542faf36f130aee232622142791f833653b5b8129d0",
+      "crc32c": "AqH16g==",
+      "generation": "1790229346784988",
+      "verification": [
+        "gcs_upload_response_size_crc32c"
+      ],
+      "verified_at_unix": 1790229346.9379444
+    },
+    "recovery_step2007": {
+      "uri": "gs://llm-router-mlserver/training-runs/initial-v1-20260924-2cee27e/checkpoint-step2007.tar",
+      "size_bytes": 1799116800,
+      "sha256": "77246b438dea7927b193e28aab7bd2d4aa55fbfdea3022e560e226d77d8ae63b",
+      "crc32c": "Ks3iCQ==",
+      "generation": "1790231258083442",
+      "verification": [
+        "gcs_upload_response_size_crc32c"
+      ],
+      "verified_at_unix": 1790231258.207821
+    },
+    "recovered_final_model": {
+      "uri": "gs://llm-router-mlserver/training-runs/initial-v1-20260924-2cee27e/final-model.tar",
+      "size_bytes": 602142720,
+      "crc32c": "8Cyz2w==",
+      "generation": "1790231390158680",
+      "sha256": "d15da837971f5535f1f96dcbe036717d066e339afad923d449c8a74e5a041e4f",
+      "verification": [
+        "all_final_artifact_files_sha256",
+        "gcs_upload_response_size_crc32c",
+        "independent_gcs_metadata_size_crc32c_generation"
+      ]
+    }
+  },
+  "interpretation": {
+    "observations": [
+      "Training loss decreased across three epochs while dev loss increased after epoch 2.",
+      "Hard recall was lower than easy and medium recall."
+    ],
+    "hypotheses": [
+      "Possible overfitting; a single seed does not establish its cause.",
+      "Source and label imbalance may contribute; per-source metrics and controlled baselines are required."
+    ],
+    "limitations": [
+      "Initial final-model files were not preserved.",
+      "No test, RouterArena, LLM outcome, cost, or latency measurements in this run.",
+      "Recovery is not an independent repetition."
+    ],
+    "next_decision": "Verify recovered R0 artifacts and common sample/input/budget contracts; complete R0/R1/R2 seed-42 D_dev source-macro quality-cost nAUC comparison, freeze the selected method and policy, and validate objective-specific serving/feedback/gate compatibility before publishing and activating production 1.0."
+  },
+  "personal_drive_relative_path": "LLM_Router/modernbert-initial-v1-20260924/attempt-recovery-eb016ac",
+  "adoption_policy": {
+    "status": "R1_validation_winner_locked_sealed_tests_complete_service_handoff_pending",
+    "required_methods": [
+      "R0_3class_CE",
+      "R1_success_BCE",
+      "R2_pairwise_preference"
+    ],
+    "selection_split": "D_dev",
+    "selection_metric": "source_macro_quality_cost_nauc",
+    "test_and_routerarena_for_selection": false,
+    "production_activation_allowed": false,
+    "reason": "User explicitly requires comparing R0/R1/R2 before selecting the production and retraining objective.",
+    "comparison_scope": "A_integrated_source_local_symbolic_tiers",
+    "seeds": [
+      42
+    ],
+    "method_status": {
+      "R0_3class_CE": {
+        "training": "completed_2007_steps_common_dev_evaluation_verified",
+        "dev_source_macro_quality_cost_nauc": 0.1661154599092283,
+        "selected": false
+      },
+      "R1_success_BCE": {
+        "training": "completed_2007_steps_common_dev_evaluation_verified",
+        "dev_source_macro_quality_cost_nauc": 0.8631791002863535,
+        "selected": true
+      },
+      "R2_pairwise_preference": {
+        "training": "completed_2007_steps_common_dev_evaluation_verified",
+        "dev_source_macro_quality_cost_nauc": 0.8338740417605066,
+        "selected": false
+      }
+    },
+    "selected_method": "R1_success_BCE",
+    "selection_lock_uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/comparison-results.tar#validation-lock.json",
+    "selection_lock_sha256": "ddae362cb6e826376383427933deae22bab1061390709be8f781345caa608e5f",
+    "common_contract_checks": {
+      "sample_ids_and_input_hashes": "verified_exact_train_and_dev_rows_after_target_join_no_missing_targets",
+      "pretrained_revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+      "max_length": 512,
+      "seed": 42,
+      "effective_sample_weight": 1.0,
+      "training_budget": "three_epochs_fixed_final_checkpoint",
+      "sealed_partitions_used_for_selection": false,
+      "r0_retraining_required_if_common_eligible_rows_change": true
+    },
+    "tie_breakers": [
+      "validation_mean_actual_cost",
+      "batch_1_p95_latency_ms",
+      "fixed_method_id"
+    ],
+    "additional_research_scope": {
+      "B_source_only_r0_r1_r2_routerdc": "not_completed_not_counted_as_A",
+      "B_top_two_seed17_seed73_repetitions": "not_completed_not_counted_as_A"
+    },
+    "production_handoff": {
+      "status": "R1_selected_service_candidate_targets_policy_and_gate_pending",
+      "contract_document": "docs/ml/README.md#retraining-objective-handoff",
+      "inference_and_confidence": "validate_objective_specific_semantics_and_offline_online_parity",
+      "service_candidate_mapping": "freeze_service_pool_and_policy_without_assuming_historical_candidate_equivalence",
+      "feedback_targets": "require_observed_targets_and_masks_do_not_invent_uncalled_outcomes",
+      "training_loss": "match_selected_objective_and_record_any_online_proxy_target_change",
+      "gate": "bind_dataset_objective_policy_and_evaluate_source_quality_cost_regression"
+    },
+    "comparison_execution": {
+      "status": "comparison_complete",
+      "code_commit": "85c422c9af4c51a51ba5eb45a0ec957b836e02d2",
+      "input_archive_sha256": "7ce814776dd9c4875bcc4907a880f3c13411a36f96d9c1667f083219f472fbe0",
+      "source_files_dirty": false,
+      "reviewed_wrapper_sha256": "57f2b6cd4ef6e2c209be527bae4a215baa7ced541b6ebc56414294d49c3bcb2a",
+      "planned_order": [
+        "R0_final_validation",
+        "R1_pilot40",
+        "R2_pilot40",
+        "R1_full2007",
+        "R2_full2007",
+        "validation_lock"
+      ],
+      "gcs_run_root": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/",
+      "drive_relative_path": "LLM_Router/routing-objectives-continual-v1-A-20260924",
+      "gpu_concurrency": 1,
+      "three_methods_completed": true,
+      "started_at_unix": 1790231874.6664014,
+      "finished_at_unix": 1790238881.0122027,
+      "personal_drive_verified": true,
+      "comparison_results_receipt": {
+        "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/comparison-results.tar",
+        "size_bytes": 583680,
+        "sha256": "c3b844dbe003a4d209e7d304ca72ab3d38f7e780a85dd17d0de2d79f3aac67b1",
+        "crc32c": "dPyXow==",
+        "generation": "1790238880869764",
+        "verified_at_unix": 1790238880.985566
+      },
+      "report_path": "../routing-objectives-continual-v1-A-20260924/REPORT.md"
+    },
+    "sealed_evaluation_report": "../routing-objectives-continual-v1-A-20260924/sealed-tests/REPORT.md"
+  },
+  "intended_logical_model_version": "1.0",
+  "personal_drive_verification": {
+    "status": "verified_after_flush_and_remount",
+    "root": "/content/drive/MyDrive/LLM_Router/modernbert-initial-v1-20260924/attempt-recovery-eb016ac",
+    "files": {
+      "router-v1-recovery-step500.tar": {
+        "size_bytes": 1814169600,
+        "sha256": "d1373c1737a61d7b72fac08d88993701b76553bf11fabac4a209c3314bbe2f40"
+      },
+      "colab-input-recovery.tar.gz": {
+        "size_bytes": 15106955,
+        "sha256": "7f1ce642921b86feba5f0f6d043ebba924c290c13fc8a315ec2054ee33b5a4d8"
+      },
+      "checkpoint-step1000.tar": {
+        "size_bytes": 1799096320,
+        "sha256": "76a18220c577dcb4e29d957abcdb6c544931fbb5275122c0ac8134f6caa62cfb"
+      },
+      "checkpoint-step1500.tar": {
+        "size_bytes": 1799106560,
+        "sha256": "8d11ccf2804e8f31db51c542faf36f130aee232622142791f833653b5b8129d0"
+      },
+      "checkpoint-step2007.tar": {
+        "size_bytes": 1799116800,
+        "sha256": "77246b438dea7927b193e28aab7bd2d4aa55fbfdea3022e560e226d77d8ae63b"
+      },
+      "final-model.tar": {
+        "size_bytes": 602142720,
+        "sha256": "d15da837971f5535f1f96dcbe036717d066e339afad923d449c8a74e5a041e4f"
+      },
+      "recovery-full.log": {
+        "size_bytes": 5650,
+        "sha256": "0bcc7c78b28ba84837a92e0bd41e9d7d9e6c8d20ab513d9341089ced0091928a"
+      },
+      "recovery-exit.json": {
+        "size_bytes": 359,
+        "sha256": "e32d58da18ffff6098fb4556e4c138c86f5c070661e8fc7664e60bca8b38b35d"
+      }
+    }
+  }
+}

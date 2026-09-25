@@ -1,0 +1,664 @@
+{
+  "schema_version": "routing-objective-comparison-report-v1",
+  "synthetic_fixture": false,
+  "comparison_scope": "A_integrated_source_local_symbolic_tiers",
+  "selection_status": "validation_lock_verified",
+  "selected_method": "pointwise",
+  "seed": 42,
+  "validation_lock_sha256": "ddae362cb6e826376383427933deae22bab1061390709be8f781345caa608e5f",
+  "common_training_config": {
+    "attention_implementation": "eager",
+    "device": "cuda",
+    "epochs": 3,
+    "eval_batch_size": 16,
+    "gradient_accumulation_steps": 4,
+    "gradient_checkpointing": true,
+    "gradient_clip_norm": 1.0,
+    "learning_rate": 2e-05,
+    "max_length": 512,
+    "max_train_steps": null,
+    "model_id": "answerdotai/ModernBERT-base",
+    "model_revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+    "precision": "fp16",
+    "seed": 42,
+    "train_batch_size": 8,
+    "train_sampling_strategy": "shuffle",
+    "train_split": "train",
+    "training_version": "modernbert-r0-initial-v1.0",
+    "truncation": true,
+    "validation_split": "validation",
+    "warmup_ratio": 0.1,
+    "weight_decay": 0.01
+  },
+  "data_contract": {
+    "experiment_version": "routing-objectives-continual-v1-A",
+    "experiment_config_sha256": "45e31296a82cded0fe82a8eaa003326e40e851f40745c793b2eb167f5c226d69",
+    "outcome_dataset_version": "routing-outcomes-continual-v1-A",
+    "outcome_manifest_sha256": "28cbc342c510fee7589151f99cdfe440281bfbe6288abd749eac9fd52f4c0b19",
+    "base_training_sha256": "8e382ee84419aa881ea0c4a68fabb0103945ab3452cdbc98720c149e36eb09ab",
+    "training_data_sha256": "3aa58866099e5bb8d84daa9921189045151609341eba943c16c7d5ed81cdce86",
+    "validation_data_sha256": "aa9d973fcf886c7465fbf9e06701984d099cd74a5eabf508cc610845613edef8",
+    "runtime_version": "modernbert-runtime-cu124-v1",
+    "runtime_contract_sha256": "c2b98693b58b70ecdb065b8a0e6f0928e3b3e0ee5bfaa7727b4f3bbf1cac349c",
+    "seed": 42
+  },
+  "generator_sha256": "6b9e46be5db6e661029542a157789f737f3eecde61cf6b564e0431cdf933d109",
+  "evaluator_source_sha256": "59f1de2108c848be58e6419d2f63e4c8ff92874e93f6f32edb6e3b36c460a1a0",
+  "operation": "local_report_only",
+  "production_activation_performed": false,
+  "model_weights_verified_by_renderer": false,
+  "remote_status_independently_verified": false,
+  "reported_remote_status": {
+    "training": "all_three_full_runs_completed_2007_steps",
+    "selection": "R1_pointwise_locked_on_D_dev",
+    "sealed_test_evaluation": "completed_fixed_policies_7202_questions",
+    "model_package_published": false,
+    "current_pointer_updated": false,
+    "serving_activated": false,
+    "personal_drive_copy_verified": true
+  },
+  "source_run_record_sha256": "2545e54b67b1af679401cdac153005e0ff06a36e9eec25321e08903e1b7f90d2",
+  "locked_budget_results": [
+    {
+      "method": "ordinal",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 0.0,
+      "penalty": 30.0,
+      "mean_quality": 0.5271780909673286,
+      "mean_actual_cost": 0.00014199385009609224,
+      "relative_cost": 0.0,
+      "budget_exceeded": false
+    },
+    {
+      "method": "ordinal",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 0.1,
+      "penalty": 0.0,
+      "mean_quality": 0.6009929532351057,
+      "mean_actual_cost": 0.0007471759128763613,
+      "relative_cost": 0.0763592687196075,
+      "budget_exceeded": false
+    },
+    {
+      "method": "ordinal",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 0.25,
+      "penalty": 0.0,
+      "mean_quality": 0.6009929532351057,
+      "mean_actual_cost": 0.0007471759128763613,
+      "relative_cost": 0.0763592687196075,
+      "budget_exceeded": false
+    },
+    {
+      "method": "ordinal",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 0.5,
+      "penalty": 0.0,
+      "mean_quality": 0.6009929532351057,
+      "mean_actual_cost": 0.0007471759128763613,
+      "relative_cost": 0.0763592687196075,
+      "budget_exceeded": false
+    },
+    {
+      "method": "ordinal",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 0.75,
+      "penalty": 0.0,
+      "mean_quality": 0.6009929532351057,
+      "mean_actual_cost": 0.0007471759128763613,
+      "relative_cost": 0.0763592687196075,
+      "budget_exceeded": false
+    },
+    {
+      "method": "ordinal",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 1.0,
+      "penalty": 0.0,
+      "mean_quality": 0.6009929532351057,
+      "mean_actual_cost": 0.0007471759128763613,
+      "relative_cost": 0.0763592687196075,
+      "budget_exceeded": false
+    },
+    {
+      "method": "ordinal",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 0.0,
+      "penalty": 10.0,
+      "mean_quality": 0.6674741099039331,
+      "mean_actual_cost": 1.4326688453159042e-05,
+      "relative_cost": 0.0,
+      "budget_exceeded": false
+    },
+    {
+      "method": "ordinal",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 0.1,
+      "penalty": 10.0,
+      "mean_quality": 0.6674741099039331,
+      "mean_actual_cost": 1.4326688453159042e-05,
+      "relative_cost": 0.0,
+      "budget_exceeded": false
+    },
+    {
+      "method": "ordinal",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 0.25,
+      "penalty": 0.003,
+      "mean_quality": 0.6750990718168436,
+      "mean_actual_cost": 0.00011823867102396514,
+      "relative_cost": 0.23426526628275382,
+      "budget_exceeded": false
+    },
+    {
+      "method": "ordinal",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 0.5,
+      "penalty": 0.003,
+      "mean_quality": 0.6750990718168436,
+      "mean_actual_cost": 0.00011823867102396514,
+      "relative_cost": 0.23426526628275382,
+      "budget_exceeded": false
+    },
+    {
+      "method": "ordinal",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 0.75,
+      "penalty": 0.003,
+      "mean_quality": 0.6750990718168436,
+      "mean_actual_cost": 0.00011823867102396514,
+      "relative_cost": 0.23426526628275382,
+      "budget_exceeded": false
+    },
+    {
+      "method": "ordinal",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 1.0,
+      "penalty": 0.003,
+      "mean_quality": 0.6750990718168436,
+      "mean_actual_cost": 0.00011823867102396514,
+      "relative_cost": 0.23426526628275382,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pointwise",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 0.0,
+      "penalty": 30.0,
+      "mean_quality": 0.5271780909673286,
+      "mean_actual_cost": 0.00014199385009609224,
+      "relative_cost": 0.0,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pointwise",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 0.1,
+      "penalty": 1.0,
+      "mean_quality": 0.7200832799487508,
+      "mean_actual_cost": 0.0005425832799487508,
+      "relative_cost": 0.0505446506127855,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pointwise",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 0.25,
+      "penalty": 0.3,
+      "mean_quality": 0.7420083279948751,
+      "mean_actual_cost": 0.0012396828315182577,
+      "relative_cost": 0.13850167256758317,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pointwise",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 0.5,
+      "penalty": 0.1,
+      "mean_quality": 0.7959961563100576,
+      "mean_actual_cost": 0.004058521396540679,
+      "relative_cost": 0.494170593875139,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pointwise",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 0.75,
+      "penalty": 0.01,
+      "mean_quality": 0.8147341447789878,
+      "mean_actual_cost": 0.0060673777706598325,
+      "relative_cost": 0.7476394475053164,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pointwise",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 1.0,
+      "penalty": 0.0,
+      "mean_quality": 0.8161755285073671,
+      "mean_actual_cost": 0.006320030877642537,
+      "relative_cost": 0.7795181294350233,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pointwise",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 0.0,
+      "penalty": 10.0,
+      "mean_quality": 0.6674741099039331,
+      "mean_actual_cost": 1.4326688453159042e-05,
+      "relative_cost": 0.0,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pointwise",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 0.1,
+      "penalty": 0.3,
+      "mean_quality": 0.7175830423658067,
+      "mean_actual_cost": 4.1924183006535944e-05,
+      "relative_cost": 0.06221740987261326,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pointwise",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 0.25,
+      "penalty": 0.1,
+      "mean_quality": 0.7284762885531706,
+      "mean_actual_cost": 8.002407407407408e-05,
+      "relative_cost": 0.148112038244263,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pointwise",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 0.5,
+      "penalty": 0.03,
+      "mean_quality": 0.7393695347405344,
+      "mean_actual_cost": 0.00021820555555555557,
+      "relative_cost": 0.4596364722290236,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pointwise",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 0.75,
+      "penalty": 0.003,
+      "mean_quality": 0.7437268332154799,
+      "mean_actual_cost": 0.00027663191721132897,
+      "relative_cost": 0.5913562877170561,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pointwise",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 1.0,
+      "penalty": 0.003,
+      "mean_quality": 0.7437268332154799,
+      "mean_actual_cost": 0.00027663191721132897,
+      "relative_cost": 0.5913562877170561,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pairwise",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 0.0,
+      "penalty": 100.0,
+      "mean_quality": 0.5271780909673286,
+      "mean_actual_cost": 0.00014199385009609224,
+      "relative_cost": 0.0,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pairwise",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 0.1,
+      "penalty": 3.0,
+      "mean_quality": 0.7233504163997438,
+      "mean_actual_cost": 0.0005385951313260731,
+      "relative_cost": 0.05004144317968061,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pairwise",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 0.25,
+      "penalty": 1.0,
+      "mean_quality": 0.7420083279948751,
+      "mean_actual_cost": 0.0012185173606662396,
+      "relative_cost": 0.13583110452572586,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pairwise",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 0.5,
+      "penalty": 1.0,
+      "mean_quality": 0.7420083279948751,
+      "mean_actual_cost": 0.0012185173606662396,
+      "relative_cost": 0.13583110452572586,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pairwise",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 0.75,
+      "penalty": 0.03,
+      "mean_quality": 0.8142536835361948,
+      "mean_actual_cost": 0.006063252594490711,
+      "relative_cost": 0.747118950526,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pairwise",
+      "source": "routerbench",
+      "rows": 3122,
+      "budget": 1.0,
+      "penalty": 0.0,
+      "mean_quality": 0.8160954516335682,
+      "mean_actual_cost": 0.006255944714926329,
+      "relative_cost": 0.7714320131718052,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pairwise",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 0.0,
+      "penalty": 10.0,
+      "mean_quality": 0.6674741099039331,
+      "mean_actual_cost": 1.4326688453159042e-05,
+      "relative_cost": 0.0,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pairwise",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 0.1,
+      "penalty": 1.0,
+      "mean_quality": 0.7013948923035613,
+      "mean_actual_cost": 3.3888997821350765e-05,
+      "relative_cost": 0.04410241725608809,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pairwise",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 0.25,
+      "penalty": 0.3,
+      "mean_quality": 0.7340746308656528,
+      "mean_actual_cost": 0.00010091623093681918,
+      "relative_cost": 0.1952125416663495,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pairwise",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 0.5,
+      "penalty": 0.1,
+      "mean_quality": 0.7449678770530167,
+      "mean_actual_cost": 0.00021512254901960784,
+      "relative_cost": 0.45268596152537954,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pairwise",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 0.75,
+      "penalty": 0.1,
+      "mean_quality": 0.7449678770530167,
+      "mean_actual_cost": 0.00021512254901960784,
+      "relative_cost": 0.45268596152537954,
+      "budget_exceeded": false
+    },
+    {
+      "method": "pairwise",
+      "source": "xroutebench",
+      "rows": 459,
+      "budget": 1.0,
+      "penalty": 0.1,
+      "mean_quality": 0.7449678770530167,
+      "mean_actual_cost": 0.00021512254901960784,
+      "relative_cost": 0.45268596152537954,
+      "budget_exceeded": false
+    }
+  ],
+  "methods": {
+    "ordinal": {
+      "manifest_sha256": "9aa168e45409ff72ac8c2eb1bdb45a4ebb32078df6bba113fe2f73e9ea0fa2c7",
+      "summary": {
+        "normalization": "source_local_always_low_and_high",
+        "per_source": {
+          "routerbench": {
+            "always_high_quality": 0.8152946828955797,
+            "always_low_quality": 0.5271780909673286,
+            "minimum_relative_cost_for_quality_retention": {
+              "0.9500": null,
+              "0.9800": null
+            },
+            "normalization_valid": true,
+            "oracle_gap": 0.28187059577194107,
+            "oracle_quality": 0.8828635490070468,
+            "quality_at_relative_cost_budget": {
+              "0.0000": 0.5271780909673286,
+              "0.1000": 0.6009929532351057,
+              "0.2500": 0.6009929532351057,
+              "0.5000": 0.6009929532351057,
+              "0.7500": 0.6009929532351057,
+              "1.0000": 0.6009929532351057
+            },
+            "quality_cost_nauc": 0.24338799332962774,
+            "row_count": 3122
+          },
+          "xroutebench": {
+            "always_high_quality": 0.7382798997035538,
+            "always_low_quality": 0.6674741099039331,
+            "minimum_relative_cost_for_quality_retention": {
+              "0.9500": null,
+              "0.9800": null
+            },
+            "normalization_valid": true,
+            "oracle_gap": 0.13667086235019188,
+            "oracle_quality": 0.8117699341670355,
+            "quality_at_relative_cost_budget": {
+              "0.0000": 0.6674741099039331,
+              "0.1000": 0.6674741099039331,
+              "0.2500": 0.6750990718168436,
+              "0.5000": 0.6750990718168436,
+              "0.7500": 0.6750990718168436,
+              "1.0000": 0.6750990718168436
+            },
+            "quality_cost_nauc": 0.08884292648882886,
+            "row_count": 459
+          }
+        },
+        "source_macro_quality_cost_nauc": 0.1661154599092283
+      },
+      "input_artifacts": {
+        "metrics.json": {
+          "sha256": "08d2b54cfc5f51ffe04c32819f710cd795e2fa7b38585e05a825928a357436f8",
+          "size_bytes": 5562
+        },
+        "validation-curve.parquet": {
+          "sha256": "47c136b0b9f95c353b1319a3f4a68ffa859747b7070dd135fff4c87fce9d5a8f",
+          "size_bytes": 8349
+        },
+        "validation-scores.parquet": {
+          "sha256": "c7cde5f2f69336f6c0b4f9faefcd35cbf1bd56de1b6f79d8bcea8779799ea776",
+          "size_bytes": 158900
+        }
+      }
+    },
+    "pointwise": {
+      "manifest_sha256": "bd5fdc7bd2cbd0826123637bc41571abebe46e9fc1525c72e4619bf2146422ea",
+      "summary": {
+        "normalization": "source_local_always_low_and_high",
+        "per_source": {
+          "routerbench": {
+            "always_high_quality": 0.8152946828955797,
+            "always_low_quality": 0.5271780909673286,
+            "minimum_relative_cost_for_quality_retention": {
+              "0.9500": 0.494170593875139,
+              "0.9800": 0.6855428904577676
+            },
+            "normalization_valid": true,
+            "oracle_gap": 0.0666880204996797,
+            "oracle_quality": 0.8828635490070468,
+            "quality_at_relative_cost_budget": {
+              "0.0000": 0.5271780909673286,
+              "0.1000": 0.7200832799487508,
+              "0.2500": 0.7420083279948751,
+              "0.5000": 0.7959961563100576,
+              "0.7500": 0.8147341447789878,
+              "1.0000": 0.8161755285073671
+            },
+            "quality_cost_nauc": 0.8405878265703168,
+            "row_count": 3122
+          },
+          "xroutebench": {
+            "always_high_quality": 0.7382798997035538,
+            "always_low_quality": 0.6674741099039331,
+            "minimum_relative_cost_for_quality_retention": {
+              "0.9500": 0.06221740987261326,
+              "0.9800": 0.148112038244263
+            },
+            "normalization_valid": true,
+            "oracle_gap": 0.06804310095155552,
+            "oracle_quality": 0.8117699341670355,
+            "quality_at_relative_cost_budget": {
+              "0.0000": 0.6674741099039331,
+              "0.1000": 0.7175830423658067,
+              "0.2500": 0.7284762885531706,
+              "0.5000": 0.7393695347405344,
+              "0.7500": 0.7437268332154799,
+              "1.0000": 0.7437268332154799
+            },
+            "quality_cost_nauc": 0.8857703740023901,
+            "row_count": 459
+          }
+        },
+        "source_macro_quality_cost_nauc": 0.8631791002863535
+      },
+      "input_artifacts": {
+        "metrics.json": {
+          "sha256": "ff115f77c2ff870a587c7a9f9cb65701c642bdb989b5bfce25f726905568a041",
+          "size_bytes": 5111
+        },
+        "validation-curve.parquet": {
+          "sha256": "7b8e202d499fc07cd6dff6a44f96a1434745964cc06b2569feb0f0eb28ff7920",
+          "size_bytes": 8759
+        },
+        "validation-scores.parquet": {
+          "sha256": "0edfe7f64ba8f96bfb6d4022406bf4d7b714b155e819d69c7fa006f32af1635b",
+          "size_bytes": 158896
+        }
+      }
+    },
+    "pairwise": {
+      "manifest_sha256": "fc98abb00cacaedf2ecce22906bdea4de0766ed7e9a08837c8e614b4040602a0",
+      "summary": {
+        "normalization": "source_local_always_low_and_high",
+        "per_source": {
+          "routerbench": {
+            "always_high_quality": 0.8152946828955797,
+            "always_low_quality": 0.5271780909673286,
+            "minimum_relative_cost_for_quality_retention": {
+              "0.9500": 0.5146298740596799,
+              "0.9800": 0.6846165458322188
+            },
+            "normalization_valid": true,
+            "oracle_gap": 0.06676809737347855,
+            "oracle_quality": 0.8828635490070468,
+            "quality_at_relative_cost_budget": {
+              "0.0000": 0.5271780909673286,
+              "0.1000": 0.7233504163997438,
+              "0.2500": 0.7420083279948751,
+              "0.5000": 0.7420083279948751,
+              "0.7500": 0.8142536835361948,
+              "1.0000": 0.8160954516335682
+            },
+            "quality_cost_nauc": 0.7947429127292942,
+            "row_count": 3122
+          },
+          "xroutebench": {
+            "always_high_quality": 0.7382798997035538,
+            "always_low_quality": 0.6674741099039331,
+            "minimum_relative_cost_for_quality_retention": {
+              "0.9500": 0.04410241725608809,
+              "0.9800": 0.1952125416663495
+            },
+            "normalization_valid": true,
+            "oracle_gap": 0.06680205711401876,
+            "oracle_quality": 0.8117699341670355,
+            "quality_at_relative_cost_budget": {
+              "0.0000": 0.6674741099039331,
+              "0.1000": 0.7013948923035613,
+              "0.2500": 0.7340746308656528,
+              "0.5000": 0.7449678770530167,
+              "0.7500": 0.7449678770530167,
+              "1.0000": 0.7449678770530167
+            },
+            "quality_cost_nauc": 0.8730051707917189,
+            "row_count": 459
+          }
+        },
+        "source_macro_quality_cost_nauc": 0.8338740417605066
+      },
+      "input_artifacts": {
+        "metrics.json": {
+          "sha256": "0743f5965999271cc6ed39111f072f3fbe39d8c18c23924147e9bce77cb7085e",
+          "size_bytes": 5103
+        },
+        "validation-curve.parquet": {
+          "sha256": "63231ffdd0e957689eb64a242b5af208bd6351e9472b2c7384980f65d8540393",
+          "size_bytes": 8644
+        },
+        "validation-scores.parquet": {
+          "sha256": "97942b36eacf4fd9c3fdcf49238facd010e577eef3c3f19e17f858760cfac597",
+          "size_bytes": 158900
+        }
+      }
+    }
+  },
+  "limitations": [
+    "single_training_seed",
+    "no_group_bootstrap_ci",
+    "no_sealed_or_external_evaluation_inputs",
+    "no_online_Claude_outcomes",
+    "model_size_from_manifest",
+    "training_time_excludes_unrecorded_attempts"
+  ]
+}

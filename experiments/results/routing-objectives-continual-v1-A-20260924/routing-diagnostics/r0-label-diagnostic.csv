@@ -1,0 +1,3 @@
+source_dataset,train_majority_label,dev_n,source_only_label_accuracy,r0_raw_argmax_t1_accuracy
+routerbench,easy,3122,0.48078155028827674,0.5884048686739269
+xroutebench,easy,459,0.5816993464052288,0.7211328976034859

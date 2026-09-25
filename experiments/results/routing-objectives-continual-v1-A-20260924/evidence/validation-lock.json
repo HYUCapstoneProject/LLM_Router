@@ -1,0 +1,113 @@
+{
+  "canonical_seed": 42,
+  "default_relative_cost_budget": 0.5,
+  "experiment_config_sha256": "45e31296a82cded0fe82a8eaa003326e40e851f40745c793b2eb167f5c226d69",
+  "experiment_version": "routing-objectives-continual-v1-A",
+  "finalists": [
+    "pointwise",
+    "pairwise"
+  ],
+  "methods": {
+    "ordinal": {
+      "canonical_quality_cost_nauc": 0.1661154599092283,
+      "canonical_run_dir": "/content/router-objective-results/full/ordinal",
+      "locked_budget_penalties": {
+        "routerbench": {
+          "0.0000": 30.0,
+          "0.1000": 0.0,
+          "0.2500": 0.0,
+          "0.5000": 0.0,
+          "0.7500": 0.0,
+          "1.0000": 0.0
+        },
+        "xroutebench": {
+          "0.0000": 10.0,
+          "0.1000": 10.0,
+          "0.2500": 0.003,
+          "0.5000": 0.003,
+          "0.7500": 0.003,
+          "1.0000": 0.003
+        }
+      },
+      "quality_cost_nauc_mean": 0.1661154599092283,
+      "quality_cost_nauc_std": 0.0,
+      "seeds": [
+        42
+      ]
+    },
+    "pairwise": {
+      "canonical_quality_cost_nauc": 0.8338740417605066,
+      "canonical_run_dir": "/content/router-objective-results/full/pairwise",
+      "locked_budget_penalties": {
+        "routerbench": {
+          "0.0000": 100.0,
+          "0.1000": 3.0,
+          "0.2500": 1.0,
+          "0.5000": 1.0,
+          "0.7500": 0.03,
+          "1.0000": 0.0
+        },
+        "xroutebench": {
+          "0.0000": 10.0,
+          "0.1000": 1.0,
+          "0.2500": 0.3,
+          "0.5000": 0.1,
+          "0.7500": 0.1,
+          "1.0000": 0.1
+        }
+      },
+      "quality_cost_nauc_mean": 0.8338740417605066,
+      "quality_cost_nauc_std": 0.0,
+      "seeds": [
+        42
+      ]
+    },
+    "pointwise": {
+      "canonical_quality_cost_nauc": 0.8631791002863535,
+      "canonical_run_dir": "/content/router-objective-results/full/pointwise",
+      "locked_budget_penalties": {
+        "routerbench": {
+          "0.0000": 30.0,
+          "0.1000": 1.0,
+          "0.2500": 0.3,
+          "0.5000": 0.1,
+          "0.7500": 0.01,
+          "1.0000": 0.0
+        },
+        "xroutebench": {
+          "0.0000": 10.0,
+          "0.1000": 0.3,
+          "0.2500": 0.1,
+          "0.5000": 0.03,
+          "0.7500": 0.003,
+          "1.0000": 0.003
+        }
+      },
+      "quality_cost_nauc_mean": 0.8631791002863535,
+      "quality_cost_nauc_std": 0.0,
+      "seeds": [
+        42
+      ]
+    }
+  },
+  "production_activation_authorized": false,
+  "required_methods": [
+    "ordinal",
+    "pointwise",
+    "pairwise"
+  ],
+  "routerarena_accessed": false,
+  "schema_version": "routing-objective-validation-lock-v1",
+  "seed_scope": "canonical_only",
+  "selection_data": "validation_only",
+  "selection_metric": "source_macro_quality_cost_nauc",
+  "stage": "final",
+  "test_data_accessed": false,
+  "validation_best_single_tier": "high",
+  "validation_fixed_tier_quality": {
+    "high": 0.8054231985378193,
+    "low": 0.5451607418167845,
+    "medium": 0.7281551770705719
+  },
+  "winner_method": "pointwise"
+}

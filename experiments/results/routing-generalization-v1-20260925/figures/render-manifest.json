@@ -1,0 +1,76 @@
+{
+  "schema_version": "g1-report-figures-v1",
+  "selected_arm": "r1-natural",
+  "inputs": {
+    "selection": {
+      "path": "/Users/yoocheolmin/workspace/school/LLM_Router/experiments/results/routing-generalization-v1-20260925/selection-lock/manifest.json",
+      "sha256": "c6fad17c23390305d62769e30f213c8381db620679c949ac6a80bd3695ee75f3"
+    },
+    "holdout": {
+      "path": "/Users/yoocheolmin/workspace/school/LLM_Router/experiments/results/routing-generalization-v1-20260925/holdout-report/manifest.json",
+      "sha256": "8fdc1e03c28063761b3235e7dd6b1c4a4d06461faf59f131cc398b07762e3582"
+    },
+    "arena": {
+      "path": "/Users/yoocheolmin/workspace/school/LLM_Router/experiments/results/routing-generalization-v1-20260925/arena-stress/results/summary.json",
+      "sha256": "c4831781a91f9eb205f39ae9eef3bb4c5861b8e415f8bae9c60182b2677ef3b2"
+    },
+    "pool": {
+      "path": "/Users/yoocheolmin/workspace/school/LLM_Router/experiments/results/routing-generalization-v1-20260925/evidence/holdout-pool-analysis.json",
+      "sha256": "26f433949077347675cf1d2997dc48bebe7a407b737143b74990cee4cf88c406"
+    }
+  },
+  "missing_values_rendered_as": "N/A or omitted figure; never zero",
+  "medium_share_analysis_included": false,
+  "figures": [
+    {
+      "file": "01-performance-and-budget.png",
+      "sha256": "e14eaf1a32dceae2565369a21df79067d65b47720c11b334f823740752cbe665",
+      "description": "Selection and holdout metrics with budget failure flags"
+    },
+    {
+      "file": "01-performance-and-budget.svg",
+      "sha256": "24db651779519f95dc4714d7c1c8daeedac99375459b64c30342ecb5eae8c748",
+      "description": "Selection and holdout metrics with budget failure flags"
+    },
+    {
+      "file": "02-realized-cost-quality.png",
+      "sha256": "de7a397c094307c74073a6b9cb3d73f8c3321a54351a95b9254bd5757c065e86",
+      "description": "Per-source actual cost and quality with fixed budgets and always baselines"
+    },
+    {
+      "file": "02-realized-cost-quality.svg",
+      "sha256": "0fd538ee7bdedb266144679b74bc8693d77830de268de10426077733e3837ab0",
+      "description": "Per-source actual cost and quality with fixed budgets and always baselines"
+    },
+    {
+      "file": "03-holdout-task-quality.png",
+      "sha256": "dd0d12b1d50b125738725eaad0aa89b38ed1c82a0da311b816133abd71d62424",
+      "description": "Holdout task quality heatmap, fixed nominal budget 0.5"
+    },
+    {
+      "file": "03-holdout-task-quality.svg",
+      "sha256": "e7bfe14465ee908fab9386afee063aa2b25430ee13d4d93782d074ef26d21097",
+      "description": "Holdout task quality heatmap, fixed nominal budget 0.5"
+    },
+    {
+      "file": "04-arena-stress.png",
+      "sha256": "3bf45019d527c35045d16e2ef78a03fbda610c7fd4c8d943d27fc01ba6103058",
+      "description": "Arena action-slot alignment and paired stability; no routing-quality claim"
+    },
+    {
+      "file": "04-arena-stress.svg",
+      "sha256": "5727ffd223d0064d6ab8169544b589a832d0a2af568a1d1d60b9d470de79f1ca",
+      "description": "Arena action-slot alignment and paired stability; no routing-quality claim"
+    },
+    {
+      "file": "05-holdout-candidate-quality.png",
+      "sha256": "a99cbafa49e1d66f0a3a7dcfdade65f5ff15a8b4f78d788f5cc2f96c649d51a3",
+      "description": "Actual source/task candidate quality; post-selection diagnostic"
+    },
+    {
+      "file": "05-holdout-candidate-quality.svg",
+      "sha256": "e1a5a3819717a4742d479f90125b4fe133be7c6f6049e636d0e53a36381c3cf0",
+      "description": "Actual source/task candidate quality; post-selection diagnostic"
+    }
+  ]
+}

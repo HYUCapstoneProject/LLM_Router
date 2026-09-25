@@ -1,0 +1,1335 @@
+{
+  "arm_reselected_on_holdout": false,
+  "inference_manifest_sha256": "f97a2c7003930c6866446ebb6d1d5453f654973ab99a6d8855a5b4f3ec4898b7",
+  "interpretation": "Task-disjoint diagnostic for freshly initialized G1 arms; parent data and taxonomy were historically exposed. No deployment or model-pool transfer approval.",
+  "production_approved": false,
+  "reports": {
+    "r1-balanced": {
+      "default_budget_feasible": false,
+      "default_source_macro_quality": 0.6695442406835179,
+      "default_source_macro_relative_cost": 0.5672134806246948,
+      "metric_note": "AUC over nominal budget grid under locked calibration policies; actual budget violations reported separately; not a reoptimized frontier nAUC",
+      "per_source": {
+        "routerbench": {
+          "always": {
+            "high": {
+              "actual_cost": 0.005955200341005968,
+              "quality": 0.9019607843137255
+            },
+            "low": {
+              "actual_cost": 8.859607843137254e-05,
+              "quality": 0.5959079283887468
+            },
+            "medium": {
+              "actual_cost": 0.00036127058823529415,
+              "quality": 0.7919863597612958
+            }
+          },
+          "budgets": {
+            "0.0000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 8.859607843137254e-05,
+              "mean_quality": 0.5959079283887468,
+              "penalty": 30.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.00010027384615384616,
+                  "mean_quality": 0.6758241758241759,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 4.819011406844107e-05,
+                  "mean_quality": 0.3193916349809886,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.0
+            },
+            "0.1000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.0003335674339300938,
+              "mean_quality": 0.7723785166240409,
+              "penalty": 1.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.0003860817582417583,
+                  "mean_quality": 0.8945054945054945,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.0001518638783269962,
+                  "mean_quality": 0.34980988593155893,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.04175692522188535
+            },
+            "0.2500": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.0008051597612958227,
+              "mean_quality": 0.7988064791133845,
+              "penalty": 0.3,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.00044524263736263743,
+                  "mean_quality": 0.9021978021978022,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.002050500380228137,
+                  "mean_quality": 0.44106463878326996,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.12214283609271127
+            },
+            "0.5000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.0022324225063938617,
+              "mean_quality": 0.8312020460358056,
+              "penalty": 0.1,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.0011360041758241759,
+                  "mean_quality": 0.910989010989011,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.006026113307984791,
+                  "mean_quality": 0.5551330798479087,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.36542884640077244
+            },
+            "0.7500": {
+              "budget_exceeded": true,
+              "mean_actual_cost": 0.005250004774083546,
+              "mean_quality": 0.8942881500426257,
+              "penalty": 0.001,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.004199643296703297,
+                  "mean_quality": 0.9472527472527472,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.00888433536121673,
+                  "mean_quality": 0.7110266159695817,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.8797949315550146
+            },
+            "1.0000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.005250004774083546,
+              "mean_quality": 0.8942881500426257,
+              "penalty": 0.001,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.004199643296703297,
+                  "mean_quality": 0.9472527472527472,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.00888433536121673,
+                  "mean_quality": 0.7110266159695817,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.8797949315550146
+            }
+          },
+          "locked_policy_quality_auc": 0.7624651810584958,
+          "normalization_valid": true,
+          "oracle_quality_upper_bound": 0.928388746803069,
+          "rows": 1173,
+          "train_fitted_baselines": {
+            "train_best_single_within_source_pool": {
+              "mean_actual_cost": 0.005955200341005968,
+              "mean_quality": 0.9019607843137255
+            },
+            "train_source_task_with_source_fallback": {
+              "mean_actual_cost": 0.005955200341005968,
+              "mean_quality": 0.9019607843137255
+            }
+          }
+        },
+        "xroutebench": {
+          "always": {
+            "high": {
+              "actual_cost": 0.0002542191640378549,
+              "quality": 0.49842271293375395
+            },
+            "low": {
+              "actual_cost": 1.3754495268138805e-05,
+              "quality": 0.7034700315457413
+            },
+            "medium": {
+              "actual_cost": 4.886190851735016e-05,
+              "quality": 0.7350157728706624
+            }
+          },
+          "budgets": {
+            "0.0000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 1.3754495268138805e-05,
+              "mean_quality": 0.7034700315457413,
+              "penalty": 3.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 5.776527331189711e-06,
+                  "mean_quality": 0.9581993569131833,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 2.8525555555555554e-05,
+                  "mean_quality": 0.011111111111111112,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 1.8697639484978545e-05,
+                  "mean_quality": 0.630901287553648,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.0
+            },
+            "0.1000": {
+              "budget_exceeded": true,
+              "mean_actual_cost": 7.647925867507886e-05,
+              "mean_quality": 0.5583596214511041,
+              "penalty": 0.3,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 1.2617041800643087e-05,
+                  "mean_quality": 0.9646302250803859,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.00020152144444444446,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.00011342068669527898,
+                  "mean_quality": 0.2317596566523605,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.2608481475796729
+            },
+            "0.2500": {
+              "budget_exceeded": true,
+              "mean_actual_cost": 9.195889589905364e-05,
+              "mean_quality": 0.5141955835962145,
+              "penalty": 0.1,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 2.504475884244373e-05,
+                  "mean_quality": 0.9646302250803859,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.0002084408888888889,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.00013628042918454935,
+                  "mean_quality": 0.11158798283261803,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.3252220005168752
+            },
+            "0.5000": {
+              "budget_exceeded": true,
+              "mean_actual_cost": 0.0001986713722397476,
+              "mean_quality": 0.5078864353312302,
+              "penalty": 0.003,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.0002425872347266881,
+                  "mean_quality": 0.9517684887459807,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.0002084408888888889,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.00013628042918454935,
+                  "mean_quality": 0.11158798283261803,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.7689981148486171
+            },
+            "0.7500": {
+              "budget_exceeded": true,
+              "mean_actual_cost": 0.00020394738170347008,
+              "mean_quality": 0.5063091482649842,
+              "penalty": 0.001,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.0002533428295819936,
+                  "mean_quality": 0.9485530546623794,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.0002084408888888889,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.00013628042918454935,
+                  "mean_quality": 0.11158798283261803,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.7909390074159784
+            },
+            "1.0000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.00020394738170347008,
+              "mean_quality": 0.5063091482649842,
+              "penalty": 0.001,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.0002533428295819936,
+                  "mean_quality": 0.9485530546623794,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.0002084408888888889,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.00013628042918454935,
+                  "mean_quality": 0.11158798283261803,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.7909390074159784
+            }
+          },
+          "locked_policy_quality_auc": null,
+          "normalization_valid": false,
+          "oracle_quality_upper_bound": 0.7570977917981072,
+          "rows": 634,
+          "train_fitted_baselines": {
+            "train_best_single_within_source_pool": {
+              "mean_actual_cost": 0.0002542191640378549,
+              "mean_quality": 0.49842271293375395
+            },
+            "train_source_task_with_source_fallback": {
+              "mean_actual_cost": 0.0002542191640378549,
+              "mean_quality": 0.49842271293375395
+            }
+          }
+        }
+      },
+      "source_macro_locked_policy_quality_auc": null
+    },
+    "r1-natural": {
+      "default_budget_feasible": false,
+      "default_source_macro_quality": 0.6526216850750723,
+      "default_source_macro_relative_cost": 0.412800559546568,
+      "metric_note": "AUC over nominal budget grid under locked calibration policies; actual budget violations reported separately; not a reoptimized frontier nAUC",
+      "per_source": {
+        "routerbench": {
+          "always": {
+            "high": {
+              "actual_cost": 0.005955200341005968,
+              "quality": 0.9019607843137255
+            },
+            "low": {
+              "actual_cost": 8.859607843137254e-05,
+              "quality": 0.5959079283887468
+            },
+            "medium": {
+              "actual_cost": 0.00036127058823529415,
+              "quality": 0.7919863597612958
+            }
+          },
+          "budgets": {
+            "0.0000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 8.859607843137254e-05,
+              "mean_quality": 0.5959079283887468,
+              "penalty": 30.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.00010027384615384616,
+                  "mean_quality": 0.6758241758241759,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 4.819011406844107e-05,
+                  "mean_quality": 0.3193916349809886,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.0
+            },
+            "0.1000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.0003245433930093777,
+              "mean_quality": 0.7655583972719523,
+              "penalty": 1.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.00036648659340659346,
+                  "mean_quality": 0.8835164835164835,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.00017941673003802282,
+                  "mean_quality": 0.3574144486692015,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.04021872006659918
+            },
+            "0.2500": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.00042811986359761293,
+              "mean_quality": 0.7868712702472294,
+              "penalty": 0.3,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.00047087934065934064,
+                  "mean_quality": 0.9021978021978022,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.00028016882129277567,
+                  "mean_quality": 0.38783269961977185,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.05787398808066837
+            },
+            "0.5000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.0011056063086104006,
+              "mean_quality": 0.8005115089514067,
+              "penalty": 0.1,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.0010506347252747252,
+                  "mean_quality": 0.9120879120879121,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.0012958121673003803,
+                  "mean_quality": 0.4144486692015209,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.1733558605046775
+            },
+            "0.7500": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.004446885933503836,
+              "mean_quality": 0.86615515771526,
+              "penalty": 0.001,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.003920072747252747,
+                  "mean_quality": 0.9472527472527472,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.006269699619771863,
+                  "mean_quality": 0.5855513307984791,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.7428982184593104
+            },
+            "1.0000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.004446885933503836,
+              "mean_quality": 0.86615515771526,
+              "penalty": 0.001,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.003920072747252747,
+                  "mean_quality": 0.9472527472527472,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.006269699619771863,
+                  "mean_quality": 0.5855513307984791,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.7428982184593104
+            }
+          },
+          "locked_policy_quality_auc": 0.6923398328690806,
+          "normalization_valid": true,
+          "oracle_quality_upper_bound": 0.928388746803069,
+          "rows": 1173,
+          "train_fitted_baselines": {
+            "train_best_single_within_source_pool": {
+              "mean_actual_cost": 0.005955200341005968,
+              "mean_quality": 0.9019607843137255
+            },
+            "train_source_task_with_source_fallback": {
+              "mean_actual_cost": 0.005955200341005968,
+              "mean_quality": 0.9019607843137255
+            }
+          }
+        },
+        "xroutebench": {
+          "always": {
+            "high": {
+              "actual_cost": 0.0002542191640378549,
+              "quality": 0.49842271293375395
+            },
+            "low": {
+              "actual_cost": 1.3754495268138805e-05,
+              "quality": 0.7034700315457413
+            },
+            "medium": {
+              "actual_cost": 4.886190851735016e-05,
+              "quality": 0.7350157728706624
+            }
+          },
+          "budgets": {
+            "0.0000": {
+              "budget_exceeded": true,
+              "mean_actual_cost": 1.4926261829652998e-05,
+              "mean_quality": 0.7034700315457413,
+              "penalty": 3.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 5.817363344051447e-06,
+                  "mean_quality": 0.9581993569131833,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 3.152888888888889e-05,
+                  "mean_quality": 0.011111111111111112,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 2.067145922746781e-05,
+                  "mean_quality": 0.630901287553648,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.004872926103902399
+            },
+            "0.1000": {
+              "budget_exceeded": true,
+              "mean_actual_cost": 6.517228706624605e-05,
+              "mean_quality": 0.6072555205047319,
+              "penalty": 0.3,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 1.611106109324759e-05,
+                  "mean_quality": 0.9646302250803859,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.00016234300000000001,
+                  "mean_quality": 0.011111111111111112,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 9.312369098712446e-05,
+                  "mean_quality": 0.3605150214592275,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.21382680483238942
+            },
+            "0.2500": {
+              "budget_exceeded": true,
+              "mean_actual_cost": 0.00010103678233438486,
+              "mean_quality": 0.5205047318611987,
+              "penalty": 0.1,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 4.519668810289389e-05,
+                  "mean_quality": 0.9678456591639871,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.00020796633333333337,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.00013426686695278971,
+                  "mean_quality": 0.12446351931330472,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.3629734360262006
+            },
+            "0.5000": {
+              "budget_exceeded": true,
+              "mean_actual_cost": 0.00017059643533123028,
+              "mean_quality": 0.5047318611987381,
+              "penalty": 0.01,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.0001860351768488746,
+                  "mean_quality": 0.9421221864951769,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.0002084408888888889,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.000135371330472103,
+                  "mean_quality": 0.11587982832618025,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.6522452585884585
+            },
+            "0.7500": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.00017059643533123028,
+              "mean_quality": 0.5047318611987381,
+              "penalty": 0.01,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.0001860351768488746,
+                  "mean_quality": 0.9421221864951769,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.0002084408888888889,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.000135371330472103,
+                  "mean_quality": 0.11587982832618025,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.6522452585884585
+            },
+            "1.0000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.00017059643533123028,
+              "mean_quality": 0.5047318611987381,
+              "penalty": 0.01,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.0001860351768488746,
+                  "mean_quality": 0.9421221864951769,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.0002084408888888889,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.000135371330472103,
+                  "mean_quality": 0.11587982832618025,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.6522452585884585
+            }
+          },
+          "locked_policy_quality_auc": null,
+          "normalization_valid": false,
+          "oracle_quality_upper_bound": 0.7570977917981072,
+          "rows": 634,
+          "train_fitted_baselines": {
+            "train_best_single_within_source_pool": {
+              "mean_actual_cost": 0.0002542191640378549,
+              "mean_quality": 0.49842271293375395
+            },
+            "train_source_task_with_source_fallback": {
+              "mean_actual_cost": 0.0002542191640378549,
+              "mean_quality": 0.49842271293375395
+            }
+          }
+        }
+      },
+      "source_macro_locked_policy_quality_auc": null
+    },
+    "r3-balanced": {
+      "default_budget_feasible": true,
+      "default_source_macro_quality": 0.6829720229883203,
+      "default_source_macro_relative_cost": 0.3593482022872374,
+      "metric_note": "AUC over nominal budget grid under locked calibration policies; actual budget violations reported separately; not a reoptimized frontier nAUC",
+      "per_source": {
+        "routerbench": {
+          "always": {
+            "high": {
+              "actual_cost": 0.005955200341005968,
+              "quality": 0.9019607843137255
+            },
+            "low": {
+              "actual_cost": 8.859607843137254e-05,
+              "quality": 0.5959079283887468
+            },
+            "medium": {
+              "actual_cost": 0.00036127058823529415,
+              "quality": 0.7919863597612958
+            }
+          },
+          "budgets": {
+            "0.0000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 8.859607843137254e-05,
+              "mean_quality": 0.5959079283887468,
+              "penalty": 100.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.00010027384615384616,
+                  "mean_quality": 0.6758241758241759,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 4.819011406844107e-05,
+                  "mean_quality": 0.3193916349809886,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.0
+            },
+            "0.1000": {
+              "budget_exceeded": true,
+              "mean_actual_cost": 0.0009650170502983803,
+              "mean_quality": 0.7791986359761296,
+              "penalty": 1.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.00042278241758241767,
+                  "mean_quality": 0.8758241758241758,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.0028411901140684413,
+                  "mean_quality": 0.4448669201520912,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.1493915274732346
+            },
+            "0.2500": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.0009650170502983803,
+              "mean_quality": 0.7791986359761296,
+              "penalty": 1.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.00042278241758241767,
+                  "mean_quality": 0.8758241758241758,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.0028411901140684413,
+                  "mean_quality": 0.4448669201520912,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.1493915274732346
+            },
+            "0.5000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.0025845495311167944,
+              "mean_quality": 0.8422847399829497,
+              "penalty": 0.01,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.001049242857142857,
+                  "mean_quality": 0.8978021978021978,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.007896827376425856,
+                  "mean_quality": 0.6501901140684411,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.4254511368029547
+            },
+            "0.7500": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.0025845495311167944,
+              "mean_quality": 0.8422847399829497,
+              "penalty": 0.01,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.001049242857142857,
+                  "mean_quality": 0.8978021978021978,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.007896827376425856,
+                  "mean_quality": 0.6501901140684411,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.4254511368029547
+            },
+            "1.0000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.0025845495311167944,
+              "mean_quality": 0.8422847399829497,
+              "penalty": 0.01,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.001049242857142857,
+                  "mean_quality": 0.8978021978021978,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.007896827376425856,
+                  "mean_quality": 0.6501901140684411,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.4254511368029547
+            }
+          },
+          "locked_policy_quality_auc": 0.6977715877437326,
+          "normalization_valid": true,
+          "oracle_quality_upper_bound": 0.928388746803069,
+          "rows": 1173,
+          "train_fitted_baselines": {
+            "train_best_single_within_source_pool": {
+              "mean_actual_cost": 0.005955200341005968,
+              "mean_quality": 0.9019607843137255
+            },
+            "train_source_task_with_source_fallback": {
+              "mean_actual_cost": 0.005955200341005968,
+              "mean_quality": 0.9019607843137255
+            }
+          }
+        },
+        "xroutebench": {
+          "always": {
+            "high": {
+              "actual_cost": 0.0002542191640378549,
+              "quality": 0.49842271293375395
+            },
+            "low": {
+              "actual_cost": 1.3754495268138805e-05,
+              "quality": 0.7034700315457413
+            },
+            "medium": {
+              "actual_cost": 4.886190851735016e-05,
+              "quality": 0.7350157728706624
+            }
+          },
+          "budgets": {
+            "0.0000": {
+              "budget_exceeded": true,
+              "mean_actual_cost": 1.4271782334384859e-05,
+              "mean_quality": 0.7018927444794952,
+              "penalty": 3.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 5.818327974276527e-06,
+                  "mean_quality": 0.9581993569131833,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 2.9648888888888884e-05,
+                  "mean_quality": 0.011111111111111112,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 1.9615493562231762e-05,
+                  "mean_quality": 0.6266094420600858,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.0021511977992136567
+            },
+            "0.1000": {
+              "budget_exceeded": true,
+              "mean_actual_cost": 7.40548738170347e-05,
+              "mean_quality": 0.5394321766561514,
+              "penalty": 0.3,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 9.520578778135048e-06,
+                  "mean_quality": 0.9581993569131833,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.00020005844444444444,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.00011152201716738198,
+                  "mean_quality": 0.1888412017167382,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.2507660641266318
+            },
+            "0.2500": {
+              "budget_exceeded": true,
+              "mean_actual_cost": 8.42696214511041e-05,
+              "mean_quality": 0.5236593059936908,
+              "penalty": 0.01,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 1.6596334405144694e-05,
+                  "mean_quality": 0.9581993569131833,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.0002084408888888889,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.0001266343347639485,
+                  "mean_quality": 0.1459227467811159,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.29324526777152016
+            },
+            "0.5000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 8.42696214511041e-05,
+              "mean_quality": 0.5236593059936908,
+              "penalty": 0.01,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 1.6596334405144694e-05,
+                  "mean_quality": 0.9581993569131833,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.0002084408888888889,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.0001266343347639485,
+                  "mean_quality": 0.1459227467811159,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.29324526777152016
+            },
+            "0.7500": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 8.42696214511041e-05,
+              "mean_quality": 0.5236593059936908,
+              "penalty": 0.01,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 1.6596334405144694e-05,
+                  "mean_quality": 0.9581993569131833,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.0002084408888888889,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.0001266343347639485,
+                  "mean_quality": 0.1459227467811159,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.29324526777152016
+            },
+            "1.0000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 8.42696214511041e-05,
+              "mean_quality": 0.5236593059936908,
+              "penalty": 0.01,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 1.6596334405144694e-05,
+                  "mean_quality": 0.9581993569131833,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.0002084408888888889,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.0001266343347639485,
+                  "mean_quality": 0.1459227467811159,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.29324526777152016
+            }
+          },
+          "locked_policy_quality_auc": null,
+          "normalization_valid": false,
+          "oracle_quality_upper_bound": 0.7570977917981072,
+          "rows": 634,
+          "train_fitted_baselines": {
+            "train_best_single_within_source_pool": {
+              "mean_actual_cost": 0.0002542191640378549,
+              "mean_quality": 0.49842271293375395
+            },
+            "train_source_task_with_source_fallback": {
+              "mean_actual_cost": 0.0002542191640378549,
+              "mean_quality": 0.49842271293375395
+            }
+          }
+        }
+      },
+      "source_macro_locked_policy_quality_auc": null
+    },
+    "r3-natural": {
+      "default_budget_feasible": true,
+      "default_source_macro_quality": 0.6849755675140718,
+      "default_source_macro_relative_cost": 0.37427783125279035,
+      "metric_note": "AUC over nominal budget grid under locked calibration policies; actual budget violations reported separately; not a reoptimized frontier nAUC",
+      "per_source": {
+        "routerbench": {
+          "always": {
+            "high": {
+              "actual_cost": 0.005955200341005968,
+              "quality": 0.9019607843137255
+            },
+            "low": {
+              "actual_cost": 8.859607843137254e-05,
+              "quality": 0.5959079283887468
+            },
+            "medium": {
+              "actual_cost": 0.00036127058823529415,
+              "quality": 0.7919863597612958
+            }
+          },
+          "budgets": {
+            "0.0000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 8.859607843137254e-05,
+              "mean_quality": 0.5959079283887468,
+              "penalty": 100.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.00010027384615384616,
+                  "mean_quality": 0.6758241758241759,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 4.819011406844107e-05,
+                  "mean_quality": 0.3193916349809886,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.0
+            },
+            "0.1000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.0002948596760443308,
+              "mean_quality": 0.7433930093776641,
+              "penalty": 3.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.00034812857142857146,
+                  "mean_quality": 0.8615384615384616,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.000110545247148289,
+                  "mean_quality": 0.33460076045627374,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.03515894176274951
+            },
+            "0.2500": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.0006178942881500427,
+              "mean_quality": 0.7655583972719523,
+              "penalty": 1.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.0004247127472527473,
+                  "mean_quality": 0.8714285714285714,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.0012863171102661596,
+                  "mean_quality": 0.39923954372623577,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.09022224544704237
+            },
+            "0.5000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.002572909462915601,
+              "mean_quality": 0.8431372549019608,
+              "penalty": 0.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.001090211208791209,
+                  "mean_quality": 0.8956043956043956,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.007703158174904944,
+                  "mean_quality": 0.6615969581749049,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.42346701316341595
+            },
+            "0.7500": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.002572909462915601,
+              "mean_quality": 0.8431372549019608,
+              "penalty": 0.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.001090211208791209,
+                  "mean_quality": 0.8956043956043956,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.007703158174904944,
+                  "mean_quality": 0.6615969581749049,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.42346701316341595
+            },
+            "1.0000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 0.002572909462915601,
+              "mean_quality": 0.8431372549019608,
+              "penalty": 0.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 0.001090211208791209,
+                  "mean_quality": 0.8956043956043956,
+                  "rows": 910
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.007703158174904944,
+                  "mean_quality": 0.6615969581749049,
+                  "rows": 263
+                }
+              },
+              "relative_cost": 0.42346701316341595
+            }
+          },
+          "locked_policy_quality_auc": 0.6759749303621169,
+          "normalization_valid": true,
+          "oracle_quality_upper_bound": 0.928388746803069,
+          "rows": 1173,
+          "train_fitted_baselines": {
+            "train_best_single_within_source_pool": {
+              "mean_actual_cost": 0.005955200341005968,
+              "mean_quality": 0.9019607843137255
+            },
+            "train_source_task_with_source_fallback": {
+              "mean_actual_cost": 0.005955200341005968,
+              "mean_quality": 0.9019607843137255
+            }
+          }
+        },
+        "xroutebench": {
+          "always": {
+            "high": {
+              "actual_cost": 0.0002542191640378549,
+              "quality": 0.49842271293375395
+            },
+            "low": {
+              "actual_cost": 1.3754495268138805e-05,
+              "quality": 0.7034700315457413
+            },
+            "medium": {
+              "actual_cost": 4.886190851735016e-05,
+              "quality": 0.7350157728706624
+            }
+          },
+          "budgets": {
+            "0.0000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 1.3754495268138805e-05,
+              "mean_quality": 0.7034700315457413,
+              "penalty": 10.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 5.776527331189711e-06,
+                  "mean_quality": 0.9581993569131833,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 2.8525555555555554e-05,
+                  "mean_quality": 0.011111111111111112,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 1.8697639484978545e-05,
+                  "mean_quality": 0.630901287553648,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.0
+            },
+            "0.1000": {
+              "budget_exceeded": true,
+              "mean_actual_cost": 3.9600047318611994e-05,
+              "mean_quality": 0.6198738170347003,
+              "penalty": 1.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 7.228617363344052e-06,
+                  "mean_quality": 0.9614147909967846,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 9.518944444444444e-05,
+                  "mean_quality": 0.011111111111111112,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 6.133596566523606e-05,
+                  "mean_quality": 0.39914163090128757,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.10748170274953987
+            },
+            "0.2500": {
+              "budget_exceeded": true,
+              "mean_actual_cost": 9.192682965299684e-05,
+              "mean_quality": 0.526813880126183,
+              "penalty": 0.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 3.26508038585209e-05,
+                  "mean_quality": 0.9646302250803859,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.00020731944444444446,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.0001264740772532189,
+                  "mean_quality": 0.1459227467811159,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.3250886493421648
+            },
+            "0.5000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 9.192682965299684e-05,
+              "mean_quality": 0.526813880126183,
+              "penalty": 0.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 3.26508038585209e-05,
+                  "mean_quality": 0.9646302250803859,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.00020731944444444446,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.0001264740772532189,
+                  "mean_quality": 0.1459227467811159,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.3250886493421648
+            },
+            "0.7500": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 9.192682965299684e-05,
+              "mean_quality": 0.526813880126183,
+              "penalty": 0.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 3.26508038585209e-05,
+                  "mean_quality": 0.9646302250803859,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.00020731944444444446,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.0001264740772532189,
+                  "mean_quality": 0.1459227467811159,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.3250886493421648
+            },
+            "1.0000": {
+              "budget_exceeded": false,
+              "mean_actual_cost": 9.192682965299684e-05,
+              "mean_quality": 0.526813880126183,
+              "penalty": 0.0,
+              "per_task": {
+                "arc_challenge": {
+                  "mean_actual_cost": 3.26508038585209e-05,
+                  "mean_quality": 0.9646302250803859,
+                  "rows": 311
+                },
+                "human_eval": {
+                  "mean_actual_cost": 0.00020731944444444446,
+                  "mean_quality": 0.0,
+                  "rows": 90
+                },
+                "mbpp": {
+                  "mean_actual_cost": 0.0001264740772532189,
+                  "mean_quality": 0.1459227467811159,
+                  "rows": 233
+                }
+              },
+              "relative_cost": 0.3250886493421648
+            }
+          },
+          "locked_policy_quality_auc": null,
+          "normalization_valid": false,
+          "oracle_quality_upper_bound": 0.7570977917981072,
+          "rows": 634,
+          "train_fitted_baselines": {
+            "train_best_single_within_source_pool": {
+              "mean_actual_cost": 0.0002542191640378549,
+              "mean_quality": 0.49842271293375395
+            },
+            "train_source_task_with_source_fallback": {
+              "mean_actual_cost": 0.0002542191640378549,
+              "mean_quality": 0.49842271293375395
+            }
+          }
+        }
+      },
+      "source_macro_locked_policy_quality_auc": null
+    }
+  },
+  "schema_version": "generalization-holdout-report-v1",
+  "selected_arm": "r1-natural",
+  "selection_lock_sha256": "c6fad17c23390305d62769e30f213c8381db620679c949ac6a80bd3695ee75f3"
+}

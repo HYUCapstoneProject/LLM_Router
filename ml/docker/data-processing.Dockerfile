@@ -44,6 +44,7 @@ COPY ml/src/llm_router_labeling/shared/dataset_io.py /opt/llm-router/ml/src/llm_
 COPY ml/src/llm_router_labeling/shared/text_normalization.py /opt/llm-router/ml/src/llm_router_labeling/shared/text_normalization.py
 COPY ml/src/llm_router_labeling/shared/object_store.py /opt/llm-router/ml/src/llm_router_labeling/shared/object_store.py
 COPY ml/src/llm_router_labeling/shared/observability.py /opt/llm-router/ml/src/llm_router_labeling/shared/observability.py
+COPY ml/src/llm_router_labeling/shared/structured_text.py /opt/llm-router/ml/src/llm_router_labeling/shared/structured_text.py
 COPY ml/config/routerbench_labeling.json /workspace/ml/config/routerbench_labeling.json
 COPY ml/config/routerbench_labeling_v2.json /workspace/ml/config/routerbench_labeling_v2.json
 COPY ml/config/routerarena_preprocessing.json /workspace/ml/config/routerarena_preprocessing.json

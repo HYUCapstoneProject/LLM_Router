@@ -1,0 +1,10 @@
+{
+  "archive_sha256": "ff3c72721881f7dbec6ec75ad47c7ecf8b03998413354675c7625ef8487448f0",
+  "archive_bytes": 95344820,
+  "drive_path": "/content/drive/MyDrive/LLM_Router/routing-generalization-v1-20260925/evaluation-final-1790317240",
+  "selected_arm": "r1-natural",
+  "selection_lock_sha256": "c6fad17c23390305d62769e30f213c8381db620679c949ac6a80bd3695ee75f3",
+  "device": "cuda",
+  "production_activated": false,
+  "status": "complete"
+}

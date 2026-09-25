@@ -1,0 +1,296 @@
+{
+  "schema_version": "routing-diagnostics-artifacts-v1",
+  "script_sha256": "69c7d741bbef2d95291b29db57d919f9ff294454e670e47dcf89859678aef19c",
+  "files": {
+    "01-difficulty-source.png": {
+      "sha256": "97b11c42e0df3a72c79e0fa42e1054ac0c0cf7885b878ef4c9b1ba1890cfec01",
+      "size_bytes": 82476
+    },
+    "02-difficulty-category.png": {
+      "sha256": "80384c8da0bdb62545054c6ed64af013b9a7b26ab97b398d6f31ee22d80c0bf6",
+      "size_bytes": 302650
+    },
+    "03-routing-source.png": {
+      "sha256": "4accd4ff07417f5b393c7d0dbf69002850ad2f3d3c77344e97d08def0ceb0950",
+      "size_bytes": 97217
+    },
+    "04-routing-category.png": {
+      "sha256": "e912cea114cd7b0e6715158fb05e8d49e355c5c85d159e3717f067bc1792d651",
+      "size_bytes": 326554
+    },
+    "05-difficulty-route-heatmaps.png": {
+      "sha256": "bcdfe7c0db7fe8baedb384501306fd76a227b506c438f26eea002623e2078d3d",
+      "size_bytes": 298186
+    },
+    "06-medium-vs-lambda.png": {
+      "sha256": "2e151f893315f9d3f0bfb4e7acd085063eb256740c92316280ca278fea4fb58a",
+      "size_bytes": 205506
+    },
+    "07-source-only-comparison.png": {
+      "sha256": "2cd9029c6dfc80c28ace277dad2a284328b8c4ff699d6e130106774f14b8100c",
+      "size_bytes": 111639
+    },
+    "SUMMARY.md": {
+      "sha256": "5b275b18bce1372cf03617fc3901d4ed9541ab102af7dedea5237fc1802b483a",
+      "size_bytes": 2642
+    },
+    "arena-evidence/execution-status.json": {
+      "sha256": "e2121dc6079edf431deec9f35c1e26798a608633cb33d6963547ccc0354a66bf",
+      "size_bytes": 235
+    },
+    "arena-evidence/inference-manifest.json": {
+      "sha256": "2d802f6cb59c0f4cf8dfd43f5f3c2a313dc567bdaf37d71dfbfedd88c9345e49",
+      "size_bytes": 1267
+    },
+    "arena-evidence/overlap-audit.json": {
+      "sha256": "f333ccbfd87a8b3bd72692d093bedf9af9fd118c662923bef4516379c6c27b89",
+      "size_bytes": 6606
+    },
+    "arena-evidence/protocol.json": {
+      "sha256": "c5df5af139a778402986d60b1f63726b5470b1cb42bf47c3433cb0e17f0af9fa",
+      "size_bytes": 7661
+    },
+    "arena-evidence/report-REPORT.md": {
+      "sha256": "a573f047fe147944bb38af0c305997e192ea7abf07de078e0763c3d2e36a3481",
+      "size_bytes": 1839
+    },
+    "arena-evidence/report-manifest.json": {
+      "sha256": "6bc1be573ebe21a46838be9491f7ad398e36586e1cbf5f526ca899879640dc0a",
+      "size_bytes": 958
+    },
+    "arena-evidence/report-summary.json": {
+      "sha256": "2529e3f46d0e2afa7eabfc5a8a736ad462b54ef129bd176a064efda273ede104",
+      "size_bytes": 856035
+    },
+    "category-baselines/category-differences.csv": {
+      "sha256": "1bf3b0383aa0b20872b500aa8e4ca1852d956cd709191f0edd1c828cc140abec",
+      "size_bytes": 719
+    },
+    "category-baselines/manifest.json": {
+      "sha256": "fac259a73a5056884dac530d6618b6e0cb5aeb25bb569fff826f68a9074f1ef7",
+      "size_bytes": 1536
+    },
+    "category-baselines/metrics.csv": {
+      "sha256": "b1597289c86d3a6b492c6ac96e72161e99ecb6319b1afd4e984c3f080408b271",
+      "size_bytes": 2081
+    },
+    "category-baselines/original-audit.json": {
+      "sha256": "d52487630d16bc74a8de17e021e598dd892ccf16de8d8df765b36b786c331d8d",
+      "size_bytes": 63525
+    },
+    "category-baselines/original-audit.md": {
+      "sha256": "32ec37a3043c0909e12af9a22327f8166269999ba90960acfebc6b9beea5b784",
+      "size_bytes": 3510
+    },
+    "category-baselines/original-audit.parquet": {
+      "sha256": "1130cb722b934c1e2813e451b385805698d8d46df892b2028e95e95e494f7421",
+      "size_bytes": 102680
+    },
+    "category-baselines/original-audit.py": {
+      "sha256": "0c7e53a2a158f68dfdff9c287446e16cb16db51597fe2f6a89127deb243ffe94",
+      "size_bytes": 7018
+    },
+    "category-baselines/r0-category-differences.png": {
+      "sha256": "d03d0bdd82b8487423a85ceefed038dc41f6ff858abe192a2dca3698443da563",
+      "size_bytes": 115175
+    },
+    "category-baselines/r0-train-category-baselines.png": {
+      "sha256": "61c24e84e81a5b9dc5a524e86d38c980f462490d57430e43b2dfa4c93bedb43e",
+      "size_bytes": 126377
+    },
+    "category-baselines/render.py": {
+      "sha256": "263401b0b84c45983ff71a998bc8e26ddaa98354f3281a00435ed96d20a72360",
+      "size_bytes": 9471
+    },
+    "category-baselines/verification.json": {
+      "sha256": "63cd88cca144a58bc84d93ba897f5872585c240caadaba4955d8acd9f33c9aa7",
+      "size_bytes": 620
+    },
+    "category-permutation/manifest.json": {
+      "sha256": "e107c7b6a14f8f043b4c4f84ae081f4f066f58e07d020fc04214c43ded4c75cc",
+      "size_bytes": 1086
+    },
+    "category-permutation/original-audit.json": {
+      "sha256": "a387148ae29c34383ab2442a011ef20f110dacff97ff3c19eb4446da1f6ad55c",
+      "size_bytes": 639369
+    },
+    "category-permutation/original-audit.md": {
+      "sha256": "901cfc9a4b03009285b988bd0ec404bcd862e12694d307ffb6213addebdadc85",
+      "size_bytes": 3061
+    },
+    "category-permutation/original-audit.py": {
+      "sha256": "4d4dcfc47d9cadf097dc42539b33c82577084cb24b27e36964cc5b68b7ae9cb4",
+      "size_bytes": 7976
+    },
+    "category-permutation/posthoc-quality-cost-ranges.png": {
+      "sha256": "ac8be67247776cf0adeb2fbf0f365c5ba8dfb1c620a850f3912ccad01c610c66",
+      "size_bytes": 127786
+    },
+    "category-permutation/ranges.csv": {
+      "sha256": "a4eb21edd9e8fed5b9676b5f8c3a4437271e1fb2d4d81e19f1a3a7d9554e64eb",
+      "size_bytes": 2318
+    },
+    "category-permutation/render.py": {
+      "sha256": "acbaa719ae7a0ed183ce04dee62dd7ad39300b6a93986e6036506b42fa5ec5d1",
+      "size_bytes": 5827
+    },
+    "category-permutation/verification.json": {
+      "sha256": "8079360e6aa90e8fd0df770ab1f6596c928d671629134a723605d9df70a728c0",
+      "size_bytes": 379
+    },
+    "diagnostics.json": {
+      "sha256": "19d378290de352956f52ecb80c302453fec4cbf67974fc94073a9abc1d81f792",
+      "size_bytes": 155734
+    },
+    "difficulty-by-category.csv": {
+      "sha256": "09f963e2a733135d80cfda9b63fbd5be944e4c23e0545ca95c12a067cc61b2c4",
+      "size_bytes": 6735
+    },
+    "difficulty-by-route.csv": {
+      "sha256": "df72d84496a2cf53acf0a05fd491896ef3b532f0376f54a4540ed537827f8982",
+      "size_bytes": 3460
+    },
+    "difficulty-by-source.csv": {
+      "sha256": "f8a673191477568e0208098968534ba2017faece770043079ebddd9d2d7f1351",
+      "size_bytes": 776
+    },
+    "index.html": {
+      "sha256": "e2c14c21e6136a510a043a4bd33e736479ce2f56f8a5d07e916defe5b2bc394f",
+      "size_bytes": 18462
+    },
+    "integrate-report.py": {
+      "sha256": "a25a79ab10d7894535f9f17c7f7d7504708aa71bc9fe5e2b0c729fb53116038e",
+      "size_bytes": 9835
+    },
+    "lambda-grid-routing.csv": {
+      "sha256": "771ccde4d7ef917108f8e01351246ca0f1c7e18e305fa34dc6a08ff805ec8e1a",
+      "size_bytes": 10131
+    },
+    "locked-penalties.csv": {
+      "sha256": "a17dbc14dacc50644626014e12fc6a3728675f252e3f8414bafdd66726312b52",
+      "size_bytes": 213
+    },
+    "medium-cost-policy-effect.csv": {
+      "sha256": "e80f9dbeee121d245a6c901125b4bb5f04c826296028eed4fa63a00f44a3b920",
+      "size_bytes": 425
+    },
+    "r0-label-diagnostic.csv": {
+      "sha256": "ce4d40d67593e65bc6f937a5c87de89ef7774634ec23732655f1173efe751bca",
+      "size_bytes": 215
+    },
+    "routerarena/conditional-on-official.png": {
+      "sha256": "3c752b64e49c81619e519470a667570a6f53c6ad536ba64d6dbc2f38e9791029",
+      "size_bytes": 158807
+    },
+    "routerarena/conditional-on-projected.png": {
+      "sha256": "fbe148732d0496c0995c8232a0bbe2e37dd2f864dd96696eb6c8f579953b4d1d",
+      "size_bytes": 156903
+    },
+    "routerarena/full-arena_source_dataset-01.png": {
+      "sha256": "6074957fedb2cd70d7ce87e08fc9c3b750ddfd111a99a143c55d4825d382843b",
+      "size_bytes": 318744
+    },
+    "routerarena/full-arena_source_dataset-02.png": {
+      "sha256": "8a497a7ef803668dc8e415bb992f98e72c5ebf47b0ff6057f2134d9f86293cfa",
+      "size_bytes": 343712
+    },
+    "routerarena/full-arena_source_dataset-03.png": {
+      "sha256": "c382685c02a5b4451d3c88aa93a2da351e9bced772332ada792b15ae0a550c62",
+      "size_bytes": 350252
+    },
+    "routerarena/full-arena_source_dataset-04.png": {
+      "sha256": "192f771f56db9cd5ea69b491544026477870c79990c2e276d261a107839871a7",
+      "size_bytes": 225539
+    },
+    "routerarena/full-arena_source_dataset-distributions.csv": {
+      "sha256": "18c20bf893547b79e2d3e24ffe280dc1ea58beb8f824bf5a9d2d1493548de4b0",
+      "size_bytes": 70119
+    },
+    "routerarena/full-category-01.png": {
+      "sha256": "606044cd078b9af77bfec79b8f5ada45038cddb1acc1702d8da570bcd8fd4f19",
+      "size_bytes": 353393
+    },
+    "routerarena/full-category-02.png": {
+      "sha256": "09bf1624fefa3fc41f18460cb5bfa90e3cc87694080596a33bf9bc966368c05e",
+      "size_bytes": 141459
+    },
+    "routerarena/full-category-distributions.csv": {
+      "sha256": "70c90125d69c117c7c6ef64dba645bc851d520af37fb35f4b14fd86d27ac9a6f",
+      "size_bytes": 22897
+    },
+    "routerarena/full-domain-01.png": {
+      "sha256": "150f7d5c464820317365ea86da7dab5af2c1f763c6e00f80dde573dd670b1f08",
+      "size_bytes": 183408
+    },
+    "routerarena/full-domain-distributions.csv": {
+      "sha256": "dcb5ba76bc9103d86541fbfb5fe41419b107c7f6f802f5073aed35442bc46391",
+      "size_bytes": 7463
+    },
+    "routerarena/full-medium-and-truncation.csv": {
+      "sha256": "ecd5be4e6aa5b0c36fadf0cceecef093f362f73d65f481754f4ead37d022f203",
+      "size_bytes": 1233
+    },
+    "routerarena/index.html": {
+      "sha256": "51f0bc7d6f56e4be4f843055e14de12704278eb1a2321397a97df8abed573875",
+      "size_bytes": 9660
+    },
+    "routerarena/manifest.json": {
+      "sha256": "c47e4d18b13918f18c4e926cea3009718b92b1fb58dd8af7cc0f194c952725b4",
+      "size_bytes": 3297
+    },
+    "routerarena/medium-and-truncation.png": {
+      "sha256": "830178ab7793a1ec21dc605cf13053b26ffe13bad3dd3908ac4f2eac658a58a8",
+      "size_bytes": 108142
+    },
+    "routerarena/paired-robustness-by-category.csv": {
+      "sha256": "42e8725b555ecab77e9e98f694deee52795fa0903b9d0b704ef59f4b5f57c38d",
+      "size_bytes": 3769
+    },
+    "routerarena/paired-robustness-retention.csv": {
+      "sha256": "179623c04a8738936319740123b487cfcb5c18551379b2d932c7cd75a9f8eb53",
+      "size_bytes": 832
+    },
+    "routerarena/paired-robustness-retention.png": {
+      "sha256": "5765b264a9272e7de7e1c6ae89ae910d3de5cb5cacfd590a4a6394f1be31da47",
+      "size_bytes": 100375
+    },
+    "routerarena/paired-robustness-rows.csv": {
+      "sha256": "8afaccf5dccc54f6e9a68713f6254cbcebe657bc4364f5f1df363b71dedcde83",
+      "size_bytes": 170518
+    },
+    "routerarena/visuals.json": {
+      "sha256": "7a02e5d5ad1c2fdcd82bef3c07dce194af6e030fab99e3aeeb82220864eddd42",
+      "size_bytes": 367855
+    },
+    "routing-by-category.csv": {
+      "sha256": "a724ed7905be4a5d58939936fc064e3620f9d2323b2e7de04b5523f4e9eed33a",
+      "size_bytes": 9956
+    },
+    "routing-by-source.csv": {
+      "sha256": "04bb704a30817f846e19836cf855e877768de48913dfb78b50a62562a368f127",
+      "size_bytes": 1167
+    },
+    "run.json": {
+      "sha256": "ebdf283abf455d7fdceb8056ca5a0c87a49e3388d3b6a336d11daada6e73e4b8",
+      "size_bytes": 964921
+    },
+    "source-only-comparison.csv": {
+      "sha256": "b6b90be47be9345f462e7f6e597a2d313c6e1ffaa4f6c58b23bd4713093d051e",
+      "size_bytes": 1429
+    },
+    "validation-routing-rows.csv": {
+      "sha256": "81a055da201202e776dae5fa4848965d61898fd03ce6e87767aaa296b3ef0279",
+      "size_bytes": 1285722
+    },
+    "within-source-category-comparison.csv": {
+      "sha256": "08cb92107d2099b8bc6b8bb89c753dd751344e305a8cdae0e83e27628af5cc76",
+      "size_bytes": 5602
+    }
+  },
+  "integration_script_sha256": "a25a79ab10d7894535f9f17c7f7d7504708aa71bc9fe5e2b0c729fb53116038e",
+  "subreports": {
+    "category-baselines": "fac259a73a5056884dac530d6618b6e0cb5aeb25bb569fff826f68a9074f1ef7",
+    "category-permutation": "e107c7b6a14f8f043b4c4f84ae081f4f066f58e07d020fc04214c43ded4c75cc",
+    "routerarena": "c47e4d18b13918f18c4e926cea3009718b92b1fb58dd8af7cc0f194c952725b4"
+  }
+}

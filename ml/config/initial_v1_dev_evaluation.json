@@ -1,0 +1,46 @@
+{
+  "evaluation_version": "routerbench-xroutebench-label-evaluation-v1",
+  "evaluation_role": "development_calibration",
+  "evaluation_split": "validation",
+  "label_semantics": "overall-solve-rate-T1-label-agreement",
+  "label_order": [
+    "easy",
+    "medium",
+    "hard"
+  ],
+  "dataset_contract": {
+    "dataset_version": "routerbench-xroutebench-continual-v1",
+    "preprocessing_version": "integrated-routing-preprocess-v2-structure",
+    "split_version": "continual-60-10-10-15-5-v1-seed-42",
+    "label_rule_version": "overall-solve-rate-grid-v1:h0.27-e0.64"
+  },
+  "dataset_manifest_sha256": "f6a4cff1684bc2626a8901dbfda9f81e7d5d7e8753e5f48320cb1ada44c8cca4",
+  "evaluation_dataset_sha256": "fb698a992f05b88bfd4488c7de0abe515e52107c8435a46fa9a45bfb63b7f4d0",
+  "domain_mapping_version": "rb-xrb-source-category-domain-v1",
+  "domain_mapping_note": "Fixed source/category grouping; does not use labels or model predictions.",
+  "category_to_domain": {
+    "routerbench:code": "code",
+    "routerbench:commonsense": "commonsense",
+    "routerbench:conversation": "conversation",
+    "routerbench:knowledge": "knowledge",
+    "routerbench:math": "math",
+    "xroutebench:aime_2020_2024": "math",
+    "xroutebench:arc_challenge": "commonsense",
+    "xroutebench:boolq": "reading_comprehension",
+    "xroutebench:commonsense_qa": "commonsense",
+    "xroutebench:gsm8k": "math",
+    "xroutebench:hellaswag": "commonsense",
+    "xroutebench:human_eval": "code",
+    "xroutebench:math": "math",
+    "xroutebench:mbpp": "code",
+    "xroutebench:mmlu": "knowledge",
+    "xroutebench:mmlu_pro": "knowledge",
+    "xroutebench:openbook_qa": "commonsense",
+    "xroutebench:squad": "reading_comprehension"
+  },
+  "inference": {
+    "batch_size": 16,
+    "max_length": 512,
+    "device": "auto"
+  }
+}

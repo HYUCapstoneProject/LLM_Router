@@ -1,0 +1,143 @@
+{
+  "schema_version": "g1-holdout-recalculation-v1",
+  "tolerance": 1e-12,
+  "model_weights_verification": "SKIPPED locally: weights not downloaded; parent independently verified remote model files",
+  "winner_reselected": false,
+  "errors": [],
+  "verified": true,
+  "selected_arm": "r1-natural",
+  "selection_lock_sha256": "c6fad17c23390305d62769e30f213c8381db620679c949ac6a80bd3695ee75f3",
+  "report_manifest_sha256": "8fdc1e03c28063761b3235e7dd6b1c4a4d06461faf59f131cc398b07762e3582",
+  "scores_manifest_sha256": "f97a2c7003930c6866446ebb6d1d5453f654973ab99a6d8855a5b4f3ec4898b7",
+  "compared_numeric_values": 808,
+  "maximum_absolute_numeric_difference": 0.0,
+  "checked_inference_rows": 7228,
+  "independent_numpy": {
+    "r1-natural": {
+      "routerbench": {
+        "rows": 1173,
+        "quality_span_high_minus_low": 0.30605285592497866,
+        "cost_span_high_minus_low": 0.005866604262574596,
+        "normalization_valid": true,
+        "auc": 0.6923398328690806,
+        "default_budget": {
+          "mean_quality": 0.8005115089514067,
+          "mean_actual_cost": 0.0011056063086104006,
+          "relative_cost": 0.1733558605046775,
+          "budget_exceeded": false
+        }
+      },
+      "xroutebench": {
+        "rows": 634,
+        "quality_span_high_minus_low": -0.20504731861198733,
+        "cost_span_high_minus_low": 0.00024046466876971609,
+        "normalization_valid": false,
+        "auc": null,
+        "default_budget": {
+          "mean_quality": 0.5047318611987381,
+          "mean_actual_cost": 0.00017059643533123028,
+          "relative_cost": 0.6522452585884585,
+          "budget_exceeded": true
+        }
+      }
+    },
+    "r1-balanced": {
+      "routerbench": {
+        "rows": 1173,
+        "quality_span_high_minus_low": 0.30605285592497866,
+        "cost_span_high_minus_low": 0.005866604262574596,
+        "normalization_valid": true,
+        "auc": 0.7624651810584958,
+        "default_budget": {
+          "mean_quality": 0.8312020460358056,
+          "mean_actual_cost": 0.0022324225063938617,
+          "relative_cost": 0.36542884640077244,
+          "budget_exceeded": false
+        }
+      },
+      "xroutebench": {
+        "rows": 634,
+        "quality_span_high_minus_low": -0.20504731861198733,
+        "cost_span_high_minus_low": 0.00024046466876971609,
+        "normalization_valid": false,
+        "auc": null,
+        "default_budget": {
+          "mean_quality": 0.5078864353312302,
+          "mean_actual_cost": 0.0001986713722397476,
+          "relative_cost": 0.7689981148486171,
+          "budget_exceeded": true
+        }
+      }
+    },
+    "r3-natural": {
+      "routerbench": {
+        "rows": 1173,
+        "quality_span_high_minus_low": 0.30605285592497866,
+        "cost_span_high_minus_low": 0.005866604262574596,
+        "normalization_valid": true,
+        "auc": 0.6759749303621169,
+        "default_budget": {
+          "mean_quality": 0.8431372549019608,
+          "mean_actual_cost": 0.002572909462915601,
+          "relative_cost": 0.42346701316341595,
+          "budget_exceeded": false
+        }
+      },
+      "xroutebench": {
+        "rows": 634,
+        "quality_span_high_minus_low": -0.20504731861198733,
+        "cost_span_high_minus_low": 0.00024046466876971609,
+        "normalization_valid": false,
+        "auc": null,
+        "default_budget": {
+          "mean_quality": 0.526813880126183,
+          "mean_actual_cost": 9.192682965299684e-05,
+          "relative_cost": 0.3250886493421648,
+          "budget_exceeded": false
+        }
+      }
+    },
+    "r3-balanced": {
+      "routerbench": {
+        "rows": 1173,
+        "quality_span_high_minus_low": 0.30605285592497866,
+        "cost_span_high_minus_low": 0.005866604262574596,
+        "normalization_valid": true,
+        "auc": 0.6977715877437326,
+        "default_budget": {
+          "mean_quality": 0.8422847399829497,
+          "mean_actual_cost": 0.0025845495311167944,
+          "relative_cost": 0.4254511368029547,
+          "budget_exceeded": false
+        }
+      },
+      "xroutebench": {
+        "rows": 634,
+        "quality_span_high_minus_low": -0.20504731861198733,
+        "cost_span_high_minus_low": 0.00024046466876971609,
+        "normalization_valid": false,
+        "auc": null,
+        "default_budget": {
+          "mean_quality": 0.5236593059936908,
+          "mean_actual_cost": 8.42696214511041e-05,
+          "relative_cost": 0.29324526777152016,
+          "budget_exceeded": false
+        }
+      }
+    }
+  },
+  "default_budget_feasible": {
+    "r1-natural": false,
+    "r1-balanced": false,
+    "r3-natural": true,
+    "r3-balanced": true
+  },
+  "explanation": "All macro AUC values remain null because xRouteBench high-minus-low quality span is negative; no missing metric replaced with zero.",
+  "checks": {
+    "all_score_sha_and_sizes": true,
+    "all_ids_order_outcomes": true,
+    "frozen_source_matches_lock": true,
+    "fixed_policy_reports_match": true,
+    "numpy_all_budget_actions_quality_cost_auc_match": true
+  }
+}

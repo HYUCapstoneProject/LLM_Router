@@ -1,8 +1,14 @@
 from __future__ import annotations
 
-import tomllib
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
 import unittest
 from pathlib import Path
+
+import tomllib
 
 
 class EvaluationPromotionImageContractTest(unittest.TestCase):
@@ -43,7 +49,43 @@ class EvaluationPromotionImageContractTest(unittest.TestCase):
         )
         self.assertNotIn("requirements-training.lock", dockerfile)
         self.assertNotIn("requirements-lock.txt", dockerfile)
-        self.assertNotIn("/training/", dockerfile)
+        self.assertEqual(package["project"]["dependencies"], [])
+        copied = [
+            line.split()[1]
+            for line in dockerfile.splitlines()
+            if line.startswith("COPY ") and line.split()[1].endswith(".py")
+        ]
+        training_modules = {Path(name).name for name in copied if "/training/" in name}
+        self.assertEqual(training_modules, {"__init__.py", "routing_policy.py"})
+        self.assertNotIn("torch", dockerfile)
+        self.assertNotIn("transformers", dockerfile)
+        self.assertNotIn("pandas", dockerfile)
+        # Import the exact image's Python files with site-packages disabled.
+        # This catches missing internal modules and accidental ML dependencies.
+        with tempfile.TemporaryDirectory() as directory:
+            isolated = Path(directory)
+            for name in copied:
+                source = ml_root.parent / name
+                target = isolated / Path(name).relative_to("ml/src")
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(source, target)
+            for entry in package["project"]["scripts"].values():
+                module = entry.split(":")[0]
+                result = subprocess.run(
+                    [sys.executable, "-S", "-m", module, "--help"],
+                    cwd=isolated,
+                    env={
+                        **os.environ,
+                        "PYTHONPATH": str(isolated),
+                        "PYTHONDONTWRITEBYTECODE": "1",
+                    },
+                    capture_output=True,
+                    text=True,
+                    timeout=15,
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn("usage:", result.stdout)
         self.assertNotIn("/evaluation/", dockerfile)
 
 

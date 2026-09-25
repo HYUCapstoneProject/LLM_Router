@@ -133,13 +133,32 @@ def _question_hash(normalized_question: str) -> str:
     return hashlib.sha256(normalized_question.encode("utf-8")).hexdigest()
 
 
-def canonical_training_digest(training: pd.DataFrame) -> str:
+def _question_normalizer(input_contract: str):
+    if input_contract == "legacy-word-only-v1":
+        return normalize_for_duplicate_detection
+    if input_contract == "structure-preserving-v2":
+        from ..shared.structured_text import structured_duplicate_key
+
+        return structured_duplicate_key
+    raise FeedbackDataError(f"Unsupported feedback input contract: {input_contract}")
+
+
+def _question_text(value: object, input_contract: str) -> str:
+    if input_contract == "structure-preserving-v2" and _string(value):
+        from ..shared.structured_text import clean_text
+
+        return clean_text(value)
+    return _string(value)
+
+
+def canonical_training_digest(
+    training: pd.DataFrame, *, input_contract: str = "legacy-word-only-v1"
+) -> str:
     """Hash only the canonical learning content, independent of event identity/order."""
+    normalize = _question_normalizer(input_contract)
     rows = [
         {
-            "normalized_question": normalize_for_duplicate_detection(
-                str(row["model_input_text"])
-            ),
+            "normalized_question": normalize(str(row["model_input_text"])),
             "final_label": str(row["difficulty_label"]),
             "sample_weight": float(row["sample_weight"]),
         }
@@ -152,7 +171,14 @@ def canonical_training_digest(training: pd.DataFrame) -> str:
             row["sample_weight"],
         )
     )
-    encoded = json.dumps(rows, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    payload = (
+        rows
+        if input_contract == "legacy-word-only-v1"
+        else {"input_contract": input_contract, "rows": rows}
+    )
+    encoded = json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
@@ -175,13 +201,15 @@ def prepare_feedback_training_dataset(
     if label_order != ("easy", "medium", "hard"):
         raise FeedbackDataError("Feedback label_order must be easy, medium, hard")
     acceptance = config["acceptance"]
+    input_contract = str(config.get("input_contract", "legacy-word-only-v1"))
+    normalize = _question_normalizer(input_contract)
 
     records: list[dict[str, Any]] = []
     seen_event_ids: set[str] = set()
     for _, row in events.reset_index(drop=True).iterrows():
         event_id = _string(row["event_id"])
-        question = _string(row["question"])
-        normalized_question = normalize_for_duplicate_detection(question)
+        question = _question_text(row["question"], input_contract)
+        normalized_question = normalize(question)
         initial_label = _string(row["initial_label"]).casefold()
         final_label = _string(row["final_label"]).casefold()
         reason = ""
@@ -190,7 +218,7 @@ def prepare_feedback_training_dataset(
             reason = "missing_event_or_request_id"
         elif event_id in seen_event_ids:
             reason = "duplicate_event_id"
-        elif not question or not normalized_question:
+        elif not question.strip() or not normalized_question.strip():
             reason = "empty_question"
         elif initial_label not in label_rank or final_label not in label_rank:
             reason = "invalid_label"
@@ -267,7 +295,7 @@ def prepare_feedback_training_dataset(
         training_records.append(
             {
                 "sample_id": f"feedback-{question_hash[:24]}",
-                "model_input_text": _string(first["question"]),
+                "model_input_text": _question_text(first["question"], input_contract),
                 "difficulty_label": str(first["normalized_final_label"]),
                 "sample_weight": sample_weight,
                 "split": "train",
@@ -288,7 +316,10 @@ def prepare_feedback_training_dataset(
         "accepted_event_count": int(metadata["acceptance_status"].eq("accepted").sum()),
         "excluded_event_count": int(metadata["acceptance_status"].eq("excluded").sum()),
         "training_row_count": len(training),
-        "canonical_batch_digest": canonical_training_digest(training),
+        "input_contract": input_contract,
+        "canonical_batch_digest": canonical_training_digest(
+            training, input_contract=input_contract
+        ),
         "exclusion_distribution": dict(sorted(exclusion_distribution.items())),
         "label_distribution": {
             str(label): int(count)
@@ -340,6 +371,9 @@ def merge_feedback_with_base_training(
     training_data_strategy: str = "full_base",
 ) -> FeedbackMergeResult:
     merge_config = config["merge"]
+    normalize = _question_normalizer(
+        str(config.get("input_contract", "legacy-word-only-v1"))
+    )
     if merge_config["base_train_conflict_policy"] != "replace_exact_train_rows":
         raise FeedbackDataError("Unsupported base_train_conflict_policy")
     if merge_config["base_holdout_overlap_policy"] != "exclude_feedback":
@@ -354,15 +388,13 @@ def merge_feedback_with_base_training(
 
     base = base_training.loc[:, TRAINING_COLUMNS].copy()
     feedback = feedback_training.loc[:, TRAINING_COLUMNS].copy()
-    base["_normalized_question"] = base["model_input_text"].map(
-        normalize_for_duplicate_detection
-    )
+    base["_normalized_question"] = base["model_input_text"].map(normalize)
     replace_base_indices: set[int] = set()
     accepted_rows: list[dict[str, Any]] = []
     merge_records: list[dict[str, Any]] = []
 
     for _, row in feedback.iterrows():
-        normalized = normalize_for_duplicate_detection(str(row["model_input_text"]))
+        normalized = normalize(str(row["model_input_text"]))
         overlaps = base[base["_normalized_question"].eq(normalized)]
         decision = "append_new_question"
         include = True

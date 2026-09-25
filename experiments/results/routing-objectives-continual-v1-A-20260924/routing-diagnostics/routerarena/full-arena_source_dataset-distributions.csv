@@ -1,0 +1,949 @@
+dimension,value,method,label_or_projected_slot,count,denominator,fraction
+arena_source_dataset,AIME,official,easy,0,39,0.0
+arena_source_dataset,ArcMMLU,official,easy,275,396,0.6944444444444444
+arena_source_dataset,AsDiv,official,easy,54,88,0.6136363636363636
+arena_source_dataset,ChessInstruct,official,easy,0,68,0.0
+arena_source_dataset,ChessInstruct_mcq,official,easy,33,80,0.4125
+arena_source_dataset,Ethics_commonsense,official,easy,75,100,0.75
+arena_source_dataset,Ethics_deontology,official,easy,42,63,0.6666666666666666
+arena_source_dataset,Ethics_justice,official,easy,5,52,0.09615384615384616
+arena_source_dataset,Ethics_virtue,official,easy,63,68,0.9264705882352942
+arena_source_dataset,FinQA,official,easy,9,74,0.12162162162162163
+arena_source_dataset,GSM8K,official,easy,16,24,0.6666666666666666
+arena_source_dataset,GeoBench,official,easy,258,329,0.78419452887538
+arena_source_dataset,GeoGraphyData_100k,official,easy,36,45,0.8
+arena_source_dataset,LiveCodeBench,official,easy,45,385,0.11688311688311688
+arena_source_dataset,MATH,official,easy,20,55,0.36363636363636365
+arena_source_dataset,MMLUPro_biology,official,easy,117,143,0.8181818181818182
+arena_source_dataset,MMLUPro_business,official,easy,63,166,0.3795180722891566
+arena_source_dataset,MMLUPro_chemistry,official,easy,43,90,0.4777777777777778
+arena_source_dataset,MMLUPro_computer science,official,easy,170,391,0.43478260869565216
+arena_source_dataset,MMLUPro_economics,official,easy,111,186,0.5967741935483871
+arena_source_dataset,MMLUPro_engineering,official,easy,79,280,0.28214285714285714
+arena_source_dataset,MMLUPro_health,official,easy,114,221,0.5158371040723982
+arena_source_dataset,AIME,official,medium,10,39,0.2564102564102564
+arena_source_dataset,ArcMMLU,official,medium,85,396,0.21464646464646464
+arena_source_dataset,AsDiv,official,medium,17,88,0.19318181818181818
+arena_source_dataset,ChessInstruct,official,medium,10,68,0.14705882352941177
+arena_source_dataset,ChessInstruct_mcq,official,medium,46,80,0.575
+arena_source_dataset,Ethics_commonsense,official,medium,25,100,0.25
+arena_source_dataset,Ethics_deontology,official,medium,20,63,0.31746031746031744
+arena_source_dataset,Ethics_justice,official,medium,36,52,0.6923076923076923
+arena_source_dataset,Ethics_virtue,official,medium,4,68,0.058823529411764705
+arena_source_dataset,FinQA,official,medium,24,74,0.32432432432432434
+arena_source_dataset,GSM8K,official,medium,6,24,0.25
+arena_source_dataset,GeoBench,official,medium,58,329,0.1762917933130699
+arena_source_dataset,GeoGraphyData_100k,official,medium,9,45,0.2
+arena_source_dataset,LiveCodeBench,official,medium,175,385,0.45454545454545453
+arena_source_dataset,MATH,official,medium,25,55,0.45454545454545453
+arena_source_dataset,MMLUPro_biology,official,medium,17,143,0.11888111888111888
+arena_source_dataset,MMLUPro_business,official,medium,84,166,0.5060240963855421
+arena_source_dataset,MMLUPro_chemistry,official,medium,34,90,0.37777777777777777
+arena_source_dataset,MMLUPro_computer science,official,medium,179,391,0.4578005115089514
+arena_source_dataset,MMLUPro_economics,official,medium,55,186,0.2956989247311828
+arena_source_dataset,MMLUPro_engineering,official,medium,159,280,0.5678571428571428
+arena_source_dataset,MMLUPro_health,official,medium,69,221,0.31221719457013575
+arena_source_dataset,AIME,official,hard,29,39,0.7435897435897436
+arena_source_dataset,ArcMMLU,official,hard,36,396,0.09090909090909091
+arena_source_dataset,AsDiv,official,hard,17,88,0.19318181818181818
+arena_source_dataset,ChessInstruct,official,hard,58,68,0.8529411764705882
+arena_source_dataset,ChessInstruct_mcq,official,hard,1,80,0.0125
+arena_source_dataset,Ethics_commonsense,official,hard,0,100,0.0
+arena_source_dataset,Ethics_deontology,official,hard,1,63,0.015873015873015872
+arena_source_dataset,Ethics_justice,official,hard,11,52,0.21153846153846154
+arena_source_dataset,Ethics_virtue,official,hard,1,68,0.014705882352941176
+arena_source_dataset,FinQA,official,hard,41,74,0.5540540540540541
+arena_source_dataset,GSM8K,official,hard,2,24,0.08333333333333333
+arena_source_dataset,GeoBench,official,hard,13,329,0.03951367781155015
+arena_source_dataset,GeoGraphyData_100k,official,hard,0,45,0.0
+arena_source_dataset,LiveCodeBench,official,hard,165,385,0.42857142857142855
+arena_source_dataset,MATH,official,hard,10,55,0.18181818181818182
+arena_source_dataset,MMLUPro_biology,official,hard,9,143,0.06293706293706294
+arena_source_dataset,MMLUPro_business,official,hard,19,166,0.1144578313253012
+arena_source_dataset,MMLUPro_chemistry,official,hard,13,90,0.14444444444444443
+arena_source_dataset,MMLUPro_computer science,official,hard,42,391,0.10741687979539642
+arena_source_dataset,MMLUPro_economics,official,hard,20,186,0.10752688172043011
+arena_source_dataset,MMLUPro_engineering,official,hard,42,280,0.15
+arena_source_dataset,MMLUPro_health,official,hard,38,221,0.17194570135746606
+arena_source_dataset,AIME,ordinal,easy,0,39,0.0
+arena_source_dataset,ArcMMLU,ordinal,easy,263,396,0.6641414141414141
+arena_source_dataset,AsDiv,ordinal,easy,66,88,0.75
+arena_source_dataset,ChessInstruct,ordinal,easy,0,68,0.0
+arena_source_dataset,ChessInstruct_mcq,ordinal,easy,0,80,0.0
+arena_source_dataset,Ethics_commonsense,ordinal,easy,11,100,0.11
+arena_source_dataset,Ethics_deontology,ordinal,easy,25,63,0.3968253968253968
+arena_source_dataset,Ethics_justice,ordinal,easy,3,52,0.057692307692307696
+arena_source_dataset,Ethics_virtue,ordinal,easy,17,68,0.25
+arena_source_dataset,FinQA,ordinal,easy,38,74,0.5135135135135135
+arena_source_dataset,GSM8K,ordinal,easy,3,24,0.125
+arena_source_dataset,GeoBench,ordinal,easy,282,329,0.8571428571428571
+arena_source_dataset,GeoGraphyData_100k,ordinal,easy,45,45,1.0
+arena_source_dataset,LiveCodeBench,ordinal,easy,19,385,0.04935064935064935
+arena_source_dataset,MATH,ordinal,easy,9,55,0.16363636363636364
+arena_source_dataset,MMLUPro_biology,ordinal,easy,117,143,0.8181818181818182
+arena_source_dataset,MMLUPro_business,ordinal,easy,48,166,0.2891566265060241
+arena_source_dataset,MMLUPro_chemistry,ordinal,easy,31,90,0.34444444444444444
+arena_source_dataset,MMLUPro_computer science,ordinal,easy,112,391,0.2864450127877238
+arena_source_dataset,MMLUPro_economics,ordinal,easy,107,186,0.5752688172043011
+arena_source_dataset,MMLUPro_engineering,ordinal,easy,22,280,0.07857142857142857
+arena_source_dataset,MMLUPro_health,ordinal,easy,139,221,0.6289592760180995
+arena_source_dataset,AIME,ordinal,medium,4,39,0.10256410256410256
+arena_source_dataset,ArcMMLU,ordinal,medium,122,396,0.30808080808080807
+arena_source_dataset,AsDiv,ordinal,medium,22,88,0.25
+arena_source_dataset,ChessInstruct,ordinal,medium,68,68,1.0
+arena_source_dataset,ChessInstruct_mcq,ordinal,medium,80,80,1.0
+arena_source_dataset,Ethics_commonsense,ordinal,medium,89,100,0.89
+arena_source_dataset,Ethics_deontology,ordinal,medium,38,63,0.6031746031746031
+arena_source_dataset,Ethics_justice,ordinal,medium,49,52,0.9423076923076923
+arena_source_dataset,Ethics_virtue,ordinal,medium,51,68,0.75
+arena_source_dataset,FinQA,ordinal,medium,9,74,0.12162162162162163
+arena_source_dataset,GSM8K,ordinal,medium,20,24,0.8333333333333334
+arena_source_dataset,GeoBench,ordinal,medium,46,329,0.1398176291793313
+arena_source_dataset,GeoGraphyData_100k,ordinal,medium,0,45,0.0
+arena_source_dataset,LiveCodeBench,ordinal,medium,99,385,0.2571428571428571
+arena_source_dataset,MATH,ordinal,medium,25,55,0.45454545454545453
+arena_source_dataset,MMLUPro_biology,ordinal,medium,23,143,0.16083916083916083
+arena_source_dataset,MMLUPro_business,ordinal,medium,84,166,0.5060240963855421
+arena_source_dataset,MMLUPro_chemistry,ordinal,medium,47,90,0.5222222222222223
+arena_source_dataset,MMLUPro_computer science,ordinal,medium,209,391,0.5345268542199488
+arena_source_dataset,MMLUPro_economics,ordinal,medium,76,186,0.40860215053763443
+arena_source_dataset,MMLUPro_engineering,ordinal,medium,158,280,0.5642857142857143
+arena_source_dataset,MMLUPro_health,ordinal,medium,80,221,0.36199095022624433
+arena_source_dataset,AIME,ordinal,hard,35,39,0.8974358974358975
+arena_source_dataset,ArcMMLU,ordinal,hard,11,396,0.027777777777777776
+arena_source_dataset,AsDiv,ordinal,hard,0,88,0.0
+arena_source_dataset,ChessInstruct,ordinal,hard,0,68,0.0
+arena_source_dataset,ChessInstruct_mcq,ordinal,hard,0,80,0.0
+arena_source_dataset,Ethics_commonsense,ordinal,hard,0,100,0.0
+arena_source_dataset,Ethics_deontology,ordinal,hard,0,63,0.0
+arena_source_dataset,Ethics_justice,ordinal,hard,0,52,0.0
+arena_source_dataset,Ethics_virtue,ordinal,hard,0,68,0.0
+arena_source_dataset,FinQA,ordinal,hard,27,74,0.36486486486486486
+arena_source_dataset,GSM8K,ordinal,hard,1,24,0.041666666666666664
+arena_source_dataset,GeoBench,ordinal,hard,1,329,0.00303951367781155
+arena_source_dataset,GeoGraphyData_100k,ordinal,hard,0,45,0.0
+arena_source_dataset,LiveCodeBench,ordinal,hard,267,385,0.6935064935064935
+arena_source_dataset,MATH,ordinal,hard,21,55,0.38181818181818183
+arena_source_dataset,MMLUPro_biology,ordinal,hard,3,143,0.02097902097902098
+arena_source_dataset,MMLUPro_business,ordinal,hard,34,166,0.20481927710843373
+arena_source_dataset,MMLUPro_chemistry,ordinal,hard,12,90,0.13333333333333333
+arena_source_dataset,MMLUPro_computer science,ordinal,hard,70,391,0.17902813299232737
+arena_source_dataset,MMLUPro_economics,ordinal,hard,3,186,0.016129032258064516
+arena_source_dataset,MMLUPro_engineering,ordinal,hard,100,280,0.35714285714285715
+arena_source_dataset,MMLUPro_health,ordinal,hard,2,221,0.00904977375565611
+arena_source_dataset,AIME,pointwise,easy,2,39,0.05128205128205128
+arena_source_dataset,ArcMMLU,pointwise,easy,0,396,0.0
+arena_source_dataset,AsDiv,pointwise,easy,1,88,0.011363636363636364
+arena_source_dataset,ChessInstruct,pointwise,easy,0,68,0.0
+arena_source_dataset,ChessInstruct_mcq,pointwise,easy,0,80,0.0
+arena_source_dataset,Ethics_commonsense,pointwise,easy,0,100,0.0
+arena_source_dataset,Ethics_deontology,pointwise,easy,0,63,0.0
+arena_source_dataset,Ethics_justice,pointwise,easy,0,52,0.0
+arena_source_dataset,Ethics_virtue,pointwise,easy,0,68,0.0
+arena_source_dataset,FinQA,pointwise,easy,6,74,0.08108108108108109
+arena_source_dataset,GSM8K,pointwise,easy,0,24,0.0
+arena_source_dataset,GeoBench,pointwise,easy,0,329,0.0
+arena_source_dataset,GeoGraphyData_100k,pointwise,easy,1,45,0.022222222222222223
+arena_source_dataset,LiveCodeBench,pointwise,easy,71,385,0.18441558441558442
+arena_source_dataset,MATH,pointwise,easy,0,55,0.0
+arena_source_dataset,MMLUPro_biology,pointwise,easy,0,143,0.0
+arena_source_dataset,MMLUPro_business,pointwise,easy,0,166,0.0
+arena_source_dataset,MMLUPro_chemistry,pointwise,easy,0,90,0.0
+arena_source_dataset,MMLUPro_computer science,pointwise,easy,0,391,0.0
+arena_source_dataset,MMLUPro_economics,pointwise,easy,0,186,0.0
+arena_source_dataset,MMLUPro_engineering,pointwise,easy,0,280,0.0
+arena_source_dataset,MMLUPro_health,pointwise,easy,0,221,0.0
+arena_source_dataset,AIME,pointwise,medium,0,39,0.0
+arena_source_dataset,ArcMMLU,pointwise,medium,37,396,0.09343434343434344
+arena_source_dataset,AsDiv,pointwise,medium,12,88,0.13636363636363635
+arena_source_dataset,ChessInstruct,pointwise,medium,68,68,1.0
+arena_source_dataset,ChessInstruct_mcq,pointwise,medium,80,80,1.0
+arena_source_dataset,Ethics_commonsense,pointwise,medium,3,100,0.03
+arena_source_dataset,Ethics_deontology,pointwise,medium,0,63,0.0
+arena_source_dataset,Ethics_justice,pointwise,medium,3,52,0.057692307692307696
+arena_source_dataset,Ethics_virtue,pointwise,medium,0,68,0.0
+arena_source_dataset,FinQA,pointwise,medium,1,74,0.013513513513513514
+arena_source_dataset,GSM8K,pointwise,medium,1,24,0.041666666666666664
+arena_source_dataset,GeoBench,pointwise,medium,25,329,0.07598784194528875
+arena_source_dataset,GeoGraphyData_100k,pointwise,medium,32,45,0.7111111111111111
+arena_source_dataset,LiveCodeBench,pointwise,medium,32,385,0.08311688311688312
+arena_source_dataset,MATH,pointwise,medium,2,55,0.03636363636363636
+arena_source_dataset,MMLUPro_biology,pointwise,medium,15,143,0.1048951048951049
+arena_source_dataset,MMLUPro_business,pointwise,medium,9,166,0.05421686746987952
+arena_source_dataset,MMLUPro_chemistry,pointwise,medium,16,90,0.17777777777777778
+arena_source_dataset,MMLUPro_computer science,pointwise,medium,29,391,0.0741687979539642
+arena_source_dataset,MMLUPro_economics,pointwise,medium,7,186,0.03763440860215054
+arena_source_dataset,MMLUPro_engineering,pointwise,medium,22,280,0.07857142857142857
+arena_source_dataset,MMLUPro_health,pointwise,medium,3,221,0.013574660633484163
+arena_source_dataset,AIME,pointwise,hard,37,39,0.9487179487179487
+arena_source_dataset,ArcMMLU,pointwise,hard,359,396,0.9065656565656566
+arena_source_dataset,AsDiv,pointwise,hard,75,88,0.8522727272727273
+arena_source_dataset,ChessInstruct,pointwise,hard,0,68,0.0
+arena_source_dataset,ChessInstruct_mcq,pointwise,hard,0,80,0.0
+arena_source_dataset,Ethics_commonsense,pointwise,hard,97,100,0.97
+arena_source_dataset,Ethics_deontology,pointwise,hard,63,63,1.0
+arena_source_dataset,Ethics_justice,pointwise,hard,49,52,0.9423076923076923
+arena_source_dataset,Ethics_virtue,pointwise,hard,68,68,1.0
+arena_source_dataset,FinQA,pointwise,hard,67,74,0.9054054054054054
+arena_source_dataset,GSM8K,pointwise,hard,23,24,0.9583333333333334
+arena_source_dataset,GeoBench,pointwise,hard,304,329,0.9240121580547113
+arena_source_dataset,GeoGraphyData_100k,pointwise,hard,12,45,0.26666666666666666
+arena_source_dataset,LiveCodeBench,pointwise,hard,282,385,0.7324675324675325
+arena_source_dataset,MATH,pointwise,hard,53,55,0.9636363636363636
+arena_source_dataset,MMLUPro_biology,pointwise,hard,128,143,0.8951048951048951
+arena_source_dataset,MMLUPro_business,pointwise,hard,157,166,0.9457831325301205
+arena_source_dataset,MMLUPro_chemistry,pointwise,hard,74,90,0.8222222222222222
+arena_source_dataset,MMLUPro_computer science,pointwise,hard,362,391,0.9258312020460358
+arena_source_dataset,MMLUPro_economics,pointwise,hard,179,186,0.9623655913978495
+arena_source_dataset,MMLUPro_engineering,pointwise,hard,258,280,0.9214285714285714
+arena_source_dataset,MMLUPro_health,pointwise,hard,218,221,0.9864253393665159
+arena_source_dataset,AIME,pairwise,easy,4,39,0.10256410256410256
+arena_source_dataset,ArcMMLU,pairwise,easy,3,396,0.007575757575757576
+arena_source_dataset,AsDiv,pairwise,easy,20,88,0.22727272727272727
+arena_source_dataset,ChessInstruct,pairwise,easy,0,68,0.0
+arena_source_dataset,ChessInstruct_mcq,pairwise,easy,0,80,0.0
+arena_source_dataset,Ethics_commonsense,pairwise,easy,0,100,0.0
+arena_source_dataset,Ethics_deontology,pairwise,easy,0,63,0.0
+arena_source_dataset,Ethics_justice,pairwise,easy,0,52,0.0
+arena_source_dataset,Ethics_virtue,pairwise,easy,0,68,0.0
+arena_source_dataset,FinQA,pairwise,easy,12,74,0.16216216216216217
+arena_source_dataset,GSM8K,pairwise,easy,1,24,0.041666666666666664
+arena_source_dataset,GeoBench,pairwise,easy,0,329,0.0
+arena_source_dataset,GeoGraphyData_100k,pairwise,easy,21,45,0.4666666666666667
+arena_source_dataset,LiveCodeBench,pairwise,easy,117,385,0.3038961038961039
+arena_source_dataset,MATH,pairwise,easy,1,55,0.01818181818181818
+arena_source_dataset,MMLUPro_biology,pairwise,easy,1,143,0.006993006993006993
+arena_source_dataset,MMLUPro_business,pairwise,easy,1,166,0.006024096385542169
+arena_source_dataset,MMLUPro_chemistry,pairwise,easy,0,90,0.0
+arena_source_dataset,MMLUPro_computer science,pairwise,easy,2,391,0.005115089514066497
+arena_source_dataset,MMLUPro_economics,pairwise,easy,0,186,0.0
+arena_source_dataset,MMLUPro_engineering,pairwise,easy,5,280,0.017857142857142856
+arena_source_dataset,MMLUPro_health,pairwise,easy,1,221,0.004524886877828055
+arena_source_dataset,AIME,pairwise,medium,0,39,0.0
+arena_source_dataset,ArcMMLU,pairwise,medium,46,396,0.11616161616161616
+arena_source_dataset,AsDiv,pairwise,medium,28,88,0.3181818181818182
+arena_source_dataset,ChessInstruct,pairwise,medium,68,68,1.0
+arena_source_dataset,ChessInstruct_mcq,pairwise,medium,80,80,1.0
+arena_source_dataset,Ethics_commonsense,pairwise,medium,2,100,0.02
+arena_source_dataset,Ethics_deontology,pairwise,medium,0,63,0.0
+arena_source_dataset,Ethics_justice,pairwise,medium,3,52,0.057692307692307696
+arena_source_dataset,Ethics_virtue,pairwise,medium,2,68,0.029411764705882353
+arena_source_dataset,FinQA,pairwise,medium,34,74,0.4594594594594595
+arena_source_dataset,GSM8K,pairwise,medium,1,24,0.041666666666666664
+arena_source_dataset,GeoBench,pairwise,medium,74,329,0.22492401215805471
+arena_source_dataset,GeoGraphyData_100k,pairwise,medium,20,45,0.4444444444444444
+arena_source_dataset,LiveCodeBench,pairwise,medium,60,385,0.15584415584415584
+arena_source_dataset,MATH,pairwise,medium,2,55,0.03636363636363636
+arena_source_dataset,MMLUPro_biology,pairwise,medium,48,143,0.3356643356643357
+arena_source_dataset,MMLUPro_business,pairwise,medium,16,166,0.0963855421686747
+arena_source_dataset,MMLUPro_chemistry,pairwise,medium,13,90,0.14444444444444443
+arena_source_dataset,MMLUPro_computer science,pairwise,medium,33,391,0.08439897698209718
+arena_source_dataset,MMLUPro_economics,pairwise,medium,38,186,0.20430107526881722
+arena_source_dataset,MMLUPro_engineering,pairwise,medium,15,280,0.05357142857142857
+arena_source_dataset,MMLUPro_health,pairwise,medium,37,221,0.167420814479638
+arena_source_dataset,AIME,pairwise,hard,35,39,0.8974358974358975
+arena_source_dataset,ArcMMLU,pairwise,hard,347,396,0.8762626262626263
+arena_source_dataset,AsDiv,pairwise,hard,40,88,0.45454545454545453
+arena_source_dataset,ChessInstruct,pairwise,hard,0,68,0.0
+arena_source_dataset,ChessInstruct_mcq,pairwise,hard,0,80,0.0
+arena_source_dataset,Ethics_commonsense,pairwise,hard,98,100,0.98
+arena_source_dataset,Ethics_deontology,pairwise,hard,63,63,1.0
+arena_source_dataset,Ethics_justice,pairwise,hard,49,52,0.9423076923076923
+arena_source_dataset,Ethics_virtue,pairwise,hard,66,68,0.9705882352941176
+arena_source_dataset,FinQA,pairwise,hard,28,74,0.3783783783783784
+arena_source_dataset,GSM8K,pairwise,hard,22,24,0.9166666666666666
+arena_source_dataset,GeoBench,pairwise,hard,255,329,0.7750759878419453
+arena_source_dataset,GeoGraphyData_100k,pairwise,hard,4,45,0.08888888888888889
+arena_source_dataset,LiveCodeBench,pairwise,hard,208,385,0.5402597402597402
+arena_source_dataset,MATH,pairwise,hard,52,55,0.9454545454545454
+arena_source_dataset,MMLUPro_biology,pairwise,hard,94,143,0.6573426573426573
+arena_source_dataset,MMLUPro_business,pairwise,hard,149,166,0.8975903614457831
+arena_source_dataset,MMLUPro_chemistry,pairwise,hard,77,90,0.8555555555555555
+arena_source_dataset,MMLUPro_computer science,pairwise,hard,356,391,0.9104859335038363
+arena_source_dataset,MMLUPro_economics,pairwise,hard,148,186,0.7956989247311828
+arena_source_dataset,MMLUPro_engineering,pairwise,hard,260,280,0.9285714285714286
+arena_source_dataset,MMLUPro_health,pairwise,hard,183,221,0.8280542986425339
+arena_source_dataset,MMLUPro_history,official,easy,155,324,0.4783950617283951
+arena_source_dataset,MMLUPro_law,official,easy,64,157,0.40764331210191085
+arena_source_dataset,MMLUPro_math,official,easy,69,205,0.33658536585365856
+arena_source_dataset,MMLUPro_philosophy,official,easy,31,75,0.41333333333333333
+arena_source_dataset,MMLUPro_physics,official,easy,44,97,0.4536082474226804
+arena_source_dataset,MMLUPro_psychology,official,easy,121,187,0.6470588235294118
+arena_source_dataset,MMLU_formal_logic,official,easy,60,95,0.631578947368421
+arena_source_dataset,MMLU_management,official,easy,59,72,0.8194444444444444
+arena_source_dataset,MathQA,official,easy,73,158,0.4620253164556962
+arena_source_dataset,MedMCQA,official,easy,167,304,0.5493421052631579
+arena_source_dataset,MusicTheoryBench,official,easy,83,221,0.3755656108597285
+arena_source_dataset,NarrativeQA,official,easy,22,383,0.057441253263707574
+arena_source_dataset,OpenTDB_Animals,official,easy,20,25,0.8
+arena_source_dataset,OpenTDB_Art,official,easy,18,19,0.9473684210526315
+arena_source_dataset,OpenTDB_Celebrities,official,easy,42,52,0.8076923076923077
+arena_source_dataset,OpenTDB_Entertainment: Board Games,official,easy,14,20,0.7
+arena_source_dataset,OpenTDB_Entertainment: Books,official,easy,82,96,0.8541666666666666
+arena_source_dataset,OpenTDB_Entertainment: Cartoon & Animations,official,easy,11,19,0.5789473684210527
+arena_source_dataset,OpenTDB_Entertainment: Comics,official,easy,16,19,0.8421052631578947
+arena_source_dataset,OpenTDB_Entertainment: Film,official,easy,21,22,0.9545454545454546
+arena_source_dataset,OpenTDB_Entertainment: Japanese Anime & Manga,official,easy,11,22,0.5
+arena_source_dataset,OpenTDB_Entertainment: Music,official,easy,16,19,0.8421052631578947
+arena_source_dataset,MMLUPro_history,official,medium,103,324,0.31790123456790126
+arena_source_dataset,MMLUPro_law,official,medium,63,157,0.4012738853503185
+arena_source_dataset,MMLUPro_math,official,medium,109,205,0.5317073170731708
+arena_source_dataset,MMLUPro_philosophy,official,medium,33,75,0.44
+arena_source_dataset,MMLUPro_physics,official,medium,42,97,0.4329896907216495
+arena_source_dataset,MMLUPro_psychology,official,medium,48,187,0.25668449197860965
+arena_source_dataset,MMLU_formal_logic,official,medium,31,95,0.3263157894736842
+arena_source_dataset,MMLU_management,official,medium,11,72,0.1527777777777778
+arena_source_dataset,MathQA,official,medium,81,158,0.5126582278481012
+arena_source_dataset,MedMCQA,official,medium,108,304,0.35526315789473684
+arena_source_dataset,MusicTheoryBench,official,medium,113,221,0.5113122171945701
+arena_source_dataset,NarrativeQA,official,medium,14,383,0.03655352480417755
+arena_source_dataset,OpenTDB_Animals,official,medium,5,25,0.2
+arena_source_dataset,OpenTDB_Art,official,medium,1,19,0.05263157894736842
+arena_source_dataset,OpenTDB_Celebrities,official,medium,9,52,0.17307692307692307
+arena_source_dataset,OpenTDB_Entertainment: Board Games,official,medium,6,20,0.3
+arena_source_dataset,OpenTDB_Entertainment: Books,official,medium,13,96,0.13541666666666666
+arena_source_dataset,OpenTDB_Entertainment: Cartoon & Animations,official,medium,7,19,0.3684210526315789
+arena_source_dataset,OpenTDB_Entertainment: Comics,official,medium,3,19,0.15789473684210525
+arena_source_dataset,OpenTDB_Entertainment: Film,official,medium,1,22,0.045454545454545456
+arena_source_dataset,OpenTDB_Entertainment: Japanese Anime & Manga,official,medium,9,22,0.4090909090909091
+arena_source_dataset,OpenTDB_Entertainment: Music,official,medium,3,19,0.15789473684210525
+arena_source_dataset,MMLUPro_history,official,hard,66,324,0.2037037037037037
+arena_source_dataset,MMLUPro_law,official,hard,30,157,0.1910828025477707
+arena_source_dataset,MMLUPro_math,official,hard,27,205,0.13170731707317074
+arena_source_dataset,MMLUPro_philosophy,official,hard,11,75,0.14666666666666667
+arena_source_dataset,MMLUPro_physics,official,hard,11,97,0.1134020618556701
+arena_source_dataset,MMLUPro_psychology,official,hard,18,187,0.0962566844919786
+arena_source_dataset,MMLU_formal_logic,official,hard,4,95,0.042105263157894736
+arena_source_dataset,MMLU_management,official,hard,2,72,0.027777777777777776
+arena_source_dataset,MathQA,official,hard,4,158,0.02531645569620253
+arena_source_dataset,MedMCQA,official,hard,29,304,0.09539473684210527
+arena_source_dataset,MusicTheoryBench,official,hard,25,221,0.11312217194570136
+arena_source_dataset,NarrativeQA,official,hard,347,383,0.9060052219321149
+arena_source_dataset,OpenTDB_Animals,official,hard,0,25,0.0
+arena_source_dataset,OpenTDB_Art,official,hard,0,19,0.0
+arena_source_dataset,OpenTDB_Celebrities,official,hard,1,52,0.019230769230769232
+arena_source_dataset,OpenTDB_Entertainment: Board Games,official,hard,0,20,0.0
+arena_source_dataset,OpenTDB_Entertainment: Books,official,hard,1,96,0.010416666666666666
+arena_source_dataset,OpenTDB_Entertainment: Cartoon & Animations,official,hard,1,19,0.05263157894736842
+arena_source_dataset,OpenTDB_Entertainment: Comics,official,hard,0,19,0.0
+arena_source_dataset,OpenTDB_Entertainment: Film,official,hard,0,22,0.0
+arena_source_dataset,OpenTDB_Entertainment: Japanese Anime & Manga,official,hard,2,22,0.09090909090909091
+arena_source_dataset,OpenTDB_Entertainment: Music,official,hard,0,19,0.0
+arena_source_dataset,MMLUPro_history,ordinal,easy,305,324,0.941358024691358
+arena_source_dataset,MMLUPro_law,ordinal,easy,122,157,0.7770700636942676
+arena_source_dataset,MMLUPro_math,ordinal,easy,23,205,0.11219512195121951
+arena_source_dataset,MMLUPro_philosophy,ordinal,easy,39,75,0.52
+arena_source_dataset,MMLUPro_physics,ordinal,easy,46,97,0.4742268041237113
+arena_source_dataset,MMLUPro_psychology,ordinal,easy,137,187,0.732620320855615
+arena_source_dataset,MMLU_formal_logic,ordinal,easy,15,95,0.15789473684210525
+arena_source_dataset,MMLU_management,ordinal,easy,66,72,0.9166666666666666
+arena_source_dataset,MathQA,ordinal,easy,1,158,0.006329113924050633
+arena_source_dataset,MedMCQA,ordinal,easy,110,304,0.3618421052631579
+arena_source_dataset,MusicTheoryBench,ordinal,easy,72,221,0.3257918552036199
+arena_source_dataset,NarrativeQA,ordinal,easy,254,383,0.6631853785900783
+arena_source_dataset,OpenTDB_Animals,ordinal,easy,15,25,0.6
+arena_source_dataset,OpenTDB_Art,ordinal,easy,13,19,0.6842105263157895
+arena_source_dataset,OpenTDB_Celebrities,ordinal,easy,46,52,0.8846153846153846
+arena_source_dataset,OpenTDB_Entertainment: Board Games,ordinal,easy,9,20,0.45
+arena_source_dataset,OpenTDB_Entertainment: Books,ordinal,easy,85,96,0.8854166666666666
+arena_source_dataset,OpenTDB_Entertainment: Cartoon & Animations,ordinal,easy,13,19,0.6842105263157895
+arena_source_dataset,OpenTDB_Entertainment: Comics,ordinal,easy,16,19,0.8421052631578947
+arena_source_dataset,OpenTDB_Entertainment: Film,ordinal,easy,15,22,0.6818181818181818
+arena_source_dataset,OpenTDB_Entertainment: Japanese Anime & Manga,ordinal,easy,15,22,0.6818181818181818
+arena_source_dataset,OpenTDB_Entertainment: Music,ordinal,easy,14,19,0.7368421052631579
+arena_source_dataset,MMLUPro_history,ordinal,medium,17,324,0.05246913580246913
+arena_source_dataset,MMLUPro_law,ordinal,medium,30,157,0.1910828025477707
+arena_source_dataset,MMLUPro_math,ordinal,medium,134,205,0.6536585365853659
+arena_source_dataset,MMLUPro_philosophy,ordinal,medium,29,75,0.38666666666666666
+arena_source_dataset,MMLUPro_physics,ordinal,medium,46,97,0.4742268041237113
+arena_source_dataset,MMLUPro_psychology,ordinal,medium,48,187,0.25668449197860965
+arena_source_dataset,MMLU_formal_logic,ordinal,medium,71,95,0.7473684210526316
+arena_source_dataset,MMLU_management,ordinal,medium,6,72,0.08333333333333333
+arena_source_dataset,MathQA,ordinal,medium,101,158,0.6392405063291139
+arena_source_dataset,MedMCQA,ordinal,medium,184,304,0.6052631578947368
+arena_source_dataset,MusicTheoryBench,ordinal,medium,142,221,0.6425339366515838
+arena_source_dataset,NarrativeQA,ordinal,medium,48,383,0.12532637075718014
+arena_source_dataset,OpenTDB_Animals,ordinal,medium,10,25,0.4
+arena_source_dataset,OpenTDB_Art,ordinal,medium,6,19,0.3157894736842105
+arena_source_dataset,OpenTDB_Celebrities,ordinal,medium,6,52,0.11538461538461539
+arena_source_dataset,OpenTDB_Entertainment: Board Games,ordinal,medium,11,20,0.55
+arena_source_dataset,OpenTDB_Entertainment: Books,ordinal,medium,11,96,0.11458333333333333
+arena_source_dataset,OpenTDB_Entertainment: Cartoon & Animations,ordinal,medium,6,19,0.3157894736842105
+arena_source_dataset,OpenTDB_Entertainment: Comics,ordinal,medium,3,19,0.15789473684210525
+arena_source_dataset,OpenTDB_Entertainment: Film,ordinal,medium,7,22,0.3181818181818182
+arena_source_dataset,OpenTDB_Entertainment: Japanese Anime & Manga,ordinal,medium,7,22,0.3181818181818182
+arena_source_dataset,OpenTDB_Entertainment: Music,ordinal,medium,5,19,0.2631578947368421
+arena_source_dataset,MMLUPro_history,ordinal,hard,2,324,0.006172839506172839
+arena_source_dataset,MMLUPro_law,ordinal,hard,5,157,0.03184713375796178
+arena_source_dataset,MMLUPro_math,ordinal,hard,48,205,0.23414634146341465
+arena_source_dataset,MMLUPro_philosophy,ordinal,hard,7,75,0.09333333333333334
+arena_source_dataset,MMLUPro_physics,ordinal,hard,5,97,0.05154639175257732
+arena_source_dataset,MMLUPro_psychology,ordinal,hard,2,187,0.0106951871657754
+arena_source_dataset,MMLU_formal_logic,ordinal,hard,9,95,0.09473684210526316
+arena_source_dataset,MMLU_management,ordinal,hard,0,72,0.0
+arena_source_dataset,MathQA,ordinal,hard,56,158,0.35443037974683544
+arena_source_dataset,MedMCQA,ordinal,hard,10,304,0.03289473684210526
+arena_source_dataset,MusicTheoryBench,ordinal,hard,7,221,0.03167420814479638
+arena_source_dataset,NarrativeQA,ordinal,hard,81,383,0.21148825065274152
+arena_source_dataset,OpenTDB_Animals,ordinal,hard,0,25,0.0
+arena_source_dataset,OpenTDB_Art,ordinal,hard,0,19,0.0
+arena_source_dataset,OpenTDB_Celebrities,ordinal,hard,0,52,0.0
+arena_source_dataset,OpenTDB_Entertainment: Board Games,ordinal,hard,0,20,0.0
+arena_source_dataset,OpenTDB_Entertainment: Books,ordinal,hard,0,96,0.0
+arena_source_dataset,OpenTDB_Entertainment: Cartoon & Animations,ordinal,hard,0,19,0.0
+arena_source_dataset,OpenTDB_Entertainment: Comics,ordinal,hard,0,19,0.0
+arena_source_dataset,OpenTDB_Entertainment: Film,ordinal,hard,0,22,0.0
+arena_source_dataset,OpenTDB_Entertainment: Japanese Anime & Manga,ordinal,hard,0,22,0.0
+arena_source_dataset,OpenTDB_Entertainment: Music,ordinal,hard,0,19,0.0
+arena_source_dataset,MMLUPro_history,pointwise,easy,0,324,0.0
+arena_source_dataset,MMLUPro_law,pointwise,easy,0,157,0.0
+arena_source_dataset,MMLUPro_math,pointwise,easy,0,205,0.0
+arena_source_dataset,MMLUPro_philosophy,pointwise,easy,0,75,0.0
+arena_source_dataset,MMLUPro_physics,pointwise,easy,0,97,0.0
+arena_source_dataset,MMLUPro_psychology,pointwise,easy,0,187,0.0
+arena_source_dataset,MMLU_formal_logic,pointwise,easy,0,95,0.0
+arena_source_dataset,MMLU_management,pointwise,easy,0,72,0.0
+arena_source_dataset,MathQA,pointwise,easy,0,158,0.0
+arena_source_dataset,MedMCQA,pointwise,easy,0,304,0.0
+arena_source_dataset,MusicTheoryBench,pointwise,easy,0,221,0.0
+arena_source_dataset,NarrativeQA,pointwise,easy,0,383,0.0
+arena_source_dataset,OpenTDB_Animals,pointwise,easy,0,25,0.0
+arena_source_dataset,OpenTDB_Art,pointwise,easy,0,19,0.0
+arena_source_dataset,OpenTDB_Celebrities,pointwise,easy,0,52,0.0
+arena_source_dataset,OpenTDB_Entertainment: Board Games,pointwise,easy,0,20,0.0
+arena_source_dataset,OpenTDB_Entertainment: Books,pointwise,easy,0,96,0.0
+arena_source_dataset,OpenTDB_Entertainment: Cartoon & Animations,pointwise,easy,0,19,0.0
+arena_source_dataset,OpenTDB_Entertainment: Comics,pointwise,easy,0,19,0.0
+arena_source_dataset,OpenTDB_Entertainment: Film,pointwise,easy,0,22,0.0
+arena_source_dataset,OpenTDB_Entertainment: Japanese Anime & Manga,pointwise,easy,0,22,0.0
+arena_source_dataset,OpenTDB_Entertainment: Music,pointwise,easy,0,19,0.0
+arena_source_dataset,MMLUPro_history,pointwise,medium,20,324,0.06172839506172839
+arena_source_dataset,MMLUPro_law,pointwise,medium,0,157,0.0
+arena_source_dataset,MMLUPro_math,pointwise,medium,35,205,0.17073170731707318
+arena_source_dataset,MMLUPro_philosophy,pointwise,medium,5,75,0.06666666666666667
+arena_source_dataset,MMLUPro_physics,pointwise,medium,7,97,0.07216494845360824
+arena_source_dataset,MMLUPro_psychology,pointwise,medium,13,187,0.06951871657754011
+arena_source_dataset,MMLU_formal_logic,pointwise,medium,2,95,0.021052631578947368
+arena_source_dataset,MMLU_management,pointwise,medium,2,72,0.027777777777777776
+arena_source_dataset,MathQA,pointwise,medium,2,158,0.012658227848101266
+arena_source_dataset,MedMCQA,pointwise,medium,8,304,0.02631578947368421
+arena_source_dataset,MusicTheoryBench,pointwise,medium,23,221,0.10407239819004525
+arena_source_dataset,NarrativeQA,pointwise,medium,107,383,0.2793733681462141
+arena_source_dataset,OpenTDB_Animals,pointwise,medium,0,25,0.0
+arena_source_dataset,OpenTDB_Art,pointwise,medium,2,19,0.10526315789473684
+arena_source_dataset,OpenTDB_Celebrities,pointwise,medium,4,52,0.07692307692307693
+arena_source_dataset,OpenTDB_Entertainment: Board Games,pointwise,medium,1,20,0.05
+arena_source_dataset,OpenTDB_Entertainment: Books,pointwise,medium,5,96,0.052083333333333336
+arena_source_dataset,OpenTDB_Entertainment: Cartoon & Animations,pointwise,medium,2,19,0.10526315789473684
+arena_source_dataset,OpenTDB_Entertainment: Comics,pointwise,medium,0,19,0.0
+arena_source_dataset,OpenTDB_Entertainment: Film,pointwise,medium,2,22,0.09090909090909091
+arena_source_dataset,OpenTDB_Entertainment: Japanese Anime & Manga,pointwise,medium,1,22,0.045454545454545456
+arena_source_dataset,OpenTDB_Entertainment: Music,pointwise,medium,2,19,0.10526315789473684
+arena_source_dataset,MMLUPro_history,pointwise,hard,304,324,0.9382716049382716
+arena_source_dataset,MMLUPro_law,pointwise,hard,157,157,1.0
+arena_source_dataset,MMLUPro_math,pointwise,hard,170,205,0.8292682926829268
+arena_source_dataset,MMLUPro_philosophy,pointwise,hard,70,75,0.9333333333333333
+arena_source_dataset,MMLUPro_physics,pointwise,hard,90,97,0.9278350515463918
+arena_source_dataset,MMLUPro_psychology,pointwise,hard,174,187,0.93048128342246
+arena_source_dataset,MMLU_formal_logic,pointwise,hard,93,95,0.9789473684210527
+arena_source_dataset,MMLU_management,pointwise,hard,70,72,0.9722222222222222
+arena_source_dataset,MathQA,pointwise,hard,156,158,0.9873417721518988
+arena_source_dataset,MedMCQA,pointwise,hard,296,304,0.9736842105263158
+arena_source_dataset,MusicTheoryBench,pointwise,hard,198,221,0.8959276018099548
+arena_source_dataset,NarrativeQA,pointwise,hard,276,383,0.720626631853786
+arena_source_dataset,OpenTDB_Animals,pointwise,hard,25,25,1.0
+arena_source_dataset,OpenTDB_Art,pointwise,hard,17,19,0.8947368421052632
+arena_source_dataset,OpenTDB_Celebrities,pointwise,hard,48,52,0.9230769230769231
+arena_source_dataset,OpenTDB_Entertainment: Board Games,pointwise,hard,19,20,0.95
+arena_source_dataset,OpenTDB_Entertainment: Books,pointwise,hard,91,96,0.9479166666666666
+arena_source_dataset,OpenTDB_Entertainment: Cartoon & Animations,pointwise,hard,17,19,0.8947368421052632
+arena_source_dataset,OpenTDB_Entertainment: Comics,pointwise,hard,19,19,1.0
+arena_source_dataset,OpenTDB_Entertainment: Film,pointwise,hard,20,22,0.9090909090909091
+arena_source_dataset,OpenTDB_Entertainment: Japanese Anime & Manga,pointwise,hard,21,22,0.9545454545454546
+arena_source_dataset,OpenTDB_Entertainment: Music,pointwise,hard,17,19,0.8947368421052632
+arena_source_dataset,MMLUPro_history,pairwise,easy,0,324,0.0
+arena_source_dataset,MMLUPro_law,pairwise,easy,0,157,0.0
+arena_source_dataset,MMLUPro_math,pairwise,easy,5,205,0.024390243902439025
+arena_source_dataset,MMLUPro_philosophy,pairwise,easy,0,75,0.0
+arena_source_dataset,MMLUPro_physics,pairwise,easy,0,97,0.0
+arena_source_dataset,MMLUPro_psychology,pairwise,easy,0,187,0.0
+arena_source_dataset,MMLU_formal_logic,pairwise,easy,0,95,0.0
+arena_source_dataset,MMLU_management,pairwise,easy,1,72,0.013888888888888888
+arena_source_dataset,MathQA,pairwise,easy,0,158,0.0
+arena_source_dataset,MedMCQA,pairwise,easy,1,304,0.003289473684210526
+arena_source_dataset,MusicTheoryBench,pairwise,easy,0,221,0.0
+arena_source_dataset,NarrativeQA,pairwise,easy,5,383,0.013054830287206266
+arena_source_dataset,OpenTDB_Animals,pairwise,easy,0,25,0.0
+arena_source_dataset,OpenTDB_Art,pairwise,easy,0,19,0.0
+arena_source_dataset,OpenTDB_Celebrities,pairwise,easy,0,52,0.0
+arena_source_dataset,OpenTDB_Entertainment: Board Games,pairwise,easy,0,20,0.0
+arena_source_dataset,OpenTDB_Entertainment: Books,pairwise,easy,1,96,0.010416666666666666
+arena_source_dataset,OpenTDB_Entertainment: Cartoon & Animations,pairwise,easy,0,19,0.0
+arena_source_dataset,OpenTDB_Entertainment: Comics,pairwise,easy,0,19,0.0
+arena_source_dataset,OpenTDB_Entertainment: Film,pairwise,easy,0,22,0.0
+arena_source_dataset,OpenTDB_Entertainment: Japanese Anime & Manga,pairwise,easy,0,22,0.0
+arena_source_dataset,OpenTDB_Entertainment: Music,pairwise,easy,0,19,0.0
+arena_source_dataset,MMLUPro_history,pairwise,medium,129,324,0.39814814814814814
+arena_source_dataset,MMLUPro_law,pairwise,medium,20,157,0.12738853503184713
+arena_source_dataset,MMLUPro_math,pairwise,medium,11,205,0.05365853658536585
+arena_source_dataset,MMLUPro_philosophy,pairwise,medium,15,75,0.2
+arena_source_dataset,MMLUPro_physics,pairwise,medium,11,97,0.1134020618556701
+arena_source_dataset,MMLUPro_psychology,pairwise,medium,43,187,0.22994652406417113
+arena_source_dataset,MMLU_formal_logic,pairwise,medium,13,95,0.1368421052631579
+arena_source_dataset,MMLU_management,pairwise,medium,16,72,0.2222222222222222
+arena_source_dataset,MathQA,pairwise,medium,0,158,0.0
+arena_source_dataset,MedMCQA,pairwise,medium,21,304,0.06907894736842106
+arena_source_dataset,MusicTheoryBench,pairwise,medium,49,221,0.22171945701357465
+arena_source_dataset,NarrativeQA,pairwise,medium,255,383,0.6657963446475196
+arena_source_dataset,OpenTDB_Animals,pairwise,medium,6,25,0.24
+arena_source_dataset,OpenTDB_Art,pairwise,medium,13,19,0.6842105263157895
+arena_source_dataset,OpenTDB_Celebrities,pairwise,medium,18,52,0.34615384615384615
+arena_source_dataset,OpenTDB_Entertainment: Board Games,pairwise,medium,2,20,0.1
+arena_source_dataset,OpenTDB_Entertainment: Books,pairwise,medium,33,96,0.34375
+arena_source_dataset,OpenTDB_Entertainment: Cartoon & Animations,pairwise,medium,7,19,0.3684210526315789
+arena_source_dataset,OpenTDB_Entertainment: Comics,pairwise,medium,4,19,0.21052631578947367
+arena_source_dataset,OpenTDB_Entertainment: Film,pairwise,medium,8,22,0.36363636363636365
+arena_source_dataset,OpenTDB_Entertainment: Japanese Anime & Manga,pairwise,medium,3,22,0.13636363636363635
+arena_source_dataset,OpenTDB_Entertainment: Music,pairwise,medium,6,19,0.3157894736842105
+arena_source_dataset,MMLUPro_history,pairwise,hard,195,324,0.6018518518518519
+arena_source_dataset,MMLUPro_law,pairwise,hard,137,157,0.8726114649681529
+arena_source_dataset,MMLUPro_math,pairwise,hard,189,205,0.9219512195121952
+arena_source_dataset,MMLUPro_philosophy,pairwise,hard,60,75,0.8
+arena_source_dataset,MMLUPro_physics,pairwise,hard,86,97,0.8865979381443299
+arena_source_dataset,MMLUPro_psychology,pairwise,hard,144,187,0.7700534759358288
+arena_source_dataset,MMLU_formal_logic,pairwise,hard,82,95,0.8631578947368421
+arena_source_dataset,MMLU_management,pairwise,hard,55,72,0.7638888888888888
+arena_source_dataset,MathQA,pairwise,hard,158,158,1.0
+arena_source_dataset,MedMCQA,pairwise,hard,282,304,0.9276315789473685
+arena_source_dataset,MusicTheoryBench,pairwise,hard,172,221,0.7782805429864253
+arena_source_dataset,NarrativeQA,pairwise,hard,123,383,0.32114882506527415
+arena_source_dataset,OpenTDB_Animals,pairwise,hard,19,25,0.76
+arena_source_dataset,OpenTDB_Art,pairwise,hard,6,19,0.3157894736842105
+arena_source_dataset,OpenTDB_Celebrities,pairwise,hard,34,52,0.6538461538461539
+arena_source_dataset,OpenTDB_Entertainment: Board Games,pairwise,hard,18,20,0.9
+arena_source_dataset,OpenTDB_Entertainment: Books,pairwise,hard,62,96,0.6458333333333334
+arena_source_dataset,OpenTDB_Entertainment: Cartoon & Animations,pairwise,hard,12,19,0.631578947368421
+arena_source_dataset,OpenTDB_Entertainment: Comics,pairwise,hard,15,19,0.7894736842105263
+arena_source_dataset,OpenTDB_Entertainment: Film,pairwise,hard,14,22,0.6363636363636364
+arena_source_dataset,OpenTDB_Entertainment: Japanese Anime & Manga,pairwise,hard,19,22,0.8636363636363636
+arena_source_dataset,OpenTDB_Entertainment: Music,pairwise,hard,13,19,0.6842105263157895
+arena_source_dataset,OpenTDB_Entertainment: Musicals & Theatres,official,easy,18,19,0.9473684210526315
+arena_source_dataset,OpenTDB_Entertainment: Television,official,easy,11,19,0.5789473684210527
+arena_source_dataset,OpenTDB_Entertainment: Video Games,official,easy,28,59,0.4745762711864407
+arena_source_dataset,OpenTDB_General Knowledge,official,easy,100,112,0.8928571428571429
+arena_source_dataset,OpenTDB_Geography,official,easy,55,59,0.9322033898305084
+arena_source_dataset,OpenTDB_History,official,easy,55,57,0.9649122807017544
+arena_source_dataset,OpenTDB_Science & Nature,official,easy,25,28,0.8928571428571429
+arena_source_dataset,OpenTDB_Science: Computers,official,easy,102,115,0.8869565217391304
+arena_source_dataset,OpenTDB_Science: Mathematics,official,easy,30,32,0.9375
+arena_source_dataset,OpenTDB_Sports,official,easy,15,19,0.7894736842105263
+arena_source_dataset,OpenTDB_Vehicles,official,easy,47,55,0.8545454545454545
+arena_source_dataset,PubMedQA,official,easy,355,466,0.7618025751072961
+arena_source_dataset,QANTA_Fine Arts,official,easy,3,75,0.04
+arena_source_dataset,QANTA_Geography,official,easy,18,46,0.391304347826087
+arena_source_dataset,QANTA_History,official,easy,12,116,0.10344827586206896
+arena_source_dataset,QANTA_Literature,official,easy,9,221,0.04072398190045249
+arena_source_dataset,QANTA_Philosophy,official,easy,5,45,0.1111111111111111
+arena_source_dataset,QANTA_Science,official,easy,5,86,0.05813953488372093
+arena_source_dataset,QANTA_Social Science,official,easy,3,55,0.05454545454545454
+arena_source_dataset,SocialiQA,official,easy,47,61,0.7704918032786885
+arena_source_dataset,SuperGLUE-CausalReasoning,official,easy,29,29,1.0
+arena_source_dataset,SuperGLUE-ClozeTest,official,easy,0,59,0.0
+arena_source_dataset,OpenTDB_Entertainment: Musicals & Theatres,official,medium,1,19,0.05263157894736842
+arena_source_dataset,OpenTDB_Entertainment: Television,official,medium,7,19,0.3684210526315789
+arena_source_dataset,OpenTDB_Entertainment: Video Games,official,medium,25,59,0.423728813559322
+arena_source_dataset,OpenTDB_General Knowledge,official,medium,12,112,0.10714285714285714
+arena_source_dataset,OpenTDB_Geography,official,medium,4,59,0.06779661016949153
+arena_source_dataset,OpenTDB_History,official,medium,2,57,0.03508771929824561
+arena_source_dataset,OpenTDB_Science & Nature,official,medium,2,28,0.07142857142857142
+arena_source_dataset,OpenTDB_Science: Computers,official,medium,11,115,0.09565217391304348
+arena_source_dataset,OpenTDB_Science: Mathematics,official,medium,2,32,0.0625
+arena_source_dataset,OpenTDB_Sports,official,medium,4,19,0.21052631578947367
+arena_source_dataset,OpenTDB_Vehicles,official,medium,8,55,0.14545454545454545
+arena_source_dataset,PubMedQA,official,medium,65,466,0.13948497854077252
+arena_source_dataset,QANTA_Fine Arts,official,medium,19,75,0.25333333333333335
+arena_source_dataset,QANTA_Geography,official,medium,16,46,0.34782608695652173
+arena_source_dataset,QANTA_History,official,medium,34,116,0.29310344827586204
+arena_source_dataset,QANTA_Literature,official,medium,41,221,0.18552036199095023
+arena_source_dataset,QANTA_Philosophy,official,medium,6,45,0.13333333333333333
+arena_source_dataset,QANTA_Science,official,medium,23,86,0.26744186046511625
+arena_source_dataset,QANTA_Social Science,official,medium,18,55,0.32727272727272727
+arena_source_dataset,SocialiQA,official,medium,9,61,0.14754098360655737
+arena_source_dataset,SuperGLUE-CausalReasoning,official,medium,0,29,0.0
+arena_source_dataset,SuperGLUE-ClozeTest,official,medium,1,59,0.01694915254237288
+arena_source_dataset,OpenTDB_Entertainment: Musicals & Theatres,official,hard,0,19,0.0
+arena_source_dataset,OpenTDB_Entertainment: Television,official,hard,1,19,0.05263157894736842
+arena_source_dataset,OpenTDB_Entertainment: Video Games,official,hard,6,59,0.1016949152542373
+arena_source_dataset,OpenTDB_General Knowledge,official,hard,0,112,0.0
+arena_source_dataset,OpenTDB_Geography,official,hard,0,59,0.0
+arena_source_dataset,OpenTDB_History,official,hard,0,57,0.0
+arena_source_dataset,OpenTDB_Science & Nature,official,hard,1,28,0.03571428571428571
+arena_source_dataset,OpenTDB_Science: Computers,official,hard,2,115,0.017391304347826087
+arena_source_dataset,OpenTDB_Science: Mathematics,official,hard,0,32,0.0
+arena_source_dataset,OpenTDB_Sports,official,hard,0,19,0.0
+arena_source_dataset,OpenTDB_Vehicles,official,hard,0,55,0.0
+arena_source_dataset,PubMedQA,official,hard,46,466,0.09871244635193133
+arena_source_dataset,QANTA_Fine Arts,official,hard,53,75,0.7066666666666667
+arena_source_dataset,QANTA_Geography,official,hard,12,46,0.2608695652173913
+arena_source_dataset,QANTA_History,official,hard,70,116,0.603448275862069
+arena_source_dataset,QANTA_Literature,official,hard,171,221,0.7737556561085973
+arena_source_dataset,QANTA_Philosophy,official,hard,34,45,0.7555555555555555
+arena_source_dataset,QANTA_Science,official,hard,58,86,0.6744186046511628
+arena_source_dataset,QANTA_Social Science,official,hard,34,55,0.6181818181818182
+arena_source_dataset,SocialiQA,official,hard,5,61,0.08196721311475409
+arena_source_dataset,SuperGLUE-CausalReasoning,official,hard,0,29,0.0
+arena_source_dataset,SuperGLUE-ClozeTest,official,hard,58,59,0.9830508474576272
+arena_source_dataset,OpenTDB_Entertainment: Musicals & Theatres,ordinal,easy,14,19,0.7368421052631579
+arena_source_dataset,OpenTDB_Entertainment: Television,ordinal,easy,13,19,0.6842105263157895
+arena_source_dataset,OpenTDB_Entertainment: Video Games,ordinal,easy,27,59,0.4576271186440678
+arena_source_dataset,OpenTDB_General Knowledge,ordinal,easy,60,112,0.5357142857142857
+arena_source_dataset,OpenTDB_Geography,ordinal,easy,40,59,0.6779661016949152
+arena_source_dataset,OpenTDB_History,ordinal,easy,47,57,0.8245614035087719
+arena_source_dataset,OpenTDB_Science & Nature,ordinal,easy,12,28,0.42857142857142855
+arena_source_dataset,OpenTDB_Science: Computers,ordinal,easy,87,115,0.7565217391304347
+arena_source_dataset,OpenTDB_Science: Mathematics,ordinal,easy,14,32,0.4375
+arena_source_dataset,OpenTDB_Sports,ordinal,easy,13,19,0.6842105263157895
+arena_source_dataset,OpenTDB_Vehicles,ordinal,easy,34,55,0.6181818181818182
+arena_source_dataset,PubMedQA,ordinal,easy,108,466,0.2317596566523605
+arena_source_dataset,QANTA_Fine Arts,ordinal,easy,41,75,0.5466666666666666
+arena_source_dataset,QANTA_Geography,ordinal,easy,37,46,0.8043478260869565
+arena_source_dataset,QANTA_History,ordinal,easy,94,116,0.8103448275862069
+arena_source_dataset,QANTA_Literature,ordinal,easy,143,221,0.6470588235294118
+arena_source_dataset,QANTA_Philosophy,ordinal,easy,30,45,0.6666666666666666
+arena_source_dataset,QANTA_Science,ordinal,easy,38,86,0.4418604651162791
+arena_source_dataset,QANTA_Social Science,ordinal,easy,42,55,0.7636363636363637
+arena_source_dataset,SocialiQA,ordinal,easy,60,61,0.9836065573770492
+arena_source_dataset,SuperGLUE-CausalReasoning,ordinal,easy,29,29,1.0
+arena_source_dataset,SuperGLUE-ClozeTest,ordinal,easy,57,59,0.9661016949152542
+arena_source_dataset,OpenTDB_Entertainment: Musicals & Theatres,ordinal,medium,5,19,0.2631578947368421
+arena_source_dataset,OpenTDB_Entertainment: Television,ordinal,medium,6,19,0.3157894736842105
+arena_source_dataset,OpenTDB_Entertainment: Video Games,ordinal,medium,31,59,0.5254237288135594
+arena_source_dataset,OpenTDB_General Knowledge,ordinal,medium,52,112,0.4642857142857143
+arena_source_dataset,OpenTDB_Geography,ordinal,medium,19,59,0.3220338983050847
+arena_source_dataset,OpenTDB_History,ordinal,medium,10,57,0.17543859649122806
+arena_source_dataset,OpenTDB_Science & Nature,ordinal,medium,15,28,0.5357142857142857
+arena_source_dataset,OpenTDB_Science: Computers,ordinal,medium,27,115,0.23478260869565218
+arena_source_dataset,OpenTDB_Science: Mathematics,ordinal,medium,15,32,0.46875
+arena_source_dataset,OpenTDB_Sports,ordinal,medium,6,19,0.3157894736842105
+arena_source_dataset,OpenTDB_Vehicles,ordinal,medium,21,55,0.38181818181818183
+arena_source_dataset,PubMedQA,ordinal,medium,334,466,0.7167381974248928
+arena_source_dataset,QANTA_Fine Arts,ordinal,medium,33,75,0.44
+arena_source_dataset,QANTA_Geography,ordinal,medium,9,46,0.1956521739130435
+arena_source_dataset,QANTA_History,ordinal,medium,22,116,0.1896551724137931
+arena_source_dataset,QANTA_Literature,ordinal,medium,78,221,0.35294117647058826
+arena_source_dataset,QANTA_Philosophy,ordinal,medium,15,45,0.3333333333333333
+arena_source_dataset,QANTA_Science,ordinal,medium,38,86,0.4418604651162791
+arena_source_dataset,QANTA_Social Science,ordinal,medium,13,55,0.23636363636363636
+arena_source_dataset,SocialiQA,ordinal,medium,1,61,0.01639344262295082
+arena_source_dataset,SuperGLUE-CausalReasoning,ordinal,medium,0,29,0.0
+arena_source_dataset,SuperGLUE-ClozeTest,ordinal,medium,2,59,0.03389830508474576
+arena_source_dataset,OpenTDB_Entertainment: Musicals & Theatres,ordinal,hard,0,19,0.0
+arena_source_dataset,OpenTDB_Entertainment: Television,ordinal,hard,0,19,0.0
+arena_source_dataset,OpenTDB_Entertainment: Video Games,ordinal,hard,1,59,0.01694915254237288
+arena_source_dataset,OpenTDB_General Knowledge,ordinal,hard,0,112,0.0
+arena_source_dataset,OpenTDB_Geography,ordinal,hard,0,59,0.0
+arena_source_dataset,OpenTDB_History,ordinal,hard,0,57,0.0
+arena_source_dataset,OpenTDB_Science & Nature,ordinal,hard,1,28,0.03571428571428571
+arena_source_dataset,OpenTDB_Science: Computers,ordinal,hard,1,115,0.008695652173913044
+arena_source_dataset,OpenTDB_Science: Mathematics,ordinal,hard,3,32,0.09375
+arena_source_dataset,OpenTDB_Sports,ordinal,hard,0,19,0.0
+arena_source_dataset,OpenTDB_Vehicles,ordinal,hard,0,55,0.0
+arena_source_dataset,PubMedQA,ordinal,hard,24,466,0.05150214592274678
+arena_source_dataset,QANTA_Fine Arts,ordinal,hard,1,75,0.013333333333333334
+arena_source_dataset,QANTA_Geography,ordinal,hard,0,46,0.0
+arena_source_dataset,QANTA_History,ordinal,hard,0,116,0.0
+arena_source_dataset,QANTA_Literature,ordinal,hard,0,221,0.0
+arena_source_dataset,QANTA_Philosophy,ordinal,hard,0,45,0.0
+arena_source_dataset,QANTA_Science,ordinal,hard,10,86,0.11627906976744186
+arena_source_dataset,QANTA_Social Science,ordinal,hard,0,55,0.0
+arena_source_dataset,SocialiQA,ordinal,hard,0,61,0.0
+arena_source_dataset,SuperGLUE-CausalReasoning,ordinal,hard,0,29,0.0
+arena_source_dataset,SuperGLUE-ClozeTest,ordinal,hard,0,59,0.0
+arena_source_dataset,OpenTDB_Entertainment: Musicals & Theatres,pointwise,easy,0,19,0.0
+arena_source_dataset,OpenTDB_Entertainment: Television,pointwise,easy,0,19,0.0
+arena_source_dataset,OpenTDB_Entertainment: Video Games,pointwise,easy,0,59,0.0
+arena_source_dataset,OpenTDB_General Knowledge,pointwise,easy,0,112,0.0
+arena_source_dataset,OpenTDB_Geography,pointwise,easy,0,59,0.0
+arena_source_dataset,OpenTDB_History,pointwise,easy,0,57,0.0
+arena_source_dataset,OpenTDB_Science & Nature,pointwise,easy,0,28,0.0
+arena_source_dataset,OpenTDB_Science: Computers,pointwise,easy,0,115,0.0
+arena_source_dataset,OpenTDB_Science: Mathematics,pointwise,easy,0,32,0.0
+arena_source_dataset,OpenTDB_Sports,pointwise,easy,0,19,0.0
+arena_source_dataset,OpenTDB_Vehicles,pointwise,easy,0,55,0.0
+arena_source_dataset,PubMedQA,pointwise,easy,22,466,0.04721030042918455
+arena_source_dataset,QANTA_Fine Arts,pointwise,easy,3,75,0.04
+arena_source_dataset,QANTA_Geography,pointwise,easy,11,46,0.2391304347826087
+arena_source_dataset,QANTA_History,pointwise,easy,11,116,0.09482758620689655
+arena_source_dataset,QANTA_Literature,pointwise,easy,10,221,0.04524886877828054
+arena_source_dataset,QANTA_Philosophy,pointwise,easy,1,45,0.022222222222222223
+arena_source_dataset,QANTA_Science,pointwise,easy,3,86,0.03488372093023256
+arena_source_dataset,QANTA_Social Science,pointwise,easy,6,55,0.10909090909090909
+arena_source_dataset,SocialiQA,pointwise,easy,0,61,0.0
+arena_source_dataset,SuperGLUE-CausalReasoning,pointwise,easy,0,29,0.0
+arena_source_dataset,SuperGLUE-ClozeTest,pointwise,easy,0,59,0.0
+arena_source_dataset,OpenTDB_Entertainment: Musicals & Theatres,pointwise,medium,1,19,0.05263157894736842
+arena_source_dataset,OpenTDB_Entertainment: Television,pointwise,medium,2,19,0.10526315789473684
+arena_source_dataset,OpenTDB_Entertainment: Video Games,pointwise,medium,6,59,0.1016949152542373
+arena_source_dataset,OpenTDB_General Knowledge,pointwise,medium,12,112,0.10714285714285714
+arena_source_dataset,OpenTDB_Geography,pointwise,medium,3,59,0.05084745762711865
+arena_source_dataset,OpenTDB_History,pointwise,medium,6,57,0.10526315789473684
+arena_source_dataset,OpenTDB_Science & Nature,pointwise,medium,0,28,0.0
+arena_source_dataset,OpenTDB_Science: Computers,pointwise,medium,9,115,0.0782608695652174
+arena_source_dataset,OpenTDB_Science: Mathematics,pointwise,medium,3,32,0.09375
+arena_source_dataset,OpenTDB_Sports,pointwise,medium,0,19,0.0
+arena_source_dataset,OpenTDB_Vehicles,pointwise,medium,1,55,0.01818181818181818
+arena_source_dataset,PubMedQA,pointwise,medium,32,466,0.06866952789699571
+arena_source_dataset,QANTA_Fine Arts,pointwise,medium,11,75,0.14666666666666667
+arena_source_dataset,QANTA_Geography,pointwise,medium,8,46,0.17391304347826086
+arena_source_dataset,QANTA_History,pointwise,medium,15,116,0.12931034482758622
+arena_source_dataset,QANTA_Literature,pointwise,medium,27,221,0.12217194570135746
+arena_source_dataset,QANTA_Philosophy,pointwise,medium,2,45,0.044444444444444446
+arena_source_dataset,QANTA_Science,pointwise,medium,3,86,0.03488372093023256
+arena_source_dataset,QANTA_Social Science,pointwise,medium,3,55,0.05454545454545454
+arena_source_dataset,SocialiQA,pointwise,medium,1,61,0.01639344262295082
+arena_source_dataset,SuperGLUE-CausalReasoning,pointwise,medium,1,29,0.034482758620689655
+arena_source_dataset,SuperGLUE-ClozeTest,pointwise,medium,6,59,0.1016949152542373
+arena_source_dataset,OpenTDB_Entertainment: Musicals & Theatres,pointwise,hard,18,19,0.9473684210526315
+arena_source_dataset,OpenTDB_Entertainment: Television,pointwise,hard,17,19,0.8947368421052632
+arena_source_dataset,OpenTDB_Entertainment: Video Games,pointwise,hard,53,59,0.8983050847457628
+arena_source_dataset,OpenTDB_General Knowledge,pointwise,hard,100,112,0.8928571428571429
+arena_source_dataset,OpenTDB_Geography,pointwise,hard,56,59,0.9491525423728814
+arena_source_dataset,OpenTDB_History,pointwise,hard,51,57,0.8947368421052632
+arena_source_dataset,OpenTDB_Science & Nature,pointwise,hard,28,28,1.0
+arena_source_dataset,OpenTDB_Science: Computers,pointwise,hard,106,115,0.9217391304347826
+arena_source_dataset,OpenTDB_Science: Mathematics,pointwise,hard,29,32,0.90625
+arena_source_dataset,OpenTDB_Sports,pointwise,hard,19,19,1.0
+arena_source_dataset,OpenTDB_Vehicles,pointwise,hard,54,55,0.9818181818181818
+arena_source_dataset,PubMedQA,pointwise,hard,412,466,0.8841201716738197
+arena_source_dataset,QANTA_Fine Arts,pointwise,hard,61,75,0.8133333333333334
+arena_source_dataset,QANTA_Geography,pointwise,hard,27,46,0.5869565217391305
+arena_source_dataset,QANTA_History,pointwise,hard,90,116,0.7758620689655172
+arena_source_dataset,QANTA_Literature,pointwise,hard,184,221,0.832579185520362
+arena_source_dataset,QANTA_Philosophy,pointwise,hard,42,45,0.9333333333333333
+arena_source_dataset,QANTA_Science,pointwise,hard,80,86,0.9302325581395349
+arena_source_dataset,QANTA_Social Science,pointwise,hard,46,55,0.8363636363636363
+arena_source_dataset,SocialiQA,pointwise,hard,60,61,0.9836065573770492
+arena_source_dataset,SuperGLUE-CausalReasoning,pointwise,hard,28,29,0.9655172413793104
+arena_source_dataset,SuperGLUE-ClozeTest,pointwise,hard,53,59,0.8983050847457628
+arena_source_dataset,OpenTDB_Entertainment: Musicals & Theatres,pairwise,easy,0,19,0.0
+arena_source_dataset,OpenTDB_Entertainment: Television,pairwise,easy,0,19,0.0
+arena_source_dataset,OpenTDB_Entertainment: Video Games,pairwise,easy,0,59,0.0
+arena_source_dataset,OpenTDB_General Knowledge,pairwise,easy,3,112,0.026785714285714284
+arena_source_dataset,OpenTDB_Geography,pairwise,easy,3,59,0.05084745762711865
+arena_source_dataset,OpenTDB_History,pairwise,easy,2,57,0.03508771929824561
+arena_source_dataset,OpenTDB_Science & Nature,pairwise,easy,0,28,0.0
+arena_source_dataset,OpenTDB_Science: Computers,pairwise,easy,3,115,0.02608695652173913
+arena_source_dataset,OpenTDB_Science: Mathematics,pairwise,easy,0,32,0.0
+arena_source_dataset,OpenTDB_Sports,pairwise,easy,2,19,0.10526315789473684
+arena_source_dataset,OpenTDB_Vehicles,pairwise,easy,3,55,0.05454545454545454
+arena_source_dataset,PubMedQA,pairwise,easy,11,466,0.023605150214592276
+arena_source_dataset,QANTA_Fine Arts,pairwise,easy,6,75,0.08
+arena_source_dataset,QANTA_Geography,pairwise,easy,8,46,0.17391304347826086
+arena_source_dataset,QANTA_History,pairwise,easy,30,116,0.25862068965517243
+arena_source_dataset,QANTA_Literature,pairwise,easy,13,221,0.058823529411764705
+arena_source_dataset,QANTA_Philosophy,pairwise,easy,6,45,0.13333333333333333
+arena_source_dataset,QANTA_Science,pairwise,easy,9,86,0.10465116279069768
+arena_source_dataset,QANTA_Social Science,pairwise,easy,11,55,0.2
+arena_source_dataset,SocialiQA,pairwise,easy,11,61,0.18032786885245902
+arena_source_dataset,SuperGLUE-CausalReasoning,pairwise,easy,13,29,0.4482758620689655
+arena_source_dataset,SuperGLUE-ClozeTest,pairwise,easy,2,59,0.03389830508474576
+arena_source_dataset,OpenTDB_Entertainment: Musicals & Theatres,pairwise,medium,6,19,0.3157894736842105
+arena_source_dataset,OpenTDB_Entertainment: Television,pairwise,medium,5,19,0.2631578947368421
+arena_source_dataset,OpenTDB_Entertainment: Video Games,pairwise,medium,12,59,0.2033898305084746
+arena_source_dataset,OpenTDB_General Knowledge,pairwise,medium,41,112,0.36607142857142855
+arena_source_dataset,OpenTDB_Geography,pairwise,medium,23,59,0.3898305084745763
+arena_source_dataset,OpenTDB_History,pairwise,medium,19,57,0.3333333333333333
+arena_source_dataset,OpenTDB_Science & Nature,pairwise,medium,7,28,0.25
+arena_source_dataset,OpenTDB_Science: Computers,pairwise,medium,11,115,0.09565217391304348
+arena_source_dataset,OpenTDB_Science: Mathematics,pairwise,medium,3,32,0.09375
+arena_source_dataset,OpenTDB_Sports,pairwise,medium,4,19,0.21052631578947367
+arena_source_dataset,OpenTDB_Vehicles,pairwise,medium,5,55,0.09090909090909091
+arena_source_dataset,PubMedQA,pairwise,medium,208,466,0.44635193133047213
+arena_source_dataset,QANTA_Fine Arts,pairwise,medium,16,75,0.21333333333333335
+arena_source_dataset,QANTA_Geography,pairwise,medium,19,46,0.41304347826086957
+arena_source_dataset,QANTA_History,pairwise,medium,28,116,0.2413793103448276
+arena_source_dataset,QANTA_Literature,pairwise,medium,42,221,0.19004524886877827
+arena_source_dataset,QANTA_Philosophy,pairwise,medium,9,45,0.2
+arena_source_dataset,QANTA_Science,pairwise,medium,12,86,0.13953488372093023
+arena_source_dataset,QANTA_Social Science,pairwise,medium,15,55,0.2727272727272727
+arena_source_dataset,SocialiQA,pairwise,medium,37,61,0.6065573770491803
+arena_source_dataset,SuperGLUE-CausalReasoning,pairwise,medium,12,29,0.41379310344827586
+arena_source_dataset,SuperGLUE-ClozeTest,pairwise,medium,25,59,0.423728813559322
+arena_source_dataset,OpenTDB_Entertainment: Musicals & Theatres,pairwise,hard,13,19,0.6842105263157895
+arena_source_dataset,OpenTDB_Entertainment: Television,pairwise,hard,14,19,0.7368421052631579
+arena_source_dataset,OpenTDB_Entertainment: Video Games,pairwise,hard,47,59,0.7966101694915254
+arena_source_dataset,OpenTDB_General Knowledge,pairwise,hard,68,112,0.6071428571428571
+arena_source_dataset,OpenTDB_Geography,pairwise,hard,33,59,0.559322033898305
+arena_source_dataset,OpenTDB_History,pairwise,hard,36,57,0.631578947368421
+arena_source_dataset,OpenTDB_Science & Nature,pairwise,hard,21,28,0.75
+arena_source_dataset,OpenTDB_Science: Computers,pairwise,hard,101,115,0.8782608695652174
+arena_source_dataset,OpenTDB_Science: Mathematics,pairwise,hard,29,32,0.90625
+arena_source_dataset,OpenTDB_Sports,pairwise,hard,13,19,0.6842105263157895
+arena_source_dataset,OpenTDB_Vehicles,pairwise,hard,47,55,0.8545454545454545
+arena_source_dataset,PubMedQA,pairwise,hard,247,466,0.5300429184549357
+arena_source_dataset,QANTA_Fine Arts,pairwise,hard,53,75,0.7066666666666667
+arena_source_dataset,QANTA_Geography,pairwise,hard,19,46,0.41304347826086957
+arena_source_dataset,QANTA_History,pairwise,hard,58,116,0.5
+arena_source_dataset,QANTA_Literature,pairwise,hard,166,221,0.751131221719457
+arena_source_dataset,QANTA_Philosophy,pairwise,hard,30,45,0.6666666666666666
+arena_source_dataset,QANTA_Science,pairwise,hard,65,86,0.7558139534883721
+arena_source_dataset,QANTA_Social Science,pairwise,hard,29,55,0.5272727272727272
+arena_source_dataset,SocialiQA,pairwise,hard,13,61,0.21311475409836064
+arena_source_dataset,SuperGLUE-CausalReasoning,pairwise,hard,4,29,0.13793103448275862
+arena_source_dataset,SuperGLUE-ClozeTest,pairwise,hard,32,59,0.5423728813559322
+arena_source_dataset,SuperGLUE-Entailment,official,easy,48,66,0.7272727272727273
+arena_source_dataset,SuperGLUE-QA,official,easy,15,69,0.21739130434782608
+arena_source_dataset,SuperGLUE-RC,official,easy,11,84,0.13095238095238096
+arena_source_dataset,SuperGLUE-Wic,official,easy,78,102,0.7647058823529411
+arena_source_dataset,SuperGLUE-Wsc,official,easy,28,34,0.8235294117647058
+arena_source_dataset,WMT19-cs-en,official,easy,0,26,0.0
+arena_source_dataset,WMT19-de-en,official,easy,0,62,0.0
+arena_source_dataset,WMT19-fi-en,official,easy,0,25,0.0
+arena_source_dataset,WMT19-gu-en,official,easy,0,89,0.0
+arena_source_dataset,WMT19-kk-en,official,easy,0,5,0.0
+arena_source_dataset,WMT19-lt-en,official,easy,0,16,0.0
+arena_source_dataset,WMT19-ru-en,official,easy,0,2,0.0
+arena_source_dataset,WMT19-zh-en,official,easy,0,32,0.0
+arena_source_dataset,SuperGLUE-Entailment,official,medium,17,66,0.25757575757575757
+arena_source_dataset,SuperGLUE-QA,official,medium,52,69,0.7536231884057971
+arena_source_dataset,SuperGLUE-RC,official,medium,68,84,0.8095238095238095
+arena_source_dataset,SuperGLUE-Wic,official,medium,23,102,0.22549019607843138
+arena_source_dataset,SuperGLUE-Wsc,official,medium,6,34,0.17647058823529413
+arena_source_dataset,WMT19-cs-en,official,medium,0,26,0.0
+arena_source_dataset,WMT19-de-en,official,medium,0,62,0.0
+arena_source_dataset,WMT19-fi-en,official,medium,0,25,0.0
+arena_source_dataset,WMT19-gu-en,official,medium,0,89,0.0
+arena_source_dataset,WMT19-kk-en,official,medium,0,5,0.0
+arena_source_dataset,WMT19-lt-en,official,medium,0,16,0.0
+arena_source_dataset,WMT19-ru-en,official,medium,0,2,0.0
+arena_source_dataset,WMT19-zh-en,official,medium,0,32,0.0
+arena_source_dataset,SuperGLUE-Entailment,official,hard,1,66,0.015151515151515152
+arena_source_dataset,SuperGLUE-QA,official,hard,2,69,0.028985507246376812
+arena_source_dataset,SuperGLUE-RC,official,hard,5,84,0.05952380952380952
+arena_source_dataset,SuperGLUE-Wic,official,hard,1,102,0.00980392156862745
+arena_source_dataset,SuperGLUE-Wsc,official,hard,0,34,0.0
+arena_source_dataset,WMT19-cs-en,official,hard,26,26,1.0
+arena_source_dataset,WMT19-de-en,official,hard,62,62,1.0
+arena_source_dataset,WMT19-fi-en,official,hard,25,25,1.0
+arena_source_dataset,WMT19-gu-en,official,hard,89,89,1.0
+arena_source_dataset,WMT19-kk-en,official,hard,5,5,1.0
+arena_source_dataset,WMT19-lt-en,official,hard,16,16,1.0
+arena_source_dataset,WMT19-ru-en,official,hard,2,2,1.0
+arena_source_dataset,WMT19-zh-en,official,hard,32,32,1.0
+arena_source_dataset,SuperGLUE-Entailment,ordinal,easy,56,66,0.8484848484848485
+arena_source_dataset,SuperGLUE-QA,ordinal,easy,61,69,0.8840579710144928
+arena_source_dataset,SuperGLUE-RC,ordinal,easy,78,84,0.9285714285714286
+arena_source_dataset,SuperGLUE-Wic,ordinal,easy,47,102,0.46078431372549017
+arena_source_dataset,SuperGLUE-Wsc,ordinal,easy,20,34,0.5882352941176471
+arena_source_dataset,WMT19-cs-en,ordinal,easy,22,26,0.8461538461538461
+arena_source_dataset,WMT19-de-en,ordinal,easy,41,62,0.6612903225806451
+arena_source_dataset,WMT19-fi-en,ordinal,easy,21,25,0.84
+arena_source_dataset,WMT19-gu-en,ordinal,easy,57,89,0.6404494382022472
+arena_source_dataset,WMT19-kk-en,ordinal,easy,2,5,0.4
+arena_source_dataset,WMT19-lt-en,ordinal,easy,11,16,0.6875
+arena_source_dataset,WMT19-ru-en,ordinal,easy,2,2,1.0
+arena_source_dataset,WMT19-zh-en,ordinal,easy,14,32,0.4375
+arena_source_dataset,SuperGLUE-Entailment,ordinal,medium,8,66,0.12121212121212122
+arena_source_dataset,SuperGLUE-QA,ordinal,medium,4,69,0.057971014492753624
+arena_source_dataset,SuperGLUE-RC,ordinal,medium,5,84,0.05952380952380952
+arena_source_dataset,SuperGLUE-Wic,ordinal,medium,55,102,0.5392156862745098
+arena_source_dataset,SuperGLUE-Wsc,ordinal,medium,14,34,0.4117647058823529
+arena_source_dataset,WMT19-cs-en,ordinal,medium,4,26,0.15384615384615385
+arena_source_dataset,WMT19-de-en,ordinal,medium,21,62,0.3387096774193548
+arena_source_dataset,WMT19-fi-en,ordinal,medium,4,25,0.16
+arena_source_dataset,WMT19-gu-en,ordinal,medium,32,89,0.3595505617977528
+arena_source_dataset,WMT19-kk-en,ordinal,medium,3,5,0.6
+arena_source_dataset,WMT19-lt-en,ordinal,medium,5,16,0.3125
+arena_source_dataset,WMT19-ru-en,ordinal,medium,0,2,0.0
+arena_source_dataset,WMT19-zh-en,ordinal,medium,15,32,0.46875
+arena_source_dataset,SuperGLUE-Entailment,ordinal,hard,2,66,0.030303030303030304
+arena_source_dataset,SuperGLUE-QA,ordinal,hard,4,69,0.057971014492753624
+arena_source_dataset,SuperGLUE-RC,ordinal,hard,1,84,0.011904761904761904
+arena_source_dataset,SuperGLUE-Wic,ordinal,hard,0,102,0.0
+arena_source_dataset,SuperGLUE-Wsc,ordinal,hard,0,34,0.0
+arena_source_dataset,WMT19-cs-en,ordinal,hard,0,26,0.0
+arena_source_dataset,WMT19-de-en,ordinal,hard,0,62,0.0
+arena_source_dataset,WMT19-fi-en,ordinal,hard,0,25,0.0
+arena_source_dataset,WMT19-gu-en,ordinal,hard,0,89,0.0
+arena_source_dataset,WMT19-kk-en,ordinal,hard,0,5,0.0
+arena_source_dataset,WMT19-lt-en,ordinal,hard,0,16,0.0
+arena_source_dataset,WMT19-ru-en,ordinal,hard,0,2,0.0
+arena_source_dataset,WMT19-zh-en,ordinal,hard,3,32,0.09375
+arena_source_dataset,SuperGLUE-Entailment,pointwise,easy,17,66,0.25757575757575757
+arena_source_dataset,SuperGLUE-QA,pointwise,easy,12,69,0.17391304347826086
+arena_source_dataset,SuperGLUE-RC,pointwise,easy,0,84,0.0
+arena_source_dataset,SuperGLUE-Wic,pointwise,easy,1,102,0.00980392156862745
+arena_source_dataset,SuperGLUE-Wsc,pointwise,easy,0,34,0.0
+arena_source_dataset,WMT19-cs-en,pointwise,easy,6,26,0.23076923076923078
+arena_source_dataset,WMT19-de-en,pointwise,easy,7,62,0.11290322580645161
+arena_source_dataset,WMT19-fi-en,pointwise,easy,6,25,0.24
+arena_source_dataset,WMT19-gu-en,pointwise,easy,8,89,0.0898876404494382
+arena_source_dataset,WMT19-kk-en,pointwise,easy,1,5,0.2
+arena_source_dataset,WMT19-lt-en,pointwise,easy,2,16,0.125
+arena_source_dataset,WMT19-ru-en,pointwise,easy,0,2,0.0
+arena_source_dataset,WMT19-zh-en,pointwise,easy,3,32,0.09375
+arena_source_dataset,SuperGLUE-Entailment,pointwise,medium,5,66,0.07575757575757576
+arena_source_dataset,SuperGLUE-QA,pointwise,medium,18,69,0.2608695652173913
+arena_source_dataset,SuperGLUE-RC,pointwise,medium,41,84,0.4880952380952381
+arena_source_dataset,SuperGLUE-Wic,pointwise,medium,0,102,0.0
+arena_source_dataset,SuperGLUE-Wsc,pointwise,medium,0,34,0.0
+arena_source_dataset,WMT19-cs-en,pointwise,medium,5,26,0.19230769230769232
+arena_source_dataset,WMT19-de-en,pointwise,medium,11,62,0.1774193548387097
+arena_source_dataset,WMT19-fi-en,pointwise,medium,1,25,0.04
+arena_source_dataset,WMT19-gu-en,pointwise,medium,14,89,0.15730337078651685
+arena_source_dataset,WMT19-kk-en,pointwise,medium,1,5,0.2
+arena_source_dataset,WMT19-lt-en,pointwise,medium,1,16,0.0625
+arena_source_dataset,WMT19-ru-en,pointwise,medium,0,2,0.0
+arena_source_dataset,WMT19-zh-en,pointwise,medium,3,32,0.09375
+arena_source_dataset,SuperGLUE-Entailment,pointwise,hard,44,66,0.6666666666666666
+arena_source_dataset,SuperGLUE-QA,pointwise,hard,39,69,0.5652173913043478
+arena_source_dataset,SuperGLUE-RC,pointwise,hard,43,84,0.5119047619047619
+arena_source_dataset,SuperGLUE-Wic,pointwise,hard,101,102,0.9901960784313726
+arena_source_dataset,SuperGLUE-Wsc,pointwise,hard,34,34,1.0
+arena_source_dataset,WMT19-cs-en,pointwise,hard,15,26,0.5769230769230769
+arena_source_dataset,WMT19-de-en,pointwise,hard,44,62,0.7096774193548387
+arena_source_dataset,WMT19-fi-en,pointwise,hard,18,25,0.72
+arena_source_dataset,WMT19-gu-en,pointwise,hard,67,89,0.7528089887640449
+arena_source_dataset,WMT19-kk-en,pointwise,hard,3,5,0.6
+arena_source_dataset,WMT19-lt-en,pointwise,hard,13,16,0.8125
+arena_source_dataset,WMT19-ru-en,pointwise,hard,2,2,1.0
+arena_source_dataset,WMT19-zh-en,pointwise,hard,26,32,0.8125
+arena_source_dataset,SuperGLUE-Entailment,pairwise,easy,22,66,0.3333333333333333
+arena_source_dataset,SuperGLUE-QA,pairwise,easy,11,69,0.15942028985507245
+arena_source_dataset,SuperGLUE-RC,pairwise,easy,8,84,0.09523809523809523
+arena_source_dataset,SuperGLUE-Wic,pairwise,easy,29,102,0.28431372549019607
+arena_source_dataset,SuperGLUE-Wsc,pairwise,easy,5,34,0.14705882352941177
+arena_source_dataset,WMT19-cs-en,pairwise,easy,8,26,0.3076923076923077
+arena_source_dataset,WMT19-de-en,pairwise,easy,11,62,0.1774193548387097
+arena_source_dataset,WMT19-fi-en,pairwise,easy,11,25,0.44
+arena_source_dataset,WMT19-gu-en,pairwise,easy,26,89,0.29213483146067415
+arena_source_dataset,WMT19-kk-en,pairwise,easy,2,5,0.4
+arena_source_dataset,WMT19-lt-en,pairwise,easy,6,16,0.375
+arena_source_dataset,WMT19-ru-en,pairwise,easy,0,2,0.0
+arena_source_dataset,WMT19-zh-en,pairwise,easy,8,32,0.25
+arena_source_dataset,SuperGLUE-Entailment,pairwise,medium,20,66,0.30303030303030304
+arena_source_dataset,SuperGLUE-QA,pairwise,medium,37,69,0.5362318840579711
+arena_source_dataset,SuperGLUE-RC,pairwise,medium,58,84,0.6904761904761905
+arena_source_dataset,SuperGLUE-Wic,pairwise,medium,61,102,0.5980392156862745
+arena_source_dataset,SuperGLUE-Wsc,pairwise,medium,2,34,0.058823529411764705
+arena_source_dataset,WMT19-cs-en,pairwise,medium,8,26,0.3076923076923077
+arena_source_dataset,WMT19-de-en,pairwise,medium,23,62,0.3709677419354839
+arena_source_dataset,WMT19-fi-en,pairwise,medium,4,25,0.16
+arena_source_dataset,WMT19-gu-en,pairwise,medium,18,89,0.20224719101123595
+arena_source_dataset,WMT19-kk-en,pairwise,medium,1,5,0.2
+arena_source_dataset,WMT19-lt-en,pairwise,medium,5,16,0.3125
+arena_source_dataset,WMT19-ru-en,pairwise,medium,1,2,0.5
+arena_source_dataset,WMT19-zh-en,pairwise,medium,8,32,0.25
+arena_source_dataset,SuperGLUE-Entailment,pairwise,hard,24,66,0.36363636363636365
+arena_source_dataset,SuperGLUE-QA,pairwise,hard,21,69,0.30434782608695654
+arena_source_dataset,SuperGLUE-RC,pairwise,hard,18,84,0.21428571428571427
+arena_source_dataset,SuperGLUE-Wic,pairwise,hard,12,102,0.11764705882352941
+arena_source_dataset,SuperGLUE-Wsc,pairwise,hard,27,34,0.7941176470588235
+arena_source_dataset,WMT19-cs-en,pairwise,hard,10,26,0.38461538461538464
+arena_source_dataset,WMT19-de-en,pairwise,hard,28,62,0.45161290322580644
+arena_source_dataset,WMT19-fi-en,pairwise,hard,10,25,0.4
+arena_source_dataset,WMT19-gu-en,pairwise,hard,45,89,0.5056179775280899
+arena_source_dataset,WMT19-kk-en,pairwise,hard,2,5,0.4
+arena_source_dataset,WMT19-lt-en,pairwise,hard,5,16,0.3125
+arena_source_dataset,WMT19-ru-en,pairwise,hard,1,2,0.5
+arena_source_dataset,WMT19-zh-en,pairwise,hard,16,32,0.5

@@ -1,0 +1,529 @@
+{
+  "schemas": {
+    "report.json": "routing-objective-comparison-report-v1",
+    "analysis.json": "routing-objective-report-analysis-v1",
+    "sealed-tests/summary.json": "routing-sealed-evaluation-v1",
+    "routing-diagnostics/run.json": "llm-router-experiment-run-v1"
+  },
+  "A_dev": {
+    "ordinal": {
+      "nauc": 0.1661154599092283,
+      "per_source_summary": {
+        "routerbench": {
+          "always_high_quality": 0.8152946828955797,
+          "always_low_quality": 0.5271780909673286,
+          "minimum_relative_cost_for_quality_retention": {
+            "0.9500": null,
+            "0.9800": null
+          },
+          "normalization_valid": true,
+          "oracle_gap": 0.28187059577194107,
+          "oracle_quality": 0.8828635490070468,
+          "quality_at_relative_cost_budget": {
+            "0.0000": 0.5271780909673286,
+            "0.1000": 0.6009929532351057,
+            "0.2500": 0.6009929532351057,
+            "0.5000": 0.6009929532351057,
+            "0.7500": 0.6009929532351057,
+            "1.0000": 0.6009929532351057
+          },
+          "quality_cost_nauc": 0.24338799332962774,
+          "row_count": 3122
+        },
+        "xroutebench": {
+          "always_high_quality": 0.7382798997035538,
+          "always_low_quality": 0.6674741099039331,
+          "minimum_relative_cost_for_quality_retention": {
+            "0.9500": null,
+            "0.9800": null
+          },
+          "normalization_valid": true,
+          "oracle_gap": 0.13667086235019188,
+          "oracle_quality": 0.8117699341670355,
+          "quality_at_relative_cost_budget": {
+            "0.0000": 0.6674741099039331,
+            "0.1000": 0.6674741099039331,
+            "0.2500": 0.6750990718168436,
+            "0.5000": 0.6750990718168436,
+            "0.7500": 0.6750990718168436,
+            "1.0000": 0.6750990718168436
+          },
+          "quality_cost_nauc": 0.08884292648882886,
+          "row_count": 459
+        }
+      },
+      "default_budget_quality_macro": 0.6380460125259746,
+      "default_budget_per_source": [
+        {
+          "method": "ordinal",
+          "source": "routerbench",
+          "penalty": 0.0,
+          "rows": 3122,
+          "mean_quality": 0.6009929532351057,
+          "mean_actual_cost": 0.0007471759128763613,
+          "relative_cost": 0.0763592687196075
+        },
+        {
+          "method": "ordinal",
+          "source": "xroutebench",
+          "penalty": 0.003,
+          "rows": 459,
+          "mean_quality": 0.6750990718168436,
+          "mean_actual_cost": 0.00011823867102396514,
+          "relative_cost": 0.23426526628275382
+        }
+      ],
+      "lambda_zero": {
+        "curve_sha_verified": "47c136b0b9f95c353b1319a3f4a68ffa859747b7070dd135fff4c87fce9d5a8f",
+        "per_source": [
+          {
+            "source_dataset": "routerbench",
+            "mean_quality": 0.6009929532351057,
+            "mean_actual_cost": 0.0007471759128763613,
+            "relative_cost": 0.0763592687196075
+          },
+          {
+            "source_dataset": "xroutebench",
+            "mean_quality": 0.6750990718168436,
+            "mean_actual_cost": 0.00011978627450980392,
+            "relative_cost": 0.23775427432341073
+          }
+        ],
+        "source_macro_quality": 0.6380460125259746,
+        "source_macro_relative_cost": 0.15705677152150913
+      }
+    },
+    "pointwise": {
+      "nauc": 0.8631791002863535,
+      "per_source_summary": {
+        "routerbench": {
+          "always_high_quality": 0.8152946828955797,
+          "always_low_quality": 0.5271780909673286,
+          "minimum_relative_cost_for_quality_retention": {
+            "0.9500": 0.494170593875139,
+            "0.9800": 0.6855428904577676
+          },
+          "normalization_valid": true,
+          "oracle_gap": 0.0666880204996797,
+          "oracle_quality": 0.8828635490070468,
+          "quality_at_relative_cost_budget": {
+            "0.0000": 0.5271780909673286,
+            "0.1000": 0.7200832799487508,
+            "0.2500": 0.7420083279948751,
+            "0.5000": 0.7959961563100576,
+            "0.7500": 0.8147341447789878,
+            "1.0000": 0.8161755285073671
+          },
+          "quality_cost_nauc": 0.8405878265703168,
+          "row_count": 3122
+        },
+        "xroutebench": {
+          "always_high_quality": 0.7382798997035538,
+          "always_low_quality": 0.6674741099039331,
+          "minimum_relative_cost_for_quality_retention": {
+            "0.9500": 0.06221740987261326,
+            "0.9800": 0.148112038244263
+          },
+          "normalization_valid": true,
+          "oracle_gap": 0.06804310095155552,
+          "oracle_quality": 0.8117699341670355,
+          "quality_at_relative_cost_budget": {
+            "0.0000": 0.6674741099039331,
+            "0.1000": 0.7175830423658067,
+            "0.2500": 0.7284762885531706,
+            "0.5000": 0.7393695347405344,
+            "0.7500": 0.7437268332154799,
+            "1.0000": 0.7437268332154799
+          },
+          "quality_cost_nauc": 0.8857703740023901,
+          "row_count": 459
+        }
+      },
+      "default_budget_quality_macro": 0.767682845525296,
+      "default_budget_per_source": [
+        {
+          "method": "pointwise",
+          "source": "routerbench",
+          "penalty": 0.1,
+          "rows": 3122,
+          "mean_quality": 0.7959961563100576,
+          "mean_actual_cost": 0.004058521396540679,
+          "relative_cost": 0.494170593875139
+        },
+        {
+          "method": "pointwise",
+          "source": "xroutebench",
+          "penalty": 0.03,
+          "rows": 459,
+          "mean_quality": 0.7393695347405344,
+          "mean_actual_cost": 0.00021820555555555557,
+          "relative_cost": 0.4596364722290236
+        }
+      ],
+      "lambda_zero": {
+        "curve_sha_verified": "7b8e202d499fc07cd6dff6a44f96a1434745964cc06b2569feb0f0eb28ff7920",
+        "per_source": [
+          {
+            "source_dataset": "routerbench",
+            "mean_quality": 0.8161755285073671,
+            "mean_actual_cost": 0.006320030877642537,
+            "relative_cost": 0.7795181294350233
+          },
+          {
+            "source_dataset": "xroutebench",
+            "mean_quality": 0.7437268332154799,
+            "mean_actual_cost": 0.0002907221132897603,
+            "relative_cost": 0.6231220519208208
+          }
+        ],
+        "source_macro_quality": 0.7799511808614235,
+        "source_macro_relative_cost": 0.701320090677922
+      }
+    },
+    "pairwise": {
+      "nauc": 0.8338740417605066,
+      "per_source_summary": {
+        "routerbench": {
+          "always_high_quality": 0.8152946828955797,
+          "always_low_quality": 0.5271780909673286,
+          "minimum_relative_cost_for_quality_retention": {
+            "0.9500": 0.5146298740596799,
+            "0.9800": 0.6846165458322188
+          },
+          "normalization_valid": true,
+          "oracle_gap": 0.06676809737347855,
+          "oracle_quality": 0.8828635490070468,
+          "quality_at_relative_cost_budget": {
+            "0.0000": 0.5271780909673286,
+            "0.1000": 0.7233504163997438,
+            "0.2500": 0.7420083279948751,
+            "0.5000": 0.7420083279948751,
+            "0.7500": 0.8142536835361948,
+            "1.0000": 0.8160954516335682
+          },
+          "quality_cost_nauc": 0.7947429127292942,
+          "row_count": 3122
+        },
+        "xroutebench": {
+          "always_high_quality": 0.7382798997035538,
+          "always_low_quality": 0.6674741099039331,
+          "minimum_relative_cost_for_quality_retention": {
+            "0.9500": 0.04410241725608809,
+            "0.9800": 0.1952125416663495
+          },
+          "normalization_valid": true,
+          "oracle_gap": 0.06680205711401876,
+          "oracle_quality": 0.8117699341670355,
+          "quality_at_relative_cost_budget": {
+            "0.0000": 0.6674741099039331,
+            "0.1000": 0.7013948923035613,
+            "0.2500": 0.7340746308656528,
+            "0.5000": 0.7449678770530167,
+            "0.7500": 0.7449678770530167,
+            "1.0000": 0.7449678770530167
+          },
+          "quality_cost_nauc": 0.8730051707917189,
+          "row_count": 459
+        }
+      },
+      "default_budget_quality_macro": 0.7434881025239459,
+      "default_budget_per_source": [
+        {
+          "method": "pairwise",
+          "source": "routerbench",
+          "penalty": 1.0,
+          "rows": 3122,
+          "mean_quality": 0.7420083279948751,
+          "mean_actual_cost": 0.0012185173606662396,
+          "relative_cost": 0.13583110452572586
+        },
+        {
+          "method": "pairwise",
+          "source": "xroutebench",
+          "penalty": 0.1,
+          "rows": 459,
+          "mean_quality": 0.7449678770530167,
+          "mean_actual_cost": 0.00021512254901960784,
+          "relative_cost": 0.45268596152537954
+        }
+      ],
+      "lambda_zero": {
+        "curve_sha_verified": "63231ffdd0e957689eb64a242b5af208bd6351e9472b2c7384980f65d8540393",
+        "per_source": [
+          {
+            "source_dataset": "routerbench",
+            "mean_quality": 0.8160954516335682,
+            "mean_actual_cost": 0.006255944714926329,
+            "relative_cost": 0.7714320131718052
+          },
+          {
+            "source_dataset": "xroutebench",
+            "mean_quality": 0.7384319293405983,
+            "mean_actual_cost": 0.00028388671023965145,
+            "relative_cost": 0.6077119184976367
+          }
+        ],
+        "source_macro_quality": 0.7772636904870833,
+        "source_macro_relative_cost": 0.689571965834721
+      }
+    }
+  },
+  "A_sealed_test": {
+    "ordinal": {
+      "cost_semantics": "recorded_source_cost_units_not_current_service_prices",
+      "per_source": {
+        "routerbench": {
+          "actual_cost_budget_excess": 0.0,
+          "actual_cost_budget_threshold": 0.00411503173049237,
+          "always_high_cost": 0.008087431615318169,
+          "always_high_quality": 0.8200115174200979,
+          "always_low_cost": 0.0001426318456665707,
+          "always_low_quality": 0.5139936654189461,
+          "budget_exceeded": false,
+          "group_count": 3473,
+          "mean_actual_cost": 0.0006816080046069681,
+          "mean_quality": 0.5896343219118917,
+          "normalization_valid": {
+            "cost": true,
+            "quality": true
+          },
+          "normalized_quality_gain_unclipped": 0.24717726759503197,
+          "relative_cost": 0.06784011863952023,
+          "relative_cost_budget": 0.5,
+          "row_count": 3473,
+          "usage_ratios": {
+            "high": 0.03570400230348402,
+            "low": 0.5842211344658796,
+            "medium": 0.38007486323063633
+          }
+        },
+        "xroutebench": {
+          "actual_cost_budget_excess": 0.0,
+          "actual_cost_budget_threshold": 0.00023608491552695095,
+          "always_high_cost": 0.0004576803432555645,
+          "always_high_quality": 0.805393125427103,
+          "always_low_cost": 1.4489487798337357e-05,
+          "always_low_quality": 0.6975916538413446,
+          "budget_exceeded": false,
+          "group_count": 3729,
+          "mean_actual_cost": 8.402854652721909e-05,
+          "mean_quality": 0.7241380972694199,
+          "normalization_valid": {
+            "cost": true,
+            "quality": true
+          },
+          "normalized_quality_gain_unclipped": 0.24625307092359186,
+          "relative_cost": 0.1569054457523504,
+          "relative_cost_budget": 0.5,
+          "row_count": 3729,
+          "usage_ratios": {
+            "high": 0.10968087959238401,
+            "low": 0.700992223116117,
+            "medium": 0.18932689729149907
+          }
+        }
+      },
+      "row_weighted_actual_cost_interpretation": "pooled_source_cost_not_comparable",
+      "row_weighted_mean_actual_cost": 0.0003721975909469592,
+      "row_weighted_mean_quality": 0.6592767237875128,
+      "source_macro_mean_quality": 0.6568862095906558,
+      "source_macro_relative_cost": 0.11237278219593533
+    },
+    "pointwise": {
+      "cost_semantics": "recorded_source_cost_units_not_current_service_prices",
+      "per_source": {
+        "routerbench": {
+          "actual_cost_budget_excess": 0.0,
+          "actual_cost_budget_threshold": 0.00411503173049237,
+          "always_high_cost": 0.008087431615318169,
+          "always_high_quality": 0.8200115174200979,
+          "always_low_cost": 0.0001426318456665707,
+          "always_low_quality": 0.5139936654189461,
+          "budget_exceeded": false,
+          "group_count": 3473,
+          "mean_actual_cost": 0.00402902119205298,
+          "mean_quality": 0.7871004894903542,
+          "normalization_valid": {
+            "cost": true,
+            "quality": true
+          },
+          "normalized_quality_gain_unclipped": 0.8924538953707188,
+          "relative_cost": 0.48917398286512614,
+          "relative_cost_budget": 0.5,
+          "row_count": 3473,
+          "usage_ratios": {
+            "high": 0.4353584797005471,
+            "low": 0.004606968039159228,
+            "medium": 0.5600345522602936
+          }
+        },
+        "xroutebench": {
+          "actual_cost_budget_excess": 1.6499517296862388e-05,
+          "actual_cost_budget_threshold": 0.00023608491552695095,
+          "always_high_cost": 0.0004576803432555645,
+          "always_high_quality": 0.805393125427103,
+          "always_low_cost": 1.4489487798337357e-05,
+          "always_low_quality": 0.6975916538413446,
+          "budget_exceeded": true,
+          "group_count": 3729,
+          "mean_actual_cost": 0.00025258443282381334,
+          "mean_quality": 0.7911824288480488,
+          "normalization_valid": {
+            "cost": true,
+            "quality": true
+          },
+          "normalized_quality_gain_unclipped": 0.8681771559328924,
+          "relative_cost": 0.5372289208897154,
+          "relative_cost_budget": 0.5,
+          "row_count": 3729,
+          "usage_ratios": {
+            "high": 0.46178600160901045,
+            "low": 0.18744971842316976,
+            "medium": 0.3507642799678198
+          }
+        }
+      },
+      "row_weighted_actual_cost_interpretation": "pooled_source_cost_not_comparable",
+      "row_weighted_mean_actual_cost": 0.0020736848028325467,
+      "row_weighted_mean_quality": 0.7892140068278775,
+      "source_macro_mean_quality": 0.7891414591692014,
+      "source_macro_relative_cost": 0.5132014518774208
+    },
+    "pairwise": {
+      "cost_semantics": "recorded_source_cost_units_not_current_service_prices",
+      "per_source": {
+        "routerbench": {
+          "actual_cost_budget_excess": 0.0,
+          "actual_cost_budget_threshold": 0.00411503173049237,
+          "always_high_cost": 0.008087431615318169,
+          "always_high_quality": 0.8200115174200979,
+          "always_low_cost": 0.0001426318456665707,
+          "always_low_quality": 0.5139936654189461,
+          "budget_exceeded": false,
+          "group_count": 3473,
+          "mean_actual_cost": 0.0012585818024762455,
+          "mean_quality": 0.7355312410020155,
+          "normalization_valid": {
+            "cost": true,
+            "quality": true
+          },
+          "normalized_quality_gain_unclipped": 0.7239367707941285,
+          "relative_cost": 0.14046294295200498,
+          "relative_cost_budget": 0.5,
+          "row_count": 3473,
+          "usage_ratios": {
+            "high": 0.08090987618773395,
+            "low": 0.03714367981572128,
+            "medium": 0.8819464439965448
+          }
+        },
+        "xroutebench": {
+          "actual_cost_budget_excess": 1.8237905604719763e-05,
+          "actual_cost_budget_threshold": 0.00023608491552695095,
+          "always_high_cost": 0.0004576803432555645,
+          "always_high_quality": 0.805393125427103,
+          "always_low_cost": 1.4489487798337357e-05,
+          "always_low_quality": 0.6975916538413446,
+          "budget_exceeded": true,
+          "group_count": 3729,
+          "mean_actual_cost": 0.0002543228211316707,
+          "mean_quality": 0.7885000215304527,
+          "normalization_valid": {
+            "cost": true,
+            "quality": true
+          },
+          "normalized_quality_gain_unclipped": 0.8432943108461057,
+          "relative_cost": 0.5411513581116294,
+          "relative_cost_budget": 0.5,
+          "row_count": 3729,
+          "usage_ratios": {
+            "high": 0.47331724322874763,
+            "low": 0.251005631536605,
+            "medium": 0.2756771252346474
+          }
+        }
+      },
+      "row_weighted_actual_cost_interpretation": "pooled_source_cost_not_comparable",
+      "row_weighted_mean_actual_cost": 0.0007386037767286866,
+      "row_weighted_mean_quality": 0.762957036974043,
+      "source_macro_mean_quality": 0.7620156312662341,
+      "source_macro_relative_cost": 0.3408071505318172
+    }
+  },
+  "A_arena": {
+    "ordinal": {
+      "rows": 8379,
+      "accuracy": 0.45482754505310896,
+      "macro_f1": 0.39606394837413167,
+      "paired_rows": 412,
+      "same_action_rate": 0.5436893203883495,
+      "interpretation": "difficulty_prediction_alignment"
+    },
+    "pointwise": {
+      "rows": 8379,
+      "accuracy": 0.22795082945458886,
+      "macro_f1": 0.175401011081202,
+      "paired_rows": 412,
+      "same_action_rate": 0.7985436893203883,
+      "interpretation": "action_slot_projection_alignment_not_difficulty_classification"
+    },
+    "pairwise": {
+      "rows": 8379,
+      "accuracy": 0.21362931137367228,
+      "macro_f1": 0.19270378784054387,
+      "paired_rows": 412,
+      "same_action_rate": 0.6286407766990292,
+      "interpretation": "action_slot_projection_alignment_not_difficulty_classification"
+    }
+  },
+  "comparison_limits": [
+    "A and G1 have different training split, pool high model and selection metric; no causal all-method ranking",
+    "A R0 Arena: trained difficulty classification; R1/R2 and G1 action-slot projection diagnostic, not actual routing success",
+    "Test uses locked dev policies; no fresh test nAUC frontier fitted",
+    "Lambda-zero is cost-ignored selection quality, not Arena classification accuracy"
+  ],
+  "Arena_shared_input_evidence": {
+    "A_prepared_manifest_sha256": "5b51c5c6aca5d2acbd4ab364b348d67b3c5d961e068eac666cdd3fc81176c161",
+    "G1_protocol_prepared_manifest_sha256": "5b51c5c6aca5d2acbd4ab364b348d67b3c5d961e068eac666cdd3fc81176c161",
+    "same_prepared_manifest": true,
+    "prepared_files": {
+      "evaluation.parquet": {
+        "sha256": "d84be2fdad3ed9753d2cba93fdbe479025800b762d13b5b2c92565573e32925f",
+        "size_bytes": 4289920
+      },
+      "metadata.parquet": {
+        "sha256": "080c358f730a488204d6c41f219015d75e799e1acac5677a81fdfd87cb944c6a",
+        "size_bytes": 4618166
+      },
+      "ordinal-run-manifest.json": {
+        "sha256": "9aa168e45409ff72ac8c2eb1bdb45a4ebb32078df6bba113fe2f73e9ea0fa2c7",
+        "size_bytes": 3706
+      },
+      "overlap-audit.json": {
+        "sha256": "f333ccbfd87a8b3bd72692d093bedf9af9fd118c662923bef4516379c6c27b89",
+        "size_bytes": 6606
+      },
+      "pairwise-run-manifest.json": {
+        "sha256": "fc98abb00cacaedf2ecce22906bdea4de0766ed7e9a08837c8e614b4040602a0",
+        "size_bytes": 3660
+      },
+      "pointwise-run-manifest.json": {
+        "sha256": "bd5fdc7bd2cbd0826123637bc41571abebe46e9fc1525c72e4619bf2146422ea",
+        "size_bytes": 3662
+      },
+      "protocol.json": {
+        "sha256": "c5df5af139a778402986d60b1f63726b5470b1cb42bf47c3433cb0e17f0af9fa",
+        "size_bytes": 7661
+      },
+      "validation-lock.json": {
+        "sha256": "ddae362cb6e826376383427933deae22bab1061390709be8f781345caa608e5f",
+        "size_bytes": 3017
+      }
+    },
+    "G1_max_length": 512,
+    "A_max_length": 512,
+    "A_projection": "fixed_lambda_zero_action_slot_argmax",
+    "G1_projection": "lambda_zero_action_slot_argmax",
+    "A_lambda": 0.0
+  }
+}
