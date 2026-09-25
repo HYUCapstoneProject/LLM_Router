@@ -343,6 +343,50 @@ class ObjectiveSharedTrainingIntegrationTest(unittest.TestCase):
             results["pointwise"] = train_shared_objective(
                 method="pointwise", output_dir=root / "runs/pointwise", **common
             )
+            # Service feedback contains only explicitly observed candidates. Exercise
+            # the real shared trainer with missing targets and no synthetic CE labels.
+            partial = outcomes.drop(columns=["difficulty_label"]).copy()
+            partial["observed_low"] = 1
+            partial["observed_medium"] = 0
+            partial["observed_high"] = 1
+            # Null-only Arrow columns deserialize as None; this matches an
+            # actual sparse export where no medium candidate was observed.
+            partial["success_medium"] = None
+            partial_path = root / "partial-r1.parquet"
+            partial.to_parquet(partial_path, index=False)
+            masked = run_training(
+                partial_path,
+                root / "partial-r1-model",
+                config,
+                runtime_contract=runtime,
+                objective_method="pointwise",
+            )
+            self.assertEqual(masked.metrics["data"]["label_distribution"], None)
+            self.assertEqual(
+                masked.metrics["data"]["observed_candidate_counts"],
+                {
+                    "observed_low": 7,
+                    "observed_medium": 0,
+                    "observed_high": 7,
+                },
+            )
+            self.assertEqual(masked.metrics["optimization"]["optimizer_steps"], 4)
+            self.assertNotEqual(
+                masked.metrics["optimization"]["training_fingerprint"],
+                original.metrics["optimization"]["training_fingerprint"],
+            )
+            # A rehearsal merge can retain old difficulty metadata on base rows
+            # and null metadata on new feedback. R1 never supervises with it.
+            partial["difficulty_label"] = ["easy"] + [None] * (len(partial) - 1)
+            partial.to_parquet(partial_path, index=False)
+            mixed = run_training(
+                partial_path,
+                root / "partial-r1-mixed-metadata",
+                config,
+                runtime_contract=runtime,
+                objective_method="pointwise",
+            )
+            self.assertEqual(mixed.metrics["optimization"]["optimizer_steps"], 4)
             lock_args = {
                 "run_roots": [root / "runs"],
                 "experiment_config_path": root / "experiment.json",

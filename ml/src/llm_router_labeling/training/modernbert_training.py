@@ -219,8 +219,15 @@ def load_training_config(path: Path) -> TrainingConfig:
     return TrainingConfig.from_mapping(values)
 
 
-def validate_training_dataframe(dataframe: pd.DataFrame) -> None:
-    missing = sorted(REQUIRED_TRAINING_COLUMNS - set(dataframe.columns))
+def validate_training_dataframe(
+    dataframe: pd.DataFrame, *, require_difficulty_labels: bool = True
+) -> None:
+    required = (
+        REQUIRED_TRAINING_COLUMNS
+        if require_difficulty_labels
+        else (REQUIRED_TRAINING_COLUMNS - {"difficulty_label"})
+    )
+    missing = sorted(required - set(dataframe.columns))
     if missing:
         raise ModernBertTrainingError(f"Training Parquet is missing columns: {missing}")
     if dataframe.empty:
@@ -229,7 +236,10 @@ def validate_training_dataframe(dataframe: pd.DataFrame) -> None:
         raise ModernBertTrainingError("Training Parquet has duplicate sample_id values")
     if dataframe["model_input_text"].fillna("").astype(str).str.strip().eq("").any():
         raise ModernBertTrainingError("Training Parquet has an empty model_input_text")
-    if not dataframe["difficulty_label"].isin(LABEL_ORDER).all():
+    if (
+        require_difficulty_labels
+        and not dataframe["difficulty_label"].isin(LABEL_ORDER).all()
+    ):
         raise ModernBertTrainingError(
             "Training Parquet has an invalid difficulty label"
         )
@@ -242,10 +252,12 @@ def validate_training_dataframe(dataframe: pd.DataFrame) -> None:
 
 
 def load_training_splits(
-    path: Path, config: TrainingConfig
+    path: Path, config: TrainingConfig, *, require_difficulty_labels: bool = True
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     dataframe = pd.read_parquet(path)
-    validate_training_dataframe(dataframe)
+    validate_training_dataframe(
+        dataframe, require_difficulty_labels=require_difficulty_labels
+    )
     train = dataframe.loc[dataframe["split"].eq(config.train_split)].reset_index(
         drop=True
     )
@@ -483,7 +495,14 @@ def run_training(
         _require_training_backends()
     )
     AutoModelForSequenceClassification, AutoTokenizer = transformer_classes
-    all_rows, train_rows, validation_rows = load_training_splits(training_path, config)
+    require_difficulty_labels = (
+        objective_method != "pointwise" or config.train_sampling_strategy != "shuffle"
+    )
+    all_rows, train_rows, validation_rows = load_training_splits(
+        training_path,
+        config,
+        require_difficulty_labels=require_difficulty_labels,
+    )
     if objective_method not in {"ordinal", "pointwise", "pairwise", "regret"}:
         raise ModernBertTrainingError(
             "Shared training supports R0/R1/R2 and research R3 objectives only"
@@ -491,6 +510,16 @@ def run_training(
     if not math.isfinite(pairwise_tie_weight) or pairwise_tie_weight <= 0:
         raise ModernBertTrainingError("pairwise_tie_weight must be finite and positive")
     target_columns: list[str] = []
+    mask_columns = [f"observed_{action}" for action in ("low", "medium", "high")]
+    present_masks = set(mask_columns) & set(all_rows.columns)
+    if present_masks and (
+        objective_method != "pointwise" or present_masks != set(mask_columns)
+    ):
+        raise ModernBertTrainingError(
+            "All three observation masks require pointwise training"
+        )
+    if not present_masks:
+        mask_columns = []
     cost_columns: list[str] = []
     if objective_method == "regret":
         from ..objective_comparison.objectives import validate_regret_lambdas
@@ -513,8 +542,27 @@ def run_training(
             raise ModernBertTrainingError(
                 f"Missing observed {objective_method} targets"
             )
-        targets = all_rows[target_columns].apply(pd.to_numeric, errors="coerce")
-        if (
+        try:
+            targets = all_rows[target_columns].apply(pd.to_numeric, errors="raise")
+        except (TypeError, ValueError) as error:
+            raise ModernBertTrainingError(
+                "Objective targets must be numeric or null"
+            ) from error
+        if mask_columns:
+            masks = all_rows[mask_columns]
+            if not masks.isin([0, 1]).all().all() or not masks.sum(axis=1).gt(0).all():
+                raise ModernBertTrainingError(
+                    "R1 masks must be binary with an observation in every row"
+                )
+            observed = masks.to_numpy(bool)
+            values = targets.to_numpy(float)
+            if not np.isin(values[observed], [0.0, 1.0]).all():
+                raise ModernBertTrainingError("Observed R1 targets must be binary")
+            if not np.isnan(values[~observed]).all():
+                raise ModernBertTrainingError(
+                    "Unobserved R1 targets must be null, never fabricated zero/one"
+                )
+        elif (
             not np.isfinite(targets.to_numpy(float)).all()
             or not targets.ge(0).all().all()
             or not targets.le(1).all().all()
@@ -522,10 +570,21 @@ def run_training(
             raise ModernBertTrainingError(
                 "Objective targets must be finite and within [0, 1]"
             )
-        if objective_method == "pointwise" and not targets.isin([0.0, 1.0]).all().all():
+        if (
+            objective_method == "pointwise"
+            and not mask_columns
+            and not targets.isin([0.0, 1.0]).all().all()
+        ):
             raise ModernBertTrainingError(
                 "R1 success targets must be observed binary values"
             )
+        # Parquet null-only columns arrive as object/None, not floating NaN.
+        # Normalize the frames actually consumed by WeightedDataset as well.
+        for frame in (all_rows, train_rows, validation_rows):
+            for column in target_columns:
+                frame[column] = pd.to_numeric(frame[column], errors="raise").astype(
+                    float
+                )
     output_labels = (
         LABEL_ORDER if objective_method == "ordinal" else ("low", "medium", "high")
     )
@@ -583,6 +642,10 @@ def run_training(
     if objective_method != "ordinal":
         fingerprint_config.update(
             objective_method=objective_method, pairwise_tie_weight=pairwise_tie_weight
+        )
+    if mask_columns:
+        fingerprint_config["pointwise_target_contract"] = (
+            "observed-candidate-mean-bce-v1"
         )
     if objective_method == "regret":
         fingerprint_config["regret_lambdas"] = list(regret_lambdas)
@@ -651,13 +714,17 @@ def run_training(
             row = self.rows.iloc[index]
             record = {
                 "text": str(row["model_input_text"]),
-                "label": LABEL2ID[str(row["difficulty_label"])],
+                "label": LABEL2ID[str(row["difficulty_label"])]
+                if require_difficulty_labels
+                else 0,
                 "weight": float(row["sample_weight"]),
             }
             if target_columns:
                 record["objective_targets"] = [
                     float(row[column]) for column in target_columns
                 ]
+            if mask_columns:
+                record["objective_mask"] = [int(row[column]) for column in mask_columns]
             if cost_columns:
                 record["decision_costs"] = [
                     float(row[column]) for column in cost_columns
@@ -682,6 +749,10 @@ def run_training(
             encoded["objective_targets"] = torch.tensor(
                 [record["objective_targets"] for record in records], dtype=torch.float32
             )
+        if mask_columns:
+            encoded["objective_mask"] = torch.tensor(
+                [record["objective_mask"] for record in records], dtype=torch.bool
+            )
         if cost_columns:
             encoded["decision_costs"] = torch.tensor(
                 [record["decision_costs"] for record in records], dtype=torch.float32
@@ -689,7 +760,7 @@ def run_training(
         return encoded
 
     def row_losses_for_objective(
-        logits: Any, labels: Any, targets: Any, costs: Any
+        logits: Any, labels: Any, targets: Any, costs: Any, observation_mask: Any = None
     ) -> Any:
         if objective_method == "ordinal":
             return functional.cross_entropy(logits, labels, reduction="none")
@@ -709,6 +780,7 @@ def run_training(
             logits,
             difficulty_ids=labels,
             success_targets=targets if objective_method == "pointwise" else None,
+            success_mask=observation_mask,
             quality_targets=targets if objective_method == "pairwise" else None,
             pairwise_tie_weight=pairwise_tie_weight,
         )
@@ -796,11 +868,14 @@ def run_training(
                     costs = (
                         batch.pop("decision_costs").to(device) if cost_columns else None
                     )
+                    observation_mask = (
+                        batch.pop("objective_mask").to(device) if mask_columns else None
+                    )
                     inputs = {key: value.to(device) for key, value in batch.items()}
                     with precision_context():
                         logits = model(**inputs).logits
                         row_losses = row_losses_for_objective(
-                            logits, labels, targets, costs
+                            logits, labels, targets, costs, observation_mask
                         )
                     validation_loss_sum += float(row_losses.sum().cpu())
                     validation_weighted_loss_sum += float(
@@ -1015,10 +1090,15 @@ def run_training(
                 batch.pop("objective_targets").to(device) if target_columns else None
             )
             costs = batch.pop("decision_costs").to(device) if cost_columns else None
+            observation_mask = (
+                batch.pop("objective_mask").to(device) if mask_columns else None
+            )
             inputs = {key: value.to(device) for key, value in batch.items()}
             with precision_context():
                 logits = model(**inputs).logits
-                row_losses = row_losses_for_objective(logits, labels, targets, costs)
+                row_losses = row_losses_for_objective(
+                    logits, labels, targets, costs, observation_mask
+                )
                 window_start = (
                     batch_index // config.gradient_accumulation_steps
                 ) * config.gradient_accumulation_steps
@@ -1242,7 +1322,16 @@ def run_training(
             "train_row_count": len(train_rows),
             "sampled_train_row_count_per_epoch": sampled_train_rows_per_epoch,
             "validation_row_count": len(validation_rows),
-            "label_distribution": all_rows["difficulty_label"].value_counts().to_dict(),
+            "label_distribution": (
+                all_rows["difficulty_label"].value_counts().to_dict()
+                if "difficulty_label" in all_rows
+                else None
+            ),
+            "observed_candidate_counts": (
+                {column: int(all_rows[column].sum()) for column in mask_columns}
+                if mask_columns
+                else None
+            ),
         },
         "tokenization": {
             "max_length": config.max_length,

@@ -133,4 +133,14 @@ class FeedbackBatchServiceTest {
         assertThatThrownBy(() -> service.retrySubmission(BATCH)).isInstanceOf(IllegalStateException.class);
         verifyNoInteractions(repository, retrainingClient);
     }
+
+    @Test
+    void r1DisablesManualAndRetryLegacySubmissionsBeforeAnyDatabaseOrNetworkCall() {
+        ReflectionTestUtils.setField(service, "legacyEnabled", false);
+        assertThatThrownBy(() -> service.submitPending("manual"))
+                .isInstanceOf(IllegalStateException.class).hasMessageContaining("R1 profile disables legacy CE");
+        assertThatThrownBy(() -> service.retrySubmission(BATCH))
+                .isInstanceOf(IllegalStateException.class).hasMessageContaining("R1 profile disables legacy CE");
+        verifyNoInteractions(repository, retrainingClient);
+    }
 }

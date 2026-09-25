@@ -33,6 +33,9 @@ public class RetrainingScheduler {
     @Value("${llm.retraining.auto-submit:false}")
     private boolean autoSubmit;
 
+    @Value("${llm.retraining.legacy-enabled:true}")
+    private boolean legacyEnabled = true;
+
     @Value("${llm.retraining.batch-size:1000}")
     private int batchSize;
 
@@ -44,7 +47,7 @@ public class RetrainingScheduler {
      */
     @Scheduled(fixedDelayString = "${llm.retraining.submit-interval-ms:300000}")
     public void autoSubmit() {
-        if (!autoSubmit) {
+        if (!legacyEnabled || !autoSubmit) {
             return;
         }
         int pending = feedbackBatchService.pendingEventCount();
@@ -63,6 +66,7 @@ public class RetrainingScheduler {
      */
     @Scheduled(fixedDelayString = "${llm.retraining.retry-interval-ms:60000}")
     public void retryUnaccepted() {
+        if (!legacyEnabled) return;
         for (String batchId : repository.findUnaccepted()) {
             log.info("미접수 배치 재제출 batchId={}", batchId);
             feedbackBatchService.retrySubmission(batchId);

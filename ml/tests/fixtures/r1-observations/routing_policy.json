@@ -1,0 +1,47 @@
+{
+  "action_order": [
+    "low",
+    "medium",
+    "high"
+  ],
+  "candidate_pool": {
+    "candidates": [
+      {
+        "action": "low",
+        "decision_cost": 0.0,
+        "model": "haiku",
+        "model_id": "actual-low",
+        "tier_projection": "easy"
+      },
+      {
+        "action": "medium",
+        "decision_cost": 0.3,
+        "model": "sonnet",
+        "model_id": "actual-mid",
+        "tier_projection": "medium"
+      },
+      {
+        "action": "high",
+        "decision_cost": 1.0,
+        "model": "opus",
+        "model_id": "actual-high",
+        "tier_projection": "hard"
+      }
+    ],
+    "cost_unit": "normalized-0-1",
+    "decision_cost_basis": "pre-request-fixed",
+    "decision_cost_version": "fixture-pre-request-costs-v1",
+    "price_version": "fixture-prices-v1",
+    "version": "service-pool-v1"
+  },
+  "input_contract": "structure-preserving-v2",
+  "lambda_cost": 0.25,
+  "length_contract_version": "train-inference-lengths-v1",
+  "max_length": 8192,
+  "objective": "pointwise",
+  "policy_sha256": "072b300cbb93f87dda228ad67adabaa7420d70d0d1bf58fdd686851cd532a54e",
+  "policy_version": "fixture-r1-service-8192-v1",
+  "schema_version": "routing-policy-v2",
+  "scope": "service-explicit",
+  "score_semantics": "independent_success_probabilities"
+}

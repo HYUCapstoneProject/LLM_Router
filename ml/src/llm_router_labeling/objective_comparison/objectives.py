@@ -61,12 +61,40 @@ def require_torch() -> Any:
     return torch
 
 
+def masked_pointwise_row_losses(logits: Any, targets: Any, mask: Any) -> Any:
+    """Mean BCE over observed candidates in each question; unknowns have zero gradient.
+
+    This is supervised learning on recorded outcomes, not an unbiased estimate
+    for uncalled candidates. Fully observed rows reduce to the original R1 loss.
+    """
+    torch = require_torch()
+    if logits.ndim != 2 or logits.shape[1] != 3:
+        raise ValueError("R1 logits must have shape [rows, 3]")
+    if targets.shape != logits.shape or mask.shape != logits.shape:
+        raise ValueError("R1 targets and observation mask must match logits")
+    if not bool(((mask == 0) | (mask == 1)).all()):
+        raise ValueError("R1 observation mask must contain only zero or one")
+    observed = mask.to(torch.bool)
+    if not bool(observed.any(dim=1).all()):
+        raise ValueError("Every R1 row must contain an observed candidate")
+    values = targets.to(logits.dtype)
+    if not bool(((values[observed] == 0) | (values[observed] == 1)).all()):
+        raise ValueError("Observed R1 targets must be binary")
+    # Replace unknown values before BCE: multiplying NaN loss by zero is still NaN.
+    safe_targets = torch.where(observed, values, torch.zeros_like(values))
+    losses = torch.nn.functional.binary_cross_entropy_with_logits(
+        logits, safe_targets, reduction="none"
+    )
+    return (losses * observed).sum(dim=1) / observed.sum(dim=1)
+
+
 def primary_row_losses(
     method: str,
     logits: Any,
     *,
     difficulty_ids: Any,
     success_targets: Any = None,
+    success_mask: Any = None,
     quality_targets: Any = None,
     pairwise_tie_weight: float = 0.25,
 ) -> Any:
@@ -76,6 +104,8 @@ def primary_row_losses(
     if method == "ordinal":
         return functional.cross_entropy(logits, difficulty_ids, reduction="none")
     if method == "pointwise":
+        if success_mask is not None:
+            return masked_pointwise_row_losses(logits, success_targets, success_mask)
         return functional.binary_cross_entropy_with_logits(
             logits, success_targets.to(logits.dtype), reduction="none"
         ).mean(dim=1)

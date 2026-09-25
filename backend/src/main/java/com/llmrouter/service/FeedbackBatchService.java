@@ -73,6 +73,9 @@ public class FeedbackBatchService {
     @Value("${llm.retraining.require-pii-redaction:false}")
     private boolean requirePiiRedaction;
 
+    @Value("${llm.retraining.legacy-enabled:true}")
+    private boolean legacyEnabled = true;
+
     /** 제출 대기 중인 이벤트 수. 대시보드와 자동 트리거가 같이 본다. */
     public int pendingEventCount() {
         return repository.countEligible();
@@ -89,6 +92,7 @@ public class FeedbackBatchService {
      * @return 제출 시도 결과. 보낼 이벤트가 없으면 비어 있다.
      */
     public Optional<SubmissionResult> submitPending(String trigger) {
+        guardLegacySubmission();
         guardPiiRedaction();
         Instant requestedAt = Instant.now(clock);
         return repository.claimEligible(batchSize, trigger,
@@ -98,6 +102,7 @@ public class FeedbackBatchService {
 
     /** Retries use the stored request, including its original requestedAt. */
     public Optional<SubmissionResult> retrySubmission(String batchId) {
+        guardLegacySubmission();
         guardPiiRedaction();
         Optional<FeedbackBatchRequest> request = repository.findRequest(batchId);
         if (request.isEmpty()) {
@@ -116,6 +121,13 @@ public class FeedbackBatchService {
      * <p>제출은 질문 원문을 외부로 내보내는 유일한 경로다. 여기서 막지 않으면
      * 설정만 바꿔 실사용자에게 연 순간 원문이 그대로 나간다.
      */
+    private void guardLegacySubmission() {
+        if (!legacyEnabled) {
+            throw new IllegalStateException("R1 profile disables legacy CE feedback submission; "
+                    + "explicit observations require the separate R1 artifact workflow");
+        }
+    }
+
     private void guardPiiRedaction() {
         if (requirePiiRedaction) {
             throw new IllegalStateException(

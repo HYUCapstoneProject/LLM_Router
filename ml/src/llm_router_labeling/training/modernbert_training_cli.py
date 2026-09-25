@@ -50,7 +50,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--objective",
         choices=("ordinal", "pointwise", "pairwise"),
         default="ordinal",
-        help="Training objective; pointwise/pairwise require complete observed targets",
+        help="Training objective; pointwise accepts explicit observation masks; pairwise requires complete targets",
     )
     parser.add_argument(
         "--max-train-steps",

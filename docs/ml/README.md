@@ -1256,7 +1256,7 @@ R0/R1/R2의 개발 검증 우승 방법과 즉시 운영 가능한 package는 �
 | 순서 | 공통으로 먼저 만들 항목 | 완료 판단 | 시점 |
 |---|---|---|---|
 | 1 | 학습/추론 길이 manifest, 전처리, package/policy hash, 시작 적재·hot reload | R0/v1·R1/v2 생산자→소비자 fixture 일치, 잘못된 새 package 거부 및 기존 모델 유지 | 분기 전 |
-| 2 | Spring v2 계약·정책 provenance, feedback 원자적 claim, 요청 snapshot·멱등 재시도, PII 검사, 상태 polling | 기존 v1 회귀와 PostgreSQL 동시 제출·rollback·migration 검증 | 분기 전 |
+| 2 | Spring 기존 v1 계약 유지·내부 정책 provenance, feedback 원자적 claim, 요청 snapshot·멱등 재시도, PII 검사, 상태 polling | 기존 v1 회귀와 PostgreSQL 동시 제출·rollback·migration 검증 | 분기 전 |
 | 3 | GCS 경로·API·IAM·서비스 계정·AR·보존 정책 | 실제 inventory, 새 feedback 경로의 VM 계정 접근 확인, 기존 CURRENT 보존 | 분기 전 |
 | 4 | 승격 증거·CURRENT CAS·실제 활성화 상태 | Vertex 성공만으로 승격 성공을 만들지 않고 gate/manifest/pipeline/batch/hash 결합 확인 | 분기 전 |
 | 5 | R0/R1별 target·loss·gate·release 설정 | 아래 방법별 계약을 각 브랜치에서 검증; 실제 release 입력 누락 시 차단 | 공통 커밋 후 병렬 |
@@ -1278,6 +1278,33 @@ R0/R1/R2의 개발 검증 우승 방법과 즉시 운영 가능한 package는 �
 | 배포 기본 | 자동 제출·활성화는 검증된 release 입력이 있을 때만 | 동일; benchmark 모델 ID를 Claude로 이름만 바꾼 release 금지 |
 
 공통 부분이라고 해서 배포 후 검증을 미리 완료 처리하지 않는다. 컨테이너의 실제 UID·볼륨·ADC·secret, Spring→FastAPI 연결, 8,192 p95/메모리, CURRENT와 실제 로딩 모델의 일치는 서버가 준비된 뒤 측정한다. Spring 기존 15초 timeout은 측정 없이 임의로 늘리지 않는다. 지금 존재하지 않는 실제 서비스 pool 결과·baseline·gate 기준은 만들어 넣지 않고 release 준비 검사에서 누락을 명시한다.
+
+<a id="post-implementation-work"></a>
+### 5.12. 파이프라인·서비스 코드 완성 이후 남은 작업 — 2026-09-26
+
+코드 구현 완료, 실제 서비스 인수, 전체 연구 완료는 서로 다른 단계다. 기본 운영은 R1이며 R0는 교체 브랜치로 유지한다. A의 R0/R1/R2, G1의 R1/R3 natural/balanced, 고정 holdout·RouterArena 및 512→8192 길이 비교는 이미 수행했으므로 아래 목록을 이 실험의 전면 재실행 요구로 읽지 않는다.
+
+**아직 코드 단계에서 남은 연결.** R1의 명시적 관측 저장·내부 export, 부분 관측 masked BCE, 기존 API를 유지하는 추론 프로필, 품질·비용 qualification 함수는 로컬 구성요소다. 실제 판정 수집→관측 배치 제출→Vertex 재학습→R1 전용 승격 증거·publisher 연결을 완료한 것은 아니다. 기존 finalLabel CE 입력을 R1 성공 라벨로 바꾸거나 R0 gate로 R1을 승인하지 않으며, 이 연결 전에는 legacy 자동 제출을 차단한다. 이 문단의 미완료 구현을 아래의 배포 후 시험만 남은 상태로 표시하지 않는다.
+
+| 운영 순서 | 코드 완성 이후 수행할 작업 | 완료 증거 |
+|---|---|---|
+| 1. 실제 서비스 모델·정책 확정 | 실제 후보 3개의 고정 모델 ID, 단가/의사결정 비용 버전, 비용 가중치 λ와 policy를 확정한다. 공개 benchmark pool의 성공률을 실제 Claude 성공률로 이름만 바꾸지 않는다. | 후보 pool·policy·모델 파일 hash와 선정 근거 |
+| 2. 운영 데이터·기준 모델·승격 시험 준비 | 명시적으로 판정된 실제 호출 결과와 보호된 D_dev/D_gate를 준비한다. 학습은 관측 후보만 사용하지만 공정한 R1 승격 비교에는 동일 문항의 세 후보 결과가 필요하다. 동일8192 baseline과 품질·비용·domain 회귀 허용치를 D_dev에서 동결한다. | 데이터/평가 manifest·SHA, baseline, 동결 기준 및 실제 평가 결과 |
+| 3. R1 배포 | image digest→새 Vertex IR→config/data/model SHA를 고정한다. 계정별 실제 IAM·image pull·quota·비용 한도, DB migration·SQLite/볼륨·secret을 확인한다. 기존 그룹을 Drive에서 원격 재읽기·SHA 검증한 후 교체하여 GCS에는 활성 모델 그룹 하나만 둔다. | 재현 가능한 release, Drive 보존/교체 기록, 기존 API 연결 및 실제 적재 모델 |
+| 4. 실제 서버8192 시험 | 짧은/긴 입력의 p50/p95, 최대 메모리, 동시 요청, timeout·fallback을 측정한다. 기존 Spring 15초 timeout의 적합성을 결과로 판단한다. | 대상 VM 측정 보고서; Colab GPU의 forward 성공으로 대체하지 않음 |
+| 5. 전체 재학습·복구 시험 | 유효 피드백→학습→승격 시험→CURRENT→서버 실제 적재를 실행한다. 중복 제출·재시도·동시 요청·gate 탈락·적재 실패·rollback·Drive 복구도 확인한다. | 배치별 로그/지표/승격 증거와 서버 modelVersion 일치; 단순202 또는 Vertex 성공만으로 완료 처리하지 않음 |
+
+이후 연구를 완성하기 위한 실행은 다음과 같다. 운영 인수의 필수 조건과 분리하여 예산·일정을 정한다.
+
+| 연구 항목 | 남은 실행과 확인할 질문 |
+|---|---|
+| 재학습 F0/F1/F2 | 고정 모델 / 새 cycle 데이터만 학습 / replay·rehearsal 포함 학습을 같은 피드백·6회 제출 기회·학습량·validation48 조건에서 비교한다. 실제 개선과 기존 능력의 망각, 비용을 측정한다. R0/R1이라는 목적함수 비교와는 다른 축이다. |
+| 캐시 C0/C1/C2 | 캐시 없음 / exact / semantic을 고정 라우터 아래 비교한다. D1 반복 replay와 D2 사람 검증 동의어·hard negative trace를 준비하고 오답 재사용·품질·호출 비용·지연을 평가한다. C3 reranker는 선택 확장이다. |
+| 추가 외부 평가 | §4.9에서 조사한 LLMRouterBench, SPROUT의 이용 조건·실제 후보 교집합·중복·점수/비용 매핑을 확인한 뒤 독립 평가 데이터를 봉인한다. 후보 조사가 데이터 준비 완료를 뜻하지 않는다. |
+| 공정한 기준선·논문 비교 | source-only B의 실제 공통 세 후보에서 TF-IDF, BGE+kNN, ModernBERT 및 RouterDC를 같은 조건으로 비교한다. finalist 추가 seed, confidence 보정, group bootstrap을 마무리한다. |
+| 인지 수준·최종 보고서 | blind 주석·통제 문항쌍과 사람 검증을 수행하고, 난이도 label 일치·후보 선택 품질·인지 정렬을 분리해 재현 가능한 보고서와 그림을 완성한다. |
+
+권장 실행 순서는 **남은 R1 연결 구현 → 운영 인수1~5 → 재학습 효과 → 캐시 → 외부 일반화·논문 비교 보완**이다. 독립적인 데이터 적합성 조사·보고서 정리는 병렬로 진행할 수 있다.
 
 <a id="cache"></a>
 ## 6. 캐시 실험
@@ -1702,7 +1729,7 @@ research/<experiment-version>/  독립 dataset·prediction·snapshot·비용 led
 <a id="execution-7"></a>
 ### 7.7. 현재 구현과 최종 명세의 차이
 
-별도 날짜가 없는 항목은 2026-09-20 로컬 코드 확인 기준이며, 2026-09-24에 이번 초기 모델·재학습 복구 관련 구현 증거를 갱신했다. 이 표가 연구 실행 차이 목록이며 다른 문서의 설계 설명을 구현 완료 표시로 읽지 않는다. HTTP 관측 보장의 상세는 serving API 계약이 소유한다.
+별도 날짜가 없는 항목은 2026-09-20 로컬 코드 확인 기준이다. 2026-09-24~26 초기 모델·재학습 복구·공통 기반의 증거를 갱신했으며, 코드 완성 이후의 우선순위는 [남은 작업](#post-implementation-work)에 정리한다. 이 표가 연구 실행 차이 목록이며 다른 문서의 설계 설명을 구현 완료 표시로 읽지 않는다. HTTP 관측 보장의 상세는 serving API 계약이 소유한다.
 
 | 범위 | 확인한 상태 | 최종 실행 전에 필요한 것 |
 |---|---|---|
@@ -1710,15 +1737,16 @@ research/<experiment-version>/  독립 dataset·prediction·snapshot·비용 led
 | 공통 학습 weight | objective trainer는 sample weight 사용, TF-IDF는 동일 적용 안 됨 | 최종 초기 비교의 effective weight 1을 모든 방법에 구현·manifest 기록; 기존 metadata weight는 보존하고 운영 feedback 가중치와 구분 |
 | 3개 실제 후보 비교 | objective 데이터·훈련·lock CLI 있음 | B의 source-only T1 probe와 실제 3-model outcome/비용 adapter·공통 후보 계약 검증; 집단 평균을 실제 호출로 해석하지 않음 |
 | R0/R1/R2 | 2026-09-24 `85c422c` T4 동일 2,007 step·seed 42 세 방법 완료, D_dev 선택 lock의 승자는 R1; GCS·Drive 보존 및 예측 기반 nAUC 재검산 완료 | 독립 test 7,202문항 평가 완료·서비스 인수 미완료; B의 추가 seed/RouterDC 실행은 별도 |
-| G1 추가 비교 | 2026-09-25 개인 Colab에서 네 arm 각각 2,007 step 완료; Drive 완료 manifest·전체 artifact SHA·CPU merge 검증, selection lock의 선정은 R1-natural | [선정 수치·기준선 한계](#generalization-selection-results). [Task holdout·새 G1 RouterArena 완료](#generalization-final-evaluation); R1-natural의 xRouteBench 예산 실패와 기준선 한계로 운영 채택 보류 권고. 기존 A와 직접 점수 비교 불가, 운영 인수·정책 변경 없음. [고정 config](../../ml/config/routing_generalization_v1.json) |
+| G1 추가 비교 | 2026-09-25 개인 Colab에서 네 arm 각각 2,007 step 완료; Drive 완료 manifest·전체 artifact SHA·CPU merge 검증, selection lock의 선정은 R1-natural | [선정 수치·기준선 한계](#generalization-selection-results). [Task holdout·새 G1 RouterArena 완료](#generalization-final-evaluation); 당시 연구 보고서는 xRouteBench 예산 실패와 기준선 한계로 운영 채택 보류를 권고했다. 이후 사용자는 R1 구현·단독 운영 방향을 선택했으나 실제 서비스 pool 검증·운영 인수는 미완료다. 기존 A와 직접 점수 비교 불가. [고정 config](../../ml/config/routing_generalization_v1.json) |
 | 표현/모델 | TF-IDF 코드·비교 notebook 있음 | BGE+kNN, 동일 예산·입력 길이·sample weight audit, 최종 최소 모델군 결과 |
 | 공식 라우터 | 논문·adapter 설계 | RouterDC 공통 pool adapter, test를 validation으로 사용하는 코드 경로 방지, 고정 budget 재학습; GraphRouter 등은 확장 |
-| Held-out 평가 | RouterArena evaluator와 objective test CLI 있음 | label/선택품질/인지 정렬 구분, global nAUC를 source별 curve/macro와 정렬, 퇴화 정규화 N/A, row bootstrap을 group 단위로 보완, robustness paired 지표·batch-1 latency·최종512 config |
+| Held-out 평가 | RouterArena evaluator와 objective test CLI 있음 | label/선택품질/인지 정렬 구분, global nAUC를 source별 curve/macro와 정렬, 퇴화 정규화 N/A, row bootstrap을 group 단위로 보완, robustness paired 지표·batch-1 latency; 역사적 공통 비교512와 새 서비스 추론8192의 조건·증거를 분리 |
 | RouterArena 실제 진단 | 2026-09-24 최종512 조건에서 8,379 label·412 paired 쌍, R0/R1/R2 총 26,373 추론·모델 hash 검증 완료; [분석](#observed-objective-results) | 학습 목표별 해석 유지, 추가 GCS 보존은 수행하지 않음. 단일 seed·과거 노출·라벨 정의 차이를 제거한 일반화 증거로 확대하지 않음 |
 | 추가 외부 평가셋 | 공식 자료 6개 후보 조사, LLMRouterBench·SPROUT 우선 inventory 제안 | 사용 조건·실제 pool 교집합·문항 중복·점수/비용 매핑 검증 미실행. [후보와 제한](#external-evaluation-candidates) |
 | Calibration·선정 | raw ECE·Q_model와 기존 finalist lock 코드 | 공통 raw-confidence ECE, neural 보정 진단 분리, B 우선 전역 2개 finalist 반복 예산을 명시적으로 구현; 표현 축의 별도 top2 sweep 방지 |
 | 기준선의 선택 정책 | 2026-09-24 `d150e87` [봉인 평가기](../../ml/scripts/evaluate-sealed-routing.py)로 7,202 test 질문·세 모델 추론 및 고정 정책 평가 완료; train-best·validation 비율 random 100 seed·paired group bootstrap 10,000회 | [실제 보고서](../../experiments/results/routing-objectives-continual-v1-A-20260924/sealed-tests/REPORT.md). R1/R2 xRouteBench 기본 budget 초과를 명시; 연구 진단이며 운영 D_gate 아님 |
 | 인지 수준 보조 실험 | blind annotation·통제 문항쌍 설계 | 고정 judge prompt/model, 사람 검증, 평가 데이터 봉인; API 호출은 미실행 |
+| 공통 코드·cloud 기반 | 2026-09-26 공통 ML `961717d`·Serving `6f83f8d`: 길이/정책·승격 증거·기존 API 및 Spring batch/retry/polling; 실제 cloud namespace·VM feedback 경로 접근 확인 | 실제 release 입력·Pipeline/Training 계정 실행 권한·image/IR·VM8192·전체 E2E는 별도. CURRENT/운영 모델 미변경. [증거](CLOUD_FOUNDATION.md) |
 | 운영 feedback core | inline→GCS, prepare/merge, version/replay, CustomJob, gate/publish/watcher 코드 있음 | 최신 유효 batch E2E·실제 serving 활성화 증거 확보; code 존재와 cloud 실측 분리 |
 | 연구 feedback | F0/F1/F2·6기회 사양 | fresh continual split, frozen logger·shared batch harness, F1/F2 공통 shuffle·실제 step 일치·공통 validation48 |
 | 연구 승격 gate | 2026-09-24 `55e3cc3` D_gate 분류 adapter·평가 계약 검사, `de11724` 보호 분할을 보존한 base 구성, `d2fc8f9` 고정 후보 outcome projection 구현; 원격 DAG는 아직 이전 설정 | 선택 objective의 품질/비용 gate와 baseline, 통합 base 게시·새 image/IR 및 E2E; CE 분류 gate만으로 R1/R2 승격하지 않음 |

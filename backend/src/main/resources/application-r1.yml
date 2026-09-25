@@ -1,0 +1,10 @@
+# R1 changes the classifier implementation behind the existing HTTP contract.
+llm:
+  router:
+    classify-contract: v1
+  retraining:
+    legacy-enabled: false
+    auto-submit: false
+    observation:
+      enabled: ${R1_OBSERVATION_ENABLED:false}
+      target-contract-version: ${R1_TARGET_CONTRACT_VERSION:}
