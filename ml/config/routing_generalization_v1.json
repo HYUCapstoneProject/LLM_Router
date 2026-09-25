@@ -1,0 +1,295 @@
+{
+  "schema_version": "routing-generalization-config-v1",
+  "experiment_version": "routing-generalization-v1",
+  "dataset_version": "routing-generalization-v1",
+  "seed": 42,
+  "input_contract": "structure-preserving-v2",
+  "base": {
+    "manifest": {
+      "path": "ml/artifacts/modernbert-initial-v1/dataset/manifest.json",
+      "sha256": "f6a4cff1684bc2626a8901dbfda9f81e7d5d7e8753e5f48320cb1ada44c8cca4"
+    },
+    "training": {
+      "path": "ml/artifacts/modernbert-initial-v1/dataset/training.parquet",
+      "sha256": "8e382ee84419aa881ea0c4a68fabb0103945ab3452cdbc98720c149e36eb09ab",
+      "bytes": 18056414
+    }
+  },
+  "source_artifacts": {
+    "ml/artifacts/routerbench-labeled/withmartian-routerbench-2024-03-27__routerbench-capability-tier-v1__overall-solve-rate-v3-probe-selected/labeled.parquet": {
+      "sha256": "33fb6a8fd198d79b8adb86e644dfae0d7569c4b36df7b104f023f5ba8be50748",
+      "bytes": 28263921
+    },
+    "ml/artifacts/routerbench-labeled/withmartian-routerbench-2024-03-27__routerbench-capability-tier-v1__overall-solve-rate-v3-probe-selected/model_tiers.json": {
+      "sha256": "a88ce8a77e6ea14901601809a9cf2bc936d13addacd476185089fdb7a2d2e11e",
+      "bytes": 2120
+    },
+    "ml/data/raw/xroutebench/ea4b6e1b29d9a734f55f0a637baf326bad6aa681/llmrouter_generic-train.parquet": {
+      "sha256": "6ae53d6b619396271e345a242bd32c253fc9796a45a75d3c122ad74843f8a7ef",
+      "bytes": 10917678
+    },
+    "ml/data/raw/xroutebench/ea4b6e1b29d9a734f55f0a637baf326bad6aa681/llm_candidates.parquet": {
+      "sha256": "ba72146533ae68641e382759c90ff5bc53eb903956d4e748b7f3c0111907541f",
+      "bytes": 8450
+    }
+  },
+  "routerbench": {
+    "labeled_path": "ml/artifacts/routerbench-labeled/withmartian-routerbench-2024-03-27__routerbench-capability-tier-v1__overall-solve-rate-v3-probe-selected/labeled.parquet",
+    "model_tiers_path": "ml/artifacts/routerbench-labeled/withmartian-routerbench-2024-03-27__routerbench-capability-tier-v1__overall-solve-rate-v3-probe-selected/model_tiers.json"
+  },
+  "xroutebench": {
+    "revision": "ea4b6e1b29d9a734f55f0a637baf326bad6aa681",
+    "data_dir": "ml/data/raw/xroutebench/ea4b6e1b29d9a734f55f0a637baf326bad6aa681",
+    "train_file": "llmrouter_generic-train.parquet",
+    "test_file": "FORBIDDEN-original-test.parquet",
+    "candidates_file": "llm_candidates.parquet",
+    "exact_metrics": [
+      "em_mc",
+      "GSM8K",
+      "MATH",
+      "code_eval"
+    ],
+    "continuous_metrics": [
+      "f1_score"
+    ],
+    "continuous_acceptance_threshold": 0.7
+  },
+  "task_taxonomy": {
+    "version": "cross-source-benchmark-family-v1",
+    "routerbench": {
+      "field": "source_task",
+      "exact": {
+        "arc-challenge": {
+          "task": "arc_challenge",
+          "domain": "science_reasoning"
+        },
+        "grade-school-math": {
+          "task": "gsm8k",
+          "domain": "math_reasoning"
+        },
+        "hellaswag": {
+          "task": "hellaswag",
+          "domain": "commonsense_choice"
+        },
+        "mbpp": {
+          "task": "mbpp",
+          "domain": "code_generation"
+        },
+        "winogrande": {
+          "task": "winogrande",
+          "domain": "commonsense_choice"
+        }
+      },
+      "prefix": {
+        "mmlu-": {
+          "task": "mmlu_family",
+          "domain": "knowledge_mcq"
+        },
+        "mtbench": {
+          "task": "mtbench",
+          "domain": "conversation"
+        }
+      }
+    },
+    "xroutebench": {
+      "field": "category",
+      "exact": {
+        "arc_challenge": {
+          "task": "arc_challenge",
+          "domain": "science_reasoning"
+        },
+        "openbook_qa": {
+          "task": "openbook_qa",
+          "domain": "science_reasoning"
+        },
+        "math": {
+          "task": "math_competition",
+          "domain": "math_reasoning"
+        },
+        "gsm8k": {
+          "task": "gsm8k",
+          "domain": "math_reasoning"
+        },
+        "aime_2020_2024": {
+          "task": "aime",
+          "domain": "math_reasoning"
+        },
+        "mmlu": {
+          "task": "mmlu_family",
+          "domain": "knowledge_mcq"
+        },
+        "mmlu_pro": {
+          "task": "mmlu_family",
+          "domain": "knowledge_mcq"
+        },
+        "mbpp": {
+          "task": "mbpp",
+          "domain": "code_generation"
+        },
+        "human_eval": {
+          "task": "human_eval",
+          "domain": "code_generation"
+        },
+        "hellaswag": {
+          "task": "hellaswag",
+          "domain": "commonsense_choice"
+        },
+        "commonsense_qa": {
+          "task": "commonsense_qa",
+          "domain": "commonsense_choice"
+        },
+        "boolq": {
+          "task": "boolq",
+          "domain": "reading_qa"
+        },
+        "squad": {
+          "task": "squad",
+          "domain": "reading_qa"
+        }
+      },
+      "prefix": {}
+    }
+  },
+  "split": {
+    "version": "new-train-dev-task-domain-holdout-v1",
+    "holdout_task_groups": [
+      "arc_challenge"
+    ],
+    "holdout_domain_groups": [
+      "code_generation"
+    ],
+    "in_domain_fractions": {
+      "train": 0.8,
+      "calibration": 0.1,
+      "selection": 0.1
+    },
+    "holdout_fraction_bounds": [
+      0.02,
+      0.5
+    ],
+    "minimum_rows_per_source": {
+      "train": 100,
+      "calibration": 30,
+      "selection": 30,
+      "task_holdout": 30
+    }
+  },
+  "balancing": {
+    "rule": "equal-source-then-task-capped-mean1-v1",
+    "max_sample_weight": 3.0,
+    "training_views": [
+      "natural",
+      "balanced"
+    ],
+    "uses_difficulty_labels": false
+  },
+  "arm_selection": {
+    "rule": "train-only-pareto-extremes-knee-v1",
+    "quality_tolerance": 1e-12,
+    "minimum_frontier_size": 3
+  },
+  "backbone": {
+    "model_id": "answerdotai/ModernBERT-base",
+    "revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+    "max_length": 512,
+    "num_labels": 3
+  },
+  "training": {
+    "epochs": 3,
+    "train_batch_size": 8,
+    "eval_batch_size": 16,
+    "gradient_accumulation_steps": 4,
+    "learning_rate": 2e-05,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.1,
+    "gradient_clip_norm": 1.0,
+    "precision": "fp16",
+    "pairwise_tie_weight": 0.25,
+    "regret_lambdas": [
+      0.0,
+      0.05,
+      0.1,
+      0.2,
+      0.4,
+      0.8,
+      1.6,
+      3.2
+    ],
+    "gradient_checkpointing": true,
+    "attention_implementation": "eager",
+    "sample_weight": 1.0,
+    "train_sampling_strategy": "shuffle",
+    "checkpoint_selection": "fixed_budget_final",
+    "max_optimizer_steps": 2007,
+    "initialization": "fresh-pinned-pretrained-only"
+  },
+  "arms": [
+    {
+      "name": "r1-natural",
+      "method": "pointwise",
+      "view": "natural"
+    },
+    {
+      "name": "r1-balanced",
+      "method": "pointwise",
+      "view": "balanced"
+    },
+    {
+      "name": "r3-natural",
+      "method": "regret",
+      "view": "natural"
+    },
+    {
+      "name": "r3-balanced",
+      "method": "regret",
+      "view": "balanced"
+    }
+  ],
+  "evaluation": {
+    "penalty_grid": [
+      0.0,
+      0.0001,
+      0.0003,
+      0.001,
+      0.003,
+      0.01,
+      0.03,
+      0.1,
+      0.3,
+      1.0,
+      3.0,
+      10.0,
+      30.0,
+      100.0
+    ],
+    "relative_cost_budgets": [
+      0.0,
+      0.1,
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "quality_retention_targets": [
+      0.95,
+      0.98
+    ],
+    "bootstrap_iterations": 2000,
+    "selection_metric": "source_macro_locked_policy_quality_auc",
+    "default_relative_cost_budget": 0.5,
+    "require_selection_budget_feasible": true,
+    "lambda_selection_role": "calibration",
+    "arm_selection_role": "selection",
+    "task_holdout_requires_selection_lock": true
+  },
+  "protocol": {
+    "new_data_source": false,
+    "previous_model_weights_permitted": false,
+    "previous_test_arena_gate_stream_permitted": false,
+    "inherited_t1_labels_diagnostic_only": true,
+    "service_pool_transfer_permitted": false,
+    "requires_separate_deployment_contract": true,
+    "holdout_usage": "one diagnostic pass after selection is locked; no tuning on holdout",
+    "previous_exposure": "Parent train/development rows were seen by prior models; all four arms require fresh initialization. Taxonomy design follows earlier project diagnostics."
+  }
+}

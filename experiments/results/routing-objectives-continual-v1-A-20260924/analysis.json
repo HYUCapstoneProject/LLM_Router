@@ -1,0 +1,141 @@
+{
+  "schema_version": "routing-objective-report-analysis-v1",
+  "selection_unchanged": true,
+  "training_or_policy_fitting_performed": false,
+  "validation_lock_sha256": "ddae362cb6e826376383427933deae22bab1061390709be8f781345caa608e5f",
+  "seed": 42,
+  "training_seed_count": 1,
+  "default_relative_cost_budget": 0.5,
+  "default_budget_policy_results": [
+    {
+      "method": "ordinal",
+      "source": "routerbench",
+      "penalty": 0.0,
+      "rows": 3122,
+      "mean_quality": 0.6009929532351057,
+      "mean_actual_cost": 0.0007471759128763613,
+      "relative_cost": 0.0763592687196075,
+      "tier_counts": {
+        "low": 1829,
+        "medium": 1160,
+        "high": 133
+      },
+      "tier_rates": {
+        "low": 0.5858424087123638,
+        "medium": 0.37155669442664957,
+        "high": 0.042600896860986545
+      }
+    },
+    {
+      "method": "ordinal",
+      "source": "xroutebench",
+      "penalty": 0.003,
+      "rows": 459,
+      "mean_quality": 0.6750990718168436,
+      "mean_actual_cost": 0.00011823867102396514,
+      "relative_cost": 0.23426526628275382,
+      "tier_counts": {
+        "low": 336,
+        "medium": 29,
+        "high": 94
+      },
+      "tier_rates": {
+        "low": 0.7320261437908496,
+        "medium": 0.06318082788671024,
+        "high": 0.2047930283224401
+      }
+    },
+    {
+      "method": "pointwise",
+      "source": "routerbench",
+      "penalty": 0.1,
+      "rows": 3122,
+      "mean_quality": 0.7959961563100576,
+      "mean_actual_cost": 0.004058521396540679,
+      "relative_cost": 0.494170593875139,
+      "tier_counts": {
+        "low": 12,
+        "medium": 1732,
+        "high": 1378
+      },
+      "tier_rates": {
+        "low": 0.003843689942344651,
+        "medium": 0.5547725816784113,
+        "high": 0.44138372837924406
+      }
+    },
+    {
+      "method": "pointwise",
+      "source": "xroutebench",
+      "penalty": 0.03,
+      "rows": 459,
+      "mean_quality": 0.7393695347405344,
+      "mean_actual_cost": 0.00021820555555555557,
+      "relative_cost": 0.4596364722290236,
+      "tier_counts": {
+        "low": 122,
+        "medium": 159,
+        "high": 178
+      },
+      "tier_rates": {
+        "low": 0.2657952069716776,
+        "medium": 0.3464052287581699,
+        "high": 0.3877995642701525
+      }
+    },
+    {
+      "method": "pairwise",
+      "source": "routerbench",
+      "penalty": 1.0,
+      "rows": 3122,
+      "mean_quality": 0.7420083279948751,
+      "mean_actual_cost": 0.0012185173606662396,
+      "relative_cost": 0.13583110452572586,
+      "tier_counts": {
+        "low": 134,
+        "medium": 2748,
+        "high": 240
+      },
+      "tier_rates": {
+        "low": 0.042921204356181936,
+        "medium": 0.8802049967969251,
+        "high": 0.07687379884689302
+      }
+    },
+    {
+      "method": "pairwise",
+      "source": "xroutebench",
+      "penalty": 0.1,
+      "rows": 459,
+      "mean_quality": 0.7449678770530167,
+      "mean_actual_cost": 0.00021512254901960784,
+      "relative_cost": 0.45268596152537954,
+      "tier_counts": {
+        "low": 146,
+        "medium": 129,
+        "high": 184
+      },
+      "tier_rates": {
+        "low": 0.31808278867102396,
+        "medium": 0.28104575163398693,
+        "high": 0.4008714596949891
+      }
+    }
+  ],
+  "source_macro_default_budget_quality": {
+    "ordinal": 0.6380460125259746,
+    "pointwise": 0.767682845525296,
+    "pairwise": 0.7434881025239459
+  },
+  "service_tier_projection": {
+    "low": "easy",
+    "medium": "medium",
+    "high": "hard"
+  },
+  "service_family_hints": {
+    "low": "haiku",
+    "medium": "sonnet",
+    "high": "opus"
+  },
+  "service_pool_evaluated": false
+}

@@ -1,0 +1,66 @@
+{
+  "status": {
+    "status": "complete",
+    "started_at_unix": 1790247614.391265,
+    "production_activated": false,
+    "input_sha256": "67a0afd8cf8b78209e552f72389cffcad9a61449743952a7b91392831ab98f4c",
+    "finished_at_unix": 1790248098.0220346
+  },
+  "receipts": {
+    "input": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/sealed-tests-v1/sealed-input.tar.gz",
+      "size_bytes": 10782517,
+      "sha256": "67a0afd8cf8b78209e552f72389cffcad9a61449743952a7b91392831ab98f4c",
+      "crc32c": "50AvKA==",
+      "generation": "1790247616949326",
+      "verified_at_unix": 1790247617.0631075
+    },
+    "protocol": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/sealed-tests-v1/sealed-protocol.tar",
+      "size_bytes": 40960,
+      "sha256": "b42ecde5bfd0fec288833ee23a021b9a8978cab25ca08e34b53f8fe871cb7976",
+      "crc32c": "PWsXtQ==",
+      "generation": "1790247633873933",
+      "verified_at_unix": 1790247633.9683821
+    },
+    "inference": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/sealed-tests-v1/sealed-inference.tar",
+      "size_bytes": 1085440,
+      "sha256": "828337557ae691df0aa35bd3dc200ad2b911a503fa278a804947d67583f4d462",
+      "crc32c": "6yBsQw==",
+      "generation": "1790248072366763",
+      "verified_at_unix": 1790248072.4801514
+    },
+    "results": {
+      "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/sealed-tests-v1/sealed-evaluation.tar",
+      "size_bytes": 2293760,
+      "sha256": "ad4b52f7ae3dcb6931475b5e780c71f30d16d697a1af4f7f0b184477f8eaaf8f",
+      "crc32c": "XFtgog==",
+      "generation": "1790248097882032",
+      "verified_at_unix": 1790248097.9907641
+    }
+  },
+  "personal_drive": {
+    "status": "verified_after_flush_and_remount",
+    "root": "/content/drive/MyDrive/LLM_Router/routing-objectives-continual-v1-A-20260924/sealed-tests",
+    "files": {
+      "sealed-input.tar.gz": {
+        "size_bytes": 10782517,
+        "sha256": "67a0afd8cf8b78209e552f72389cffcad9a61449743952a7b91392831ab98f4c"
+      },
+      "sealed-protocol.tar": {
+        "size_bytes": 40960,
+        "sha256": "b42ecde5bfd0fec288833ee23a021b9a8978cab25ca08e34b53f8fe871cb7976"
+      },
+      "sealed-inference.tar": {
+        "size_bytes": 1085440,
+        "sha256": "828337557ae691df0aa35bd3dc200ad2b911a503fa278a804947d67583f4d462"
+      },
+      "sealed-evaluation.tar": {
+        "size_bytes": 2293760,
+        "sha256": "ad4b52f7ae3dcb6931475b5e780c71f30d16d697a1af4f7f0b184477f8eaaf8f"
+      }
+    },
+    "copy_errors": {}
+  }
+}

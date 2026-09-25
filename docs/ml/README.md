@@ -1,6 +1,6 @@
 # ML 최종 실험 명세
 
-기준일: 2026-09-23. 데이터·라우팅 비교·평가·재학습·캐시·실행 관리의 **현재 기준은 이 파일 하나**다. 과거 설정·실험 기록은 [Deprecated settings](../deprecated-settings.md), 설치·CLI 입구는 [ml/README](../../ml/README.md), 프로젝트 개요·협업 규칙은 [문서 시작점](../README.md)을 따른다. 프로젝트 결정 원장은 memorize다.
+기준일: 2026-09-25. 데이터·라우팅 비교·평가·재학습·캐시·실행 관리의 **현재 기준은 이 파일 하나**다. 과거 설정·실험 기록은 [Deprecated settings](../deprecated-settings.md), 설치·CLI 입구는 [ml/README](../../ml/README.md), 프로젝트 개요·협업 규칙은 [문서 시작점](../README.md)을 따른다. 프로젝트 결정 원장은 memorize다.
 
 > 어떤 조건에서 임베딩 캐시와 에스컬레이션 피드백 학습을 결합한 라우팅 시스템이 더 나은 비용–품질 균형을 만드는가?
 
@@ -13,6 +13,9 @@
 5. [재학습 파이프라인](#retraining)
 6. [캐시 실험](#cache)
 7. [실행·산출물 관리](#execution) / [실행 전 구현 차이](#implementation-gaps)
+8. [쉬운 용어 정리](#plain-language-glossary)
+
+처음 읽는다면 [R0~R3 요약과 쉬운 설명](#objectives-plain-language) → [세 후보를 3단계로 선택하는 과정](#three-stage-selection-explained) → [용어표](#plain-language-glossary) 순으로 볼 수 있다.
 
 <a id="overview"></a>
 ## 1. 연구 전제와 최소 실험
@@ -54,7 +57,42 @@ flowchart TD
     I --> J
 ```
 
-새 결정은 memorize와 이 파일의 해당 장에 반영하고 config/manifest를 함께 갱신한다. 별도의 최신 계획·체크리스트 사본을 만들지 않는다. 실행 결과는 artifact에 저장하고 이 파일에서는 위치와 검증 상태만 관리한다.
+새 결정은 memorize와 이 파일의 해당 장에 반영하고 config/manifest를 함께 갱신한다. 별도의 최신 계획·체크리스트 사본을 만들지 않는다. 실행 원본은 artifact에 보존하고 이 파일에 주요 결과·해석·다음 실험의 근거를 함께 기록한다.
+
+<a id="observed-objective-results"></a>
+### 1.1. R0·R1·R2 실측 결과와 추가 실험의 근거
+
+2026-09-24 통합 A는 동일한 ModernBERT-base, train 21,406문항, D_dev 3,581문항, 최대 512토큰, seed 42, 2,007 optimizer step으로 세 방법을 학습했다. R0는 난이도 CE, R1은 실제 후보별 성공 BCE, R2는 후보 품질 차이의 pairwise 학습이다. 독립 seed 반복은 아직 없다. [학습·선정 원본](../../experiments/results/routing-objectives-continual-v1-A-20260924/REPORT.md), [고정 test 원본](../../experiments/results/routing-objectives-continual-v1-A-20260924/sealed-tests/REPORT.md).
+
+| 방법 | D_dev source-macro 비용–품질 nAUC ↑ | 고정 test 기본 budget .50의 평균 품질 ↑ | 같은 test의 상대 실제 비용 |
+|---|---:|---:|---:|
+| R0 | 0.166115 | 0.656886 | 0.112373 |
+| R1 | **0.863179** | **0.789141** | 0.513201 |
+| R2 | 0.833874 | 0.762016 | 0.340807 |
+
+선정은 D_dev의 nAUC로 완료했고 승자는 R1이다. nAUC는 여러 비용 구간의 정규화 품질 회복량이며 성공 확률이 아니다. Test는 RouterBench 3,473개와 xRouteBench 3,729개, 총 7,202개 문항에 validation에서 고정한 정책을 적용한 결과다. 원천별 실제 비용을 정규화한 뒤 같은 비중으로 평균했으므로 달러 비용이나 현재 Claude 절감률로 읽지 않는다. R1의 품질 이득은 지출 증가를 동반하며 동일 비용 우월성을 입증하지 않는다. xRouteBench에서는 R1·R2 상대 비용이 각각 .537229·.541151로 .50 상한을 넘었다. Test 결과로 λ를 다시 맞추지 않았다.
+
+R1−R0 test 평균 품질 차이는 +.132255, 질문 group paired bootstrap 95% 구간은 [.123020, .141503]이다. 이는 고정된 학습 모델·정책에 대한 표본 변동이며 seed 안정성이나 R1−R2의 유의성을 뜻하지 않는다. 통합 A의 세 출력은 원천별 서로 다른 실제 LLM을 나타낸다. RouterBench의 Mistral-7B/Yi-34B/GPT-4와 xRouteBench의 gpt-oss-20B/gpt-oss-120B/Cogito-671B를 같은 실제 모델 풀로 해석하지 않는다.
+
+#### RouterArena 외부 라벨 정렬
+
+2026-09-24~25 새 평가에서는 원본을 구조 보존 입력으로 다시 조립하고 개발 데이터 35,733문항과 중복을 감사했다. Full 8,400개에서 near overlap 18개·중복 2개·빈 질문 1개를 제외해 **8,379개**를 평가했다. Robustness 412개는 원문과 짝지어진 변형으로 독립 표본 수에 더하지 않는다. 세 모델에 같은 문항, 512토큰, λ=0을 적용했고 26,373개 추론의 원본·모델 SHA를 확인했다. [평가 명세·실행 기록](../../experiments/results/routing-objectives-continual-v1-A-20260924/routing-diagnostics/run.json), [외부 평가 원본](../../experiments/results/routing-objectives-continual-v1-A-20260924/routing-diagnostics/arena-evidence/report-REPORT.md).
+
+| 방법 | 공식 라벨과의 일치율 | 3-label macro-F1 | 이 수치의 의미 |
+|---|---:|---:|---|
+| R0 | 45.48% | .3961 | 난이도 분류기의 외부 라벨 정렬 |
+| R1 | 22.80% | .1754 | 비용 없는 후보 선택을 난이도 슬롯으로 투영한 정렬 |
+| R2 | 21.36% | .1927 | 비용 없는 후보 선택을 난이도 슬롯으로 투영한 정렬 |
+
+R0는 hard 재현율 15.02%, hard→easy 오분류율 52.34%였다. Always-easy 정확도 47.49%도 넘지 못했으나 macro-F1는 그 상수 기준선보다 높다. R1/R2는 난이도 분류기로 학습하지 않았으므로 위 표로 실제 라우팅 품질의 승자를 재선정하지 않는다. T1은 정답률 기반 라벨, Arena는 공식 인지 수준 라벨이라 같은 과제의 정확도 하락으로 직접 해석할 수도 없다. 최대 길이를 넘은 문항은 748개(8.93%)다. 과거 Arena 결과 관찰 이력이 있어 완전히 처음 보는 blind test라고 주장하지 않는다.
+
+#### 출처·카테고리 일반화에 대한 관측
+
+학습 데이터의 원천·카테고리별 최빈 라벨만 답하는 기준선은 xRouteBench D_dev에서 정확도 71.46%, R0는 72.11%였다. 추가 정답은 459문항 중 3개이며 macro-F1는 기준선 .5986이 R0 .5905보다 높았다. RouterBench에서는 같은 기준선 53.01%에 비해 R0 58.84%로 개선됐다. 이 결과는 일부 높은 정확도가 카테고리 사전 분포로 설명됨을 보이지만, 모델이 그 정보만 사용한다는 인과 증거는 아니다. [train-only 기준선 원본](../../experiments/results/routing-objectives-continual-v1-A-20260924/routing-diagnostics/category-baselines/original-audit.md).
+
+같은 원천·카테고리 안에서 선택을 1,000회 재배정한 사후 D_dev 진단에서는 R1/R2의 RouterBench 품질이 재배정 범위보다 높았지만 비용도 높았다. xRouteBench는 세 방법 모두 그 품질 범위 안이었다. 이는 질문별 선택 정보의 보조 진단이며, 그 범위는 신뢰구간이나 독립 test 검정이 아니다. [재배정 진단 원본](../../experiments/results/routing-objectives-continual-v1-A-20260924/routing-diagnostics/category-permutation/original-audit.md).
+
+따라서 **R1의 기존 개발검증 선정은 유지하되, 보지 않은 task에서의 일반화와 실제 서비스 후보에 대한 성공·비용 성능은 별도 검증한다.** 이를 위해 일반화용 데이터 버전과 R1/R3×학습 분포 실험을 추가한다. 기존 결과를 좋은 결과로 바꾸기 위한 test 재튜닝이나 Arena의 학습 편입이 목적이 아니다. 이번 결과는 로컬에 보존했고 추가 GCS 업로드·운영 활성화는 하지 않았다. 평가 T4는 개인 `alexyoo0506@gmail.com` Colab에서 실행 후 종료했으며, 관측 잔액은 190.65→189.83 CU였다.
 
 <a id="data"></a>
 ## 2. 데이터·전처리
@@ -67,6 +105,7 @@ flowchart TD
 | RouterBench text-only | 공개 질문×모델 결과, 난이도 학습·비교 | train으로 학습, validation으로 선택, 고정 test로 최종 평가 |
 | xRouteBench `llmrouter_generic` | 별도 모델 pool의 공개 결과, 통합 학습·3-action 비교 | 공식 train을 train/validation으로 분할, 공식 test는 최종 평가 |
 | RouterArena | 독립적인 인지 수준 기반 외부 난이도 진단 | 중복 검사에 질문 text 사용; 모델·설정 동결 후 label 평가 |
+| 일반화 G1 | 기존 개발 질문의 task/domain 분리 및 학습 분포 ablation | 새 train에서만 후보·가중치 결정; calibration/selection과 task/domain holdout 분리 |
 | 순차 feedback 표본 | 재학습·망각 실험 | 기존 개발 데이터에서 별도 봉인; 초기 모델도 해당 질문을 보지 않음 |
 | 캐시용 반복·의미 문항 | 응답 재사용 검증 | 학습·튜닝 표본과 분리; [캐시 계약](#cache) 적용 |
 
@@ -256,6 +295,37 @@ outcome projection에는 각 action의 `model_id`, `quality`, `success`, `actual
 
 문서 통합은 위 코드 수정이나 데이터 재생성을 수행한 기록이 아니다. 실행 gate와 보존 정책은 [실행·산출물](#execution), 외부 평가·인지 주석은 [평가](#evaluation), feedback의 별도 분할은 [재학습](#retraining)을 따른다.
 
+<a id="generalization-data"></a>
+### 2.10. 추가 데이터 유형 G1: task/domain 일반화
+
+G1은 새로운 benchmark 원천을 수집했다는 뜻이 아니라 **기존 개발 질문의 역할을 다시 고정한 별도 데이터 버전**이다. A의 R0/R1/R2 실측에서 출처·카테고리 경향과 질문별 능력의 구분이 필요해졌기 때문에 추가한다. Natural과 balanced는 같은 질문·후보 outcome·split을 사용하며 학습 loss의 가중치만 다르게 보는 두 view다. balanced용 질문을 복제하거나 별도 평가 정답을 만들지 않는다.
+
+입력 범위는 기존 D_initial_train 21,406개와 D_dev 3,581개, 합계 24,987개다. D_gate·stream·retention, 원본 고정 test, Arena를 학습 또는 새 선택 pool로 편입하지 않는다. 기존 모델은 이 pool의 질문을 보았으므로 그 checkpoint를 G1의 미관측 기준선으로 재사용하지 않고 pinned pretrained backbone에서 다시 시작한다.
+
+`source_task`가 문항 ID인 원천이 있어 해당 문자열만 나누면 가짜 task holdout이 생긴다. [G1 config](../../ml/config/routing_generalization_v1.json)의 원천별 mapping으로 공통 task family를 고정한다. 기본 최종 holdout은 `arc_challenge` task와 `code_generation` 수행유형(domain: MBPP/HumanEval)이다. 이 domain은 코드 생성 유형을 뜻하며 컴퓨터과학 지식 전체가 학습에서 제외됐다는 뜻은 아니다. 같은 family는 두 원천에서 함께 제외하고, duplicate group도 모든 역할을 가로질러 검사한다. Holdout family를 바꾸면 새 version으로 기록한다.
+
+| G1 partition | 허용 역할 |
+|---|---|
+| train | 후보 pool·decision cost·학습 가중치 추정, 모델 학습 |
+| calibration | 후보 점수/비용 정책 보정; 학습 gradient에 사용하지 않음 |
+| selection | 고정된 보정 정책으로 비교군 선택 |
+| task/domain holdout | 학습에서 제외한 family의 최종 일반화 평가; 선택·보정에 사용하지 않음 |
+
+Holdout을 먼저 제외한 나머지를 duplicate-group 단위 train/calibration/selection 80/10/10으로 나눈다. inherited T1은 진단 metadata이며 R1/R3의 target·분할·균형 가중치에 사용하지 않는다. 원천별 실제 세 후보와 decision cost는 **새 train의 outcome만** 사용해 다시 선정하고 네 비교군이 공유한다. Source metadata는 감사·가중치·evaluator에만 사용하며 질문에 접두어로 넣지 않는다. 보호된 partition이나 다른 source의 outcome으로 결측을 보충하지 않는다.
+
+이는 새로 학습하는 모델에 대한 task-disjoint 평가다. 분석자가 기존 benchmark 결과를 보았다는 이력까지 지우는 pristine blind test는 아니다. 서로 다른 원천의 symbolic action 의미도 자동으로 같아지지 않는다. 새 외부 benchmark는 [후보 조사](#external-evaluation-candidates)의 중복·모델 ID·채점 계약을 통과한 경우에만 별도 도입한다.
+
+2026-09-25 실제 로컬 prepare를 완료했다. [manifest](../../ml/artifacts/routing-generalization-v1/dataset/manifest.json) SHA-256은 `956406a392b10cd97c49ae04ae6a1d4733c6e672e53e396cc240c7eb8c8ae98c`다. 모델 학습 완료 기록은 아니다.
+
+| 역할 | RouterBench | xRouteBench | 합계 |
+|---|---:|---:|---:|
+| train | 16,616 | 1,975 | 18,591 |
+| calibration | 2,038 | 237 | 2,275 |
+| selection | 2,060 | 254 | 2,314 |
+| task/domain holdout | 1,173 | 634 | 1,807 |
+
+Holdout은 ARC-Challenge 1,221·MBPP 496·HumanEval 90문항이며 확인한 duplicate-group 교차는 0이다. Balanced view의 weight 평균은 1, 최소 약 0.50170, 최대 3이고 같은 행과 순서를 보존한다. 새 train의 후보 재선정에서 RB의 세 ID는 이전과 같았고, **xRB high는 `cogito-v2-1-671b`에서 `llama-4-maverick`으로 바뀌었다**. xRB low/medium은 GPT-OSS 20B/120B다. [봉인된 후보](../../ml/artifacts/routing-generalization-v1/dataset/arms.json)를 기준으로 삼으며 이전 모델의 가중치·정책을 그대로 재사용하지 않는다.
+
 <a id="routing"></a>
 ## 3. 라우팅 비교 실험
 
@@ -284,6 +354,10 @@ RouterBench+xRouteBench의 동일한 통합 train/validation을 사용한다. T1
 
 기존 `routing-objective-comparison-v1`은 source마다 선택한 실제 세 모델을 공통 low/medium/high index로 투영해 통합 R0/R1/R2를 학습한다. source metadata는 evaluator가 올바른 outcome/cost를 찾는 데만 쓰고 질문 encoder에 붙이지 않는다. 이 결과를 동일한 전역 모델 세 개의 성능이라고 부르지 않는다.
 
+2026-09-24 운영 `1.0` 후보 선정은 **A의 R0/R1/R2 세 방법을 모두 비교한 뒤** 진행한다. 이미 학습 중인 R0는 비교 후보이며 단독으로 운영 anchor를 확정하지 않는다. 이번 최소 비교는 봉인한 continual split의 D_initial_train/D_dev, T1 `(hard=.27, easy=.64)`, seed 42, pinned ModernBERT, 512 tokens와 동일 학습 예산을 공유한다. D_gate·D_stream·D_retention_test·원본 test·RouterArena는 방법 선택에 사용하지 않는다.
+
+R1/R2의 후보별 target을 결합한 뒤 세 방법의 sample ID·입력 hash·data order·실제 optimizer step이 같은지 검증한다. 결측 outcome 때문에 공통 eligible 행이 줄면 R0도 같은 행으로 다시 학습하며, 복구 중인 R0를 조건 확인 없이 재사용하지 않는다. R1/R2는 각각 같은 pretrained revision에서 초기화하고 R0가 fine-tune한 weight에서 시작하지 않는다. 채택은 D_dev의 source별 비용–품질 nAUC의 macro 평균으로 결정하며, 지표·동률 규칙·정책 lock은 [평가 계약](#evaluation-3)을 따른다. GCS의 연구 후보 보관과 운영 `approved/CURRENT` 갱신은 별도 상태다.
+
 <a id="routing-b-최소-논문-비교의-실제-3-action-실험"></a>
 #### B. 최소 논문 비교의 실제 3-action 실험
 
@@ -292,6 +366,8 @@ RouterBench+xRouteBench의 동일한 통합 train/validation을 사용한다. T1
 B의 T1은 해당 source의 train만 대상으로 동일한 threshold grid와 group OOF 절차에서 별도 선정해 B의 모든 분류기가 공유한다. A의 통합 train에서 고른 T1을 가져오지 않는다. source macro와 source 최소 F1 항은 그 한 source의 F1로 계산하고, class·bootstrap·category coverage도 해당 source 안에서 검사한다. 예를 들어 기존 클래스별 10%·500행 gate를 만족하지 못하면 그 사실을 보고하며 test를 보고 완화하지 않는다. B의 T1 값은 A와 같다고 보장하지 않고 별도 manifest에 봉인한다.
 
 현 outcome builder는 A의 통합 projection을 생성한다. B의 source-specific runner와 외부 공식 구현 adapter는 구현 보완이 필요하다. 사용할 후보 수만 3으로 바꾸었다고 재현이 완료된 것으로 보지 않는다.
+
+A의 운영 후보 선정 완료가 B의 논문 비교 완료를 뜻하지 않는다. B의 RouterDC 및 상위 두 방법의 seed 17/73 반복은 전체 최소 연구에 남아 있는 별도 실행 범위다. 이번 A의 R0/R1/R2 seed 42 결과를 세 seed 결과나 RouterDC 직접 비교로 표시하지 않는다.
 
 <a id="routing-3"></a>
 ### 3.3. 최소 비교군과 선택 확장
@@ -345,6 +421,28 @@ ModernBERT-base 약 149M, RoBERTa-base 약 125M은 근접 규모이지 동일 �
 <a id="routing-5"></a>
 ### 3.5. 같은 backbone의 학습 목표
 
+<a id="objectives-plain-language"></a>
+#### R0~R3 요약과 쉬운 설명
+
+R0~R3는 이 프로젝트의 실험 이름이다. 학계 전체에서 같은 뜻으로 쓰는 고유 알고리즘 이름은 아니다. 핵심 차이는 **같은 질문을 보더라도 무엇을 맞히도록 가르치는가**다. 라우터는 직접 답을 쓰는 학생보다 질문을 어느 담당자에게 맡길지 정하는 선생님에 가깝다.
+
+| 방법 | 학술적 학습 형태 | 모델에게 가르치는 내용 | 효용 | 주요 한계 |
+|---|---|---|---|---|
+| **R0** | 다중 클래스 분류, Cross-Entropy | 질문의 easy/medium/hard 라벨 | 단순한 구조로 난이도 분류를 직접 학습 | 후보별 결과를 한 라벨로 압축하면서 선택에 필요한 정보를 잃을 수 있음 |
+| **R1** | 후보별 독립 이진 예측, Binary Cross-Entropy | 각 후보가 성공 기준을 넘는가 | 여러 후보가 함께 성공하는 상황과 후보별 차이를 표현 | 성공/실패 변환으로 세밀한 품질 차이가 줄며 출력의 확률 정확성은 별도 검증 필요 |
+| **R2** | 쌍별 순위 학습, Pairwise Learning-to-Rank | 같은 질문에서 후보 A와 B 중 누가 더 좋은가 | 공개 품질 점수의 상대적 우열·동률을 학습 | 상대 점수는 성공 확률이 아니며 비용은 선택 정책에서 반영 |
+| **R3** | 비용·품질 효용 기반 가중 분류, utility-gap-weighted CE | 비용까지 고려할 때 어떤 후보가 좋은 선택인가 | 학습부터 비용–품질 선택을 반영 | 비용 기준·λ grid에 의존하며 기대 regret 직접 최소화와 동치가 아님 |
+
+**R0는 난이도 스티커를 붙이는 학습이다.** 공개 채점 결과를 정해진 규칙으로 easy/medium/hard 중 하나로 바꾸어 가르친다. 그 스티커는 사람이 느끼는 인지 난이도와 반드시 같지 않다. 스티커 하나로 요약하는 과정에서 어느 후보가 실제로 성공했는지의 차이가 사라질 수 있다.
+
+**R1은 각 담당자에게 “이 질문을 풀 수 있니?”를 묻는 학습이다.** 정답으로 후보별 성공 1·실패 0을 알려주고, 새 질문에서는 세 후보의 성공 점수를 각각 예측한다. 셋 다 성공할 수 있으므로 세 점수의 합이 1일 필요가 없다. 출력 .8이 실제 성공률 80%에 해당하는지는 별도 검증할 문제다.
+
+**R2는 담당자끼리 비교해 순위를 배우는 학습이다.** 같은 질문의 후보별 공개 품질 점수로 승리·패배·동률을 만든다. 라우터가 두 답변 본문을 읽고 직접 심사하거나 새 사람 선호를 수집하는 구조가 아니다. 질문을 입력받아 어떤 후보가 상대적으로 나을지 예측한다. 품질 점수가 이진값뿐인 태스크에서는 원천에 없는 세밀한 품질 정보를 만들어내지 못한다.
+
+**R3는 학습할 때부터 가성비를 고려한다.** `선택의 가치 = 품질 − λ×비용`으로 좋은 후보를 정하고 그 선택을 맞히게 가르친다. λ는 비용을 얼마나 중요하게 보는지다. 설명용으로 품질 점수가 70/90/95, 비용 감점이 0/9/30이면 최종 가치는 70/81/65여서 중간 후보가 선택된다. 이 숫자는 실제 실험 결과가 아닌 예시다. 최선과 차선의 가치 차이가 큰 사례에 더 큰 학습 가중치를 준다. 여기서 regret은 최선의 선택에 비해 잃은 가치를 뜻한다.
+
+번호가 클수록 더 우수하다는 뜻은 아니다. 기존 A에서는 R1이 개발 검증 기준으로 선정됐고, 2026-09-25 G1의 네 GPU 학습과 selection 평가에서도 R1-natural이 선정됐다. R3 실측은 [G1 선정 결과](#generalization-selection-results)에 기록한다. 새 유형 질문의 holdout과 새 G1 모델의 RouterArena 진단도 완료했으며, [최종 평가](#generalization-final-evaluation)는 선정 결과와 구분한다. 아래 식과 데이터 계약은 이 설명을 실제 코드에 대응시킨 것이다.
+
 R0/R1/R2는 동일 pretrained ModernBERT와 세 logit 출력 크기를 사용한다. seed별 head 초기화·data order·최대 optimizer step을 맞춘다. eligible sample의 주 비교 loss weight는 모두 1이다. [공통 가중치 정책](#data)을 따른다.
 
 <a id="routing-r0-3-class-cross-entropy"></a>
@@ -369,6 +467,17 @@ inference_score_t = sigmoid(z_t)
 
 한 번 관측된 결과를 이용해 추정하는 성공 가능성이지 후보 모델의 참 성공 확률을 직접 측정한 값은 아니다. 연속 quality와 이산 success를 혼동하지 않는다.
 
+R1의 정답은 미리 알려진 성공 확률이 아니라 **공개 후보별 채점 결과를 이진화한 값**이다. RouterBench의 MMLU/HellaSwag/ARC-Challenge/WinoGrande는 점수 1.0, GSM8K/MBPP/MT-Bench 등 연속 점수로 처리한 유형은 .70 이상을 성공으로 삼았다. xRouteBench의 `em_mc/GSM8K/MATH/code_eval`은 `performance=1.0`, `f1_score`는 .70 이상이다. 이 .70은 후보별 결과의 성공 판정 기준이며 TF-IDF OOF에서 고른 easy/hard 라벨 경계와 다르다. 새 Claude 호출이나 임의 판정으로 정답을 채운 것이 아니다. [실제 변환 코드](../../ml/src/llm_router_labeling/routing_data/preprocessing.py).
+
+기존 A의 [학습 원본](../../ml/artifacts/routing-objective-continual-v1/dataset/train.parquet)을 2026-09-25 집계한 결과는 다음과 같다. G1의 새 분할·후보 결과와 구분한다.
+
+| 원천 | 학습 질문 수 | low 성공 / 실패 | medium 성공 / 실패 | high 성공 / 실패 |
+|---|---:|---:|---:|---:|
+| RouterBench | 18,765 | 8,946 / 9,819 | 13,643 / 5,122 | 15,433 / 3,332 |
+| xRouteBench | 2,641 | 1,741 / 900 | 1,854 / 787 | 1,939 / 702 |
+
+모든 후보에 양쪽 사례가 있어 학습 신호는 존재했다. 21,406개 질문에 세 target이 있지만 이를 독립적인 64,218개 질문으로 세지 않는다. 개발 검증의 라우팅 성과는 [실측 분석](#observed-objective-results)에 있다. 그 성과만으로 출력 .8의 실제 성공률이 80%인지, 질문별 판단이 출처·유형별 사전 분포를 넘는지, 새 분야와 서비스 Claude에서 성립하는지까지 입증되지는 않는다. 현재는 유용한 선택 점수를 학습한 근거와 확률 보정·일반화의 미검증 범위를 구분한다.
+
 <a id="routing-r2-결과-기반-pairwise-preference"></a>
 #### R2: 결과 기반 pairwise preference
 
@@ -384,6 +493,21 @@ inference_score = z
 
 품질이 같은 후보의 비용 차이는 target을 임의로 승패로 바꾸는 대신 아래의 decision rule에서 처리한다. 같은 점수·비용의 최종 동률은 고정된 action ID 순서로 해결한다.
 
+#### R1과 R2가 실제로 사용한 같은 문항의 차이
+
+R2는 R1과 같은 후보별 공개 결과에서 **성공/실패로 바꾸기 전의 quality**를 사용한다. 질문마다 low–medium, low–high, medium–high의 세 쌍을 비교한다. 모델의 입력은 질문이며 아래 채점값은 학습 정답이다. 추론 때 후보 답변이나 정답을 미리 읽지 않는다.
+
+| 기존 A 학습 원본의 실제 문항 | 후보 | 공개 quality | R1 target |
+|---|---|---:|---:|
+| RB `grade-school-math.dev.1` | Mistral-7B / low | .75 | 성공 1 |
+| 같은 문항 | Yi-34B / medium | .25 | 실패 0 |
+| 같은 문항 | GPT-4 / high | .75 | 성공 1 |
+| xRB SQuAD `49c1f6dc64cb4fad00d6` | GPT-OSS-20B / low | 약 .154 | 실패 0 |
+| 같은 문항 | GPT-OSS-120B / medium | 약 .222 | 실패 0 |
+| 같은 문항 | Cogito-671B / high | .100 | 실패 0 |
+
+첫 문항에서 R2는 low가 medium보다 우세, low와 high는 동률, medium은 high보다 열세라고 배운다. 둘째 문항에서 R1은 셋 다 성공 기준 미달이라고 배우지만 R2는 해당 공개 지표에서 medium > low > high라는 상대 관계를 배운다. 상대적으로 가장 낫다는 것이 성공 기준을 넘거나 사람이 만족할 답이라는 뜻은 아니다. 두 사례는 설명용으로 지어낸 점수가 아니라 위 학습 parquet의 관측값이다.
+
 <a id="routing-무엇이-기존-성공률-라벨과-다른가"></a>
 #### 무엇이 기존 성공률 라벨과 다른가?
 
@@ -392,9 +516,11 @@ inference_score = z
 이 예시는 전체 성공률 압축의 설명이며 운영 v2의 tier-consensus 규칙을 그대로 재현한 예시는 아니다. 품질 관계가 단조적이고 label이 최적 행동을 충분히 나타낸다면 방법 간 차이는 작을 수 있다. 개선이 없는 결과도 연구 결과로 보고한다.
 
 <a id="routing-r3-선택-확장"></a>
-#### R3: 선택 확장
+#### R3: 비용·품질 목표의 추가 비교
 
-기존 구현의 `regret`은 `quality−λ×decision_cost` 최적 action에 대한 CE를 utility gap으로 가중하는 변형이다. 기대 regret 자체를 미분하는 모든 알고리즘과 동치라고 하지 않는다. λ grid를 train 전에 고정하며 R3는 최소 실행에서 제외한다.
+기존 구현의 `regret`은 `quality−λ×decision_cost` 최적 action에 대한 CE를 utility gap으로 가중하는 변형이다. 학습 logits에도 같은 λ×decision_cost를 반영한다. 기대 regret 자체를 직접 미분하는 모든 알고리즘과 동치라고 하지 않는다. λ grid를 train 전에 고정한다. R3는 완료된 A의 최소 세 방법 비교에는 없었으며, [G1 추가 비교](#generalization-experiments)에서 실제 GPU 학습과 selection 평가를 완료한 연구 방법이다. 운영 feedback objective 또는 package 호환성을 자동으로 확대하지 않는다.
+
+각 λ에서 top-1과 top-2 utility 차이를 가중치로 사용하고 최솟값을 `1e-4`로 제한한다. Utility 동률은 첫 action slot을 선택하며, 각 λ의 row loss를 grid 전체에서 평균한다. R1의 binary success target에서 R3의 continuous quality 기반 utility target으로도 바뀌므로 이 비교는 loss·target 체계의 결합 효과이며 비용 항 하나만의 인과 효과가 아니다.
 
 <a id="routing-6"></a>
 ### 3.6. 실제 세 후보와 의사결정
@@ -418,6 +544,28 @@ action(q) = argmax_t [inference_score_t(q) − λ × decision_cost_t]
 λ 후보 grid는 config에 사전 고정하고 validation에서 budget별 정책을 선택한다. test는 이 정책을 그대로 실행한 실제 quality/cost를 보고한다. test에서 target budget에 맞춰 λ를 재선택하지 않는다. 후보 score의 calibration, normalized area, quality target 비용 규칙은 [평가](#evaluation)에 따른다.
 
 세 action을 서비스의 Haiku/Sonnet/Opus로 연결하는 것은 별도 mapping이다. 과거 후보의 품질·가격을 현재 Claude와 같다고 가정하지 않으며 신규 Claude API는 학습에 사용하지 않는다.
+
+<a id="three-stage-selection-explained"></a>
+#### R1·R2는 어떻게 최종 3단계를 선택하는가?
+
+**점수 하나를 두 임계값으로 잘라 세 구간을 만드는 방식이 아니다.** 처음부터 고정된 세 후보 자리에 점수를 출력하고, 비용을 반영한 점수가 가장 높은 후보 하나를 선택한다. 질문마다 후보를 점수순으로 정렬해 low/medium/high라는 이름을 다시 붙이지 않는다.
+
+| 단계 | R1 | R2 |
+|---|---|---|
+| 질문에서 세 점수 출력 | 후보별 독립 sigmoid 성공 점수 | 후보별 상대 품질 logit |
+| 선택 점수 계산 | 성공 점수 − λ×decision cost | 상대 점수 − λ×decision cost |
+| 후보 결정 | 가장 높은 선택 점수의 고정 후보 | 같은 규칙으로 고정 후보 선택 |
+| 3단계 표현 | low→easy, medium→medium, high→hard | 같은 대응 관계 |
+
+예를 들어 R1 성공 점수가 .70/.90/.95이고 비용 감점이 0/.06/.20이면 선택 점수는 .70/.84/.75다. medium 후보가 선택되어 medium 단계로 표시된다. **이 숫자는 계산을 설명하는 가상 예시**이며 실제 R1 출력이나 확률 검증 결과가 아니다. R2는 같은 선택 절차를 쓰지만 점수가 −.4/1.2/1.5처럼 나와도 되는 상대 척도이므로 R1과 λ 숫자를 무조건 같게 쓰지 않는다. λ=0이면 비용 감점 없이 점수만 비교한다. 새 G1에서는 calibration에서 정책을 정하고 selection·holdout에서는 고정한다.
+
+| 방법 | 3단계 표시의 의미 |
+|---|---|
+| R0 | 직접 학습한 난이도 라벨의 예측; 비용 정책을 적용하면 그 정책의 선택과 원래 argmax 예측을 구분 |
+| R1·R2 | 선택한 후보 action의 서비스용 표현; `hard`가 인지적으로 어려운 문제라는 판정을 뜻하지 않음 |
+| R3 | 비용·품질 목표로 학습한 점수에서 후보를 선택할 수 있으나 현재 연구 구현이며 운영 API 호환은 별도 |
+
+서비스에서는 easy→Haiku, medium→Sonnet, hard→Opus로 연결하려는 구조를 유지할 수 있다. 그러나 과거 공개 후보를 이 이름으로 바꾸는 것만으로 정확성·비용 성능이 이전되지는 않는다. 실제 서비스 후보와 정책을 검증해야 한다. 기존 실험 브랜치의 Spring v2 구현은 R0/R1/R2를 허용하고 R3는 미지원이다. 이 Spring 변경은 이번 main 통합에서 제외했으며 R1 전용 브랜치에서 인수한다. [운영 인수 계약](#retraining-objective-handoff)을 따른다.
 
 <a id="routing-7"></a>
 ### 3.7. 필수 비학습 기준선
@@ -494,6 +642,137 @@ R0/R1/R2의 primary 목적함수 비교는 고정 training budget의 종료 chec
 현재 core/adapter와 최종 계약의 차이는 [실행 차이 목록](#execution-7)에서 관리한다. 구현된 method enum 전체를 최소 실행 범위로 해석하지 않는다.
 
 완료된 run에는 데이터·config·모델 revision hash, 후보 ID, seed, 학습 시간, validation 선정 근거, 봉인된 test prediction이 있어야 한다. test outcome이 trainer 입력으로 들어갔거나 duplicate group이 split을 넘은 run은 주 비교에 사용하지 않는다. 인지 수준 정렬은 [평가](#evaluation)의 보조 실험이며 이 결과만으로 라우터의 내부 판단 원리를 입증했다고 주장하지 않는다.
+
+<a id="generalization-experiments"></a>
+### 3.11. G1 추가 실험: 목표 함수와 학습 분포의 2×2 비교
+
+추가하는 방법은 세 가지이고 기준선까지 합치면 네 arm이다. 기존 A의 R1 결과를 새 holdout에 그대로 대입하지 않는다. **G1 분할로 R1-natural도 다시 학습**해야 비교가 성립하므로 실제 실행 횟수는 baseline 포함 네 번이다. 서로 다른 split의 과거 점수와 새 점수를 개선량으로 빼지 않는다.
+
+| Arm | 목표 함수 | 학습 분포 | 검증하려는 가설 |
+|---|---|---|---|
+| R1-natural | 후보별 성공 BCE | 자연분포·weight 1 | 새 분할에서의 기준 성능 |
+| R1-balanced | 같은 BCE | source×task 기반 bounded loss weight | 목표 함수 변경 없이 출처·task 편중을 줄이면 일반화가 개선되는가 |
+| R3-natural | utility gap 가중 cost-adjusted CE | 자연분포·weight 1 | 비용–품질 선택에 더 직접적인 학습 신호가 개선을 만드는가 |
+| R3-balanced | 같은 R3 loss | R1-balanced와 같은 weight | 목표 함수와 분포 조정의 결합 효과가 있는가 |
+
+세 추가 arm의 이득을 전제하지 않는다. R1-balanced는 다중 성공 target의 loss 가중치 실험이므로 R0의 3-class sampler를 복사하지 않는다. 가중치는 G1 train의 source/task 개수만으로 정하며 범위·정규화·최종 effective weight를 manifest에 기록한다. 작은 집단에 무한 가중치를 주지 않는다. calibration/selection/holdout은 원래 분포를 유지하고 평가 점수에 학습 가중치를 적용하지 않는다.
+
+네 arm은 동일 train 질문 순서·일반 shuffle·초기 backbone/revision·seed 42·optimizer·최대 길이 512·총 optimizer step·종료 checkpoint 규칙을 공유한다. Natural/balanced를 같은 학습 질문의 view로 만들어 목적함수 효과와 분포 효과를 구분한다. R3의 λ grid는 시작 전에 고정하고 비용 정책까지 동일 숫자로 강제하지 않는다. R1 sigmoid와 R3 raw score는 척도가 다르기 때문이다. Interrupted-run resume는 objective, λ grid, view weight, split/config/model hash를 확인한다. 다른 arm의 checkpoint를 이어 학습하지 않는다.
+
+선택 절차는 train 학습 → calibration에서 정책 보정 → selection에서 고정 정책의 source별 품질·실제 비용과 source-macro 지표 비교 → 방법·정책 lock → task/domain holdout 평가 순서다. Holdout에서 λ를 다시 맞추거나 같은 holdout 결과로 다음 설정을 반복 선택하지 않는다. Always-low/medium/high, source pool별 train-best-single, source/task 기준선과 함께 비교하고 예산 초과·task별 품질·원천별 표본 수를 공개한다. 미관측 task의 기준선은 해당 source의 train-best-single로 돌아가며 holdout 정답으로 후보를 고르지 않는다. 서로 다른 pool을 합쳐 global best 후보를 정하지 않는다. 낮은 표본 수의 task 결과와 단일 seed를 일반적 우월성으로 확대하지 않는다.
+
+Calibration에서 source별·명목 budget별 λ를 고정한다. Selection의 `source_macro_locked_policy_quality_auc`는 그 정책의 low/high 기준 정규화 품질을 고정 budget `[0,.1,.25,.5,.75,1]`에 대해 적분한 값이다. **기존 A의 재최적화 frontier nAUC와 다른 지표**이며, 분포 변화로 실제 비용이 명목 budget을 넘을 수 있다. 현재 hard guard는 기본 budget `.5`에서 모든 source의 실제 relative cost가 `.5` 이하여야 한다는 조건이다. 다른 grid 지점의 위반도 보고하지만 이 조건으로 배제하지 않는다. 유효한 품질 정규화와 기본 예산 조건을 만족한 arm 중 해당 AUC 내림차순, 기본 source-macro 비용 오름차순, arm 이름순으로 선택한다. 적격 arm이 없으면 lock을 만들지 않고 holdout 추론을 중단한다. OOD에서 high 품질이 low 이하여도 비용 판정은 별개이며 정규화 AUC만 N/A로 남긴다.
+
+Lock에는 calibration 정책·selection 근거·train 기준선·dataset/config/run hash를 보존한다. Holdout 접근 전에 봉인된 pre-holdout 증거로 정책과 승자를 재계산해 lock의 의미까지 검증한다. 최종 보고서는 네 arm을 보여주되 선택 arm을 holdout 결과로 바꾸지 않는다. 이 lock은 운영 승격 승인이 아니다.
+
+초기 pilot과 canonical run은 별도 폴더에 두며 synthetic CPU smoke를 실제 G1 학습 결과로 표시하지 않는다. 최초 추가 작업의 코드·CPU 검증 이후, 2026-09-25 개인 Colab에서 네 arm 모두 2,007 step 학습과 selection 평가를 완료했다. [선정 결과](#generalization-selection-results)와 완료된 [holdout·RouterArena 진단](#generalization-final-evaluation)을 구분한다. 실행 시 개인 Colab 계정과 CU를 확인하고, FastAPI의 GCP 프로젝트에 초기학습 GPU job을 만들지 않는다. 운영 게시·CURRENT 교체·GCS 업로드는 이 실험 코드의 자동 동작에 포함하지 않는다.
+
+R0/R1/R2의 출력 평균 또는 모델 가중치 병합은 이번 세 추가 arm에 포함하지 않는다. 서로 다른 의미의 점수를 그대로 섞지 않으며 앙상블·보조 난이도 head는 별도 후속 ablation이다. 외부 데이터의 질문만 늘리고 그 질문에 대한 실제 후보 outcome을 임의로 붙이는 방식도 사용하지 않는다.
+
+<a id="generalization-selection-results"></a>
+#### 2026-09-25 G1 학습·selection 실측
+
+네 arm 모두 같은 seed 42·2,007 optimizer step을 완료했고 개인 Drive의 완료 manifest·artifact SHA 및 CPU merge 검증을 통과했다. Calibration에서 고정한 정책을 selection 2,314문항(RouterBench 2,060, xRouteBench 254)에 적용한 결과다. Selection lock SHA는 `c6fad17c23390305d62769e30f213c8381db620679c949ac6a80bd3695ee75f3`다. [상세 보고서](../../experiments/results/routing-generalization-v1-20260925/report.md)에 원본·시각화를 연결한다. **아래 표는 selection 결과이며, 완료된 task holdout·새 G1 RouterArena 결과는 [별도 절](#generalization-final-evaluation)에 기록한다.**
+
+| 방법 | 고정 정책 품질 AUC | 기본 budget .5 품질 · source macro | 기본 상대비용 · source macro | 선정 적격 |
+|---|---:|---:|---:|---|
+| **R1-natural** | **.814739** | **.751785** | .426774 | **예 · 선정** |
+| R1-balanced | .809377 | .747759 | .493867 | 아니오 · xRouteBench 예산 초과 |
+| R3-natural | .463653 | .701311 | .312073 | 예 |
+| R3-balanced | .470166 | .701984 | .256387 | 예 |
+
+R1-natural은 모든 source의 기본 예산을 통과한 방법 중 AUC가 가장 높아 선정됐다. R1-balanced는 macro 상대비용이 .5보다 작아도 xRouteBench에서 .519797로 상한을 넘는다. 해당 arm의 AUC도 R1-natural보다 낮으므로 예산 조건만으로 순위가 뒤집힌 것은 아니다. 이 AUC는 명목 budget grid의 고정 정책 지표로, 기존 A의 frontier nAUC와 같은 척도가 아니다.
+
+| 방법 | Source | 기본 품질 | 관측 평균 비용 | 기본 상대비용 | 고정 λ |
+|---|---|---:|---:|---:|---:|
+| R1-natural | RouterBench | .768155 | .003777985 | .445639 | .1 |
+| R1-natural | xRouteBench | .735415 | .000133079 | .407909 | .01 |
+| R1-balanced | RouterBench | .768641 | .003959606 | .467937 | .1 |
+| R1-balanced | xRouteBench | .726876 | .000166045 | **.519797** | .003 |
+| R3-natural | RouterBench | .746432 | .003560250 | .418908 | 0 |
+| R3-natural | xRouteBench | .656190 | .000073363 | .205238 | 0 |
+| R3-balanced | RouterBench | .747888 | .003498991 | .411387 | .01 |
+| R3-balanced | xRouteBench | .656080 | .000042765 | .101387 | .01 |
+
+관측 비용은 benchmark의 당시 가격·사용량에 따른 값으로 현재 Claude 청구액이 아니다. R3-balanced는 R3-natural보다 macro 품질이 .000673 높고 상대비용은 .055686 낮지만, 원천별 품질 변화는 RouterBench +.001456, xRouteBench −.000109다. 따라서 balancing이 두 source의 품질을 모두 높였다고 해석하지 않는다. R1-balanced는 R1-natural보다 macro 품질이 .004027 낮고 비용이 .067093 높다. 단일 seed 결과이며 통계적 유의성을 검증한 비교가 아니다.
+
+| Source | 고정 기준선 | 품질 | 관측 평균 비용 |
+|---|---|---:|---:|
+| RouterBench | always-low | .488204 | .000148136 |
+| RouterBench | always-medium | .715752 | .000593195 |
+| RouterBench | always-high / train-best / train-task | .803592 | .008293398 |
+| xRouteBench | always-low | .632568 | .000012892 |
+| xRouteBench | always-medium | **.744685** | **.000041376** |
+| xRouteBench | always-high / train-best | .737985 | .000307533 |
+| xRouteBench | train-source×task | .761607 | .000133246 |
+
+RouterBench에서 R1-natural은 always-high보다 비용을 약 54.45% 줄이는 대신 품질이 .035437 낮고, always-medium보다 품질이 .052403 높은 대신 비용은 약 6.37배다. **xRouteBench의 기본 운영점에서는 always-medium이 네 학습 arm 모두보다 품질이 높고 비용도 낮다.** 이는 단일후보 기준선 비교이며 선택 비율 분석이 아니다. Train-source×task 기준선 역시 R1-natural보다 품질이 .026192 높으면서 비용 차이는 약 .126%에 불과하다. 따라서 네 학습 방법 중 선정됐다는 사실이 간단한 기준선에 대한 경제적 우월성을 증명하지 않는다. Selection 결과를 보고 train-best 후보를 medium으로 다시 바꾸지도 않는다.
+
+전체 nominal budget grid에서 확인한 예산 초과는 다음 다섯 지점이다. 선정 조건은 기본 .5에 적용하며 다른 지점의 초과도 숨기지 않는다. Calibration 정책을 selection 결과에 맞춰 재조정하지 않았다.
+
+| 방법 | Source | 명목 budget | 실제 상대비용 |
+|---|---|---:|---:|
+| R1-natural | xRouteBench | 0 | .001583 |
+| R1-balanced | xRouteBench | 0 | .000901 |
+| R1-balanced | xRouteBench | .5 | .519797 |
+| R3-balanced | RouterBench | .1 | .105520 |
+| R3-balanced | xRouteBench | 0 | .000644 |
+
+현재 결론은 **R1-natural을 G1 연구 후보로 고정**한 것이다. R3 두 방법은 xRouteBench에서 비용을 낮췄지만 품질 약 .656으로 R1-natural .735보다 낮았고, R3-natural은 기본 λ=0에서도 이 차이가 남는다. 원인이나 범용적 우열을 단정하지 않는다. Holdout에서는 고정된 방법·정책을 평가하며 결과에 따라 다시 승자를 고르지 않는다. 운영 채택은 실제 서비스 pool·feedback·정책·승격 계약을 별도로 검증해야 한다.
+
+<a id="generalization-final-evaluation"></a>
+#### G1 고정 holdout·RouterArena 최종 평가와 채택 판단
+
+네 G1 arm의 **task holdout 1,807문항과 RouterArena 진단 평가를 완료**했고 GPU 결과 원본과 artifact SHA를 검증했다. 이번 완료 범위는 R1/R3×natural/balanced의 G1 실험이다. 기존 A의 원본 test·D_gate·feedback stream·retention을 재평가한 것이 아니며, R0/R2의 동일 G1 조건 재학습 결과도 아니다. [최종 보고서](../../experiments/results/routing-generalization-v1-20260925/report.md), [holdout 원본](../../experiments/results/routing-generalization-v1-20260925/holdout-report/manifest.json), [Arena 원본](../../experiments/results/routing-generalization-v1-20260925/arena-stress/results/summary.json).
+
+| 방법 | Holdout 원 품질 · source macro | 실제 상대비용 · source macro | 기본 .5 모든 source 통과 | 정규화 AUC |
+|---|---:|---:|---|---|
+| **R1-natural · 잠긴 선정 방법** | .652622 | .412801 | **실패** | N/A |
+| R1-balanced | .669544 | .567213 | 실패 | N/A |
+| R3-natural | .684976 | .374278 | 통과 | N/A |
+| R3-balanced | .682972 | .359348 | 통과 | N/A |
+
+R1-natural의 RouterBench 상대비용은 .173356으로 통과하지만 **xRouteBench는 .652245로 .5를 초과**한다. 실제 xRouteBench 평균 비용 .000170596은 기본 예산에 대응하는 .000133987보다 약 27.32% 높다. Source macro .412801만 보고 예산 통과라고 해석하지 않는다. R3-natural의 원 품질은 R1-natural보다 .032354 높고 예산도 통과했으나, 이는 holdout 사후 관측으로 selection lock의 승자를 R3로 바꾸지 않는다.
+
+| Source | R1-natural 품질 / 평균 비용 | R3-natural 품질 / 평균 비용 | always-low 품질 / 평균 비용 | always-medium 품질 / 평균 비용 |
+|---|---|---|---|---|
+| RouterBench | .800512 / .001105606 | .843137 / .002572909 | .595908 / .000088596 | .791986 / .000361271 |
+| xRouteBench | .504732 / .000170596 | .526814 / .000091927 | .703470 / .000013754 | .735016 / .000048862 |
+
+xRouteBench에서는 **always-low와 always-medium 모두 네 학습 arm보다 품질이 높고 비용도 낮다.** RouterBench에서 R3-natural의 품질 이득은 주로 MBPP(.661597 대 R1-natural .414449)에서 비용을 약 5.94배 사용한 결과이고, ARC 품질은 .895604로 R1-natural .912088보다 낮다. 모든 task에서의 일반화 향상이나 동일 비용 우월성으로 확대하지 않는다.
+
+xRouteBench holdout의 고정 후보 품질은 low .703470, medium .735016, high .498423이다. **High−low 품질 차이가 음수라 고정 평가 계약의 xRouteBench AUC와 source-macro AUC는 N/A**다. 모델 완료 실패나 누락값을 0으로 채운 결과가 아니다. 후보 순서·분모를 사후 교체하지 않고 원 품질·비용으로 진단한다.
+
+| xRouteBench task | 문항 수 | low 품질 | medium 품질 | high 품질 |
+|---|---:|---:|---:|---:|
+| ARC-Challenge | 311 | .958199 | .974277 | .932476 |
+| MBPP | 233 | .630901 | .699571 | .111588 |
+| HumanEval | 90 | .011111 | 0 | 0 |
+
+High 품질 반전의 약 93.08%는 MBPP가 기여하며, task를 동등 가중해도 반전은 유지된다. HumanEval의 거의 전부 실패한 결과는 원천 응답·실행·형식·채점 조건을 감사할 이유다. 그러나 quality·success·cost 결측률은 모두 0%이므로 결측이라고 처리하거나, 결과를 본 뒤 제외하거나, 채점 오류로 단정하지 않는다. 실제 모델 능력과 원천 scoring 조건의 영향은 이 집계만으로 분리할 수 없다.
+
+RouterArena는 8,379문항과 변형 질문 412쌍을 사용했고 최대 512토큰을 넘은 문항은 748개다. 아래는 **λ=0에서 세 action slot을 easy/medium/hard로 투영한 난이도 라벨 일치 진단**이다. Source별 잠긴 비용 정책을 Arena에 임의 적용하지 않았으며, 실제 후보 답변의 routing quality·cost 또는 Claude 성능을 측정한 표가 아니다.
+
+| G1 방법 | Arena 라벨 일치 정확도 | Macro-F1 | 변형 쌍의 같은 선택 비율 |
+|---|---:|---:|---:|
+| R1-natural | 23.57% | .1953 | 72.09% |
+| R1-balanced | 21.04% | .1726 | 80.10% |
+| R3-natural | 31.58% | .3149 | 51.70% |
+| R3-balanced | 31.35% | .3094 | 59.95% |
+
+R3의 F1은 R1보다 높지만 변형 쌍 일관성은 더 낮다. 특히 R3-natural은 약 48.30%의 쌍에서 선택이 달랐다. 반대로 같은 선택을 반복하는 상수 모델도 일관성 100%를 얻으므로 R1의 높은 일관성만으로 정확성을 주장하지 않는다. Always-easy 정확도 47.49%는 네 방법 모두보다 높지만 상수 분류의 macro-F1 한계도 함께 고려한다. 난이도 라벨과 후보 선택의 목표 차이, 역사적 Arena 관찰, 단일 seed 한계를 유지하며 Arena 결과로 winner·λ를 다시 고르지 않았다.
+
+개인 Drive의 `LLM_Router/routing-generalization-v1-20260925/evaluation-final-1790317240`에 완료 평가 archive를 보존했다. [보관 receipt](../../experiments/results/routing-generalization-v1-20260925/archive-receipt.json)는 95,344,820 bytes, SHA `ff3c72721881f7dbec6ec75ad47c7ecf8b03998413354675c7625ef8487448f0`, status `complete`를 기록한다. 학습 모델은 앞서 각 세션의 Drive 경로에 보존·검증했다. 평가 완료 후 CPU·T4 세션을 모두 종료했으며, 개인 Colab 조회에서 활성 0개·사용률 0 CU/h·잔액 181.73 CU를 확인했다. 이 평가에서 Spring 코드·커밋·운영 브랜치·배포는 변경하지 않았다.
+
+**분석 권고:** 연구 선정은 R1-natural로 유지하되 운영 채택은 보류한다. 잠긴 방법의 xRouteBench 예산 실패, 저가 단일후보 기준선의 우위, task별 후보 품질 반전 때문에 source별 데이터·채점·후보·평가 계약을 먼저 감사하고 새 독립 비교 후 채택 방식을 확정하는 것이 타당하다. 이는 사용자의 최종 채택 결정이 아니다. 기존에 확정한 main 기반 R0/채택 방식별 분리 브랜치·워크트리와 Spring 변경 목록 공유 계획은 보존한다. R3로 즉시 바꾸거나 이미 본 holdout을 반복 튜닝하는 것은 이 권고에 포함하지 않는다.
+
+#### R0~R3 통합 판단과 비용 감점 없는 추가 진단
+
+2026-09-25 후속 [종합 비교 분석](../../experiments/results/routing-method-review-20260925/REVIEW.md)은 A와 G1의 조건 차이를 유지하면서 개발 후보로 **R1-natural**, 일반화·비용 대안으로 **R3-natural**을 권고한다. 이는 사용자의 최종 채택 결정 또는 운영 배포 승인이 아니다. R2는 A에서 R1 다음 nAUC와 일부 낮은 비용의 장점이 있으나 G1의 R3와 직접 비교하지 않았다. 난이도 라벨 일치 목적에는 R0가 가장 높았지만 실제 후보 선택의 품질·비용 우위를 뜻하지 않는다.
+
+저장된 G1 logits에서 추론 비용 감점 λ=0을 적용한 **사후 진단**의 holdout source-macro 성공률은 R1-natural 68.5145%, R1-balanced 69.9084%, R3-natural 68.4976%, R3-balanced 68.3398%다. 원본 선택 함수와 독립 argmax가 전 행에서 일치했고 기존 selection lock은 변경하지 않았다. 따라서 기존 고정 비용 정책에서 R3-natural이 좋았다는 관측을 비용 없는 정확도의 우위로 확대하지 않는다. 이 holdout의 quality는 0/1 success와 같지만 selection에는 연속 quality가 있으므로 두 지표를 구분한다.
+
+Natural/balanced는 같은 18,591문항의 loss 가중치 view다. 실제 xRouteBench loss 비중은 10.62%→31.87%, RouterBench는 89.38%→68.13%로 변한다. 난이도 class 수를 맞춘 데이터셋이 아니다. R1 balancing은 λ=0 holdout 성공률 +1.3939%p와 기본 정책의 비용 증가를 동반했고, R3 balancing은 λ=0 성공률 −.1577%p와 기본 macro 상대비용 감소를 동반했다. Balanced의 일관된 우위나 R0/R2에서의 효과는 확인하지 않았다. 현 checkpoint 배포 보류 및 실제 서비스 후보·원천 채점 감사·독립 평가 조건은 앞 절과 같다.
 
 <a id="evaluation"></a>
 ## 4. 평가·인지 수준 분석
@@ -693,6 +972,26 @@ run별 `predictions.parquet`, `metrics.json`, `model_info.json`, dataset/validat
 
 기존 config의 RouterArena max length 8192와 epoch 관찰, 운영 gate 코드를 그대로 실행한 결과를 이 최종 프로토콜을 충족한 것으로 표시하지 않는다. 문서 통합은 학습·평가 실행이나 운영 코드 변경이 아니다.
 
+<a id="external-evaluation-candidates"></a>
+### 4.9. RouterArena 외 외부 평가 후보 조사
+
+2026-09-25 공식 논문·저자 저장소·공개 dataset card를 확인했다. 우선순위는 **LLMRouterBench → SPROUT**이다. 문항별 여러 LLM의 결과가 있어 난이도 label 일치율을 넘어 품질–비용 선택을 평가할 수 있기 때문이다. 아직 대용량 원본 다운로드·중복 제거·완전한 질문×모델 교집합 검증·신규 모델 호출을 수행한 것은 아니다.
+
+| 후보 | 공개 정보와 적합한 평가 | 제약·현재 판단 |
+|---|---|---|
+| **LLMRouterBench** | 33 모델·21개 이상 데이터셋·400K+ 평가 인스턴스. 응답·score·입출력 토큰·cost로 공개 pool의 비용–품질 평가에 유리. [논문](https://arxiv.org/abs/2601.07206), [공식 코드](https://github.com/ynulihao/LLMRouterBench), [데이터](https://huggingface.co/datasets/NPULH/LLMRouterBench) | 400K는 고유 질문 수가 아니다. 기존 MATH/MBPP/HumanEval/MMLU-Pro 등과 중복 위험이 있고, 도구·다중턴 과제는 현재 단일 입력 계약에 별도 adapter 필요. 명시적 dataset license 미확인. **수집 적합성 조사 1순위**. |
+| **SPROUT / CARROT** | 공개 원본 44,241문항, 현재 스키마 13 모델. 문항별 응답·judge score·토큰. RAGBench·OpenHermes·MuSR 등으로 태스크 확장 가능. [논문](https://arxiv.org/abs/2502.03261), [공식 데이터](https://huggingface.co/datasets/CARROT-LLM-Routing/SPROUT) | 0–1 score에 연속값이 있으며 달러 비용은 기록 토큰·단가로 별도 추정해야 한다. MATH/MMLU-Pro 중복 위험, 긴 RAG context의 512-token 절단 영향, dataset license 미확인. **수집 적합성 조사 2순위**. |
+| **LiveBench** | 객관적 자동 채점과 공개 model answers/judgments. 시점 일반화 평가 후보. [논문](https://arxiv.org/abs/2406.19314), [답변](https://huggingface.co/datasets/livebench/model_answer), [점수](https://huggingface.co/datasets/livebench/model_judgment) | 답변과 점수 snapshot의 모델·문항 범위가 다르므로 교집합 검증 필요. [공식 안내](https://github.com/LiveBench/LiveBench/blob/main/README.md)의 전체 공개 질문은 2024-11-25 버전이므로 최신 평가라고 부르지 않는다. 공개 총비용을 문항별 실비로 간주하지 않는다. [Datasheet](https://github.com/LiveBench/LiveBench/blob/main/docs/DATASHEET.md)는 Apache-2.0. |
+| **HELM Lite / Capabilities** | 특정 release의 요청·응답·문항별 통계 공개. 과거 Claude 후보를 포함한 실행 재현에 유용. [논문](https://openreview.net/forum?id=iO4LZibEqW), [원본 결과 문서](https://crfm-helm.readthedocs.io/en/latest/downloading_raw_results/), [Lite v1.7.0](https://crfm.stanford.edu/helm/lite/v1.7.0/) | 선택 release/model/adapter/few-shot를 함께 고정하고 필요한 run만 수집한다. 코드 Apache-2.0과 원천 dataset 조건을 구분. 과거 Claude 3 결과를 현재 서비스 모델 성능으로 치환하지 않는다. |
+| **R2-Bench / R2-Router** | 문항×모델×출력 예산의 응답·token count·judge score. 비용 예산 제어 후속 연구에 적합. [논문](https://arxiv.org/abs/2602.02823), [코드](https://github.com/jqxue1999/R2-Router), [HF 카드](https://huggingface.co/datasets/JiaqiXue/R2-Bench/blob/main/README.md) | 공식 GitHub 15 모델 vs HF 카드 10 모델, 마지막 예산 `default` vs `8000`이 달라 실제 파일 확인 선행. SPROUT과 문항 중복 위험. HF MIT, 원천 조건 별도. **우리 pairwise R2와 다른 연구**이며 독립 평가 우선순위는 낮다. |
+| **KMMLU-Pro** | 한국 전문자격 14종의 한국어 2,822문항. 한국어 지식 평가 보완. [논문](https://arxiv.org/abs/2507.08924), [공식 카드](https://huggingface.co/datasets/LGAI-EXAONE/KMMLU-Pro/blob/main/README.md) | 질문·정답은 있으나 원하는 후보별 outcome/cost 행렬은 미확인. `score`는 시험 배점이다. 서비스 모델 호출·usage 수집이 필요. CC-BY-NC-ND-4.0, gated 비상업 이용·평가 전용 조건 확인 전제로 고려한다. |
+
+LLMRouterBench에서 확인한 HF revision은 `0e5af1b84bf73437a01a1849c0f1d2468baa93fc`, SPROUT은 `d54e3cda2189ca1ed13a877a44ed34736c4b6920`이다. 최신 GitHub 설명의 모든 태스크가 이 과거 archive에도 있다고 가정하지 않는다. SPROUT의 code license를 dataset 이용·재배포 허가로 대신하지 않는다.
+
+도입 순서는 사용 조건 확인 → frozen archive inventory → 기존 train/dev/test와 ID·정규화 텍스트·근접 중복 비교 → 실제 모델 ID·실행 설정·점수 의미·비용 근거의 교집합 확정 → calibration과 external test 봉인이다. 같은 family의 새 문항과 완전히 새로운 family를 분리해 보고한다. 기록된 후보의 결과만 재사용하면 LLM 재호출은 피할 수 있지만 현재 RB/xRB 또는 서비스 Claude 세 후보 전체와 같은 pool인지는 아직 확인되지 않았다. **새 모델 세 개를 가격순 low/medium/high에 넣어 기존 R1/R2의 외부 성능이라고 보고하지 않는다.** 새 pool 학습·보정은 별도 전이 실험이다.
+
+GroupDRO의 연구는 집단 편중과 정규화의 중요성을 검토하는 참고이며 이번 bounded weighting을 GroupDRO 구현이라고 부르지 않는다. [GroupDRO 논문](https://arxiv.org/abs/1911.08731). RouteLLM의 preference·augmentation 및 후보 전이 결과도 후속 설계 근거로 참고하되, 두 후보 라우팅 결과를 우리 세 출력의 전이 보장으로 확장하지 않는다. [RouteLLM 논문](https://arxiv.org/abs/2406.18665).
+
 <a id="retraining"></a>
 ## 5. 재학습 파이프라인
 
@@ -862,6 +1161,8 @@ source마다 D_initial_train만으로 고른 실제 후보 세 개를 고정한�
 
 주 실험은 frozen initial R0 logging policy로 feedback을 한 번 만들고 F1/F2에 동일 batch를 제공한다. 모든 arm은 같은 다음 window를 업데이트 전에 예측·채점한다. feedback 수집 비용은 공통 비용, 각 arm의 추론·훈련 비용은 별도로 기록한다. 각 arm이 자신의 feedback을 만드는 on-policy 실험은 같은 arrival trace라도 학습 데이터가 달라지므로 별도의 시스템 확장 실험이다.
 
+이 단락의 R0 logger는 기존 CE feedback 원인분리 실험의 계약이다. A에서 R1/R2를 채택한 뒤 해당 방법의 재학습 효과를 검증하려면 선택한 공통 anchor·관측 가능한 target·loss·고정 logger를 새 run contract에 명시한다. 기존 finalLabel CE 실험을 실행하고 R1/R2 재학습 결과라고 부르지 않는다. 필요한 변경은 [채택 방법의 운영 인수 계약](#retraining-objective-handoff)을 따른다.
+
 F1/F2 모두 D_dev에서 고정한 validation 48행을 사용한다. F1에서 제거하는 것은 **base 학습 행**이다. 현행 `balanced_effective_batch`는 easy/medium/hard 모두가 필요하지만 F1에는 easy가 없으므로, 원인분리 실험은 두 arm 모두 shuffle sampler를 사용한다. F2만 운영 balanced sampler로 바꾸는 F2-P는 별도 운영 재현이다.
 
 Pilot 업데이트는 최대 40 step, 본 실험은 pilot 후 동결한 공통 실제 step 목표를 사용한다(100 step은 실행 전 검토할 예시). 현재 trainer는 epoch 기반 step과 상한 중 작은 값을 실행한다. 따라서 `max_optimizer_steps`만 같게 놓지 않고 행 수별 epoch/반복 횟수를 조정하여 **실제 완료 step 일치**를 검증한다. token 수·반복수·시간·메모리도 기록한다. F1/F2 차이는 history와 base rehearsal의 결합 효과이며 각각의 개별 효과를 주장하지 않는다.
@@ -895,6 +1196,36 @@ Pristine의 성능 효과는 15성공을 포함하는 별도 확장이다. 같�
 모의 LLM 비용과 실제 CPU/GPU 실험 비용을 분리한다. 성공·실패 훈련비, 추론비, 저장비를 포함하여 총비용과 손익분기 요청 수를 계산한다. 개선을 확인하지 못하거나 손익분기에 도달하지 못한 결과도 남긴다.
 
 각 run은 split·triplet·stream order·feedback ledger·채택/제외 사유·version/anchor/policy·gate·비용·snapshot prediction을 보존한다. 최소 크기는 공유 initial anchor 하나와 `6기회 × F1/F2`이며 데이터가 없는 window는 학습하지 않는다. 실제 실행 절차·현재 미구현 항목·역사적 결과 보존은 [실행과 산출물](#execution)을 따른다.
+
+<a id="retraining-objective-handoff"></a>
+### 5.10. 채택 방법의 운영 인수 계약
+
+R0/R1/R2의 개발 검증 우승 방법과 즉시 운영 가능한 package는 별도로 확인한다. 2026-09-24 확인한 현재 운영 FastAPI classifier는 세 logit에 항상 softmax를 적용하고 argmax를 easy/medium/hard로 반환한다. feedback trainer는 finalLabel을 CE target으로 사용한다. 출력 크기가 모두 3이라는 이유로 R1/R2 weight를 이 경로에 그대로 넣지 않는다.
+
+**세 방법 모두 최종 선택을 easy/medium/hard → Haiku/Sonnet/Opus의 기존 3단계 흐름으로 연결할 수 있다.** R1/R2 지원에 단계 수를 늘리거나 줄이는 변경은 필요하지 않다. 차이는 세 점수의 의미, 비용을 포함한 선택 규칙, 재학습 target/loss다. R1/R2의 tier는 후보 action의 서비스 투영이며 난이도 분류 확률과 구분한다.
+
+| 경계 | R0 | R1 | R2 |
+|---|---|---|---|
+| 학습 target | T1 난이도 class | source별 실제 후보의 success 0/1 | 같은 질문·후보 쌍의 공개 quality 차이 |
+| 추론 score | 3-class softmax | 후보별 독립 sigmoid | 상대 quality logit; pair 확률은 logit 차이의 sigmoid |
+| 라우팅 정책 | 동결한 score−λ×decision_cost | 같은 식에 success score 사용 | 같은 식에 상대 score 사용 |
+| confidence 의미 | 난이도 class 신뢰도 | 특정 후보의 학습된 success score; 검증 없이 현재 Claude 정답 확률로 해석하지 않음 | class confidence 없음; 상대 margin/pair score를 별도 의미로 반환 |
+| 현재 inline feedback의 직접 사용 | finalLabel CE라는 기존 운영 proxy; T1 gold와 다른 의미를 기록 | 세 후보 success 전체를 제공하지 못함 | quality 차이·비교 선호를 제공하지 못함 |
+
+다음 인수 조건을 구현·검증한 후에만 채택 방법의 `1.0` 및 이후 재학습 모델을 활성화한다.
+
+1. **모델·정책 package:** objective ID, output/score 의미, action 순서, source별 `arms.json` hash, 실제 서비스 모델 mapping·가격/decision-cost version, 선택 budget·λ, 512-token 입력 계약과 policy hash를 함께 보존한다. serving loader가 지원하지 않는 objective/contract를 거부하도록 한다. 현재 softmax argmax는 λ=0인 경로이므로 R0가 이겨도 비교에서 동결한 정책과 자동으로 같아지는 것은 아니다.
+2. **추론·응답:** offline evaluator와 online adapter에 같은 logits를 주었을 때 score·action·동률 처리의 일치를 검사한다. API에는 objective·policy version과 score 의미를 식별할 수 있는 계약이 필요하다. R1/R2의 action을 기존 tier 문자열로 전달할 때는 low/medium/high의 서비스 호환 투영임을 명시하고 인지 난이도 prediction이라고 부르지 않는다. 현 응답의 필수 숫자 `confidence`를 R2의 임의 softmax 값으로 채우지 않으며, 명시적인 별도 score 또는 nullable confidence를 지원하는 versioned 응답을 마련한다. Spring의 실제 모델 선택과 fallback도 같은 policy version을 기록한다.
+3. **후보 pool 이전:** A의 low/medium/high는 source마다 다른 역사적 실제 모델이다. 공개 source를 입력으로 모르는 서비스 요청에 source별 evaluator 정책을 그대로 적용할 수 없다. 하나의 서비스 후보 pool과 질문에서 사용 가능한 decision cost를 별도로 고정하고 mapping을 검증한다. Haiku/Sonnet/Opus에 이름을 대응시키는 것만으로 공개 benchmark의 품질·확률·비용이 이전되었다고 주장하지 않는다.
+4. **Feedback target과 loss:** 현 `initialLabel/finalLabel/userSatisfied`는 최종 만족과 escalation 경로의 일부만 담는다. 미호출 후보를 실패 0으로 채우거나, 중간 호출을 추정하거나, 만족=true를 객관적인 quality 점수로 만들지 않는다. R1의 online target에는 실제 호출별 모델 ID·관측 결과·판정 기준·관측 mask가 필요하며, loss는 관측된 후보 항에만 적용한다. 사용자 만족을 success proxy로 쓰면 별도 target version과 편향을 기록한다. R2에는 같은 질문의 관측된 두 응답에 대한 비교 가능한 quality/명시적 preference가 필요하다. 공개 quality 차이가 없는 online preference를 별도 loss/weight로 사용하면 초기 R2와의 차이를 이름·manifest에 남긴다. 근거가 부족한 행은 해당 target 업데이트에서 제외하고 제외 사유를 기록한다.
+5. **전처리·replay·실행:** 새 feedback schema, manifest, canonical digest에 objective·candidate/policy·target version과 관측 mask를 연결한다. 충돌 판정은 같은 질문의 finalLabel뿐 아니라 같은 후보/판정 계약의 상충 결과를 검사한다. 후보별 mask/quality를 유지하는 base rehearsal와 history replay, trainer dispatch, package 검증, image digest·IR·serving 설정을 함께 갱신한다. CE 전용 행으로 target을 잃은 뒤 R1/R2 loss만 바꾸는 방식은 허용하지 않는다.
+6. **승격·rollback:** D_dev로 선택·동결한 뒤 D_gate의 동일 질문과 candidate/outcome 계약에서 선택 품질·비용과 source/domain 회귀를 비교한다. R1/R2의 3-class label alignment는 진단으로 별도 표시한다. CE macro-F1/hard recall만 통과시켜 R1/R2 승격을 완료로 보지 않는다. dataset·evaluation role·objective·policy 및 baseline 계약을 검사하고, CURRENT/실제 serving 일치·재학습→gate→승격·이전 package rollback을 검증한다. sealed test와 RouterArena를 반복 승격 기준으로 바꾸지 않는다.
+
+위 항목은 필요한 호환성 조건이며 구현 완료 주장이 아니다. R1/R2가 개발 검증에서 이겼는데 운영 계약이 아직 준비되지 않았다면 그 방법을 채택 후보로 고정하고 인수를 완성한다. 편의상 CE로 재학습하거나 차순위 방법을 조용히 우승으로 바꾸지 않는다. 새 Claude 호출·judge 생성은 이 인수 정의에 포함하지 않는다.
+
+2026-09-24 코드 점검에서 Spring의 [`EscalationEvent`](../../backend/src/main/java/com/llmrouter/dto/EscalationEvent.java)는 명시적 만족 버튼이 없고 체인 종료를 `userSatisfied=true`로 간주한다고 문서화한다. 이 신호를 실제 만족 관측이나 객관적인 정답으로 표시하지 않는다. 초기 공개 데이터 비교와 온라인 피드백 수집 변경은 별도 실행이며, 명시적 만족·선호 입력의 추가 여부는 사용자 확인 중이다.
+
+로컬 구현 증거: `2bb4395`의 [정책 helper](../../ml/src/llm_router_labeling/training/routing_policy.py)와 v2 후보 패키지는 세 목적함수의 score/action 및 기존 tier 투영을 검증한다. `2d0e503`은 물리 버전별 파일·정책 identity를 고정하고 현재 CE gate로 v2가 자동 승인되는 것을 차단한다. `e565f21`은 이전 approved 패키지의 실제 SHA와 메타데이터로 롤백한다. 이는 실제 서비스 policy 값의 선정·게시·활성화 완료를 뜻하지 않는다.
 
 <a id="cache"></a>
 ## 6. 캐시 실험
@@ -1099,10 +1430,12 @@ Colab 초기학습이 공식 경로다. 기존 `initial-training-pipeline.yaml`�
 3. CPU baseline과 작은 GPU smoke/pilot으로 runtime·실제 step·예상 비용을 확인한다.
 4. validation에서 설정과 finalist를 고르고 lock을 만든다. test를 본 뒤 다시 선택하지 않는다.
 5. 봉인 test와 RouterArena 평가, 독립 인지 수준 분석을 [평가 계약](#evaluation)에 따라 수행한다.
-6. 새 continual partition의 initial anchor를 학습하고 [재학습 실험](#retraining)을 실행한다.
+6. continual partition에서 선택한 방법의 initial anchor와 운영 인수 계약을 확인하고 [재학습 실험](#retraining)을 실행한다.
 7. 같은 고정 라우터로 [캐시 실험](#cache)을 수행하고 시스템 총비용을 결합한다.
 
 번호는 데이터 의존 순서다. 캐시 문항 작성·코드 구현처럼 독립적인 준비는 병행할 수 있다. 아직 실행하지 않은 실험의 예상 결과를 결과표에 채우지 않는다.
+
+현재 `1.0` 전달의 선행 조건은 A의 R0/R1/R2 canonical 비교와 D_dev 선택 lock이다. 동일 continual split을 이미 먼저 봉인했으므로 세 후보 모두 그 D_initial_train/D_dev에서 학습·선택한다. R0 복구·보관, R1/R2 trainer와 평가 코드, 운영 인수·상태 관측 수정은 병행할 수 있지만 운영 게시/활성화는 비교와 호환성 검증 후 진행한다. B·표현/모델·feedback·cache 등 전체 연구의 남은 실행과 이번 세 후보 선정 상태는 따로 보고한다.
 
 <a id="execution-2"></a>
 ### 7.2. 로컬 진입점
@@ -1113,15 +1446,94 @@ Colab 초기학습이 공식 경로다. 기존 `initial-training-pipeline.yaml`�
 
 실제 통합 build 시 `--routerarena-path`를 존재하는 봉인 artifact로 명시한다. 파일이 없는 채로 실행해 `overlap=0`이 출력되었다고 누수 검사가 완료된 것으로 처리하지 않는다. 원본 Pickle은 출처·checksum을 검증한 파일에 한하여 기존 `--trust-pickle` 계약을 따른다.
 
+운영 `1.0` 후보 비교의 공통 데이터는 [전용 데이터 config](../../ml/config/modernbert_initial_v1_data.json)로 만든다. 고정 test 보호 후 development pool을 `60/10/10/15/5`로 먼저 분할하고, **D_initial_train만** threshold OOF에 사용한다. [R0 전용 학습 config](../../ml/config/modernbert_initial_v1_training.json)는 일반 3-class CE, 512 tokens, shuffle, effective weight 1, batch 8 × accumulation 4, 3 epochs, clip norm 1이다. 이는 R0 후보의 설정이며 R1/R2 비교 없이 운영 `1.0`을 확정하는 계약이 아니다. 운영 v2 설정을 덮어쓰지 않는다.
+
+`routing-comparison-data --config ml/config/modernbert_initial_v1_data.json build --output-dir ml/artifacts/modernbert-initial-v1/dataset` 후 [bundle 생성기](../../ml/scripts/build-modernbert-initial-v1-archive.py)를 실행한다. Bundle에는 train+D_dev만 전달하며 gate·stream·retention·test 질문은 포함하지 않는다. [Colab 실행기](../../ml/scripts/run-modernbert-initial-v1.py)의 `--pilot`은 최대 train 1,200/validation 300행·40 step이고, full은 별도 run 폴더에서 pristine backbone으로 시작한다. source/config/data checksum과 실제 runtime을 검증하고 Drive에 checkpoint를 보존한다. Colab 기본 Python 버전이 계약과 다르면 별도 Python 3.12 환경을 사용한다.
+
+2026-09-24 로컬 CPU 실행에서 T1 `(hard=.27,easy=.64)`, T2 `(.27,.55)`를 선정했다. 이 값은 `D_initial_train`의 9개 후보·5-fold OOF·bootstrap 1,000회 결과이며 미리 고정한 예전 임계값을 재사용한 것이 아니다. 산출물 기준은 `ml/artifacts/modernbert-initial-v1/dataset/manifest.json`이며, 학습·GCS 승격 완료를 뜻하지 않는다. R0 initial run은 A의 공통 조건을 검증해 비교 후보로 연결했다. 2026-09-24 세 방법의 full run 및 D_dev 선택 lock을 완료했으며 결과는 [실제 통합 A 보고서](../../experiments/results/routing-objectives-continual-v1-A-20260924/REPORT.md)에 있다. R1 0.863179, R2 0.833874, R0 0.166115의 source-macro nAUC로 R1을 선정했다. seed 42 단일 비교이며 서비스 Claude 성능 또는 운영 활성화 완료를 뜻하지 않는다.
+
 현재 source tree에는 최소 실험 전체를 실행하는 단일 명령이 없다. 아래 미구현 표의 후보·weight·평가 adapter가 정렬되기 전에는 기존 notebook을 그대로 실행하고 “최종 사양을 재현했다”고 표시하지 않는다.
+
+#### G1의 로컬 준비와 추가 실험 진입점
+
+코드는 [데이터 준비](../../ml/src/llm_router_labeling/generalization/data.py), [네 arm 학습](../../ml/src/llm_router_labeling/generalization/training.py), [보정·선정 잠금·holdout 평가](../../ml/src/llm_router_labeling/generalization/evaluation.py)로 나뉜다. 아래 경로는 저장소 루트 기준이다. `prepare`는 새 output directory에서만 실행하고 이미 준비된 canonical 데이터에는 `verify`를 사용한다.
+
+```bash
+export PYTHONPATH=ml/src
+G1_CONFIG=ml/config/routing_generalization_v1.json
+G1_DATA=ml/artifacts/routing-generalization-v1/dataset
+G1_RUN=ml/artifacts/routing-generalization-v1/run-seed42
+G1_RUNTIME=ml/config/modernbert_runtime_cu124_v1.json
+
+# 처음 준비할 때만 실행; 현재 canonical 경로는 로컬 준비 완료
+# python -m llm_router_labeling.generalization prepare \
+#   --config "$G1_CONFIG" --project-root . --output-dir "$G1_DATA"
+python -m llm_router_labeling.generalization verify --dataset-dir "$G1_DATA"
+python -m llm_router_labeling.generalization.train_cli plan \
+  --dataset-dir "$G1_DATA" --config "$G1_CONFIG" --runtime-contract "$G1_RUNTIME"
+
+# GPU가 필요한 전체 네 arm 실행 예시; 현재 Colab 실행은 아래처럼 두 세션에 분담
+python -m llm_router_labeling.generalization.train_cli train \
+  --dataset-dir "$G1_DATA" --config "$G1_CONFIG" --runtime-contract "$G1_RUNTIME" \
+  --output-dir "$G1_RUN"
+python -m llm_router_labeling.generalization.eval_cli lock \
+  --dataset-dir "$G1_DATA" --config "$G1_CONFIG" --runs-dir "$G1_RUN" \
+  --output-dir "$G1_RUN-selection-lock"
+python -m llm_router_labeling.generalization.eval_cli infer \
+  --dataset-dir "$G1_DATA" --config "$G1_CONFIG" --runs-dir "$G1_RUN" \
+  --lock-dir "$G1_RUN-selection-lock" --output-dir "$G1_RUN-holdout-scores"
+python -m llm_router_labeling.generalization.eval_cli evaluate \
+  --dataset-dir "$G1_DATA" --config "$G1_CONFIG" --runs-dir "$G1_RUN" \
+  --lock-dir "$G1_RUN-selection-lock" --scores-dir "$G1_RUN-holdout-scores" \
+  --output-dir "$G1_RUN-holdout-report"
+```
+
+학습 runner의 기본 실행은 네 arm을 순차 처리하며, `--arms`로 같은 네 arm 계획의 일부를 세션별로 분담할 수 있다. 500 optimizer step마다 checkpoint를 남기고 네 arm 모두 총 2,007 step이다. 현재 train 크기에서는 필요한 반복 수를 4로 계산하고 마지막 반복을 중간 종료한다. 따라서 과거 A의 3 epochs와 이름만 맞추지 않는다. 같은 output에서 재개하면 plan·소스·데이터·objective·λ·weight 계약을 검증하고 완료된 arm을 재사용한다. Checkpoint callback을 통해 영구 저장소 보관을 연결할 수 있지만 CLI가 개인 Drive를 자동 mount하거나 원격 백업하지는 않는다. Colab 실행 전에 output을 승인된 영구 저장 위치에 두는 연결을 마쳐야 한다.
+
+원본 score parquet, arm별 model/manifest, root run-plan/manifest, selection-lock/manifest, holdout score/report manifest를 함께 보존한다. `_SUCCESS` 없는 부분 실행은 완료로 사용하지 않는다. Lock·holdout output은 덮어쓰기를 거부한다. 고정 정책 재적용 보고서의 다른 경로 생성은 새로운 독립 평가로 세지 않는다. 실제 GPU 실험 후에는 같은 단일 문서에 결과를 추가하고, 이번 CPU 검증을 새 모델의 품질 증거로 사용하지 않는다.
+
+2026-09-25 최초 코드 작업의 관련 CPU 검증은 73개 통과, CUDA 전용 1개 제외다. 실제 tiny 모델의 네 arm optimizer 실행과 중간/최종 checkpoint 재개 동등성, 학습·선정 동안 holdout 파일이 없는 상태, lock 이후 저장 모델 재로딩·holdout 평가, score/model/lock 변조 거부를 포함한다. Ruff·diff-check와 새 문서 내부 파일 링크도 통과했다. 이후 실제 G1 Colab 실행에 착수했으며, 아래 기록 시점에는 두 세션의 natural arm 학습 프로세스와 T4 사용률 97%, GPU 메모리 3,607MiB를 확인했다. 이는 최초 실행 관측 기록으로, 당시에는 첫 checkpoint와 arm 완료 및 새 학습 결과·selection·holdout 성능을 확인하지 못했다. 이후 완료 상태는 아래의 학습·선정 완료 갱신을 따른다.
+
+**2026-09-25 03:10 KST 상태 갱신.** 개인 계정 조회에서 활성 Colab 세션 0개와 사용률 0 CU/h를 확인했다. 앞선 GPU 학습 시작 확인과 구분하며, 세션이 없는 것을 완료로 간주하지 않는다. Drive의 완료 manifest·checkpoint 검증과 필요 시 복구가 선행되어야 하며 당시 채택 방식은 미정이었다.
+
+**2026-09-25 G1 Colab 실행 설정.** 개인 계정 `alexyoo0506@gmail.com`의 Colab T4 세션 두 개에 다음처럼 분담한다. 각 세션 안에서는 두 arm을 순차 실행한다. FastAPI 운영 프로젝트의 GPU 학습 작업으로 제출하지 않는다.
+
+| 개인 Colab 세션 | 담당 arm | 개인 Drive의 MyDrive 기준 출력 경로 |
+|---|---|---|
+| R1 세션 · T4 1장 | `r1-natural`, `r1-balanced` | `LLM_Router/routing-generalization-v1-20260925/r1-session` |
+| R3 세션 · T4 1장 | `r3-natural`, `r3-balanced` | `LLM_Router/routing-generalization-v1-20260925/r3-session` |
+
+양쪽 모두 bundle에 고정한 [초기 비교 전용 lock](../../ml/requirements-objective-initial-v1.lock)과 그 하위 training lock을 설치하고 runtime 계약을 검증한다. Torch 2.5.1의 CUDA 12.4 wheel은 별도로 설치한다. 최소 환경 변수만 넘긴 supervisor에서 CUDA 인식이 실패했고, **`LD_LIBRARY_PATH`를 보존하면 CUDA 인식이 복구되는 것을 확인**했다. 따라서 launcher는 설치 검증 때의 GPU 라이브러리 탐색 환경을 보존해야 한다. 환경 변수 값 전체나 인증 정보를 로그에 남기지 않는다.
+
+사용자가 승인한 표준 Drive 연결 후 [Colab 실행기](../../ml/scripts/run-generalization-colab.py)의 `--drive-root` 모드로 해당 Drive 경로에 직접 저장한다. 쓰기·재읽기와 checkpoint SHA를 검사하며, 최종 원격 보존 확인은 학습 진행 상태와 별도로 수행한다. 두 세션의 부분 실행 결과를 합칠 때 같은 `run-plan.json`과 네 arm의 완료 manifest를 검증한 뒤에만 전체 비교를 봉인한다. Holdout 질문은 학습 bundle에서 제외하고 selection lock 이후에만 전달한다.
+
+**2026-09-25 재개 운영 메모.** 첫 두 세션이 사라진 뒤 확인한 개인 Colab 잔액은 **187.54 CU**였으므로 사용량 소진으로 확인된 장애가 아니다. 종료 원인은 아직 확정하지 않았고 idle 회수는 가설로만 남긴다. 앞의 GPU 실행 관측과 이후 활성 세션 0개 기록은 각 관측 시점의 상태이며, 완료 기록으로 해석하지 않는다.
+
+개인 T4 두 세션을 다시 할당하고 동일한 frozen bundle·runtime·원본 Drive 출력 경로로 복구 preflight를 통과했다. 이번 실행은 `foreground_kernel_wait` 방식으로 kernel이 실제 학습 subprocess의 종료까지 기다린다. CLI 대기 제한은 22,800초, 학습 subprocess 제한은 21,600초이며, 환경을 상속해 `LD_LIBRARY_PATH`를 보존한다. 이는 실행 방식 변경으로, 학습 코드·데이터·계획·500-step checkpoint 간격을 바꾼 새 실험이 아니다.
+
+복구 시 원본 `run-plan.json` 일치와 기존 step 500을 포함한 checkpoint의 manifest·파일 SHA를 검사하고 최신 유효 checkpoint에서 재개한다. 복구 직후 기록 시점에는 **step 1,000 도달과 arm 완료를 아직 확인하지 않았다.** 이후 진행·완료는 아래 갱신으로 구분한다. 재개 attempt는 독립 seed 반복으로 세지 않는다.
+
+**2026-09-25 학습·선정 완료 갱신.** R3 세션은 05:04 KST, R1 세션은 05:12 KST에 완료됐고 네 arm 모두 각각 2,007 optimizer step을 수행했다. 개인 Drive의 완료 manifest와 모든 artifact SHA를 검증한 뒤 CPU에서 동일 계획의 네 arm을 merge하고 selection lock을 재검증했다. Lock SHA는 `c6fad17c23390305d62769e30f213c8381db620679c949ac6a80bd3695ee75f3`, 선정 arm은 `r1-natural`이다. [선정 수치](#generalization-selection-results) 이후 task holdout과 새 G1 모델의 RouterArena 진단도 완료했다. [최종 평가와 보관 기록](#generalization-final-evaluation)을 따른다. 이 갱신 작업에서 Spring 코드·운영 브랜치·배포는 변경하지 않았다.
+
+**사용자 확정 후속 계획.** 실험 산출물의 완료·보존을 확인하고 정해진 calibration/selection 절차로 선정 lock을 만든 다음, 고정 holdout 평가와 결과 분석을 수행한다. 그 근거로 채택 방식을 결정한 뒤 다음 순서로 운영 구현을 진행한다. G1 연구 후보는 selection lock으로 R1-natural이 선정됐으며, 고정 holdout·RouterArena 평가는 완료했으나 서비스 인수는 미완료다. 2026-09-25 사용자는 Spring 변경을 제외한 작업의 main 병합과, 통합 main에서 R1 구현 및 R0 완성 브랜치를 분리하도록 지시했다. R1 구현 선택과 연구 체크포인트의 운영 승인은 구분한다. 실제 서비스 pool 검증과 승격 gate 완료 전에는 운영 활성화를 표시하지 않는다.
+
+1. `LLM_Router`의 Spring 코드와 `LLM_Router-serving`의 FastAPI 코드 모두 각 저장소의 `main`을 기준으로 R0용과 채택한 다른 방식용 브랜치·워크트리를 분리한다. 기존 미커밋 변경을 보존하며, 현재 작업 디렉터리를 `main` 체크아웃으로 덮어쓰지 않는다. 실험 코드를 운영 브랜치에 통째로 옮기지 않고 필요한 변경을 검토해 반영한다.
+2. 각 방식에 맞는 API 응답·score 의미, feedback 관측·target·mask, 학습 loss, 실제 후보 모델 mapping·비용·λ·model policy를 구현한다. R0의 finalLabel CE와 R1/R3의 후보별 관측 계약을 같은 것으로 취급하지 않는다. Spring 담당자가 검토할 변경 파일·API/DTO·설정·동작 차이와 검증 결과 목록을 별도 산출물로 남긴다.
+3. Spring→FastAPI→재학습 파이프라인→평가·승격→서빙 갱신의 전체 흐름과 이전 모델·정책으로의 rollback을 검증한다. 연구 점수를 그대로 서비스 모델의 성공 확률로 해석하지 않으며, package·policy version과 실제 활성 모델의 일치를 확인한다.
+4. 실제 서비스 후보 pool에서 같은 품질·비용 기준으로 평가한 뒤 우수한 모델을 라우터에 배포한다. 연구 실험 승자 선정만으로 배포 자격을 충족했다고 보지 않는다.
+
+기존 A와 G1은 학습 분할·후보 pool·평가 지표 정의가 달라 보고된 수치만으로 우열을 직접 비교하지 않는다. R0와 채택 방식의 최종 비교가 필요하면 **동일한 데이터·분할·후보 pool·학습 예산·평가 정책의 비교를 별도 계약으로 재현**하고, 이미 확인한 test/holdout 결과를 새 독립 검증처럼 취급하지 않는다. G1의 잠긴 평가 결과를 보고 같은 holdout에 맞춰 방법이나 λ를 다시 고르지 않는다.
 
 <a id="execution-3"></a>
 ### 7.3. Colab, runtime, checkpoint
 
 학습 environment는 data-only environment와 분리한다. 비교 실험의 scikit-learn 계열은 `comparison` extra와 [비교 전용 lock](../../ml/requirements-comparison.lock)으로 설치하며, 기존 CPU 전처리 이미지의 [기본 lock](../../ml/requirements-lock.txt)에 추가하지 않는다. ModernBERT 운영 runtime은 [runtime contract](../../ml/config/modernbert_runtime_cu124_v1.json)와 [training lock](../../ml/requirements-training.lock)의 Python 3.11/3.12, PyTorch 2.5.1, Transformers 4.48.3, CUDA 12.4 기준이다. Colab의 당일 preinstalled 버전이 맞는지 확인하고, 실제 runtime fingerprint를 기록한다. 새 모델에 별도 dependency가 필요하면 environment를 version으로 분리한다.
 
+2026-09-24 통합 A의 R0/R1/R2 실행은 [초기 비교 전용 lock](../../ml/requirements-objective-initial-v1.lock)을 사용한다. 이 lock은 학습 lock의 NumPy 2.1.2 등 R0 수치 환경을 유지하면서 평가 의존성만 추가한다. 기존 비교 lock으로 실행 중인 R0 환경을 교체하지 않는다. 세 방법은 [공통 실행기](../../ml/scripts/run-routing-objectives-v1.py)와 고정 입력 manifest를 사용한다.
+
 | Archive 생성기 | 용도 |
 |---|---|
+| [build-modernbert-initial-v1-archive.py](../../ml/scripts/build-modernbert-initial-v1-archive.py) | 통합 continual R0 후보의 검증된 source/config와 train+D_dev bundle; 운영 채택은 세 방법 비교 후 |
 | [build-router-model-comparison-colab-archive.sh](../../ml/scripts/build-router-model-comparison-colab-archive.sh) | 표현/모델 비교 source·config bundle |
 | [build-routing-objective-colab-archive.sh](../../ml/scripts/build-routing-objective-colab-archive.sh) | 목표함수 비교 source·config bundle |
 | [build-modernbert-colab-balanced-v2-archive.sh](../../ml/scripts/build-modernbert-colab-balanced-v2-archive.sh) | 기존 운영 v2 재현·호환 bundle |
@@ -1134,7 +1546,7 @@ Colab 초기학습이 공식 경로다. 기존 `initial-training-pipeline.yaml`�
 - 학습 I/O는 Colab 로컬 disk, durable 사본은 Drive에 둔다.
 - 기본 50 optimizer step마다 로컬 checkpoint, 500 step마다 Drive 동기화; epoch 끝·최종 step도 동기화한다.
 - model·optimizer·scheduler·scaler·epoch/batch cursor·RNG를 저장한다. `.partial-*` 복사 후 파일 checksum이 일치해야 완결 checkpoint로 승격한다.
-- `_SUCCESS`와 manifest가 있는 checkpoint만 resume한다. data/config/runtime/step fingerprint가 다르면 재개를 거부한다.
+- `_SUCCESS`와 manifest가 있는 checkpoint만 resume한다. data/config/runtime/step fingerprint가 다르면 재개를 거부한다. 이미 완료된 로컬·Drive 모델을 재사용할 때도 현재 요청의 fingerprint가 같아야 하며, 다르면 기존 결과를 보존하고 실패한다.
 - 기본 최근 checkpoint 2개 보존은 모든 epoch weight 보존과 다르다. 최종 비교·feedback 분석에 필요한 snapshot은 별도 경로로 복사해 보호한다.
 
 재학습의 approved-anchor warm start는 위 interrupted-run resume와 다르다. 재학습은 weight만 재사용하고 optimizer를 새로 만든다. 기존 baseline notebook의 epoch별 RouterArena 관측을 최종 연구의 checkpoint 선택에 사용하지 않는다. 새로운 run directory와 version을 만들고 과거 artifact를 덮어쓰지 않는다.
@@ -1218,6 +1630,8 @@ research/<experiment-version>/  독립 dataset·prediction·snapshot·비용 led
 <a id="execution-6"></a>
 ### 7.6. 실험별 필수 산출물
 
+실행마다 [공통 보고서 템플릿](../../experiments/templates/RUN_REPORT.md)을 복사해 `experiments/results/<run_id>/REPORT.md`와 `run.json`을 남긴다. 실제 예시는 [R0 후보 학습·복구 기록](../../experiments/results/modernbert-initial-v1-20260924/REPORT.md)이다. 프로세스 성공, 최종 파일의 원격 보존, 세 방법 비교·선정, 운영 인수, 모델 게시, 서버 활성화 상태를 각각 기록한다. 미측정은 0으로 채우지 않으며 checkpoint에서 재개한 attempt를 독립 seed 반복으로 세지 않는다. 큰 파일은 Drive/GCS의 immutable URI·크기·checksum으로 연결한다.
+
 | 묶음 | 반드시 보존할 내용 |
 |---|---|
 | Source/data | 원본 URL·revision·license 기록, 파일 크기·SHA-256, sample/group IDs, partition manifest, 제외 사유, source/domain/label 분포, 누수 audit |
@@ -1225,6 +1639,7 @@ research/<experiment-version>/  독립 dataset·prediction·snapshot·비용 led
 | Code/runtime | 실제 code commit, dirty 여부와 재현 snapshot, archive·image·IR digest, dependency lock, CPU/GPU·메모리·runtime fingerprint |
 | Training | 실제 optimizer step·token 수·시간, loss/validation, 선택 근거, checkpoint manifest·`_SUCCESS` |
 | Routing 평가 | validation lock, 질문별 선택·확률·품질·비용, seed별 지표와 신뢰구간, baseline·oracle 정의 |
+| 방법 채택·운영 인수 | R0/R1/R2 실행 상태와 source별 nAUC·macro, 선정 method·policy lock, objective별 추론/feedback/loss/gate 계약, 게시·활성화 증거 |
 | Cognitive audit | judge model/prompt/version, blind 입력·출력, human 독립 주석, 판정 불가·불일치, 통제 문항쌍 |
 | Feedback | arrival trace, 공개한 outcome, event/batch/canonical digest, accepted/excluded, anchor/version, gate/활성화, 실패 비용 |
 | Cache | 후보·hit/miss·answer correctness, namespace/version, calibration freeze, 전체 요청 분모·미측정 범위, 실제 지연·순비용 |
@@ -1235,28 +1650,61 @@ research/<experiment-version>/  독립 dataset·prediction·snapshot·비용 led
 <a id="execution-7"></a>
 ### 7.7. 현재 구현과 최종 명세의 차이
 
-ML 항목은 2026-09-20 로컬 코드 확인 기준이며, serving 관측 계약의 참조는 2026-09-23에 갱신했다. 이 표가 연구 실행 차이 목록이며 다른 문서의 설계 설명을 구현 완료 표시로 읽지 않는다. HTTP 관측 보장의 상세는 serving API 계약이 소유한다.
+별도 날짜가 없는 항목은 2026-09-20 로컬 코드 확인 기준이며, 2026-09-24에 이번 초기 모델·재학습 복구 관련 구현 증거를 갱신했다. 이 표가 연구 실행 차이 목록이며 다른 문서의 설계 설명을 구현 완료 표시로 읽지 않는다. HTTP 관측 보장의 상세는 serving API 계약이 소유한다.
 
 | 범위 | 확인한 상태 | 최종 실행 전에 필요한 것 |
 |---|---|---|
-| RB+xRB 공통 데이터 | build·manifest·train-only threshold 선택 코드 있음 | 코드 들여쓰기·수식·필수 system 조건 보존, word-only 중복 key의 기호 충돌·task-ID 감사, 실제 결측 분모/solve-rate 재계산, metric registry 검증, 봉인 파일로 overlap 검사 실행 증거; 최종 provenance·manifest 재생성 |
+| RB+xRB 공통 데이터 | 2026-09-24 구조 보존·중복/누수 감사·train-only T1 선정 후 42,935행 봉인, GCS checksum 검증; [실행 기록](../../experiments/results/modernbert-initial-v1-20260924/REPORT.md) | 최종 모델 평가와 연결; 데이터 준비 완료를 모델 채택 완료로 해석하지 않음 |
 | 공통 학습 weight | objective trainer는 sample weight 사용, TF-IDF는 동일 적용 안 됨 | 최종 초기 비교의 effective weight 1을 모든 방법에 구현·manifest 기록; 기존 metadata weight는 보존하고 운영 feedback 가중치와 구분 |
 | 3개 실제 후보 비교 | objective 데이터·훈련·lock CLI 있음 | B의 source-only T1 probe와 실제 3-model outcome/비용 adapter·공통 후보 계약 검증; 집단 평균을 실제 호출로 해석하지 않음 |
-| R0/R1/R2 | ModernBERT CE/pointwise/pairwise core 존재 | selection의 `METHODS`가 R3 포함 4개를 요구하므로 최소 3-arm lock 지원으로 조정; 최종 데이터·후보·가중치·선택 규칙을 맞춘 smoke와 실제 결과; R0 명칭 정정 |
+| R0/R1/R2 | 2026-09-24 `85c422c` T4 동일 2,007 step·seed 42 세 방법 완료, D_dev 선택 lock의 승자는 R1; GCS·Drive 보존 및 예측 기반 nAUC 재검산 완료 | 독립 test 7,202문항 평가 완료·서비스 인수 미완료; B의 추가 seed/RouterDC 실행은 별도 |
+| G1 추가 비교 | 2026-09-25 개인 Colab에서 네 arm 각각 2,007 step 완료; Drive 완료 manifest·전체 artifact SHA·CPU merge 검증, selection lock의 선정은 R1-natural | [선정 수치·기준선 한계](#generalization-selection-results). [Task holdout·새 G1 RouterArena 완료](#generalization-final-evaluation); R1-natural의 xRouteBench 예산 실패와 기준선 한계로 운영 채택 보류 권고. 기존 A와 직접 점수 비교 불가, 운영 인수·정책 변경 없음. [고정 config](../../ml/config/routing_generalization_v1.json) |
 | 표현/모델 | TF-IDF 코드·비교 notebook 있음 | BGE+kNN, 동일 예산·입력 길이·sample weight audit, 최종 최소 모델군 결과 |
 | 공식 라우터 | 논문·adapter 설계 | RouterDC 공통 pool adapter, test를 validation으로 사용하는 코드 경로 방지, 고정 budget 재학습; GraphRouter 등은 확장 |
 | Held-out 평가 | RouterArena evaluator와 objective test CLI 있음 | label/선택품질/인지 정렬 구분, global nAUC를 source별 curve/macro와 정렬, 퇴화 정규화 N/A, row bootstrap을 group 단위로 보완, robustness paired 지표·batch-1 latency·최종512 config |
+| RouterArena 실제 진단 | 2026-09-24 최종512 조건에서 8,379 label·412 paired 쌍, R0/R1/R2 총 26,373 추론·모델 hash 검증 완료; [분석](#observed-objective-results) | 학습 목표별 해석 유지, 추가 GCS 보존은 수행하지 않음. 단일 seed·과거 노출·라벨 정의 차이를 제거한 일반화 증거로 확대하지 않음 |
+| 추가 외부 평가셋 | 공식 자료 6개 후보 조사, LLMRouterBench·SPROUT 우선 inventory 제안 | 사용 조건·실제 pool 교집합·문항 중복·점수/비용 매핑 검증 미실행. [후보와 제한](#external-evaluation-candidates) |
 | Calibration·선정 | raw ECE·Q_model와 기존 finalist lock 코드 | 공통 raw-confidence ECE, neural 보정 진단 분리, B 우선 전역 2개 finalist 반복 예산을 명시적으로 구현; 표현 축의 별도 top2 sweep 방지 |
-| 기준선의 선택 정책 | 현재 random은 균등 1 seed, best-single은 validation 기반 | 최종 matched-random 100 seed와 train-only best-single로 정렬; 진단용 test action shuffle과 배포 가능한 val-ratio random 구분 |
+| 기준선의 선택 정책 | 2026-09-24 `d150e87` [봉인 평가기](../../ml/scripts/evaluate-sealed-routing.py)로 7,202 test 질문·세 모델 추론 및 고정 정책 평가 완료; train-best·validation 비율 random 100 seed·paired group bootstrap 10,000회 | [실제 보고서](../../experiments/results/routing-objectives-continual-v1-A-20260924/sealed-tests/REPORT.md). R1/R2 xRouteBench 기본 budget 초과를 명시; 연구 진단이며 운영 D_gate 아님 |
 | 인지 수준 보조 실험 | blind annotation·통제 문항쌍 설계 | 고정 judge prompt/model, 사람 검증, 평가 데이터 봉인; API 호출은 미실행 |
 | 운영 feedback core | inline→GCS, prepare/merge, version/replay, CustomJob, gate/publish/watcher 코드 있음 | 최신 유효 batch E2E·실제 serving 활성화 증거 확보; code 존재와 cloud 실측 분리 |
 | 연구 feedback | F0/F1/F2·6기회 사양 | fresh continual split, frozen logger·shared batch harness, F1/F2 공통 shuffle·실제 step 일치·공통 validation48 |
-| 연구 승격 gate | 운영 DAG는 RouterArena gate | D_gate schema·metric adapter와 별도 root; D_dev로 고른 임계값 freeze; 통합 base contract 새 version |
+| 연구 승격 gate | 2026-09-24 `55e3cc3` D_gate 분류 adapter·평가 계약 검사, `de11724` 보호 분할을 보존한 base 구성, `d2fc8f9` 고정 후보 outcome projection 구현; 원격 DAG는 아직 이전 설정 | 선택 objective의 품질/비용 gate와 baseline, 통합 base 게시·새 image/IR 및 E2E; CE 분류 gate만으로 R1/R2 승격하지 않음 |
 | Canonical uniqueness | whole-batch digest 예약/commit 구현 | merge 후 nonempty·novel 정보 검증을 연구 harness에 추가; 중복 mode가 이를 보장한다고 가정하지 않음 |
 | 캐시 | Spring exact-first·기본 enforce 설정, FastAPI reranker 모델 미설정 시 비활성, 별도 실험 사양 | exact replay·semantic reuse trace, human/정답 검증, 비용·지연 ledger; arm별 모드 고정, 채점 불가능 후보의 운영 호환 bypass 배제·검증 |
 | Colab→운영 인수 | checksum checkpoint와 package CLI 있음 | 통합 데이터 초기 모델의 검증된 인수 manifest·gate·baseline; 자동 importer의 검증 범위 확인 |
+| R0/R1/R2 채택→운영 | R1 개발 검증 승자 동결. 로컬 policy/package-v2 및 격리 serving `7a6cb03` 3단계 추론, `9991ca4` CLI/image loss 전달 회귀 통과. 실제 운영은 이전 CE 모델 유지 | 실제 서비스 후보·policy 선정, 관측된 feedback target/mask, D_gate 품질/비용 및 E2E 인수; [계약](#retraining-objective-handoff) |
 | 운영 복구·효율 | SQLite lease, atomic CURRENT, load-before-swap, rollback 코드 | state 유실 복구 migration, 상태 polling 부하, evaluation CPU image 경량화는 별도 후속; 관측 보장의 현재 한계는 [Serving 구현 범위](../../../LLM_Router-serving/docs/api-contract.md#implementation) 참조 |
 
 실행 중 각 행을 갱신할 때 증거 artifact URI·commit·검증일을 남긴다. 과거 체크리스트의 `[x]`를 새 실험 완료로 승계하지 않는다.
 
 과거 v1/v2 결과·최초 승격의 한계·Git 복구는 [Deprecated settings](../deprecated-settings.md)에 모았다. 현재 설계·구현·원격 배포 상태는 구분하며, 원본 artifact가 없는 실험을 문서 수치만으로 재현했다고 표시하지 않는다.
+
+<a id="plain-language-glossary"></a>
+## 8. 쉬운 용어 정리
+
+| 용어 | 쉬운 뜻 | 이 프로젝트의 예·주의점 |
+|---|---|---|
+| Dataset · 데이터셋 | 공부하거나 평가할 문제와 관련 정보의 묶음 | 질문, 후보별 품질·비용·성공 여부 |
+| Candidate · 후보 | 라우터가 선택할 실제 LLM | low/medium/high는 미리 정한 세 후보 자리이며 질문마다 이름을 재정렬하지 않음 |
+| Label / Target · 라벨·목표값 | 학습할 때 맞히라고 알려주는 정답 | R0 난이도, R1 후보별 성공, R2 후보 간 비교 |
+| Split · 데이터 분할 | 문제들을 목적에 따라 나누는 것 | 학습 문제와 최종 시험 문제를 분리 |
+| Train · 학습 데이터 | 답을 보며 모델을 수정하는 문제집 | G1의 18,591문항 |
+| Calibration · 보정 데이터 | 점수를 어떻게 사용할지 조정하는 자료 | G1에서는 비용 정책 λ를 정하는 2,275문항. 확률 보정 완료라는 뜻은 아님 |
+| Selection · 선택 데이터 | 보정된 방법들 중 채택할 방법을 고르는 자료 | G1의 2,314문항 |
+| Holdout / Test · 보류 평가 | 학습·선택에 쓰지 않고 남긴 시험 문제 | G1 미관측 task 1,807문항. 결과를 보고 다시 고르면 같은 독립 시험이 아님 |
+| Task / Domain · 과제·영역 | 질문이 요구하는 일의 종류 또는 묶음 | G1의 code_generation은 코드 생성 수행유형이며 컴퓨터과학 지식 전체가 아님 |
+| Manifest · 매니페스트 | 실험 상자의 내용물 목록과 설명서 | 파일·개수·설정·검사값을 기록. 성적표 자체도, 기록만으로 검증이 완료된다는 뜻도 아님 |
+| Hash · 해시 | 파일 내용으로 계산한 지문 같은 검사값 | 저장·전송 후 파일이 바뀌었는지 확인 |
+| Checkpoint · 체크포인트 | 중간에 저장한 모델과 학습 진행 상태 | 중단 후 같은 조건으로 이어 학습 |
+| Epoch / Optimizer step | 문제집 한 바퀴 / 모델 파라미터를 한 번 수정하는 횟수 | G1 네 방법은 각각 2,007 step; batch 여러 개를 모아 한 step으로 쓸 수 있음 |
+| Loss · 손실 | 학습 목표를 얼마나 못 맞혔는지 나타내는 벌점 | 모델은 정해진 loss를 줄이도록 수정됨. 실제 서비스 효용과 자동으로 같지는 않음 |
+| Logit / Sigmoid / Softmax | 원점수 / 개별 점수를 0~1로 변환 / 여러 점수를 합계 1로 변환 | R1 독립 sigmoid, R0 softmax, R2·R3 선택 점수는 raw logit |
+| Policy / λ · 정책·람다 | 점수를 행동으로 바꾸는 규칙 / 비용의 중요도 | `점수−λ×비용`이 가장 높은 후보를 선택 |
+| Seed · 시드 | 무작위 과정의 시작 번호 | 초기화·학습 순서 재현을 위한 seed 42. 하나의 seed만으로 안정성을 입증하지 않음 |
+| Baseline / Arm | 비교 기준 / 실험의 한 가지 방법 | R1-natural 기준선, R3-balanced 비교군 |
+| Sample weight · 표본 가중치 | 어떤 학습 사례를 더 중요하게 반영할지 정한 값 | G1-balanced는 행을 바꾸지 않고 source/task별 loss 가중치를 조정 |
+| Regret · 후회값 | 최선의 선택에 비해 잃은 가치 | 감정이 아닌 수치. 우리 R3의 실제 loss는 효용 차이를 이용한 가중 분류 |
+| nAUC | 여러 비용 구간의 성능을 정규화해 요약한 수치 | 성공 확률이 아님. 기존 A와 G1의 지표 정의 차이를 확인해야 함 |
+
+실험을 읽을 때는 **어떤 문제집(dataset)을 어떻게 나누고(split), 무엇을 정답(target)으로 가르쳤으며, 어떤 규칙(policy)으로 선택했는지**를 먼저 확인한다. Manifest는 그 조건과 사용한 파일을 다시 확인하기 위한 설명서다.

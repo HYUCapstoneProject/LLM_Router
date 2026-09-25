@@ -1,0 +1,18 @@
+{
+  "gcs_uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/reports/experiment-reports-f2f121d5bdbffc59.tar.gz",
+  "size_bytes": 263509,
+  "sha256": "f2f121d5bdbffc59478c3eb696f3b90eb97e2664437a2a6aab1bfd47f3383b29",
+  "crc32c": "fiQ2Tg==",
+  "generation": "1790252103834442",
+  "file_count": 24,
+  "source_commit": "d53e8dbe617e5da30e27e822a546401ffafbc7f7",
+  "drive_filename": "experiment-reports-f2f121d5bdbffc59.tar.gz",
+  "personal_drive": {
+    "status": "verified_after_flush_and_remount",
+    "drive_path": "/content/drive/MyDrive/LLM_Router/routing-objectives-continual-v1-A-20260924/reports/experiment-reports-f2f121d5bdbffc59.tar.gz",
+    "size_bytes": 263509,
+    "sha256": "f2f121d5bdbffc59478c3eb696f3b90eb97e2664437a2a6aab1bfd47f3383b29",
+    "files_verified": 23
+  },
+  "scope": "report_artifacts_only_not_production_model_activation"
+}

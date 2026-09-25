@@ -69,6 +69,7 @@ class TrainingConfig:
     precision: str
     attention_implementation: str
     train_sampling_strategy: str = "shuffle"
+    gradient_clip_norm: float | None = None
 
     @classmethod
     def from_mapping(cls, values: Mapping[str, Any]) -> "TrainingConfig":
@@ -113,11 +114,22 @@ class TrainingConfig:
             attention_implementation=str(
                 values.get("attention_implementation", "eager")
             ),
+            gradient_clip_norm=(
+                None
+                if values.get("gradient_clip_norm") is None
+                else float(values["gradient_clip_norm"])
+            ),
         )
         config.validate()
         return config
 
     def validate(self) -> None:
+        if self.gradient_clip_norm is not None and (
+            not math.isfinite(self.gradient_clip_norm) or self.gradient_clip_norm <= 0
+        ):
+            raise ModernBertTrainingError(
+                "gradient_clip_norm must be finite and positive"
+            )
         positive_integers = {
             "max_length": self.max_length,
             "train_batch_size": self.train_batch_size,
@@ -222,7 +234,7 @@ def validate_training_dataframe(dataframe: pd.DataFrame) -> None:
             "Training Parquet has an invalid difficulty label"
         )
     weights = pd.to_numeric(dataframe["sample_weight"], errors="coerce")
-    if weights.isna().any() or not weights.gt(0).all():
+    if not np.isfinite(weights.to_numpy(float)).all() or not weights.gt(0).all():
         raise ModernBertTrainingError("Training sample_weight must be positive numeric")
     group_splits = dataframe.groupby("duplicate_group_id")["split"].nunique()
     if group_splits.gt(1).any():
@@ -297,7 +309,9 @@ def classification_metrics(
     }
 
 
-def validate_checkpoint_contract(output_dir: Path) -> dict[str, Any]:
+def validate_checkpoint_contract(
+    output_dir: Path, *, label_order: Sequence[str] = LABEL_ORDER
+) -> dict[str, Any]:
     config_path = output_dir / "config.json"
     tokenizer_config_path = output_dir / "tokenizer_config.json"
     if not config_path.is_file() or not tokenizer_config_path.is_file():
@@ -314,7 +328,9 @@ def validate_checkpoint_contract(output_dir: Path) -> dict[str, Any]:
         str(label): int(index)
         for label, index in model_config.get("label2id", {}).items()
     }
-    if id2label != ID2LABEL or label2id != LABEL2ID:
+    expected_id2label = dict(enumerate(label_order))
+    expected_label2id = {label: index for index, label in expected_id2label.items()}
+    if id2label != expected_id2label or label2id != expected_label2id:
         raise ModernBertTrainingError(
             f"Checkpoint label contract mismatch: {id2label=}, {label2id=}"
         )
@@ -326,8 +342,8 @@ def validate_checkpoint_contract(output_dir: Path) -> dict[str, Any]:
     if not model_files:
         raise ModernBertTrainingError("Checkpoint has no saved model weights")
     return {
-        "id2label": {str(index): label for index, label in ID2LABEL.items()},
-        "label2id": LABEL2ID,
+        "id2label": {str(index): label for index, label in expected_id2label.items()},
+        "label2id": expected_label2id,
         "model_weight_files": sorted(model_files),
     }
 
@@ -459,12 +475,62 @@ def run_training(
     validation_observations_per_epoch: int = 0,
     on_validation_observation: ValidationObservationCallback | None = None,
     on_progress: TrainingProgressCallback | None = None,
+    objective_method: str = "ordinal",
+    pairwise_tie_weight: float = 0.25,
+    regret_lambdas: Sequence[float] | None = None,
 ) -> TrainingResult:
     torch, functional, transformers, transformer_classes, scheduler_factory = (
         _require_training_backends()
     )
     AutoModelForSequenceClassification, AutoTokenizer = transformer_classes
     all_rows, train_rows, validation_rows = load_training_splits(training_path, config)
+    if objective_method not in {"ordinal", "pointwise", "pairwise", "regret"}:
+        raise ModernBertTrainingError(
+            "Shared training supports R0/R1/R2 and research R3 objectives only"
+        )
+    if not math.isfinite(pairwise_tie_weight) or pairwise_tie_weight <= 0:
+        raise ModernBertTrainingError("pairwise_tie_weight must be finite and positive")
+    target_columns: list[str] = []
+    cost_columns: list[str] = []
+    if objective_method == "regret":
+        from ..objective_comparison.objectives import validate_regret_lambdas
+
+        regret_lambdas = validate_regret_lambdas(regret_lambdas or ())
+        cost_columns = [f"decision_cost_{tier}" for tier in ("low", "medium", "high")]
+        if set(cost_columns) - set(all_rows.columns):
+            raise ModernBertTrainingError("R3 requires complete decision cost targets")
+        costs = all_rows[cost_columns].apply(pd.to_numeric, errors="coerce")
+        if not np.isfinite(costs.to_numpy(float)).all() or not costs.ge(0).all().all():
+            raise ModernBertTrainingError(
+                "Decision costs must be finite and non-negative"
+            )
+    elif regret_lambdas is not None:
+        raise ModernBertTrainingError("regret_lambdas applies to research R3 only")
+    if objective_method != "ordinal":
+        prefix = "success" if objective_method == "pointwise" else "quality"
+        target_columns = [f"{prefix}_{tier}" for tier in ("low", "medium", "high")]
+        if set(target_columns) - set(all_rows.columns):
+            raise ModernBertTrainingError(
+                f"Missing observed {objective_method} targets"
+            )
+        targets = all_rows[target_columns].apply(pd.to_numeric, errors="coerce")
+        if (
+            not np.isfinite(targets.to_numpy(float)).all()
+            or not targets.ge(0).all().all()
+            or not targets.le(1).all().all()
+        ):
+            raise ModernBertTrainingError(
+                "Objective targets must be finite and within [0, 1]"
+            )
+        if objective_method == "pointwise" and not targets.isin([0.0, 1.0]).all().all():
+            raise ModernBertTrainingError(
+                "R1 success targets must be observed binary values"
+            )
+    output_labels = (
+        LABEL_ORDER if objective_method == "ordinal" else ("low", "medium", "high")
+    )
+    output_id2label = dict(enumerate(output_labels))
+    output_label2id = {label: index for index, label in output_id2label.items()}
     requested_device = device_override or config.device
     device = _resolve_device(torch, requested_device)
     runtime_report = validate_runtime_contract(
@@ -513,9 +579,17 @@ def run_training(
     )
     total_steps = min(planned_steps, maximum_steps or planned_steps)
     training_data_sha256 = sha256_file(training_path)
+    fingerprint_config = asdict(config)
+    if objective_method != "ordinal":
+        fingerprint_config.update(
+            objective_method=objective_method, pairwise_tie_weight=pairwise_tie_weight
+        )
+    if objective_method == "regret":
+        fingerprint_config["regret_lambdas"] = list(regret_lambdas)
+        fingerprint_config["regret_loss_contract"] = "utility-gap-weighted-ce-v1"
     current_fingerprint = training_fingerprint(
         training_data_sha256=training_data_sha256,
-        config=asdict(config),
+        config=fingerprint_config,
         maximum_steps=maximum_steps,
         runtime_version=runtime_report["runtime_version"],
     )
@@ -533,8 +607,8 @@ def run_training(
             config.model_id,
             revision=config.model_revision,
             num_labels=len(LABEL_ORDER),
-            label2id=LABEL2ID,
-            id2label=ID2LABEL,
+            label2id=output_label2id,
+            id2label=output_id2label,
             attn_implementation=config.attention_implementation,
         )
     else:
@@ -545,6 +619,23 @@ def run_training(
             model_source,
             attn_implementation=config.attention_implementation,
         )
+        loaded_objective = getattr(model.config, "router_objective", "ordinal")
+        if loaded_objective != objective_method:
+            raise ModernBertTrainingError(
+                "Warm-start/resume checkpoint objective mismatch"
+            )
+    if objective_method != "ordinal":
+        model.config.router_objective = objective_method
+        model.config.router_score_semantics = (
+            "independent_success_logits"
+            if objective_method == "pointwise"
+            else "utility_gap_weighted_ce_scores"
+            if objective_method == "regret"
+            else "relative_quality_scores"
+        )
+        if objective_method == "regret":
+            model.config.router_research_only = True
+            model.config.router_regret_lambdas = list(regret_lambdas)
     if config.gradient_checkpointing:
         model.gradient_checkpointing_enable()
     model.to(device)
@@ -558,11 +649,20 @@ def run_training(
 
         def __getitem__(self, index: int) -> dict[str, Any]:
             row = self.rows.iloc[index]
-            return {
+            record = {
                 "text": str(row["model_input_text"]),
                 "label": LABEL2ID[str(row["difficulty_label"])],
                 "weight": float(row["sample_weight"]),
             }
+            if target_columns:
+                record["objective_targets"] = [
+                    float(row[column]) for column in target_columns
+                ]
+            if cost_columns:
+                record["decision_costs"] = [
+                    float(row[column]) for column in cost_columns
+                ]
+            return record
 
     def collate(records: list[dict[str, Any]]) -> dict[str, Any]:
         encoded = tokenizer(
@@ -578,7 +678,40 @@ def run_training(
         encoded["sample_weight"] = torch.tensor(
             [record["weight"] for record in records], dtype=torch.float32
         )
+        if target_columns:
+            encoded["objective_targets"] = torch.tensor(
+                [record["objective_targets"] for record in records], dtype=torch.float32
+            )
+        if cost_columns:
+            encoded["decision_costs"] = torch.tensor(
+                [record["decision_costs"] for record in records], dtype=torch.float32
+            )
         return encoded
+
+    def row_losses_for_objective(
+        logits: Any, labels: Any, targets: Any, costs: Any
+    ) -> Any:
+        if objective_method == "ordinal":
+            return functional.cross_entropy(logits, labels, reduction="none")
+        if objective_method == "regret":
+            from ..objective_comparison.objectives import regret_row_losses
+
+            return regret_row_losses(
+                logits,
+                quality_targets=targets,
+                decision_costs=costs,
+                regret_lambdas=regret_lambdas,
+            )
+        from ..objective_comparison.objectives import primary_row_losses
+
+        return primary_row_losses(
+            objective_method,
+            logits,
+            difficulty_ids=labels,
+            success_targets=targets if objective_method == "pointwise" else None,
+            quality_targets=targets if objective_method == "pairwise" else None,
+            pairwise_tie_weight=pairwise_tie_weight,
+        )
 
     train_dataset = WeightedDataset(train_rows)
 
@@ -655,11 +788,19 @@ def run_training(
                 for batch in validation_loader:
                     weights = batch.pop("sample_weight").to(device)
                     labels = batch.pop("labels").to(device)
+                    targets = (
+                        batch.pop("objective_targets").to(device)
+                        if target_columns
+                        else None
+                    )
+                    costs = (
+                        batch.pop("decision_costs").to(device) if cost_columns else None
+                    )
                     inputs = {key: value.to(device) for key, value in batch.items()}
                     with precision_context():
                         logits = model(**inputs).logits
-                        row_losses = functional.cross_entropy(
-                            logits, labels, reduction="none"
+                        row_losses = row_losses_for_objective(
+                            logits, labels, targets, costs
                         )
                     validation_loss_sum += float(row_losses.sum().cpu())
                     validation_weighted_loss_sum += float(
@@ -672,7 +813,15 @@ def run_training(
         finally:
             model.train(was_training)
         return {
-            **classification_metrics(actual, predicted),
+            **(
+                classification_metrics(actual, predicted)
+                if objective_method == "ordinal"
+                else {
+                    "row_count": validation_row_count,
+                    "objective_method": objective_method,
+                    "evaluation_role": "objective_loss_only_not_difficulty_accuracy",
+                }
+            ),
             "loss": validation_loss_sum / validation_row_count,
             "weighted_loss": (validation_weighted_loss_sum / validation_weight_sum),
         }
@@ -711,7 +860,9 @@ def run_training(
         try:
             resume_state = torch.load(
                 resume_dir / "training_state.pt",
-                map_location=device,
+                # CPU and CUDA RNG states are CPU ByteTensors. Optimizer loading
+                # moves its parameter state to the model's device separately.
+                map_location="cpu",
                 weights_only=False,
             )
         except Exception as error:
@@ -848,7 +999,9 @@ def run_training(
                     validation_targets.setdefault(global_step, []).append(
                         (epoch_index + 1, point_number)
                     )
-    for epoch_index in range(start_epoch_index, config.epochs):
+    # A crash after the final durable checkpoint must not perform an extra step.
+    first_epoch = start_epoch_index if optimizer_steps < total_steps else config.epochs
+    for epoch_index in range(first_epoch, config.epochs):
         train_loader = train_loader_for_epoch(epoch_index)
         first_batch_index = start_batch_index if epoch_index == start_epoch_index else 0
         last_batch_index = -1
@@ -858,10 +1011,14 @@ def run_training(
             last_batch_index = batch_index
             weights = batch.pop("sample_weight").to(device)
             labels = batch.pop("labels").to(device)
+            targets = (
+                batch.pop("objective_targets").to(device) if target_columns else None
+            )
+            costs = batch.pop("decision_costs").to(device) if cost_columns else None
             inputs = {key: value.to(device) for key, value in batch.items()}
             with precision_context():
                 logits = model(**inputs).logits
-                row_losses = functional.cross_entropy(logits, labels, reduction="none")
+                row_losses = row_losses_for_objective(logits, labels, targets, costs)
                 window_start = (
                     batch_index // config.gradient_accumulation_steps
                 ) * config.gradient_accumulation_steps
@@ -898,6 +1055,11 @@ def run_training(
                 train_loader
             )
             if should_step:
+                if config.gradient_clip_norm is not None:
+                    scaler.unscale_(optimizer)
+                    torch.nn.utils.clip_grad_norm_(
+                        model.parameters(), config.gradient_clip_norm
+                    )
                 scaler.step(optimizer)
                 scaler.update()
                 scheduler.step()
@@ -1035,7 +1197,9 @@ def run_training(
     output_dir.mkdir(parents=True, exist_ok=True)
     model.save_pretrained(output_dir, safe_serialization=True)
     tokenizer.save_pretrained(output_dir)
-    checkpoint_contract = validate_checkpoint_contract(output_dir)
+    checkpoint_contract = validate_checkpoint_contract(
+        output_dir, label_order=output_labels
+    )
 
     del optimizer, model
     if device.startswith("cuda"):
@@ -1057,7 +1221,7 @@ def run_training(
     with torch.inference_mode():
         reload_index = int(reloaded_model(**reload_inputs).logits.argmax(dim=-1).item())
     reload_label = str(reloaded_model.config.id2label[reload_index])
-    if reload_label not in LABEL_ORDER:
+    if reload_label not in output_labels:
         raise ModernBertTrainingError(
             f"Reloaded checkpoint produced unknown label: {reload_label}"
         )
@@ -1100,6 +1264,7 @@ def run_training(
             "weight_decay": config.weight_decay,
             "warmup_steps": warmup_steps,
             "gradient_accumulation_steps": config.gradient_accumulation_steps,
+            "gradient_clip_norm": config.gradient_clip_norm,
             "effective_batch_size": (
                 config.train_batch_size * config.gradient_accumulation_steps
             ),
@@ -1119,5 +1284,5 @@ def run_training(
         },
     }
     write_json(output_dir / "metrics.json", metrics)
-    write_json(output_dir / "training_config.json", asdict(config))
+    write_json(output_dir / "training_config.json", fingerprint_config)
     return TrainingResult(metrics=metrics, output_dir=output_dir)

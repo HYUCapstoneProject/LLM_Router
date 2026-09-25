@@ -1,6 +1,10 @@
 # 성능 평가 색인
 
-이 문서는 2026년 8월에 수행한 기존 서비스·라우터 측정의 색인이다. 각 문서에 방법·원본 데이터·한계가 있다.
+2026-09-25 추가: [R1/R3 natural·balanced 최종 평가](routing-generalization-v1-20260925/report.md), [R0~R3 통합 판단](routing-method-review-20260925/REVIEW.md), [Git·원본 보관 범위](ARTIFACT_STORAGE.md).
+
+현재 최종 설계에 따른 실행 기록은 [R0 초기 학습·복구](modernbert-initial-v1-20260924/REPORT.md), [R0/R1/R2 통합 A 비교](routing-objectives-continual-v1-A-20260924/REPORT.md), [비교 결과 해석](routing-objectives-continual-v1-A-20260924/ANALYSIS.md)에 있다. 세 방법을 같은 2,007 step·seed 42로 비교했으며 D_dev 비용–품질 nAUC는 R1 0.863179, R2 0.833874, R0 0.166115로 R1이 선정됐다. GCS·개인 Drive 보존을 검증했다. 공개 후보의 단일 seed 결과이며, [독립 test 7,202문항 평가](routing-objectives-continual-v1-A-20260924/sealed-tests/REPORT.md)도 완료했으며, R1/R2의 일부 source 비용 상한 초과를 기록했다. 실제 Claude 서비스 검증·운영 활성화는 별도다. 이후 실험은 [공통 보고서 형식](../templates/RUN_REPORT.md)으로 데이터·학습 조건, 비교·선정, 결과·해석, 파일 보존·게시 상태를 기록한다.
+
+아래는 2026년 8월에 수행한 기존 서비스·라우터 측정의 색인이다. 각 문서에 방법·원본 데이터·한계가 있다.
 숫자를 인용하기 전에 **"인용 시 주의"** 열을 먼저 볼 것.
 
 기준일: 2026-08-30

@@ -38,6 +38,7 @@ RUN python -m pip install \
 COPY ml/docker/modernbert-training.pyproject.toml /opt/llm-router/ml/pyproject.toml
 RUN mkdir -p \
         /opt/llm-router/ml/src/llm_router_labeling/training \
+        /opt/llm-router/ml/src/llm_router_labeling/objective_comparison \
         /opt/llm-router/ml/src/llm_router_labeling/shared \
         /opt/llm-router/config
 COPY ml/src/llm_router_labeling/__init__.py /opt/llm-router/ml/src/llm_router_labeling/__init__.py
@@ -46,6 +47,9 @@ COPY ml/src/llm_router_labeling/training/modernbert_training.py /opt/llm-router/
 COPY ml/src/llm_router_labeling/training/modernbert_training_cli.py /opt/llm-router/ml/src/llm_router_labeling/training/modernbert_training_cli.py
 COPY ml/src/llm_router_labeling/training/modernbert_checkpointing.py /opt/llm-router/ml/src/llm_router_labeling/training/modernbert_checkpointing.py
 COPY ml/src/llm_router_labeling/training/modernbert_runtime.py /opt/llm-router/ml/src/llm_router_labeling/training/modernbert_runtime.py
+# Include only the loss module as a namespace package. The research package's
+# __init__.py imports dataset preparation, which the training image does not use.
+COPY ml/src/llm_router_labeling/objective_comparison/objectives.py /opt/llm-router/ml/src/llm_router_labeling/objective_comparison/objectives.py
 COPY ml/src/llm_router_labeling/shared/__init__.py /opt/llm-router/ml/src/llm_router_labeling/shared/__init__.py
 COPY ml/src/llm_router_labeling/shared/dataset_io.py /opt/llm-router/ml/src/llm_router_labeling/shared/dataset_io.py
 COPY ml/src/llm_router_labeling/shared/object_store.py /opt/llm-router/ml/src/llm_router_labeling/shared/object_store.py
@@ -55,6 +59,7 @@ COPY ml/config/modernbert_runtime_cu124_v1.json /opt/llm-router/config/modernber
 RUN python -m pip install --no-deps /opt/llm-router/ml \
     && python -c "import torch, transformers; from pathlib import Path; from llm_router_labeling.training.modernbert_runtime import collect_runtime_versions, load_runtime_contract, validate_runtime_contract; contract = load_runtime_contract(Path('/opt/llm-router/config/modernbert_runtime_cu124_v1.json')); validate_runtime_contract(contract, collect_runtime_versions(torch, transformers), device='cpu'); assert torch.version.cuda == '12.4'" \
     && modernbert-train --help >/dev/null \
+    && python -c "from llm_router_labeling.objective_comparison.objectives import primary_row_losses; assert callable(primary_row_losses)" \
     && cc --version >/dev/null \
     && c++ --version >/dev/null \
     && groupadd --gid 10001 trainer \

@@ -1,0 +1,7 @@
+method,source_dataset,budget,lambda
+ordinal,routerbench,0.5,0.0
+ordinal,xroutebench,0.5,0.003
+pointwise,routerbench,0.5,0.1
+pointwise,xroutebench,0.5,0.03
+pairwise,routerbench,0.5,1.0
+pairwise,xroutebench,0.5,0.1

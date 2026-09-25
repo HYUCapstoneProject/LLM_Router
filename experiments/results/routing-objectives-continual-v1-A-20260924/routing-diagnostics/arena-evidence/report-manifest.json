@@ -1,0 +1,25 @@
+{
+  "files": {
+    "REPORT.md": {
+      "sha256": "a573f047fe147944bb38af0c305997e192ea7abf07de078e0763c3d2e36a3481",
+      "size_bytes": 1839
+    },
+    "category-domain-source-metrics.csv": {
+      "sha256": "2cd40ef9a4e9bdde1947c335c0f04baf5c6825807039c686c7c2ae915621410c",
+      "size_bytes": 85602
+    },
+    "predictions.parquet": {
+      "sha256": "5ffa0b39d69a27caa5b7f903dae0bde1a7b7db59d2a98e47940cefc2cb1595d1",
+      "size_bytes": 2437246
+    },
+    "summary.json": {
+      "sha256": "2529e3f46d0e2afa7eabfc5a8a736ad462b54ef129bd176a064efda273ede104",
+      "size_bytes": 856035
+    }
+  },
+  "prepared_manifest_sha256": "5b51c5c6aca5d2acbd4ab364b348d67b3c5d961e068eac666cdd3fc81176c161",
+  "protocol_sha256": "c5df5af139a778402986d60b1f63726b5470b1cb42bf47c3433cb0e17f0af9fa",
+  "role": "report",
+  "schema_version": "routing-arena-diagnostics-v1",
+  "score_manifest_sha256": "2d802f6cb59c0f4cf8dfd43f5f3c2a313dc567bdaf37d71dfbfedd88c9345e49"
+}

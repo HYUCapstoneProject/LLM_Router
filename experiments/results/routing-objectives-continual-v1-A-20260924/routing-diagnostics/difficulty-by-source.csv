@@ -1,0 +1,13 @@
+split,source_dataset,difficulty_label,count,denominator,fraction,small_sample_n_lt_30
+dev,routerbench,easy,1501,3122,0.48078155028827674,False
+dev,routerbench,medium,1268,3122,0.40614990390775146,False
+dev,routerbench,hard,353,3122,0.11306854580397181,False
+dev,xroutebench,easy,267,459,0.5816993464052288,False
+dev,xroutebench,medium,92,459,0.20043572984749455,False
+dev,xroutebench,hard,100,459,0.2178649237472767,False
+train,routerbench,easy,9043,18765,0.4819078070876632,False
+train,routerbench,medium,7618,18765,0.4059685584865441,False
+train,routerbench,hard,2104,18765,0.11212363442579269,False
+train,xroutebench,easy,1565,2641,0.5925785687239682,False
+train,xroutebench,medium,503,2641,0.1904581597879591,False
+train,xroutebench,hard,573,2641,0.2169632714880727,False

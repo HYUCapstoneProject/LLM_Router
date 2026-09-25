@@ -25,6 +25,11 @@ def build_parser() -> argparse.ArgumentParser:
     assemble.add_argument("--output-dir", type=Path, required=True)
     assemble.add_argument("--evaluation-metrics", type=Path)
     assemble.add_argument(
+        "--routing-policy",
+        type=Path,
+        help="Explicit service routing_policy.json; requires model-package-v2 metadata",
+    )
+    assemble.add_argument(
         "--model-version",
         help="Overrides metadata['model_version'] with the run's candidate version",
     )
@@ -50,14 +55,11 @@ def main() -> None:
                 metadata,
                 args.evaluation_metrics,
                 model_version=args.model_version,
+                routing_policy_path=args.routing_policy,
             )
     else:
         result = validate_model_package(args.package_dir, args.manifest)
-    if (
-        args.command == "assemble"
-        and args.observability_run_uri
-        and args.model_version
-    ):
+    if args.command == "assemble" and args.observability_run_uri and args.model_version:
         if not args.batch_id:
             raise SystemExit("observability requires --batch-id")
         write_observability_json(

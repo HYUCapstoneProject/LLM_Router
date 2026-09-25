@@ -1,0 +1,22 @@
+{
+  "rule": "train-only-pareto-extremes-knee-v1",
+  "selection_split": "train_only",
+  "sources": {
+    "routerbench": {
+      "selected_models": {
+        "high": "gpt-4-1106-preview",
+        "low": "mistralai/mistral-7b-chat",
+        "medium": "zero-one-ai/Yi-34B-Chat"
+      },
+      "training_row_count": 18765
+    },
+    "xroutebench": {
+      "selected_models": {
+        "high": "cogito-v2-1-671b",
+        "low": "gpt-oss-20b",
+        "medium": "gpt-oss-120b"
+      },
+      "training_row_count": 2641
+    }
+  }
+}

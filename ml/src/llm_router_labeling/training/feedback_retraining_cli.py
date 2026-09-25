@@ -12,11 +12,20 @@ from ..shared.dataset_io import load_config, sha256_file, write_json
 from ..shared.object_store import ObjectStore, build_object_store
 from ..shared.observability import write_observability_json
 from .feedback_retraining_preprocessing import (
+    FeedbackDataError,
     load_feedback_events,
     merge_feedback_with_base_training,
     prepare_feedback_training_dataset,
     validate_feedback_manifest,
 )
+
+
+def _require_deployment_ready(config: Mapping[str, Any]) -> None:
+    status = config.get("deployment_status")
+    if status is not None and status != "approved":
+        raise FeedbackDataError(
+            f"Feedback configuration is not approved for execution: {status}"
+        )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -88,12 +97,16 @@ def _publish_metrics(
         args, "candidate_model_version", None
     ):
         raise ValueError("observability requires batch-id and candidate-model-version")
+    payload = dict(metrics)
+    source_batch_id = payload.pop("batch_id", None)
+    if source_batch_id is not None:
+        payload["source_batch_id"] = source_batch_id
     write_observability_json(
         f"{args.observability_run_uri.rstrip('/')}/{relative_uri}",
         {
+            **payload,
             "batch_id": args.batch_id,
             "candidate_model_version": args.candidate_model_version,
-            **dict(metrics),
         },
     )
 
@@ -158,6 +171,7 @@ def _reserve_unique_batch(
 
 
 def command_prepare(args: argparse.Namespace, config: dict[str, Any]) -> dict[str, Any]:
+    _require_deployment_ready(config)
     manifest = load_config(args.manifest_path)
     validate_feedback_manifest(
         manifest,
@@ -202,6 +216,13 @@ def command_prepare(args: argparse.Namespace, config: dict[str, Any]) -> dict[st
 
 
 def command_merge(args: argparse.Namespace, config: dict[str, Any]) -> dict[str, Any]:
+    _require_deployment_ready(config)
+    expected_hash = config.get("base_dataset_sha256")
+    if (
+        expected_hash is not None
+        and sha256_file(args.base_training_path) != expected_hash
+    ):
+        raise FeedbackDataError("Base training dataset SHA-256 mismatch")
     base = pd.read_parquet(args.base_training_path)
     feedback = pd.read_parquet(args.feedback_training_path)
     result = merge_feedback_with_base_training(

@@ -1,0 +1,182 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>R0 · R1 · R2 라우팅 분포 진단</title><style>
+body{margin:0;background:#f2f5f8;color:#172b45;font:16px/1.65 system-ui,sans-serif}main{max-width:1180px;margin:0 auto;padding:44px 24px 80px}header{margin-bottom:26px}h1{font-size:36px;line-height:1.25;letter-spacing:-1.3px}h2{font-size:23px;line-height:1.4;margin:0 0 12px}p{max-width:95ch;color:#45566f}.eyebrow{color:#087f8c;font-weight:700;letter-spacing:1.4px;font-size:12px}.note{border-left:4px solid #087f8c;background:#e6f4f3;padding:18px 24px}section{background:white;border:1px solid #dce4ed;border-radius:12px;padding:26px;margin-top:22px}img{width:100%;height:auto;margin-top:12px}.caption{font-size:12px;color:#6b7a8f}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:right;padding:9px;border-bottom:1px solid #e2e8ef}th:first-child,td:first-child{text-align:left}.downloads{display:flex;gap:8px;flex-wrap:wrap}a{color:#087f8c}.downloads a{background:#edf5f8;padding:7px 10px;border-radius:6px;font-size:12px}code{word-break:break-all}details{margin-top:16px}@media(max-width:650px){main{padding:24px 12px}h1{font-size:28px}section{padding:16px}table{font-size:11px}}
+</style><main><header><div class="eyebrow">VALIDATION DIAGNOSTICS · SEED 42 · FROZEN POLICY</div><h1>난이도와 라우팅 선택을<br>원천·카테고리별로 확인하기</h1><p>학습 21,406건 / 개발검증 3,581건. 개발검증은 기존 R0·R1·R2 점수를 재집계했습니다. RouterArena는 별도의 고정 설정 추론 결과로 구분했고 정책을 다시 선택하지 않았습니다.</p></header><!-- integrated-nav:start --><nav class="downloads" aria-label="보고서 바로가기"><a href="#category-baselines">R0 train-only 기준선</a><a href="#category-permutation">카테고리 내부 셔플</a><a href="#routerarena">RouterArena</a><a href="routerarena/index.html">RouterArena 상세 그래프</a></nav><!-- integrated-nav:end -->
+<div class="note"><b>난이도 라벨과 라우팅 단계는 서로 다릅니다.</b><br>T1 easy/medium/hard는 정답률 기반 난이도입니다. 선택 action low/medium/high는 원천별 3개 후보 중 하나입니다. R1의 medium 선택이 많다는 사실만으로 “질문을 전부 중간 난이도로 판정했다”고 해석할 수 없습니다.</div>
+<section><h2>budget 0.5에서 medium을 선택한 비율</h2><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>R0 · CE</th>
+      <th>R1 · BCE</th>
+      <th>R2 · RankNet</th>
+    </tr>
+    <tr>
+      <th>source_dataset</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RouterBench</th>
+      <td>37.2%</td>
+      <td>55.5%</td>
+      <td>88.0%</td>
+    </tr>
+    <tr>
+      <th>xRouteBench</th>
+      <td>6.3%</td>
+      <td>34.6%</td>
+      <td>28.1%</td>
+    </tr>
+  </tbody>
+</table><p>검증 데이터는 RouterBench 3,122건(87.2%), xRouteBench 459건(12.8%)입니다. 전체 평균만 보면 큰 원천의 양상이 과대표현될 수 있습니다.</p><details><summary>실제 후보 모델과 점수 의미</summary><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>low</th>
+      <th>medium</th>
+      <th>high</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>routerbench</th>
+      <td>mistralai/mistral-7b-chat</td>
+      <td>zero-one-ai/Yi-34B-Chat</td>
+      <td>gpt-4-1106-preview</td>
+    </tr>
+    <tr>
+      <th>xroutebench</th>
+      <td>gpt-oss-20b</td>
+      <td>gpt-oss-120b</td>
+      <td>cogito-v2-1-671b</td>
+    </tr>
+  </tbody>
+</table><p>R0는 난이도 분류 확률에 비용 정책을 적용합니다. R1은 후보별 독립 성공 점수, R2는 후보 사이의 상대 품질 점수에 비용 정책을 적용합니다. R2 점수는 성공 확률이 아닙니다.</p></details></section>
+<section><h2>medium 집중에 비용 정책이 미치는 영향</h2><p>같은 모델 점수에서 λ만 0으로 놓은 진단과, 저장된 budget 0.5 정책을 비교합니다. 예를 들어 RouterBench에서 R2의 medium 비율은 λ=0일 때 23.9%, 고정 정책 λ=1에서는 88.0%입니다. 이 차이는 비용 정책 적용으로 발생합니다. λ=0 결과는 진단용이며 정책을 다시 선택한 것이 아닙니다.</p><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>method</th>
+      <th>source_dataset</th>
+      <th>lambda_zero_medium_rate</th>
+      <th>locked_medium_rate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ordinal</td>
+      <td>routerbench</td>
+      <td>37.2%</td>
+      <td>37.2%</td>
+    </tr>
+    <tr>
+      <td>ordinal</td>
+      <td>xroutebench</td>
+      <td>6.1%</td>
+      <td>6.3%</td>
+    </tr>
+    <tr>
+      <td>pointwise</td>
+      <td>routerbench</td>
+      <td>23.4%</td>
+      <td>55.5%</td>
+    </tr>
+    <tr>
+      <td>pointwise</td>
+      <td>xroutebench</td>
+      <td>23.7%</td>
+      <td>34.6%</td>
+    </tr>
+    <tr>
+      <td>pairwise</td>
+      <td>routerbench</td>
+      <td>23.9%</td>
+      <td>88.0%</td>
+    </tr>
+    <tr>
+      <td>pairwise</td>
+      <td>xroutebench</td>
+      <td>18.3%</td>
+      <td>28.1%</td>
+    </tr>
+  </tbody>
+</table></section>
+<section><h2>학습·검증 난이도 분포</h2><p>T1은 전체 후보 모델의 정답률로 만든 난이도 지표입니다. 정답률 0.64 이상은 easy, 0.27 이상 0.64 미만은 medium, 그 미만은 hard입니다. 사람의 난이도 판정과 동일한 정답으로 취급하지 않습니다.</p><a href="01-difficulty-source.png"><img src="01-difficulty-source.png" alt="학습·검증 난이도 분포" loading="lazy"></a><p class="caption">PNG 원본을 열려면 그림을 누르세요.</p></section><section><h2>카테고리별 난이도</h2><p>원천마다 카테고리 체계가 달라 원천/카테고리 조합을 유지했습니다. 오른쪽은 왼쪽과 같은 카테고리 순서이며, 별표(*)는 30건 미만입니다.</p><a href="02-difficulty-category.png"><img src="02-difficulty-category.png" alt="카테고리별 난이도" loading="lazy"></a><p class="caption">PNG 원본을 열려면 그림을 누르세요.</p></section><section><h2>고정 budget 0.5의 라우팅 분포</h2><p>각 방법·원천에 저장된 λ를 그대로 적용했습니다. low/medium/high는 해당 원천의 후보 모델 순서이며 easy/medium/hard 난이도와 다른 개념입니다. 공개 벤치마크의 후보는 Claude 모델이 아닙니다.</p><a href="03-routing-source.png"><img src="03-routing-source.png" alt="고정 budget 0.5의 라우팅 분포" loading="lazy"></a><p class="caption">PNG 원본을 열려면 그림을 누르세요.</p></section><section><h2>같은 원천 안에서 카테고리별 라우팅</h2><p>같은 검증 샘플을 비교합니다. medium 비중 하나만으로 붕괴 여부를 판단할 수 없습니다. 원천별 모델 비용, 질문별 품질 예측과 λ가 함께 결정합니다.</p><a href="04-routing-category.png"><img src="04-routing-category.png" alt="같은 원천 안에서 카테고리별 라우팅" loading="lazy"></a><p class="caption">PNG 원본을 열려면 그림을 누르세요.</p></section><section><h2>난이도와 실제 선택의 관계</h2><p>각 행은 같은 T1 난이도에 속하는 질문입니다. R1·R2의 학습 목표는 난이도 맞히기가 아니므로 이 표를 분류 정확도나 혼동행렬로 해석하면 안 됩니다.</p><a href="05-difficulty-route-heatmaps.png"><img src="05-difficulty-route-heatmaps.png" alt="난이도와 실제 선택의 관계" loading="lazy"></a><p class="caption">PNG 원본을 열려면 그림을 누르세요.</p></section><section><h2>전체 λ 그리드에서 medium 비율</h2><p>기존 곡선 저장 과정에서 중복 비용 점이 생략됐으므로, 원래 등록된 14개 λ 모두를 저장 점수로 복원했습니다. 별은 budget 0.5에서 고정한 원천별 정책입니다. λ 숫자의 의미는 CE·BCE·RankNet 점수 척도에 따라 다릅니다. 오른쪽은 원천 비율로 가중한 전체 검증 데이터입니다.</p><a href="06-medium-vs-lambda.png"><img src="06-medium-vs-lambda.png" alt="전체 λ 그리드에서 medium 비율" loading="lazy"></a><p class="caption">PNG 원본을 열려면 그림을 누르세요.</p></section><section><h2>원천만 아는 고정 선택과 비교</h2><p>Source-only fixed는 학습 데이터에서 원천별 평균 비용이 budget 0.5 이하인 후보 중 평균 품질이 가장 높은 하나를 고릅니다. Train-best single은 비용 제한 없이 학습 평균 품질로 선택합니다. 두 기준 모두 검증 결과로 후보를 다시 고르지 않았습니다. 그래프의 실현 비용은 같지 않으므로 동일 비용 우월성이나 통계적 유의성으로 해석하지 않습니다.</p><a href="07-source-only-comparison.png"><img src="07-source-only-comparison.png" alt="원천만 아는 고정 선택과 비교" loading="lazy"></a><p class="caption">PNG 원본을 열려면 그림을 누르세요.</p></section><section><h2>R0 난이도 진단: 원천별 학습 다수 라벨과 비교</h2><p>이 표는 λ를 적용하기 전 R0 raw argmax를 T1과 비교합니다. source-only 기준은 학습 데이터의 원천별 다수 라벨 하나입니다. R1·R2에는 같은 정확도 지표를 적용하지 않습니다.</p><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>source_dataset</th>
+      <th>train_majority_label</th>
+      <th>dev_n</th>
+      <th>source_only_label_accuracy</th>
+      <th>r0_raw_argmax_t1_accuracy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>routerbench</td>
+      <td>easy</td>
+      <td>3122</td>
+      <td>48.1%</td>
+      <td>58.8%</td>
+    </tr>
+    <tr>
+      <td>xroutebench</td>
+      <td>easy</td>
+      <td>459</td>
+      <td>58.2%</td>
+      <td>72.1%</td>
+    </tr>
+  </tbody>
+</table></section>
+
+<section><h2>검증과 재현</h2><p>원본 manifest SHA, artifact SHA·크기, 모든 sample ID의 일대일 결합, 중첩 메타데이터·품질·비용 열, train/dev 중복 그룹 분리, T1 임계값 재구성, 저장된 품질·비용 곡선의 라우팅 비율을 확인했습니다. 작은 셀과 단일 seed의 차이는 기술 통계이며 유의성 검정 결과가 아닙니다.</p><details><summary>고정 λ 보기</summary><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>method</th>
+      <th>source</th>
+      <th>budget</th>
+      <th>lambda</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ordinal</td>
+      <td>routerbench</td>
+      <td>0.5</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <td>ordinal</td>
+      <td>xroutebench</td>
+      <td>0.5</td>
+      <td>0.003</td>
+    </tr>
+    <tr>
+      <td>pointwise</td>
+      <td>routerbench</td>
+      <td>0.5</td>
+      <td>0.100</td>
+    </tr>
+    <tr>
+      <td>pointwise</td>
+      <td>xroutebench</td>
+      <td>0.5</td>
+      <td>0.030</td>
+    </tr>
+    <tr>
+      <td>pairwise</td>
+      <td>routerbench</td>
+      <td>0.5</td>
+      <td>1.000</td>
+    </tr>
+    <tr>
+      <td>pairwise</td>
+      <td>xroutebench</td>
+      <td>0.5</td>
+      <td>0.100</td>
+    </tr>
+  </tbody>
+</table></details><p>수치 원본: <a href="diagnostics.json">diagnostics.json</a> · <a href="manifest.json">출력 SHA manifest</a> · <a href="../../../../ml/scripts/render-routing-diagnostics.py">재현 스크립트</a></p><p><code>PYTHONPATH=/private/tmp/llm-router-report-deps .venv/bin/python ml/scripts/render-routing-diagnostics.py</code></p><div class="downloads"><a href="difficulty-by-source.csv">difficulty-by-source.csv</a><a href="difficulty-by-category.csv">difficulty-by-category.csv</a><a href="routing-by-source.csv">routing-by-source.csv</a><a href="routing-by-category.csv">routing-by-category.csv</a><a href="difficulty-by-route.csv">difficulty-by-route.csv</a><a href="validation-routing-rows.csv">validation-routing-rows.csv</a><a href="locked-penalties.csv">locked-penalties.csv</a><a href="lambda-grid-routing.csv">lambda-grid-routing.csv</a><a href="source-only-comparison.csv">source-only-comparison.csv</a><a href="within-source-category-comparison.csv">within-source-category-comparison.csv</a><a href="r0-label-diagnostic.csv">r0-label-diagnostic.csv</a><a href="medium-cost-policy-effect.csv">medium-cost-policy-effect.csv</a></div></section><!-- category-baseline-audit:start --><section id="category-baselines"><h2>R0: 카테고리의 다수 라벨만 알아도 설명되는가?</h2><p>학습 데이터의 원천별 다수 라벨, 원천·카테고리별 다수 라벨을 각각 고정해 개발검증에 적용했습니다. 두 기준선은 검증 정답으로 규칙을 맞추지 않았습니다. 비교 대상은 비용 정책 적용 전 R0의 난이도 분류이며 R1·R2에는 이 정확도를 적용하지 않습니다.</p><a href="category-baselines/r0-train-category-baselines.png"><img src="category-baselines/r0-train-category-baselines.png" alt="Train-only majority 기준선과 R0의 정확도, macro F1, balanced accuracy"></a><p>xRouteBench 정확도는 카테고리 기준선 71.46%, R0 72.11%로, R0의 추가 정답은 459건 중 3건입니다. Macro F1은 기준선 0.5986가 R0 0.5905보다 높습니다. RouterBench는 기준선 53.01%에서 R0 58.84%로 개선됩니다.</p><p><b>높은 원천별 정확도만으로 질문의 난이도를 일반화했다고 결론 낼 수 없습니다.</b> 단순한 카테고리 정보가 일부 정확도를 설명하지만, R0 전체가 카테고리 규칙에만 의존한다는 인과 증명도 아닙니다. 카테고리별 표본 수와 다른 지표를 함께 봐야 합니다.</p><details><summary>카테고리별 정확도 차이</summary><a href="category-baselines/r0-category-differences.png"><img src="category-baselines/r0-category-differences.png" alt="카테고리별 R0 정확도에서 train majority 정확도를 뺀 차이"></a><p>표본이 작은 구간의 큰 차이는 과해석하지 않습니다. 0은 같은 정확도이며 반드시 동일한 예측을 뜻하지는 않습니다.</p></details><p><a href="category-baselines/original-audit.md">독립 분석 메모</a> · <a href="category-baselines/original-audit.json">전체 지표·train prior·입력 SHA</a> · <a href="category-baselines/original-audit.parquet">행별 예측</a> · <a href="category-baselines/original-audit.py">분석 재현</a> · <a href="category-baselines/render.py">시각화·독립 검증</a> · <a href="category-baselines/manifest.json">파일 manifest</a></p></section><!-- category-baseline-audit:end --><!-- category-permutation-audit:start --><section id="category-permutation"><h2>사후 진단: 카테고리 안에서 선택을 바꿔도 비슷한가?</h2><p>동일한 원천·카테고리 안에서 고정 budget 0.5의 선택을 1,000회 재배정했습니다. 각 모델의 low/medium/high 사용 건수는 매번 그대로입니다. 모든 모델에는 같은 행 permutation을 적용했습니다. 막대는 재배정 결과의 중앙 95% 범위이고 점은 실제 고정 정책입니다. 각 행의 셔플 평균을 0으로 놓았습니다.</p><a href="category-permutation/posthoc-quality-cost-ranges.png"><img src="category-permutation/posthoc-quality-cost-ranges.png" alt="카테고리 내부 선택 재배정의 품질·비용 범위와 실제 선택 비교"></a><p><b>이 범위는 신뢰구간이 아닙니다.</b> 이미 모델·정책 선택에 사용한 개발검증의 사후 진단이며, 독립 test의 유의성 검정도 아닙니다. 선택 비율을 유지해도 문항별 비용이 달라 실현 비용이 바뀝니다. 각 원천 비용 단위 그대로 표시했으며, 원천 간 비용을 평균하거나 현재 서비스 비용으로 환산하지 않았습니다.</p><p>RouterBench에서는 R1·R2의 품질이 셔플 범위 위에 있어 카테고리별 모델 사용 비율 이상의 질문별 선택 정보가 있다는 보조 근거입니다. 하지만 비용도 범위 위이므로 같은 비용에서 더 낫다는 뜻은 아닙니다. xRouteBench에서는 세 모델의 품질이 모두 범위 안에 있습니다. 이 진단만으로 출처·카테고리 규칙에 대한 의존을 배제하거나 R1의 질문별 선택 우위를 일반화할 수 없습니다.</p><p><a href="category-permutation/original-audit.md">해석 메모</a> · <a href="category-permutation/original-audit.json">1,000회 원시 집계·지표·SHA</a> · <a href="category-permutation/ranges.csv">수치 표</a> · <a href="category-permutation/original-audit.py">분석 재현</a> · <a href="category-permutation/render.py">시각화·분포 검증</a> · <a href="category-permutation/manifest.json">파일 manifest</a></p></section><!-- category-permutation-audit:end --><!-- routerarena-audit:start --><section id="routerarena"><h2>RouterArena: 공식 라벨과 R0·R1·R2의 선택</h2><p>정제된 full 8,379건과 대응하는 robustness 412쌍을 고정 λ=0·최대 512토큰으로 확인했습니다. 세 모델의 같은 질문 ID와 공식 라벨을 검증했습니다. <a href="routerarena/index.html"><b>전체 카테고리·도메인·medium·robustness 보고서 열기 →</b></a></p><a href="routerarena/conditional-on-official.png"><img src="routerarena/conditional-on-official.png" alt="RouterArena 공식 난이도별 R0와 R1·R2 action 슬롯 분포"></a><p><b>R0는 난이도 분류기이고 R1·R2는 action 슬롯의 argmax 투영입니다.</b> R1·R2 표는 난이도 학습 성능, 후보별 실측 성공률, 운영 경로 또는 공식 Arena Score가 아닙니다. 개발검증의 T1 정답률 기반 라벨과 Arena 공식 Difficulty는 정의가 다르므로 정확도 차이를 같은 과제의 성능 하락이라고 단정하지 않습니다.</p><p>과거 RouterArena 평가를 학습 전에 확인한 이력이 있어 완전히 보지 않은 blind test가 아닙니다. Full과 robustness는 같은 원본의 쌍이므로 합산하지 않습니다. 이번 진단으로 모델·정책을 다시 선택하거나 배포하지 않았습니다.</p><p><a href="routerarena/visuals.json">전체 수치·검증 내역</a> · <a href="routerarena/manifest.json">산출 manifest</a></p></section><!-- routerarena-audit:end --></main></html>

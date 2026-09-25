@@ -1,0 +1,148 @@
+{
+  "schema_version": "routing-objective-report-transfer-evidence-v1",
+  "source_transfer_report_sha256": "dc75526ee15908bb567bfe794d299f534a727e98cb3aec6776d364f06974ae3c",
+  "transfer_status": {
+    "status": "comparison_complete",
+    "started_at_unix": 1790231874.6664014,
+    "input_receipt": {
+      "archive_sha256": "7ce814776dd9c4875bcc4907a880f3c13411a36f96d9c1667f083219f472fbe0",
+      "size_bytes": 30388710,
+      "code_commit": "85c422c9af4c51a51ba5eb45a0ec957b836e02d2",
+      "source_files_dirty": false
+    },
+    "required_methods": [
+      "ordinal",
+      "pointwise",
+      "pairwise"
+    ],
+    "production_activated": false,
+    "retry_requires_new_report_upload_descriptor": true,
+    "winner_method": "pointwise",
+    "finished_at_unix": 1790238881.0122027
+  },
+  "receipt_count": 15,
+  "comparison_receipt": {
+    "uri": "gs://llm-router-mlserver/training-runs/objectives-continual-v1-A-20260924/comparison-results.tar",
+    "size_bytes": 583680,
+    "sha256": "c3b844dbe003a4d209e7d304ca72ab3d38f7e780a85dd17d0de2d79f3aac67b1",
+    "crc32c": "dPyXow==",
+    "generation": "1790238880869764",
+    "verified_at_unix": 1790238880.985566
+  },
+  "local_archive_sha256_verified": true,
+  "archive_contains_model_weights": false,
+  "archive_files": [
+    "validation-lock.json",
+    "input-manifest.json",
+    "arms.json",
+    "ordinal/metrics.json",
+    "ordinal/manifest.json",
+    "ordinal/validation-scores.parquet",
+    "ordinal/validation-curve.parquet",
+    "ordinal/execution.log",
+    "pointwise/metrics.json",
+    "pointwise/manifest.json",
+    "pointwise/validation-scores.parquet",
+    "pointwise/validation-curve.parquet",
+    "pointwise/execution.log",
+    "pairwise/metrics.json",
+    "pairwise/manifest.json",
+    "pairwise/validation-scores.parquet",
+    "pairwise/validation-curve.parquet",
+    "pairwise/execution.log"
+  ],
+  "remote_receipts_independently_verified_by": "parent task before report generation; size/CRC32C/generation for all 15 objects",
+  "remote_status_checked_by_this_renderer": false,
+  "copied_input_sha256": {
+    "validation-lock.json": "ddae362cb6e826376383427933deae22bab1061390709be8f781345caa608e5f",
+    "arms.json": "47052a8a02820804e3091f7b60aad25a06e8d0fe75eb1b974a23414b10ff4b20"
+  },
+  "personal_drive": {
+    "status": "verified_after_flush_and_remount",
+    "root": "/content/drive/MyDrive/LLM_Router/routing-objectives-continual-v1-A-20260924",
+    "files": {
+      "objective-colab-input.tar.gz": {
+        "size_bytes": 30388710,
+        "sha256": "7ce814776dd9c4875bcc4907a880f3c13411a36f96d9c1667f083219f472fbe0"
+      },
+      "r0-results.tar": {
+        "size_bytes": 18503680,
+        "sha256": "1b437a4f7df88ad6e083a977477a585ece7a9e7646e16ada98115fb0eafa0b90"
+      },
+      "pointwise-pilot-results.tar": {
+        "size_bytes": 603392000,
+        "sha256": "bd00dd67c009fe5a131ac87f3040c4cf0c51cd04f7fc1ba2096dd3107154f048"
+      },
+      "pairwise-pilot-results.tar": {
+        "size_bytes": 603392000,
+        "sha256": "9dfbad70e248cceb6e65f4c85c077aae15da082c08a715ee1598bb4a720b2a37"
+      },
+      "pointwise-step500.tar": {
+        "size_bytes": 1799065600,
+        "sha256": "c6f1edc2a656e80bdf6e3ab63382eb32ef51d2c0f9e3c7202bde7972bade7d34"
+      },
+      "pointwise-step1000.tar": {
+        "size_bytes": 1799065600,
+        "sha256": "59a2e6156c92ea61c4c89e6c579ae4f8c691266effdbe0da0577f6a3aa01f227"
+      },
+      "pointwise-step1500.tar": {
+        "size_bytes": 1799065600,
+        "sha256": "3f9892029386055c0e45eb42094d4e52d9f3cae94a7aa6930ae5d926999d0a0d"
+      },
+      "pointwise-step2007.tar": {
+        "size_bytes": 1799065600,
+        "sha256": "8e378a07b223aeb113ffdea93c11ff05139b51607404ba35b0d02c673e4e3739"
+      },
+      "pointwise-final-results.tar": {
+        "size_bytes": 620574720,
+        "sha256": "0da9d3dc3b845642bf0b8201758308a4d21a3c66fd7582468b46a0ea328a7d8d"
+      },
+      "pairwise-step500.tar": {
+        "size_bytes": 1799065600,
+        "sha256": "2ffe57cf03b2d6c19363c662fbd7ab4ae519ca4a455341f1f9bcec9551de5f7d"
+      },
+      "pairwise-step1000.tar": {
+        "size_bytes": 1799065600,
+        "sha256": "9d0325799b268a349d42bbe4b5a94f291bde4e240bb638f6d1d88bb0e3551c2d"
+      },
+      "pairwise-step1500.tar": {
+        "size_bytes": 1799065600,
+        "sha256": "34bb5bb5e8b8346f5325a32d8c736d7e34964d7a2358cca3a6fc08b2fdf4e417"
+      },
+      "pairwise-step2007.tar": {
+        "size_bytes": 1799065600,
+        "sha256": "ac239b6ee897336cb8a0b9ecca2ef418f9c73cd0036cc94c56dc1110d7132b35"
+      },
+      "pairwise-final-results.tar": {
+        "size_bytes": 620574720,
+        "sha256": "0cc85b221227c7b139123c0d5451c1b06232f3cbeffc0e8ebc2bb886c3038ef7"
+      },
+      "comparison-results.tar": {
+        "size_bytes": 583680,
+        "sha256": "c3b844dbe003a4d209e7d304ca72ab3d38f7e780a85dd17d0de2d79f3aac67b1"
+      }
+    },
+    "staging_errors": {}
+  },
+  "personal_drive_evidence_scope": "Original Colab transfer report records flush/remount verification; this local analysis did not independently query Drive.",
+  "personal_drive_receipts_match_gcs_receipts": true,
+  "personal_drive_to_gcs_receipt_keys": {
+    "objective-colab-input.tar.gz": "input",
+    "r0-results.tar": "r0",
+    "pointwise-pilot-results.tar": "pointwise-pilot",
+    "pairwise-pilot-results.tar": "pairwise-pilot",
+    "pointwise-step500.tar": "pointwise-step500",
+    "pointwise-step1000.tar": "pointwise-step1000",
+    "pointwise-step1500.tar": "pointwise-step1500",
+    "pointwise-step2007.tar": "pointwise-step2007",
+    "pointwise-final-results.tar": "pointwise-final",
+    "pairwise-step500.tar": "pairwise-step500",
+    "pairwise-step1000.tar": "pairwise-step1000",
+    "pairwise-step1500.tar": "pairwise-step1500",
+    "pairwise-step2007.tar": "pairwise-step2007",
+    "pairwise-final-results.tar": "pairwise-final",
+    "comparison-results.tar": "comparison"
+  },
+  "personal_drive_verified_file_count": 15,
+  "renderer_remote_status_note": "REPORT.md/report.json had no separate run-record input; their unknown remote status does not negate this transfer receipt."
+}

@@ -1,0 +1,28 @@
+{
+  "schema_version": "routing-method-review-v1",
+  "post_hoc_diagnostic": true,
+  "selection_changed": false,
+  "production_approved": false,
+  "files": {
+    "REVIEW.md": {
+      "sha256": "82c2055ba912c432fc1a95903c896cbe4441502b9fee2b01fa107523b81fa216",
+      "size_bytes": 9682
+    },
+    "a-evidence.json": {
+      "sha256": "8bae5538b9850948647a46dd171f29ae1b89120d2f2bd5fff17484231d6b7583",
+      "size_bytes": 19810
+    },
+    "g1-zero-penalty.json": {
+      "sha256": "eff4df0c812b86e82a7042ee01e3a965f861cbb8ee87f1fc382138c37872e63c",
+      "size_bytes": 28053
+    },
+    "g1-zero-penalty.md": {
+      "sha256": "4981abc6a3dd21192559a7a69d345544e2c52f187d02afb481b930b0b4d4a4d7",
+      "size_bytes": 3699
+    },
+    "weight-views.json": {
+      "sha256": "58f0852e731e48a8b0aa16a1ecbb2326060d1003b633ca86dda8269180f00f85",
+      "size_bytes": 1371
+    }
+  }
+}

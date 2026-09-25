@@ -4,20 +4,19 @@ import hashlib
 import json
 import math
 import time
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 import numpy as np
 import pandas as pd
 
 from ..routing_data.preprocessing import (
-    RoutingDataError,
     _routerbench_accepted,
     _routerbench_models,
     _validate_xroute_rows,
 )
 from ..shared.dataset_io import write_json
-
 
 TIERS = ("low", "medium", "high")
 SPLIT_FILES = {
@@ -53,12 +52,23 @@ def _resolve(root: Path, value: str | Path) -> Path:
     return path if path.is_absolute() else root / path
 
 
-def _load_anchor_rows(base_dataset_dir: Path) -> pd.DataFrame:
+def _load_anchor_rows(
+    base_dataset_dir: Path,
+    *,
+    split_files: Mapping[str, str] = SPLIT_FILES,
+    artifact_contracts: Mapping[str, Any] | None = None,
+) -> pd.DataFrame:
     frames: list[pd.DataFrame] = []
-    for logical_split, relative in SPLIT_FILES.items():
+    for logical_split, relative in split_files.items():
         path = base_dataset_dir / relative
         if not path.is_file():
             raise ObjectiveDataError(f"Missing frozen comparison split: {path}")
+        if artifact_contracts is not None:
+            contract = artifact_contracts.get(relative)
+            if not contract or _sha256(path) != contract["sha256"]:
+                raise ObjectiveDataError(
+                    f"Frozen comparison split checksum mismatch: {path}"
+                )
         frame = pd.read_parquet(path)
         frame["objective_split"] = logical_split
         frames.append(frame)
@@ -74,7 +84,11 @@ def _load_anchor_rows(base_dataset_dir: Path) -> pd.DataFrame:
     }
     missing = sorted(required - set(anchor.columns))
     if missing:
-        raise ObjectiveDataError(f"Frozen comparison rows are missing columns: {missing}")
+        raise ObjectiveDataError(
+            f"Frozen comparison rows are missing columns: {missing}"
+        )
+    if anchor.groupby("duplicate_group_id")["objective_split"].nunique().gt(1).any():
+        raise ObjectiveDataError("A duplicate group crosses objective splits")
     return anchor
 
 
@@ -95,7 +109,9 @@ def _routerbench_matrices(
     wanted = anchor.loc[anchor["source_dataset"].eq("routerbench"), "sample_id"]
     labeled = labeled.set_index("sample_id").reindex(wanted)
     if labeled.index.has_duplicates or labeled["query_text"].isna().any():
-        raise ObjectiveDataError("RouterBench outcomes do not align with frozen sample IDs")
+        raise ObjectiveDataError(
+            "RouterBench outcomes do not align with frozen sample IDs"
+        )
     quality = labeled.loc[:, models].apply(pd.to_numeric, errors="coerce")
     quality.columns = models
     raw_for_acceptance = labeled.reset_index().copy()
@@ -103,7 +119,9 @@ def _routerbench_matrices(
         "routerbench:"
     )
     success = _routerbench_accepted(raw_for_acceptance, models)
-    success.index = "routerbench:" + raw_for_acceptance["sample_id"].astype(str).to_numpy()
+    success.index = (
+        "routerbench:" + raw_for_acceptance["sample_id"].astype(str).to_numpy()
+    )
     success = success.reindex(wanted)
     cost = labeled.loc[:, [f"{model}|total_cost" for model in models]].apply(
         pd.to_numeric, errors="coerce"
@@ -121,7 +139,15 @@ def _xroute_matrices(
     models = candidates["model_name"].astype(str).tolist()
     price = candidates.set_index("model_name")
     frames: list[pd.DataFrame] = []
-    for split, filename in (("train", section["train_file"]), ("test", section["test_file"])):
+    for split, filename in (
+        ("train", section["train_file"]),
+        ("test", section["test_file"]),
+    ):
+        source_rows = anchor.loc[anchor["source_dataset"].eq("xroutebench")]
+        if "source_split" in source_rows and split not in set(
+            source_rows["source_split"]
+        ):
+            continue
         raw = pd.read_parquet(data_dir / filename)
         validated = _validate_xroute_rows(
             raw,
@@ -129,10 +155,13 @@ def _xroute_matrices(
             candidates=models,
             exact_metrics=set(section["exact_metrics"]),
             continuous_metrics=set(section["continuous_metrics"]),
+            structured=config.get("input_contract") == "structure-preserving-v2",
         )
         validated["sample_id"] = validated["query_key"].map(
-            lambda key: "xroutebench:"
-            + hashlib.sha256(str(key).encode("utf-8")).hexdigest()[:20]
+            lambda key: (
+                "xroutebench:"
+                + hashlib.sha256(str(key).encode("utf-8")).hexdigest()[:20]
+            )
         )
         input_prices = price.loc[
             validated["model_name"].astype(str), "input_price_per_1m"
@@ -158,7 +187,9 @@ def _xroute_matrices(
     success = success.reindex(index=wanted, columns=models)
     cost = cost.reindex(index=wanted, columns=models)
     if quality.index.has_duplicates or quality.isna().all(axis=1).any():
-        raise ObjectiveDataError("xRouteBench outcomes do not align with frozen sample IDs")
+        raise ObjectiveDataError(
+            "xRouteBench outcomes do not align with frozen sample IDs"
+        )
     return quality, success, cost
 
 
@@ -198,9 +229,15 @@ def select_three_arms(
     statistics = pd.DataFrame(
         {
             "model_name": list(quality.columns),
-            "mean_quality": [float(quality_train[column].mean()) for column in quality.columns],
-            "mean_cost": [float(cost_train[column].mean()) for column in quality.columns],
-            "valid_rows": [int(quality_train[column].notna().sum()) for column in quality.columns],
+            "mean_quality": [
+                float(quality_train[column].mean()) for column in quality.columns
+            ],
+            "mean_cost": [
+                float(cost_train[column].mean()) for column in quality.columns
+            ],
+            "valid_rows": [
+                int(quality_train[column].notna().sum()) for column in quality.columns
+            ],
         }
     )
     frontier = pareto_frontier(statistics, tolerance=tolerance)
@@ -233,7 +270,9 @@ def select_three_arms(
     )
     inverse = {model: tier for tier, model in selected.items()}
     statistics["selected_tier"] = statistics["model_name"].map(inverse).fillna("")
-    return selected, statistics.sort_values("mean_cost", kind="stable").reset_index(drop=True)
+    return selected, statistics.sort_values("mean_cost", kind="stable").reset_index(
+        drop=True
+    )
 
 
 def _project_source(
@@ -253,18 +292,24 @@ def _project_source(
     high_cost = float(selected_stats.at[selected["high"], "mean_cost"])
     span = high_cost - low_cost
     if span <= 0:
-        raise ObjectiveDataError(f"Selected {source} arms do not have increasing train cost")
+        raise ObjectiveDataError(
+            f"Selected {source} arms do not have increasing train cost"
+        )
     for tier in TIERS:
         model_name = selected[tier]
         output[f"model_{tier}"] = model_name
         output[f"quality_{tier}"] = pd.to_numeric(
             quality.loc[output.index, model_name], errors="coerce"
         )
-        output[f"success_{tier}"] = success.loc[output.index, model_name].astype("Float64")
+        output[f"success_{tier}"] = success.loc[output.index, model_name].astype(
+            "Float64"
+        )
         output[f"actual_cost_{tier}"] = pd.to_numeric(
             cost.loc[output.index, model_name], errors="coerce"
         )
-        decision_cost = (float(selected_stats.at[model_name, "mean_cost"]) - low_cost) / span
+        decision_cost = (
+            float(selected_stats.at[model_name, "mean_cost"]) - low_cost
+        ) / span
         output[f"decision_cost_{tier}"] = float(decision_cost)
     required_values = [
         f"{prefix}_{tier}"
@@ -277,9 +322,19 @@ def _project_source(
         raise ObjectiveDataError(
             f"{source} selected-arm outcomes are incomplete for {int(incomplete.sum())} rows: {examples}"
         )
-    output["oracle_quality_tier"] = output.loc[
-        :, [f"quality_{tier}" for tier in TIERS]
-    ].to_numpy(float).argmax(axis=1)
+    values = output.loc[:, required_values].to_numpy(float)
+    if not np.isfinite(values).all() or (values < 0).any():
+        raise ObjectiveDataError(f"{source} outcomes must be finite and non-negative")
+    for tier in TIERS:
+        if not output[f"quality_{tier}"].between(0.0, 1.0).all():
+            raise ObjectiveDataError(f"{source} quality must be within [0, 1]")
+        if not output[f"success_{tier}"].isin([0.0, 1.0]).all():
+            raise ObjectiveDataError(f"{source} success must be observed binary values")
+    output["oracle_quality_tier"] = (
+        output.loc[:, [f"quality_{tier}" for tier in TIERS]]
+        .to_numpy(float)
+        .argmax(axis=1)
+    )
     return output.reset_index(drop=True)
 
 
@@ -291,7 +346,19 @@ def build_outcome_dataset(
     base_manifest = _load_json(base_manifest_path)
     if base_manifest.get("coverage_resolution_status") != "complete":
         raise ObjectiveDataError("Base comparison dataset coverage is not resolved")
-    anchor = _load_anchor_rows(base_dataset_dir)
+    expected_manifest = config.get("base_dataset_manifest_sha256")
+    if expected_manifest and _sha256(base_manifest_path) != expected_manifest:
+        raise ObjectiveDataError("Base dataset manifest checksum mismatch")
+    split_files = config.get("split_files", SPLIT_FILES)
+    if not {"train", "validation"}.issubset(split_files):
+        raise ObjectiveDataError(
+            "Objective comparison requires train and validation splits"
+        )
+    anchor = _load_anchor_rows(
+        base_dataset_dir,
+        split_files=split_files,
+        artifact_contracts=base_manifest.get("artifacts"),
+    )
     t2_path = base_dataset_dir / "threshold" / "t2-all-splits.parquet"
     if t2_path.is_file():
         t2 = pd.read_parquet(t2_path, columns=["sample_id", "difficulty_label"])
@@ -339,23 +406,29 @@ def build_outcome_dataset(
         )
         arms_payload["sources"][source] = {
             "selected_models": selected,
-            "training_row_count": int(len(train_ids)),
+            "training_row_count": len(train_ids),
         }
 
-    projected = pd.concat(projected_frames, ignore_index=True).sort_values(
-        ["objective_split", "source_dataset", "sample_id"], kind="stable"
+    # Preserve the exact anchor row order so all methods share the same shuffle.
+    projected = pd.concat(projected_frames, ignore_index=True).set_index(
+        "sample_id", drop=False
     )
+    projected = projected.loc[anchor["sample_id"].tolist()].reset_index(drop=True)
     if projected["sample_id"].duplicated().any() or len(projected) != len(anchor):
         raise ObjectiveDataError("Projected rows do not preserve the frozen sample set")
 
     output_dir.mkdir(parents=True, exist_ok=True)
     artifact_paths: list[Path] = []
-    for split in SPLIT_FILES:
+    for split in split_files:
         target = output_dir / f"{split}.parquet"
-        projected.loc[projected["objective_split"].eq(split)].to_parquet(target, index=False)
+        projected.loc[projected["objective_split"].eq(split)].to_parquet(
+            target, index=False
+        )
         artifact_paths.append(target)
     statistics_path = output_dir / "candidate-statistics.parquet"
-    pd.concat(statistics_frames, ignore_index=True).to_parquet(statistics_path, index=False)
+    pd.concat(statistics_frames, ignore_index=True).to_parquet(
+        statistics_path, index=False
+    )
     artifact_paths.append(statistics_path)
     arms_path = output_dir / "arms.json"
     write_json(arms_path, arms_payload)
@@ -367,7 +440,8 @@ def build_outcome_dataset(
         "created_at_unix": int(time.time()),
         "base_dataset_manifest_sha256": _sha256(base_manifest_path),
         "row_counts": {
-            split: int(projected["objective_split"].eq(split).sum()) for split in SPLIT_FILES
+            split: int(projected["objective_split"].eq(split).sum())
+            for split in split_files
         },
         "source_row_counts": {
             source: int(projected["source_dataset"].eq(source).sum())
@@ -382,5 +456,7 @@ def build_outcome_dataset(
     }
     manifest_path = output_dir / "manifest.json"
     write_json(manifest_path, manifest)
-    (output_dir / "_SUCCESS").write_text(_sha256(manifest_path) + "\n", encoding="utf-8")
+    (output_dir / "_SUCCESS").write_text(
+        _sha256(manifest_path) + "\n", encoding="utf-8"
+    )
     return manifest

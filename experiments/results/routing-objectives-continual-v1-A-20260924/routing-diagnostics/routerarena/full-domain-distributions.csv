@@ -1,0 +1,109 @@
+dimension,value,method,label_or_projected_slot,count,denominator,fraction
+domain,"0 Computer science, information, and general works",official,easy,692,1399,0.49463902787705505
+domain,1 Philosophy and psychology,official,easy,402,685,0.5868613138686132
+domain,3 Social Science,official,easy,297,699,0.4248927038626609
+domain,4 Language,official,easy,209,700,0.2985714285714286
+domain,5 Science,official,easy,774,1399,0.5532523230879199
+domain,6 Technology,official,easy,821,1398,0.5872675250357654
+domain,7 Arts & recreation,official,easy,298,700,0.4257142857142857
+domain,8 Literature,official,easy,113,700,0.16142857142857142
+domain,9 History,official,easy,373,699,0.5336194563662375
+domain,"0 Computer science, information, and general works",official,medium,462,1399,0.3302358827734096
+domain,1 Philosophy and psychology,official,medium,203,685,0.29635036496350364
+domain,3 Social Science,official,medium,253,699,0.36194563662374823
+domain,4 Language,official,medium,167,700,0.23857142857142857
+domain,5 Science,official,medium,431,1399,0.3080771979985704
+domain,6 Technology,official,medium,420,1398,0.30042918454935624
+domain,7 Arts & recreation,official,medium,255,700,0.36428571428571427
+domain,8 Literature,official,medium,68,700,0.09714285714285714
+domain,9 History,official,medium,177,699,0.2532188841201717
+domain,"0 Computer science, information, and general works",official,hard,245,1399,0.17512508934953538
+domain,1 Philosophy and psychology,official,hard,80,685,0.11678832116788321
+domain,3 Social Science,official,hard,149,699,0.21316165951359084
+domain,4 Language,official,hard,324,700,0.46285714285714286
+domain,5 Science,official,hard,194,1399,0.13867047891350964
+domain,6 Technology,official,hard,157,1398,0.1123032904148784
+domain,7 Arts & recreation,official,hard,147,700,0.21
+domain,8 Literature,official,hard,519,700,0.7414285714285714
+domain,9 History,official,hard,149,699,0.21316165951359084
+domain,"0 Computer science, information, and general works",ordinal,easy,541,1399,0.3867047891350965
+domain,1 Philosophy and psychology,ordinal,easy,277,685,0.4043795620437956
+domain,3 Social Science,ordinal,easy,417,699,0.5965665236051502
+domain,4 Language,ordinal,easy,518,700,0.74
+domain,5 Science,ordinal,easy,657,1399,0.46962115796997855
+domain,6 Technology,ordinal,easy,479,1398,0.3426323319027182
+domain,7 Arts & recreation,ordinal,easy,275,700,0.39285714285714285
+domain,8 Literature,ordinal,easy,482,700,0.6885714285714286
+domain,9 History,ordinal,easy,614,699,0.8783977110157367
+domain,"0 Computer science, information, and general works",ordinal,medium,509,1399,0.363831308077198
+domain,1 Philosophy and psychology,ordinal,medium,390,685,0.5693430656934306
+domain,3 Social Science,ordinal,medium,213,699,0.30472103004291845
+domain,4 Language,ordinal,medium,172,700,0.24571428571428572
+domain,5 Science,ordinal,medium,546,1399,0.3902787705503931
+domain,6 Technology,ordinal,medium,783,1398,0.5600858369098712
+domain,7 Arts & recreation,ordinal,medium,416,700,0.5942857142857143
+domain,8 Literature,ordinal,medium,137,700,0.1957142857142857
+domain,9 History,ordinal,medium,83,699,0.11874105865522175
+domain,"0 Computer science, information, and general works",ordinal,hard,349,1399,0.2494639027877055
+domain,1 Philosophy and psychology,ordinal,hard,18,685,0.026277372262773723
+domain,3 Social Science,ordinal,hard,69,699,0.09871244635193133
+domain,4 Language,ordinal,hard,10,700,0.014285714285714285
+domain,5 Science,ordinal,hard,196,1399,0.1401000714796283
+domain,6 Technology,ordinal,hard,136,1398,0.09728183118741059
+domain,7 Arts & recreation,ordinal,hard,9,700,0.012857142857142857
+domain,8 Literature,ordinal,hard,81,700,0.11571428571428571
+domain,9 History,ordinal,hard,2,699,0.002861230329041488
+domain,"0 Computer science, information, and general works",pointwise,easy,71,1399,0.05075053609721229
+domain,1 Philosophy and psychology,pointwise,easy,1,685,0.00145985401459854
+domain,3 Social Science,pointwise,easy,12,699,0.017167381974248927
+domain,4 Language,pointwise,easy,63,700,0.09
+domain,5 Science,pointwise,easy,6,1399,0.004288777698355968
+domain,6 Technology,pointwise,easy,22,1398,0.015736766809728183
+domain,7 Arts & recreation,pointwise,easy,3,700,0.004285714285714286
+domain,8 Literature,pointwise,easy,10,700,0.014285714285714285
+domain,9 History,pointwise,easy,23,699,0.032904148783977114
+domain,"0 Computer science, information, and general works",pointwise,medium,119,1399,0.08506075768406005
+domain,1 Philosophy and psychology,pointwise,medium,28,685,0.040875912408759124
+domain,3 Social Science,pointwise,medium,21,699,0.030042918454935622
+domain,4 Language,pointwise,medium,107,700,0.15285714285714286
+domain,5 Science,pointwise,medium,121,1399,0.0864903502501787
+domain,6 Technology,pointwise,medium,68,1398,0.04864091559370529
+domain,7 Arts & recreation,pointwise,medium,201,700,0.28714285714285714
+domain,8 Literature,pointwise,medium,139,700,0.19857142857142857
+domain,9 History,pointwise,medium,88,699,0.12589413447782546
+domain,"0 Computer science, information, and general works",pointwise,hard,1209,1399,0.8641887062187277
+domain,1 Philosophy and psychology,pointwise,hard,656,685,0.9576642335766423
+domain,3 Social Science,pointwise,hard,666,699,0.9527896995708155
+domain,4 Language,pointwise,hard,530,700,0.7571428571428571
+domain,5 Science,pointwise,hard,1272,1399,0.9092208720514653
+domain,6 Technology,pointwise,hard,1308,1398,0.9356223175965666
+domain,7 Arts & recreation,pointwise,hard,496,700,0.7085714285714285
+domain,8 Literature,pointwise,hard,551,700,0.7871428571428571
+domain,9 History,pointwise,hard,588,699,0.8412017167381974
+domain,"0 Computer science, information, and general works",pairwise,easy,128,1399,0.091493924231594
+domain,1 Philosophy and psychology,pairwise,easy,6,685,0.008759124087591242
+domain,3 Social Science,pairwise,easy,35,699,0.05007153075822604
+domain,4 Language,pairwise,easy,162,700,0.23142857142857143
+domain,5 Science,pairwise,easy,41,1399,0.029306647605432452
+domain,6 Technology,pairwise,easy,22,1398,0.015736766809728183
+domain,7 Arts & recreation,pairwise,easy,8,700,0.011428571428571429
+domain,8 Literature,pairwise,easy,19,700,0.027142857142857142
+domain,9 History,pairwise,easy,64,699,0.09155937052932761
+domain,"0 Computer science, information, and general works",pairwise,medium,191,1399,0.13652609006433167
+domain,1 Philosophy and psychology,pairwise,medium,87,685,0.12700729927007298
+domain,3 Social Science,pairwise,medium,160,699,0.22889842632331903
+domain,4 Language,pairwise,medium,283,700,0.4042857142857143
+domain,5 Science,pairwise,medium,216,1399,0.15439599714081487
+domain,6 Technology,pairwise,medium,302,1398,0.21602288984263232
+domain,7 Arts & recreation,pairwise,medium,283,700,0.4042857142857143
+domain,8 Literature,pairwise,medium,330,700,0.4714285714285714
+domain,9 History,pairwise,medium,256,699,0.36623748211731044
+domain,"0 Computer science, information, and general works",pairwise,hard,1080,1399,0.7719799857040743
+domain,1 Philosophy and psychology,pairwise,hard,592,685,0.8642335766423358
+domain,3 Social Science,pairwise,hard,504,699,0.721030042918455
+domain,4 Language,pairwise,hard,255,700,0.36428571428571427
+domain,5 Science,pairwise,hard,1142,1399,0.8162973552537527
+domain,6 Technology,pairwise,hard,1074,1398,0.7682403433476395
+domain,7 Arts & recreation,pairwise,hard,409,700,0.5842857142857143
+domain,8 Literature,pairwise,hard,351,700,0.5014285714285714
+domain,9 History,pairwise,hard,379,699,0.542203147353362

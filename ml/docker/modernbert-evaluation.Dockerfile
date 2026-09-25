@@ -28,6 +28,7 @@ RUN mkdir -p \
 COPY ml/src/llm_router_labeling/__init__.py /opt/llm-router/ml/src/llm_router_labeling/__init__.py
 COPY ml/src/llm_router_labeling/evaluation/__init__.py /opt/llm-router/ml/src/llm_router_labeling/evaluation/__init__.py
 COPY ml/src/llm_router_labeling/evaluation/routerarena_evaluation_cli.py /opt/llm-router/ml/src/llm_router_labeling/evaluation/routerarena_evaluation_cli.py
+COPY ml/src/llm_router_labeling/evaluation/continual_gate.py /opt/llm-router/ml/src/llm_router_labeling/evaluation/continual_gate.py
 COPY ml/src/llm_router_labeling/evaluation/routerarena_routing_evaluator.py /opt/llm-router/ml/src/llm_router_labeling/evaluation/routerarena_routing_evaluator.py
 COPY ml/src/llm_router_labeling/evaluation/routerarena_visualization.py /opt/llm-router/ml/src/llm_router_labeling/evaluation/routerarena_visualization.py
 COPY ml/src/llm_router_labeling/evaluation/routerarena_preprocessing.py /opt/llm-router/ml/src/llm_router_labeling/evaluation/routerarena_preprocessing.py

@@ -1,0 +1,5645 @@
+{
+  "schema_version": "routing-distribution-diagnostics-v1",
+  "scope": "descriptive_train_and_dev_only",
+  "new_model_inference": false,
+  "policy_reselected": false,
+  "routerarena_predictions_available_in_this_report": false,
+  "seed_scope": "single_seed_42",
+  "frozen_budget": 0.5,
+  "t1_thresholds": {
+    "candidate_id": "h0.27-e0.64",
+    "easy_threshold": 0.64,
+    "hard_threshold": 0.27,
+    "j_threshold": 0.577183731099587
+  },
+  "row_counts": {
+    "train": 21406,
+    "validation": 3581
+  },
+  "source_dev_counts": {
+    "routerbench": 3122,
+    "xroutebench": 459
+  },
+  "difficulty_dev_counts": {
+    "easy": 1768,
+    "medium": 1360,
+    "hard": 453
+  },
+  "join_and_curve_checks": {
+    "ordinal": {
+      "joined_rows": 3581,
+      "overlapping_columns_verified": 17,
+      "stored_curve_points_reproduced": 18
+    },
+    "pointwise": {
+      "joined_rows": 3581,
+      "overlapping_columns_verified": 17,
+      "stored_curve_points_reproduced": 25
+    },
+    "pairwise": {
+      "joined_rows": 3581,
+      "overlapping_columns_verified": 17,
+      "stored_curve_points_reproduced": 22
+    }
+  },
+  "input_files": {
+    "/Users/yoocheolmin/workspace/school/LLM_Router/ml/config/routing_objective_continual_v1.json": {
+      "sha256": "45e31296a82cded0fe82a8eaa003326e40e851f40745c793b2eb167f5c226d69",
+      "size_bytes": 3704
+    },
+    "/private/tmp/llm-router-objective-results-local/comparison/validation-lock.json": {
+      "sha256": "ddae362cb6e826376383427933deae22bab1061390709be8f781345caa608e5f",
+      "size_bytes": 3017
+    },
+    "/private/tmp/llm-router-objective-results-local/comparison/input-manifest.json": {
+      "sha256": "91af20264ee9bcfc26d47054a8198d8eba0abca50ab4b30973ae9b6fc7e26846",
+      "size_bytes": 4912
+    },
+    "/Users/yoocheolmin/workspace/school/LLM_Router/ml/src/llm_router_labeling/objective_comparison/evaluation.py": {
+      "sha256": "59f1de2108c848be58e6419d2f63e4c8ff92874e93f6f32edb6e3b36c460a1a0",
+      "size_bytes": 9976
+    },
+    "/Users/yoocheolmin/workspace/school/LLM_Router/ml/src/llm_router_labeling/objective_comparison/data.py": {
+      "sha256": "c6d4788b92de8ab6e02b7e498328cd4848bfbc624aa82f2ec8d060fcadffcff8",
+      "size_bytes": 18590
+    },
+    "/Users/yoocheolmin/workspace/school/LLM_Router/ml/src/llm_router_labeling/objective_comparison/objectives.py": {
+      "sha256": "6dcccab1888019c74fadc9532aab687df9f60f2920942c70594a93dff9f55ca6",
+      "size_bytes": 5157
+    },
+    "/Users/yoocheolmin/workspace/school/LLM_Router/ml/artifacts/modernbert-initial-v1/dataset/manifest.json": {
+      "sha256": "f6a4cff1684bc2626a8901dbfda9f81e7d5d7e8753e5f48320cb1ada44c8cca4",
+      "size_bytes": 7672
+    },
+    "/Users/yoocheolmin/workspace/school/LLM_Router/ml/artifacts/modernbert-initial-v1/dataset/train/training.parquet": {
+      "sha256": "9c8a1fc0cce11888f4a66b2c120b227b14eab6408cef944d2a7d746a1a3505db",
+      "size_bytes": 15520866
+    },
+    "/Users/yoocheolmin/workspace/school/LLM_Router/ml/artifacts/modernbert-initial-v1/dataset/validation/validation.parquet": {
+      "sha256": "fb698a992f05b88bfd4488c7de0abe515e52107c8435a46fa9a45bfb63b7f4d0",
+      "size_bytes": 2646031
+    },
+    "/Users/yoocheolmin/workspace/school/LLM_Router/ml/artifacts/modernbert-initial-v1/dataset/metadata.parquet": {
+      "sha256": "f516805774cd336d2c69f5b39d3bf357b598c7f11809966546f1136a61542740",
+      "size_bytes": 30219806
+    },
+    "/Users/yoocheolmin/workspace/school/LLM_Router/ml/artifacts/routing-objective-continual-v1/dataset/manifest.json": {
+      "sha256": "28cbc342c510fee7589151f99cdfe440281bfbe6288abd749eac9fd52f4c0b19",
+      "size_bytes": 1674
+    },
+    "/Users/yoocheolmin/workspace/school/LLM_Router/ml/artifacts/routing-objective-continual-v1/dataset/train.parquet": {
+      "sha256": "d9b0db47defd1d7162c1cf70059a6db806d743641d094c1e84b4c696bcbd56bf",
+      "size_bytes": 15732594
+    },
+    "/Users/yoocheolmin/workspace/school/LLM_Router/ml/artifacts/routing-objective-continual-v1/dataset/validation.parquet": {
+      "sha256": "aa9d973fcf886c7465fbf9e06701984d099cd74a5eabf508cc610845613edef8",
+      "size_bytes": 2709619
+    },
+    "/private/tmp/llm-router-objective-results-local/comparison/ordinal/manifest.json": {
+      "sha256": "9aa168e45409ff72ac8c2eb1bdb45a4ebb32078df6bba113fe2f73e9ea0fa2c7",
+      "size_bytes": 3706
+    },
+    "/private/tmp/llm-router-objective-results-local/comparison/ordinal/metrics.json": {
+      "sha256": "08d2b54cfc5f51ffe04c32819f710cd795e2fa7b38585e05a825928a357436f8",
+      "size_bytes": 5562
+    },
+    "/private/tmp/llm-router-objective-results-local/comparison/ordinal/validation-curve.parquet": {
+      "sha256": "47c136b0b9f95c353b1319a3f4a68ffa859747b7070dd135fff4c87fce9d5a8f",
+      "size_bytes": 8349
+    },
+    "/private/tmp/llm-router-objective-results-local/comparison/ordinal/validation-scores.parquet": {
+      "sha256": "c7cde5f2f69336f6c0b4f9faefcd35cbf1bd56de1b6f79d8bcea8779799ea776",
+      "size_bytes": 158900
+    },
+    "/private/tmp/llm-router-objective-results-local/comparison/pointwise/manifest.json": {
+      "sha256": "bd5fdc7bd2cbd0826123637bc41571abebe46e9fc1525c72e4619bf2146422ea",
+      "size_bytes": 3662
+    },
+    "/private/tmp/llm-router-objective-results-local/comparison/pointwise/metrics.json": {
+      "sha256": "ff115f77c2ff870a587c7a9f9cb65701c642bdb989b5bfce25f726905568a041",
+      "size_bytes": 5111
+    },
+    "/private/tmp/llm-router-objective-results-local/comparison/pointwise/validation-curve.parquet": {
+      "sha256": "7b8e202d499fc07cd6dff6a44f96a1434745964cc06b2569feb0f0eb28ff7920",
+      "size_bytes": 8759
+    },
+    "/private/tmp/llm-router-objective-results-local/comparison/pointwise/validation-scores.parquet": {
+      "sha256": "0edfe7f64ba8f96bfb6d4022406bf4d7b714b155e819d69c7fa006f32af1635b",
+      "size_bytes": 158896
+    },
+    "/private/tmp/llm-router-objective-results-local/comparison/pairwise/manifest.json": {
+      "sha256": "fc98abb00cacaedf2ecce22906bdea4de0766ed7e9a08837c8e614b4040602a0",
+      "size_bytes": 3660
+    },
+    "/private/tmp/llm-router-objective-results-local/comparison/pairwise/metrics.json": {
+      "sha256": "0743f5965999271cc6ed39111f072f3fbe39d8c18c23924147e9bce77cb7085e",
+      "size_bytes": 5103
+    },
+    "/private/tmp/llm-router-objective-results-local/comparison/pairwise/validation-curve.parquet": {
+      "sha256": "63231ffdd0e957689eb64a242b5af208bd6351e9472b2c7384980f65d8540393",
+      "size_bytes": 8644
+    },
+    "/private/tmp/llm-router-objective-results-local/comparison/pairwise/validation-scores.parquet": {
+      "sha256": "97942b36eacf4fd9c3fdcf49238facd010e577eef3c3f19e17f858760cfac597",
+      "size_bytes": 158900
+    }
+  },
+  "source_local_candidates": {
+    "routerbench": {
+      "high": "gpt-4-1106-preview",
+      "low": "mistralai/mistral-7b-chat",
+      "medium": "zero-one-ai/Yi-34B-Chat"
+    },
+    "xroutebench": {
+      "high": "cogito-v2-1-671b",
+      "low": "gpt-oss-20b",
+      "medium": "gpt-oss-120b"
+    }
+  },
+  "source_only_baseline_selection": {
+    "routerbench": {
+      "train_best_single": "high",
+      "train_budget_fixed": "medium"
+    },
+    "xroutebench": {
+      "train_best_single": "high",
+      "train_budget_fixed": "medium"
+    }
+  },
+  "tables": {
+    "difficulty-by-source": [
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "difficulty_label": "easy",
+        "count": 1501,
+        "denominator": 3122,
+        "fraction": 0.4807815503,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "difficulty_label": "medium",
+        "count": 1268,
+        "denominator": 3122,
+        "fraction": 0.4061499039,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "difficulty_label": "hard",
+        "count": 353,
+        "denominator": 3122,
+        "fraction": 0.1130685458,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "easy",
+        "count": 267,
+        "denominator": 459,
+        "fraction": 0.5816993464,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "medium",
+        "count": 92,
+        "denominator": 459,
+        "fraction": 0.2004357298,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "hard",
+        "count": 100,
+        "denominator": 459,
+        "fraction": 0.2178649237,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "difficulty_label": "easy",
+        "count": 9043,
+        "denominator": 18765,
+        "fraction": 0.4819078071,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "difficulty_label": "medium",
+        "count": 7618,
+        "denominator": 18765,
+        "fraction": 0.4059685585,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "difficulty_label": "hard",
+        "count": 2104,
+        "denominator": 18765,
+        "fraction": 0.1121236344,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "easy",
+        "count": 1565,
+        "denominator": 2641,
+        "fraction": 0.5925785687,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "medium",
+        "count": 503,
+        "denominator": 2641,
+        "fraction": 0.1904581598,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "hard",
+        "count": 573,
+        "denominator": 2641,
+        "fraction": 0.2169632715,
+        "small_sample_n_lt_30": false
+      }
+    ],
+    "difficulty-by-category": [
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "difficulty_label": "easy",
+        "count": 15,
+        "denominator": 39,
+        "fraction": 0.3846153846,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "difficulty_label": "medium",
+        "count": 14,
+        "denominator": 39,
+        "fraction": 0.358974359,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "difficulty_label": "hard",
+        "count": 10,
+        "denominator": 39,
+        "fraction": 0.2564102564,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "difficulty_label": "easy",
+        "count": 669,
+        "denominator": 1147,
+        "fraction": 0.58326068,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "difficulty_label": "medium",
+        "count": 409,
+        "denominator": 1147,
+        "fraction": 0.3565823888,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "difficulty_label": "hard",
+        "count": 69,
+        "denominator": 1147,
+        "fraction": 0.0601569311,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "difficulty_label": "easy",
+        "count": 3,
+        "denominator": 8,
+        "fraction": 0.375,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "difficulty_label": "medium",
+        "count": 2,
+        "denominator": 8,
+        "fraction": 0.25,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "difficulty_label": "hard",
+        "count": 3,
+        "denominator": 8,
+        "fraction": 0.375,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "difficulty_label": "easy",
+        "count": 598,
+        "denominator": 1258,
+        "fraction": 0.4753577107,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "difficulty_label": "medium",
+        "count": 473,
+        "denominator": 1258,
+        "fraction": 0.3759936407,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "difficulty_label": "hard",
+        "count": 187,
+        "denominator": 1258,
+        "fraction": 0.1486486486,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "difficulty_label": "easy",
+        "count": 216,
+        "denominator": 670,
+        "fraction": 0.3223880597,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "difficulty_label": "medium",
+        "count": 370,
+        "denominator": 670,
+        "fraction": 0.552238806,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "difficulty_label": "hard",
+        "count": 84,
+        "denominator": 670,
+        "fraction": 0.1253731343,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "difficulty_label": "easy",
+        "count": 0,
+        "denominator": 11,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "difficulty_label": "medium",
+        "count": 0,
+        "denominator": 11,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "difficulty_label": "hard",
+        "count": 11,
+        "denominator": 11,
+        "fraction": 1.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "difficulty_label": "easy",
+        "count": 42,
+        "denominator": 45,
+        "fraction": 0.9333333333,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "difficulty_label": "medium",
+        "count": 2,
+        "denominator": 45,
+        "fraction": 0.0444444444,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "difficulty_label": "hard",
+        "count": 1,
+        "denominator": 45,
+        "fraction": 0.0222222222,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "difficulty_label": "easy",
+        "count": 27,
+        "denominator": 41,
+        "fraction": 0.6585365854,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "difficulty_label": "medium",
+        "count": 11,
+        "denominator": 41,
+        "fraction": 0.2682926829,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "difficulty_label": "hard",
+        "count": 3,
+        "denominator": 41,
+        "fraction": 0.0731707317,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "difficulty_label": "easy",
+        "count": 29,
+        "denominator": 42,
+        "fraction": 0.6904761905,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "difficulty_label": "medium",
+        "count": 9,
+        "denominator": 42,
+        "fraction": 0.2142857143,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "difficulty_label": "hard",
+        "count": 4,
+        "denominator": 42,
+        "fraction": 0.0952380952,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "difficulty_label": "easy",
+        "count": 37,
+        "denominator": 47,
+        "fraction": 0.7872340426,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "difficulty_label": "medium",
+        "count": 6,
+        "denominator": 47,
+        "fraction": 0.1276595745,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "difficulty_label": "hard",
+        "count": 4,
+        "denominator": 47,
+        "fraction": 0.085106383,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "difficulty_label": "easy",
+        "count": 27,
+        "denominator": 40,
+        "fraction": 0.675,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "difficulty_label": "medium",
+        "count": 11,
+        "denominator": 40,
+        "fraction": 0.275,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "difficulty_label": "hard",
+        "count": 2,
+        "denominator": 40,
+        "fraction": 0.05,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "difficulty_label": "easy",
+        "count": 0,
+        "denominator": 13,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "difficulty_label": "medium",
+        "count": 3,
+        "denominator": 13,
+        "fraction": 0.2307692308,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "difficulty_label": "hard",
+        "count": 10,
+        "denominator": 13,
+        "fraction": 0.7692307692,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "difficulty_label": "easy",
+        "count": 16,
+        "denominator": 47,
+        "fraction": 0.3404255319,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "difficulty_label": "medium",
+        "count": 17,
+        "denominator": 47,
+        "fraction": 0.3617021277,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "difficulty_label": "hard",
+        "count": 14,
+        "denominator": 47,
+        "fraction": 0.2978723404,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "difficulty_label": "easy",
+        "count": 18,
+        "denominator": 35,
+        "fraction": 0.5142857143,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "difficulty_label": "medium",
+        "count": 9,
+        "denominator": 35,
+        "fraction": 0.2571428571,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "difficulty_label": "hard",
+        "count": 8,
+        "denominator": 35,
+        "fraction": 0.2285714286,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "difficulty_label": "easy",
+        "count": 29,
+        "denominator": 46,
+        "fraction": 0.6304347826,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "difficulty_label": "medium",
+        "count": 15,
+        "denominator": 46,
+        "fraction": 0.3260869565,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "difficulty_label": "hard",
+        "count": 2,
+        "denominator": 46,
+        "fraction": 0.0434782609,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "difficulty_label": "easy",
+        "count": 3,
+        "denominator": 7,
+        "fraction": 0.4285714286,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "difficulty_label": "medium",
+        "count": 3,
+        "denominator": 7,
+        "fraction": 0.4285714286,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "difficulty_label": "hard",
+        "count": 1,
+        "denominator": 7,
+        "fraction": 0.1428571429,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "difficulty_label": "easy",
+        "count": 39,
+        "denominator": 46,
+        "fraction": 0.847826087,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "difficulty_label": "medium",
+        "count": 6,
+        "denominator": 46,
+        "fraction": 0.1304347826,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "difficulty_label": "hard",
+        "count": 1,
+        "denominator": 46,
+        "fraction": 0.0217391304,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "difficulty_label": "easy",
+        "count": 0,
+        "denominator": 39,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "difficulty_label": "medium",
+        "count": 0,
+        "denominator": 39,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "dev",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "difficulty_label": "hard",
+        "count": 39,
+        "denominator": 39,
+        "fraction": 1.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "difficulty_label": "easy",
+        "count": 86,
+        "denominator": 224,
+        "fraction": 0.3839285714,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "difficulty_label": "medium",
+        "count": 79,
+        "denominator": 224,
+        "fraction": 0.3526785714,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "difficulty_label": "hard",
+        "count": 59,
+        "denominator": 224,
+        "fraction": 0.2633928571,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "difficulty_label": "easy",
+        "count": 4034,
+        "denominator": 6903,
+        "fraction": 0.5843836013,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "difficulty_label": "medium",
+        "count": 2457,
+        "denominator": 6903,
+        "fraction": 0.3559322034,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "difficulty_label": "hard",
+        "count": 412,
+        "denominator": 6903,
+        "fraction": 0.0596841953,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "difficulty_label": "easy",
+        "count": 20,
+        "denominator": 39,
+        "fraction": 0.5128205128,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "difficulty_label": "medium",
+        "count": 9,
+        "denominator": 39,
+        "fraction": 0.2307692308,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "difficulty_label": "hard",
+        "count": 10,
+        "denominator": 39,
+        "fraction": 0.2564102564,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "difficulty_label": "easy",
+        "count": 3603,
+        "denominator": 7574,
+        "fraction": 0.4757063639,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "difficulty_label": "medium",
+        "count": 2847,
+        "denominator": 7574,
+        "fraction": 0.3758912068,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "difficulty_label": "hard",
+        "count": 1124,
+        "denominator": 7574,
+        "fraction": 0.1484024294,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "difficulty_label": "easy",
+        "count": 1300,
+        "denominator": 4025,
+        "fraction": 0.3229813665,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "difficulty_label": "medium",
+        "count": 2226,
+        "denominator": 4025,
+        "fraction": 0.5530434783,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "difficulty_label": "hard",
+        "count": 499,
+        "denominator": 4025,
+        "fraction": 0.1239751553,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "difficulty_label": "easy",
+        "count": 0,
+        "denominator": 64,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "difficulty_label": "medium",
+        "count": 2,
+        "denominator": 64,
+        "fraction": 0.03125,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "difficulty_label": "hard",
+        "count": 62,
+        "denominator": 64,
+        "fraction": 0.96875,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "difficulty_label": "easy",
+        "count": 250,
+        "denominator": 266,
+        "fraction": 0.9398496241,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "difficulty_label": "medium",
+        "count": 13,
+        "denominator": 266,
+        "fraction": 0.0488721805,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "difficulty_label": "hard",
+        "count": 3,
+        "denominator": 266,
+        "fraction": 0.0112781955,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "difficulty_label": "easy",
+        "count": 162,
+        "denominator": 234,
+        "fraction": 0.6923076923,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "difficulty_label": "medium",
+        "count": 59,
+        "denominator": 234,
+        "fraction": 0.2521367521,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "difficulty_label": "hard",
+        "count": 13,
+        "denominator": 234,
+        "fraction": 0.0555555556,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "difficulty_label": "easy",
+        "count": 170,
+        "denominator": 234,
+        "fraction": 0.7264957265,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "difficulty_label": "medium",
+        "count": 46,
+        "denominator": 234,
+        "fraction": 0.1965811966,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "difficulty_label": "hard",
+        "count": 18,
+        "denominator": 234,
+        "fraction": 0.0769230769,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "difficulty_label": "easy",
+        "count": 214,
+        "denominator": 263,
+        "fraction": 0.8136882129,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "difficulty_label": "medium",
+        "count": 29,
+        "denominator": 263,
+        "fraction": 0.1102661597,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "difficulty_label": "hard",
+        "count": 20,
+        "denominator": 263,
+        "fraction": 0.0760456274,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "difficulty_label": "easy",
+        "count": 158,
+        "denominator": 237,
+        "fraction": 0.6666666667,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "difficulty_label": "medium",
+        "count": 64,
+        "denominator": 237,
+        "fraction": 0.2700421941,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "difficulty_label": "hard",
+        "count": 15,
+        "denominator": 237,
+        "fraction": 0.0632911392,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "difficulty_label": "easy",
+        "count": 0,
+        "denominator": 77,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "difficulty_label": "medium",
+        "count": 16,
+        "denominator": 77,
+        "fraction": 0.2077922078,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "difficulty_label": "hard",
+        "count": 61,
+        "denominator": 77,
+        "fraction": 0.7922077922,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "difficulty_label": "easy",
+        "count": 88,
+        "denominator": 264,
+        "fraction": 0.3333333333,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "difficulty_label": "medium",
+        "count": 95,
+        "denominator": 264,
+        "fraction": 0.3598484848,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "difficulty_label": "hard",
+        "count": 81,
+        "denominator": 264,
+        "fraction": 0.3068181818,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "difficulty_label": "easy",
+        "count": 103,
+        "denominator": 198,
+        "fraction": 0.5202020202,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "difficulty_label": "medium",
+        "count": 51,
+        "denominator": 198,
+        "fraction": 0.2575757576,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "difficulty_label": "hard",
+        "count": 44,
+        "denominator": 198,
+        "fraction": 0.2222222222,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "difficulty_label": "easy",
+        "count": 172,
+        "denominator": 265,
+        "fraction": 0.6490566038,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "difficulty_label": "medium",
+        "count": 78,
+        "denominator": 265,
+        "fraction": 0.2943396226,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "difficulty_label": "hard",
+        "count": 15,
+        "denominator": 265,
+        "fraction": 0.0566037736,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "difficulty_label": "easy",
+        "count": 15,
+        "denominator": 34,
+        "fraction": 0.4411764706,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "difficulty_label": "medium",
+        "count": 15,
+        "denominator": 34,
+        "fraction": 0.4411764706,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "difficulty_label": "hard",
+        "count": 4,
+        "denominator": 34,
+        "fraction": 0.1176470588,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "difficulty_label": "easy",
+        "count": 232,
+        "denominator": 267,
+        "fraction": 0.8689138577,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "difficulty_label": "medium",
+        "count": 30,
+        "denominator": 267,
+        "fraction": 0.1123595506,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "difficulty_label": "hard",
+        "count": 5,
+        "denominator": 267,
+        "fraction": 0.0187265918,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "difficulty_label": "easy",
+        "count": 1,
+        "denominator": 238,
+        "fraction": 0.0042016807,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "difficulty_label": "medium",
+        "count": 5,
+        "denominator": 238,
+        "fraction": 0.0210084034,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "split": "train",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "difficulty_label": "hard",
+        "count": 232,
+        "denominator": 238,
+        "fraction": 0.974789916,
+        "small_sample_n_lt_30": false
+      }
+    ],
+    "routing-by-source": [
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "route": "low",
+        "count": 1829,
+        "denominator": 3122,
+        "fraction": 0.5858424087,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "route": "medium",
+        "count": 1160,
+        "denominator": 3122,
+        "fraction": 0.3715566944,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "route": "high",
+        "count": 133,
+        "denominator": 3122,
+        "fraction": 0.0426008969,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "route": "low",
+        "count": 336,
+        "denominator": 459,
+        "fraction": 0.7320261438,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "route": "medium",
+        "count": 29,
+        "denominator": 459,
+        "fraction": 0.0631808279,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "route": "high",
+        "count": 94,
+        "denominator": 459,
+        "fraction": 0.2047930283,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "route": "low",
+        "count": 134,
+        "denominator": 3122,
+        "fraction": 0.0429212044,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "route": "medium",
+        "count": 2748,
+        "denominator": 3122,
+        "fraction": 0.8802049968,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "route": "high",
+        "count": 240,
+        "denominator": 3122,
+        "fraction": 0.0768737988,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "route": "low",
+        "count": 146,
+        "denominator": 459,
+        "fraction": 0.3180827887,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "route": "medium",
+        "count": 129,
+        "denominator": 459,
+        "fraction": 0.2810457516,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "route": "high",
+        "count": 184,
+        "denominator": 459,
+        "fraction": 0.4008714597,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "route": "low",
+        "count": 12,
+        "denominator": 3122,
+        "fraction": 0.0038436899,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "route": "medium",
+        "count": 1732,
+        "denominator": 3122,
+        "fraction": 0.5547725817,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "route": "high",
+        "count": 1378,
+        "denominator": 3122,
+        "fraction": 0.4413837284,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "route": "low",
+        "count": 122,
+        "denominator": 459,
+        "fraction": 0.265795207,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "route": "medium",
+        "count": 159,
+        "denominator": 459,
+        "fraction": 0.3464052288,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "route": "high",
+        "count": 178,
+        "denominator": 459,
+        "fraction": 0.3877995643,
+        "small_sample_n_lt_30": false
+      }
+    ],
+    "routing-by-category": [
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "route": "low",
+        "count": 18,
+        "denominator": 39,
+        "fraction": 0.4615384615,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "route": "medium",
+        "count": 6,
+        "denominator": 39,
+        "fraction": 0.1538461538,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "route": "high",
+        "count": 15,
+        "denominator": 39,
+        "fraction": 0.3846153846,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "route": "low",
+        "count": 929,
+        "denominator": 1147,
+        "fraction": 0.8099389712,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "route": "medium",
+        "count": 212,
+        "denominator": 1147,
+        "fraction": 0.1848299913,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "route": "high",
+        "count": 6,
+        "denominator": 1147,
+        "fraction": 0.0052310375,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "route": "low",
+        "count": 5,
+        "denominator": 8,
+        "fraction": 0.625,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "route": "medium",
+        "count": 2,
+        "denominator": 8,
+        "fraction": 0.25,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "route": "high",
+        "count": 1,
+        "denominator": 8,
+        "fraction": 0.125,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "route": "low",
+        "count": 688,
+        "denominator": 1258,
+        "fraction": 0.546899841,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "route": "medium",
+        "count": 499,
+        "denominator": 1258,
+        "fraction": 0.3966613672,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "route": "high",
+        "count": 71,
+        "denominator": 1258,
+        "fraction": 0.0564387917,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "route": "low",
+        "count": 189,
+        "denominator": 670,
+        "fraction": 0.2820895522,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "route": "medium",
+        "count": 441,
+        "denominator": 670,
+        "fraction": 0.6582089552,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "route": "high",
+        "count": 40,
+        "denominator": 670,
+        "fraction": 0.0597014925,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "route": "low",
+        "count": 0,
+        "denominator": 11,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "route": "medium",
+        "count": 0,
+        "denominator": 11,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "route": "high",
+        "count": 11,
+        "denominator": 11,
+        "fraction": 1.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "route": "low",
+        "count": 45,
+        "denominator": 45,
+        "fraction": 1.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "route": "medium",
+        "count": 0,
+        "denominator": 45,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "route": "high",
+        "count": 0,
+        "denominator": 45,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "route": "low",
+        "count": 37,
+        "denominator": 41,
+        "fraction": 0.9024390244,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "route": "medium",
+        "count": 4,
+        "denominator": 41,
+        "fraction": 0.0975609756,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "route": "high",
+        "count": 0,
+        "denominator": 41,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "route": "low",
+        "count": 42,
+        "denominator": 42,
+        "fraction": 1.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "route": "medium",
+        "count": 0,
+        "denominator": 42,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "route": "high",
+        "count": 0,
+        "denominator": 42,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "route": "low",
+        "count": 43,
+        "denominator": 47,
+        "fraction": 0.914893617,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "route": "medium",
+        "count": 0,
+        "denominator": 47,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "route": "high",
+        "count": 4,
+        "denominator": 47,
+        "fraction": 0.085106383,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "route": "low",
+        "count": 34,
+        "denominator": 40,
+        "fraction": 0.85,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "route": "medium",
+        "count": 6,
+        "denominator": 40,
+        "fraction": 0.15,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "route": "high",
+        "count": 0,
+        "denominator": 40,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "route": "low",
+        "count": 0,
+        "denominator": 13,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "route": "medium",
+        "count": 0,
+        "denominator": 13,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "route": "high",
+        "count": 13,
+        "denominator": 13,
+        "fraction": 1.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "route": "low",
+        "count": 13,
+        "denominator": 47,
+        "fraction": 0.2765957447,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "route": "medium",
+        "count": 14,
+        "denominator": 47,
+        "fraction": 0.2978723404,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "route": "high",
+        "count": 20,
+        "denominator": 47,
+        "fraction": 0.4255319149,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "route": "low",
+        "count": 27,
+        "denominator": 35,
+        "fraction": 0.7714285714,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "route": "medium",
+        "count": 1,
+        "denominator": 35,
+        "fraction": 0.0285714286,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "route": "high",
+        "count": 7,
+        "denominator": 35,
+        "fraction": 0.2,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "route": "low",
+        "count": 44,
+        "denominator": 46,
+        "fraction": 0.9565217391,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "route": "medium",
+        "count": 2,
+        "denominator": 46,
+        "fraction": 0.0434782609,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "route": "high",
+        "count": 0,
+        "denominator": 46,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "route": "low",
+        "count": 5,
+        "denominator": 7,
+        "fraction": 0.7142857143,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "route": "medium",
+        "count": 2,
+        "denominator": 7,
+        "fraction": 0.2857142857,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "route": "high",
+        "count": 0,
+        "denominator": 7,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "route": "low",
+        "count": 46,
+        "denominator": 46,
+        "fraction": 1.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "route": "medium",
+        "count": 0,
+        "denominator": 46,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "route": "high",
+        "count": 0,
+        "denominator": 46,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "route": "low",
+        "count": 0,
+        "denominator": 39,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "route": "medium",
+        "count": 0,
+        "denominator": 39,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "route": "high",
+        "count": 39,
+        "denominator": 39,
+        "fraction": 1.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "route": "low",
+        "count": 8,
+        "denominator": 39,
+        "fraction": 0.2051282051,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "route": "medium",
+        "count": 22,
+        "denominator": 39,
+        "fraction": 0.5641025641,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "route": "high",
+        "count": 9,
+        "denominator": 39,
+        "fraction": 0.2307692308,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "route": "low",
+        "count": 16,
+        "denominator": 1147,
+        "fraction": 0.0139494333,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "route": "medium",
+        "count": 1129,
+        "denominator": 1147,
+        "fraction": 0.9843068875,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "route": "high",
+        "count": 2,
+        "denominator": 1147,
+        "fraction": 0.0017436792,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "route": "low",
+        "count": 1,
+        "denominator": 8,
+        "fraction": 0.125,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "route": "medium",
+        "count": 7,
+        "denominator": 8,
+        "fraction": 0.875,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "route": "high",
+        "count": 0,
+        "denominator": 8,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "route": "low",
+        "count": 65,
+        "denominator": 1258,
+        "fraction": 0.0516693164,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "route": "medium",
+        "count": 1179,
+        "denominator": 1258,
+        "fraction": 0.9372019078,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "route": "high",
+        "count": 14,
+        "denominator": 1258,
+        "fraction": 0.0111287758,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "route": "low",
+        "count": 44,
+        "denominator": 670,
+        "fraction": 0.0656716418,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "route": "medium",
+        "count": 411,
+        "denominator": 670,
+        "fraction": 0.6134328358,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "route": "high",
+        "count": 215,
+        "denominator": 670,
+        "fraction": 0.3208955224,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "route": "low",
+        "count": 3,
+        "denominator": 11,
+        "fraction": 0.2727272727,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "route": "medium",
+        "count": 0,
+        "denominator": 11,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "route": "high",
+        "count": 8,
+        "denominator": 11,
+        "fraction": 0.7272727273,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "route": "low",
+        "count": 30,
+        "denominator": 45,
+        "fraction": 0.6666666667,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "route": "medium",
+        "count": 10,
+        "denominator": 45,
+        "fraction": 0.2222222222,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "route": "high",
+        "count": 5,
+        "denominator": 45,
+        "fraction": 0.1111111111,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "route": "low",
+        "count": 22,
+        "denominator": 41,
+        "fraction": 0.5365853659,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "route": "medium",
+        "count": 17,
+        "denominator": 41,
+        "fraction": 0.4146341463,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "route": "high",
+        "count": 2,
+        "denominator": 41,
+        "fraction": 0.0487804878,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "route": "low",
+        "count": 15,
+        "denominator": 42,
+        "fraction": 0.3571428571,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "route": "medium",
+        "count": 14,
+        "denominator": 42,
+        "fraction": 0.3333333333,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "route": "high",
+        "count": 13,
+        "denominator": 42,
+        "fraction": 0.3095238095,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "route": "low",
+        "count": 9,
+        "denominator": 47,
+        "fraction": 0.1914893617,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "route": "medium",
+        "count": 3,
+        "denominator": 47,
+        "fraction": 0.0638297872,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "route": "high",
+        "count": 35,
+        "denominator": 47,
+        "fraction": 0.7446808511,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "route": "low",
+        "count": 1,
+        "denominator": 40,
+        "fraction": 0.025,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "route": "medium",
+        "count": 11,
+        "denominator": 40,
+        "fraction": 0.275,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "route": "high",
+        "count": 28,
+        "denominator": 40,
+        "fraction": 0.7,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "route": "low",
+        "count": 9,
+        "denominator": 13,
+        "fraction": 0.6923076923,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "route": "medium",
+        "count": 2,
+        "denominator": 13,
+        "fraction": 0.1538461538,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "route": "high",
+        "count": 2,
+        "denominator": 13,
+        "fraction": 0.1538461538,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "route": "low",
+        "count": 9,
+        "denominator": 47,
+        "fraction": 0.1914893617,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "route": "medium",
+        "count": 3,
+        "denominator": 47,
+        "fraction": 0.0638297872,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "route": "high",
+        "count": 35,
+        "denominator": 47,
+        "fraction": 0.7446808511,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "route": "low",
+        "count": 4,
+        "denominator": 35,
+        "fraction": 0.1142857143,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "route": "medium",
+        "count": 9,
+        "denominator": 35,
+        "fraction": 0.2571428571,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "route": "high",
+        "count": 22,
+        "denominator": 35,
+        "fraction": 0.6285714286,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "route": "low",
+        "count": 3,
+        "denominator": 46,
+        "fraction": 0.0652173913,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "route": "medium",
+        "count": 24,
+        "denominator": 46,
+        "fraction": 0.5217391304,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "route": "high",
+        "count": 19,
+        "denominator": 46,
+        "fraction": 0.4130434783,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "route": "low",
+        "count": 1,
+        "denominator": 7,
+        "fraction": 0.1428571429,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "route": "medium",
+        "count": 2,
+        "denominator": 7,
+        "fraction": 0.2857142857,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "route": "high",
+        "count": 4,
+        "denominator": 7,
+        "fraction": 0.5714285714,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "route": "low",
+        "count": 8,
+        "denominator": 46,
+        "fraction": 0.1739130435,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "route": "medium",
+        "count": 27,
+        "denominator": 46,
+        "fraction": 0.5869565217,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "route": "high",
+        "count": 11,
+        "denominator": 46,
+        "fraction": 0.2391304348,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "route": "low",
+        "count": 32,
+        "denominator": 39,
+        "fraction": 0.8205128205,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "route": "medium",
+        "count": 7,
+        "denominator": 39,
+        "fraction": 0.1794871795,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "route": "high",
+        "count": 0,
+        "denominator": 39,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "route": "low",
+        "count": 0,
+        "denominator": 39,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "route": "medium",
+        "count": 1,
+        "denominator": 39,
+        "fraction": 0.0256410256,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "route": "high",
+        "count": 38,
+        "denominator": 39,
+        "fraction": 0.9743589744,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "route": "low",
+        "count": 0,
+        "denominator": 1147,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "route": "medium",
+        "count": 857,
+        "denominator": 1147,
+        "fraction": 0.7471665214,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "route": "high",
+        "count": 290,
+        "denominator": 1147,
+        "fraction": 0.2528334786,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "route": "low",
+        "count": 0,
+        "denominator": 8,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "route": "medium",
+        "count": 4,
+        "denominator": 8,
+        "fraction": 0.5,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "route": "high",
+        "count": 4,
+        "denominator": 8,
+        "fraction": 0.5,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "route": "low",
+        "count": 6,
+        "denominator": 1258,
+        "fraction": 0.0047694754,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "route": "medium",
+        "count": 657,
+        "denominator": 1258,
+        "fraction": 0.5222575517,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "route": "high",
+        "count": 595,
+        "denominator": 1258,
+        "fraction": 0.472972973,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "route": "low",
+        "count": 6,
+        "denominator": 670,
+        "fraction": 0.0089552239,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "route": "medium",
+        "count": 213,
+        "denominator": 670,
+        "fraction": 0.3179104478,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "route": "high",
+        "count": 451,
+        "denominator": 670,
+        "fraction": 0.6731343284,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "route": "low",
+        "count": 6,
+        "denominator": 11,
+        "fraction": 0.5454545455,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "route": "medium",
+        "count": 0,
+        "denominator": 11,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "route": "high",
+        "count": 5,
+        "denominator": 11,
+        "fraction": 0.4545454545,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "route": "low",
+        "count": 18,
+        "denominator": 45,
+        "fraction": 0.4,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "route": "medium",
+        "count": 27,
+        "denominator": 45,
+        "fraction": 0.6,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "route": "high",
+        "count": 0,
+        "denominator": 45,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "route": "low",
+        "count": 17,
+        "denominator": 41,
+        "fraction": 0.4146341463,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "route": "medium",
+        "count": 22,
+        "denominator": 41,
+        "fraction": 0.5365853659,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "route": "high",
+        "count": 2,
+        "denominator": 41,
+        "fraction": 0.0487804878,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "route": "low",
+        "count": 4,
+        "denominator": 42,
+        "fraction": 0.0952380952,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "route": "medium",
+        "count": 37,
+        "denominator": 42,
+        "fraction": 0.880952381,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "route": "high",
+        "count": 1,
+        "denominator": 42,
+        "fraction": 0.0238095238,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "route": "low",
+        "count": 0,
+        "denominator": 47,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "route": "medium",
+        "count": 1,
+        "denominator": 47,
+        "fraction": 0.0212765957,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "route": "high",
+        "count": 46,
+        "denominator": 47,
+        "fraction": 0.9787234043,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "route": "low",
+        "count": 1,
+        "denominator": 40,
+        "fraction": 0.025,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "route": "medium",
+        "count": 12,
+        "denominator": 40,
+        "fraction": 0.3,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "route": "high",
+        "count": 27,
+        "denominator": 40,
+        "fraction": 0.675,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "route": "low",
+        "count": 12,
+        "denominator": 13,
+        "fraction": 0.9230769231,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "route": "medium",
+        "count": 1,
+        "denominator": 13,
+        "fraction": 0.0769230769,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "route": "high",
+        "count": 0,
+        "denominator": 13,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "route": "low",
+        "count": 9,
+        "denominator": 47,
+        "fraction": 0.1914893617,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "route": "medium",
+        "count": 7,
+        "denominator": 47,
+        "fraction": 0.1489361702,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "route": "high",
+        "count": 31,
+        "denominator": 47,
+        "fraction": 0.6595744681,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "route": "low",
+        "count": 7,
+        "denominator": 35,
+        "fraction": 0.2,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "route": "medium",
+        "count": 7,
+        "denominator": 35,
+        "fraction": 0.2,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "route": "high",
+        "count": 21,
+        "denominator": 35,
+        "fraction": 0.6,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "route": "low",
+        "count": 0,
+        "denominator": 46,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "route": "medium",
+        "count": 9,
+        "denominator": 46,
+        "fraction": 0.1956521739,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "route": "high",
+        "count": 37,
+        "denominator": 46,
+        "fraction": 0.8043478261,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "route": "low",
+        "count": 0,
+        "denominator": 7,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "route": "medium",
+        "count": 1,
+        "denominator": 7,
+        "fraction": 0.1428571429,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "route": "high",
+        "count": 6,
+        "denominator": 7,
+        "fraction": 0.8571428571,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "route": "low",
+        "count": 9,
+        "denominator": 46,
+        "fraction": 0.1956521739,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "route": "medium",
+        "count": 35,
+        "denominator": 46,
+        "fraction": 0.7608695652,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "route": "high",
+        "count": 2,
+        "denominator": 46,
+        "fraction": 0.0434782609,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "route": "low",
+        "count": 39,
+        "denominator": 39,
+        "fraction": 1.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "route": "medium",
+        "count": 0,
+        "denominator": 39,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "route": "high",
+        "count": 0,
+        "denominator": 39,
+        "fraction": 0.0,
+        "small_sample_n_lt_30": false
+      }
+    ],
+    "difficulty-by-route": [
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "difficulty_label": "easy",
+        "route": "low",
+        "count": 1150,
+        "denominator": 1501,
+        "fraction": 0.7661558961,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "difficulty_label": "easy",
+        "route": "medium",
+        "count": 328,
+        "denominator": 1501,
+        "fraction": 0.218520986,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "difficulty_label": "easy",
+        "route": "high",
+        "count": 23,
+        "denominator": 1501,
+        "fraction": 0.0153231179,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "difficulty_label": "hard",
+        "route": "low",
+        "count": 130,
+        "denominator": 353,
+        "fraction": 0.3682719547,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "difficulty_label": "hard",
+        "route": "medium",
+        "count": 184,
+        "denominator": 353,
+        "fraction": 0.5212464589,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "difficulty_label": "hard",
+        "route": "high",
+        "count": 39,
+        "denominator": 353,
+        "fraction": 0.1104815864,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "difficulty_label": "medium",
+        "route": "low",
+        "count": 549,
+        "denominator": 1268,
+        "fraction": 0.4329652997,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "difficulty_label": "medium",
+        "route": "medium",
+        "count": 648,
+        "denominator": 1268,
+        "fraction": 0.5110410095,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "difficulty_label": "medium",
+        "route": "high",
+        "count": 71,
+        "denominator": 1268,
+        "fraction": 0.0559936909,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "easy",
+        "route": "low",
+        "count": 245,
+        "denominator": 267,
+        "fraction": 0.9176029963,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "easy",
+        "route": "medium",
+        "count": 15,
+        "denominator": 267,
+        "fraction": 0.0561797753,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "easy",
+        "route": "high",
+        "count": 7,
+        "denominator": 267,
+        "fraction": 0.0262172285,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "hard",
+        "route": "low",
+        "count": 25,
+        "denominator": 100,
+        "fraction": 0.25,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "hard",
+        "route": "medium",
+        "count": 2,
+        "denominator": 100,
+        "fraction": 0.02,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "hard",
+        "route": "high",
+        "count": 73,
+        "denominator": 100,
+        "fraction": 0.73,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "medium",
+        "route": "low",
+        "count": 66,
+        "denominator": 92,
+        "fraction": 0.7173913043,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "medium",
+        "route": "medium",
+        "count": 12,
+        "denominator": 92,
+        "fraction": 0.1304347826,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "medium",
+        "route": "high",
+        "count": 14,
+        "denominator": 92,
+        "fraction": 0.152173913,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "easy",
+        "route": "low",
+        "count": 59,
+        "denominator": 1501,
+        "fraction": 0.0393071286,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "easy",
+        "route": "medium",
+        "count": 1390,
+        "denominator": 1501,
+        "fraction": 0.9260493005,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "easy",
+        "route": "high",
+        "count": 52,
+        "denominator": 1501,
+        "fraction": 0.034643571,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "hard",
+        "route": "low",
+        "count": 18,
+        "denominator": 353,
+        "fraction": 0.0509915014,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "hard",
+        "route": "medium",
+        "count": 295,
+        "denominator": 353,
+        "fraction": 0.835694051,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "hard",
+        "route": "high",
+        "count": 40,
+        "denominator": 353,
+        "fraction": 0.1133144476,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "medium",
+        "route": "low",
+        "count": 57,
+        "denominator": 1268,
+        "fraction": 0.0449526814,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "medium",
+        "route": "medium",
+        "count": 1063,
+        "denominator": 1268,
+        "fraction": 0.8383280757,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "medium",
+        "route": "high",
+        "count": 148,
+        "denominator": 1268,
+        "fraction": 0.1167192429,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "easy",
+        "route": "low",
+        "count": 77,
+        "denominator": 267,
+        "fraction": 0.2883895131,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "easy",
+        "route": "medium",
+        "count": 82,
+        "denominator": 267,
+        "fraction": 0.3071161049,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "easy",
+        "route": "high",
+        "count": 108,
+        "denominator": 267,
+        "fraction": 0.404494382,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "hard",
+        "route": "low",
+        "count": 50,
+        "denominator": 100,
+        "fraction": 0.5,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "hard",
+        "route": "medium",
+        "count": 20,
+        "denominator": 100,
+        "fraction": 0.2,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "hard",
+        "route": "high",
+        "count": 30,
+        "denominator": 100,
+        "fraction": 0.3,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "medium",
+        "route": "low",
+        "count": 19,
+        "denominator": 92,
+        "fraction": 0.2065217391,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "medium",
+        "route": "medium",
+        "count": 27,
+        "denominator": 92,
+        "fraction": 0.2934782609,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "medium",
+        "route": "high",
+        "count": 46,
+        "denominator": 92,
+        "fraction": 0.5,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "easy",
+        "route": "low",
+        "count": 4,
+        "denominator": 1501,
+        "fraction": 0.0026648901,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "easy",
+        "route": "medium",
+        "count": 1041,
+        "denominator": 1501,
+        "fraction": 0.6935376416,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "easy",
+        "route": "high",
+        "count": 456,
+        "denominator": 1501,
+        "fraction": 0.3037974684,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "hard",
+        "route": "low",
+        "count": 3,
+        "denominator": 353,
+        "fraction": 0.0084985836,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "hard",
+        "route": "medium",
+        "count": 133,
+        "denominator": 353,
+        "fraction": 0.3767705382,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "hard",
+        "route": "high",
+        "count": 217,
+        "denominator": 353,
+        "fraction": 0.6147308782,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "medium",
+        "route": "low",
+        "count": 5,
+        "denominator": 1268,
+        "fraction": 0.0039432177,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "medium",
+        "route": "medium",
+        "count": 558,
+        "denominator": 1268,
+        "fraction": 0.4400630915,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "difficulty_label": "medium",
+        "route": "high",
+        "count": 705,
+        "denominator": 1268,
+        "fraction": 0.5559936909,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "easy",
+        "route": "low",
+        "count": 40,
+        "denominator": 267,
+        "fraction": 0.1498127341,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "easy",
+        "route": "medium",
+        "count": 124,
+        "denominator": 267,
+        "fraction": 0.4644194757,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "easy",
+        "route": "high",
+        "count": 103,
+        "denominator": 267,
+        "fraction": 0.3857677903,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "hard",
+        "route": "low",
+        "count": 66,
+        "denominator": 100,
+        "fraction": 0.66,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "hard",
+        "route": "medium",
+        "count": 10,
+        "denominator": 100,
+        "fraction": 0.1,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "hard",
+        "route": "high",
+        "count": 24,
+        "denominator": 100,
+        "fraction": 0.24,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "medium",
+        "route": "low",
+        "count": 16,
+        "denominator": 92,
+        "fraction": 0.1739130435,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "medium",
+        "route": "medium",
+        "count": 25,
+        "denominator": 92,
+        "fraction": 0.2717391304,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "difficulty_label": "medium",
+        "route": "high",
+        "count": 51,
+        "denominator": 92,
+        "fraction": 0.5543478261,
+        "small_sample_n_lt_30": false
+      }
+    ],
+    "locked-penalties": [
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "budget": 0.5,
+        "lambda": 0.0
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "budget": 0.5,
+        "lambda": 0.003
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "budget": 0.5,
+        "lambda": 0.1
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "budget": 0.5,
+        "lambda": 0.03
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "budget": 0.5,
+        "lambda": 1.0
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "budget": 0.5,
+        "lambda": 0.1
+      }
+    ],
+    "lambda-grid-routing": [
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "lambda": 0.0,
+        "n": 3122,
+        "low_rate": 0.5858424087,
+        "medium_rate": 0.3715566944,
+        "high_rate": 0.0426008969
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "lambda": 0.0,
+        "n": 459,
+        "low_rate": 0.7320261438,
+        "medium_rate": 0.0610021786,
+        "high_rate": 0.2069716776
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.0,
+        "n": 3581,
+        "low_rate": 0.6045797263,
+        "medium_rate": 0.3317509076,
+        "high_rate": 0.0636693661
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "lambda": 0.0001,
+        "n": 3122,
+        "low_rate": 0.5858424087,
+        "medium_rate": 0.3715566944,
+        "high_rate": 0.0426008969
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "lambda": 0.0001,
+        "n": 459,
+        "low_rate": 0.7320261438,
+        "medium_rate": 0.0610021786,
+        "high_rate": 0.2069716776
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.0001,
+        "n": 3581,
+        "low_rate": 0.6045797263,
+        "medium_rate": 0.3317509076,
+        "high_rate": 0.0636693661
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "lambda": 0.0003,
+        "n": 3122,
+        "low_rate": 0.5858424087,
+        "medium_rate": 0.3715566944,
+        "high_rate": 0.0426008969
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "lambda": 0.0003,
+        "n": 459,
+        "low_rate": 0.7320261438,
+        "medium_rate": 0.0610021786,
+        "high_rate": 0.2069716776
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.0003,
+        "n": 3581,
+        "low_rate": 0.6045797263,
+        "medium_rate": 0.3317509076,
+        "high_rate": 0.0636693661
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "lambda": 0.001,
+        "n": 3122,
+        "low_rate": 0.5858424087,
+        "medium_rate": 0.3715566944,
+        "high_rate": 0.0426008969
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "lambda": 0.001,
+        "n": 459,
+        "low_rate": 0.7320261438,
+        "medium_rate": 0.0610021786,
+        "high_rate": 0.2069716776
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.001,
+        "n": 3581,
+        "low_rate": 0.6045797263,
+        "medium_rate": 0.3317509076,
+        "high_rate": 0.0636693661
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "lambda": 0.003,
+        "n": 3122,
+        "low_rate": 0.5858424087,
+        "medium_rate": 0.3718770019,
+        "high_rate": 0.0422805894
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "lambda": 0.003,
+        "n": 459,
+        "low_rate": 0.7320261438,
+        "medium_rate": 0.0631808279,
+        "high_rate": 0.2047930283
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.003,
+        "n": 3581,
+        "low_rate": 0.6045797263,
+        "medium_rate": 0.3323094108,
+        "high_rate": 0.0631108629
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "lambda": 0.01,
+        "n": 3122,
+        "low_rate": 0.5874439462,
+        "medium_rate": 0.3715566944,
+        "high_rate": 0.0409993594
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "lambda": 0.01,
+        "n": 459,
+        "low_rate": 0.7320261438,
+        "medium_rate": 0.0653594771,
+        "high_rate": 0.2026143791
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.01,
+        "n": 3581,
+        "low_rate": 0.6059759844,
+        "medium_rate": 0.3323094108,
+        "high_rate": 0.0617146049
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "lambda": 0.03,
+        "n": 3122,
+        "low_rate": 0.5887251762,
+        "medium_rate": 0.3744394619,
+        "high_rate": 0.0368353619
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "lambda": 0.03,
+        "n": 459,
+        "low_rate": 0.7320261438,
+        "medium_rate": 0.0653594771,
+        "high_rate": 0.2026143791
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.03,
+        "n": 3581,
+        "low_rate": 0.6070929908,
+        "medium_rate": 0.3348226752,
+        "high_rate": 0.058084334
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "lambda": 0.1,
+        "n": 3122,
+        "low_rate": 0.5938500961,
+        "medium_rate": 0.3805253043,
+        "high_rate": 0.0256245996
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "lambda": 0.1,
+        "n": 459,
+        "low_rate": 0.7320261438,
+        "medium_rate": 0.0697167756,
+        "high_rate": 0.1982570806
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.1,
+        "n": 3581,
+        "low_rate": 0.6115610165,
+        "medium_rate": 0.340686959,
+        "high_rate": 0.0477520246
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "lambda": 0.3,
+        "n": 3122,
+        "low_rate": 0.6005765535,
+        "medium_rate": 0.3888532992,
+        "high_rate": 0.0105701473
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "lambda": 0.3,
+        "n": 459,
+        "low_rate": 0.7407407407,
+        "medium_rate": 0.082788671,
+        "high_rate": 0.1764705882
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.3,
+        "n": 3581,
+        "low_rate": 0.6185423066,
+        "medium_rate": 0.3496230103,
+        "high_rate": 0.031834683
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "lambda": 1.0,
+        "n": 3122,
+        "low_rate": 0.6210762332,
+        "medium_rate": 0.3789237668,
+        "high_rate": 0.0
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "lambda": 1.0,
+        "n": 459,
+        "low_rate": 0.8845315904,
+        "medium_rate": 0.1154684096,
+        "high_rate": 0.0
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "pooled_rows",
+        "lambda": 1.0,
+        "n": 3581,
+        "low_rate": 0.6548450154,
+        "medium_rate": 0.3451549846,
+        "high_rate": 0.0
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "lambda": 3.0,
+        "n": 3122,
+        "low_rate": 0.6707238949,
+        "medium_rate": 0.3292761051,
+        "high_rate": 0.0
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "lambda": 3.0,
+        "n": 459,
+        "low_rate": 0.9586056645,
+        "medium_rate": 0.0413943355,
+        "high_rate": 0.0
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "pooled_rows",
+        "lambda": 3.0,
+        "n": 3581,
+        "low_rate": 0.7076235688,
+        "medium_rate": 0.2923764312,
+        "high_rate": 0.0
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "lambda": 10.0,
+        "n": 3122,
+        "low_rate": 0.8910954516,
+        "medium_rate": 0.1089045484,
+        "high_rate": 0.0
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "lambda": 10.0,
+        "n": 459,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "pooled_rows",
+        "lambda": 10.0,
+        "n": 3581,
+        "low_rate": 0.9050544541,
+        "medium_rate": 0.0949455459,
+        "high_rate": 0.0
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "lambda": 30.0,
+        "n": 3122,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "lambda": 30.0,
+        "n": 459,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "pooled_rows",
+        "lambda": 30.0,
+        "n": 3581,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "lambda": 100.0,
+        "n": 3122,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "lambda": 100.0,
+        "n": 459,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "pooled_rows",
+        "lambda": 100.0,
+        "n": 3581,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.0,
+        "n": 3122,
+        "low_rate": 0.0003203075,
+        "medium_rate": 0.233504164,
+        "high_rate": 0.7661755285
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.0,
+        "n": 459,
+        "low_rate": 0.2156862745,
+        "medium_rate": 0.2374727669,
+        "high_rate": 0.5468409586
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.0,
+        "n": 3581,
+        "low_rate": 0.0279251606,
+        "medium_rate": 0.2340128456,
+        "high_rate": 0.7380619939
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.0001,
+        "n": 3122,
+        "low_rate": 0.000640615,
+        "medium_rate": 0.233504164,
+        "high_rate": 0.765855221
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.0001,
+        "n": 459,
+        "low_rate": 0.2156862745,
+        "medium_rate": 0.2396514161,
+        "high_rate": 0.5446623094
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.0001,
+        "n": 3581,
+        "low_rate": 0.0282044122,
+        "medium_rate": 0.2342920972,
+        "high_rate": 0.7375034906
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.0003,
+        "n": 3122,
+        "low_rate": 0.000640615,
+        "medium_rate": 0.2338244715,
+        "high_rate": 0.7655349135
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.0003,
+        "n": 459,
+        "low_rate": 0.2156862745,
+        "medium_rate": 0.2418300654,
+        "high_rate": 0.5424836601
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.0003,
+        "n": 3581,
+        "low_rate": 0.0282044122,
+        "medium_rate": 0.2348506004,
+        "high_rate": 0.7369449874
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.001,
+        "n": 3122,
+        "low_rate": 0.000640615,
+        "medium_rate": 0.2373478539,
+        "high_rate": 0.7620115311
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.001,
+        "n": 459,
+        "low_rate": 0.2156862745,
+        "medium_rate": 0.2461873638,
+        "high_rate": 0.5381263617
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.001,
+        "n": 3581,
+        "low_rate": 0.0282044122,
+        "medium_rate": 0.2384808713,
+        "high_rate": 0.7333147166
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.003,
+        "n": 3122,
+        "low_rate": 0.000640615,
+        "medium_rate": 0.2472773863,
+        "high_rate": 0.7520819987
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.003,
+        "n": 459,
+        "low_rate": 0.2287581699,
+        "medium_rate": 0.2549019608,
+        "high_rate": 0.5163398693
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.003,
+        "n": 3581,
+        "low_rate": 0.0298799218,
+        "medium_rate": 0.2482546775,
+        "high_rate": 0.7218654007
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.01,
+        "n": 3122,
+        "low_rate": 0.000640615,
+        "medium_rate": 0.2741832159,
+        "high_rate": 0.7251761691
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.01,
+        "n": 459,
+        "low_rate": 0.2418300654,
+        "medium_rate": 0.2832244009,
+        "high_rate": 0.4749455338
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.01,
+        "n": 3581,
+        "low_rate": 0.0315554314,
+        "medium_rate": 0.2753420832,
+        "high_rate": 0.6931024853
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.03,
+        "n": 3122,
+        "low_rate": 0.0009609225,
+        "medium_rate": 0.3417680974,
+        "high_rate": 0.6572709801
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.03,
+        "n": 459,
+        "low_rate": 0.265795207,
+        "medium_rate": 0.3464052288,
+        "high_rate": 0.3877995643
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.03,
+        "n": 3581,
+        "low_rate": 0.0349064507,
+        "medium_rate": 0.3423624686,
+        "high_rate": 0.6227310807
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.1,
+        "n": 3122,
+        "low_rate": 0.0038436899,
+        "medium_rate": 0.5547725817,
+        "high_rate": 0.4413837284
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.1,
+        "n": 459,
+        "low_rate": 0.348583878,
+        "medium_rate": 0.5359477124,
+        "high_rate": 0.1154684096
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.1,
+        "n": 3581,
+        "low_rate": 0.0480312762,
+        "medium_rate": 0.5523596761,
+        "high_rate": 0.3996090478
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.3,
+        "n": 3122,
+        "low_rate": 0.0227418322,
+        "medium_rate": 0.899103139,
+        "high_rate": 0.0781550288
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.3,
+        "n": 459,
+        "low_rate": 0.4989106754,
+        "medium_rate": 0.4727668845,
+        "high_rate": 0.0283224401
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.3,
+        "n": 3581,
+        "low_rate": 0.0837754817,
+        "medium_rate": 0.8444568556,
+        "high_rate": 0.0717676627
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "lambda": 1.0,
+        "n": 3122,
+        "low_rate": 0.0688661115,
+        "medium_rate": 0.9311338885,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "lambda": 1.0,
+        "n": 459,
+        "low_rate": 0.7559912854,
+        "medium_rate": 0.2440087146,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 1.0,
+        "n": 3581,
+        "low_rate": 0.1569394024,
+        "medium_rate": 0.8430605976,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "lambda": 3.0,
+        "n": 3122,
+        "low_rate": 0.2905188981,
+        "medium_rate": 0.7094811019,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "lambda": 3.0,
+        "n": 459,
+        "low_rate": 0.9934640523,
+        "medium_rate": 0.0065359477,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 3.0,
+        "n": 3581,
+        "low_rate": 0.3806199386,
+        "medium_rate": 0.6193800614,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "lambda": 10.0,
+        "n": 3122,
+        "low_rate": 0.9746957079,
+        "medium_rate": 0.0253042921,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "lambda": 10.0,
+        "n": 459,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 10.0,
+        "n": 3581,
+        "low_rate": 0.9779391231,
+        "medium_rate": 0.0220608769,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "lambda": 30.0,
+        "n": 3122,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "lambda": 30.0,
+        "n": 459,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 30.0,
+        "n": 3581,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "lambda": 100.0,
+        "n": 3122,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "lambda": 100.0,
+        "n": 459,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 100.0,
+        "n": 3581,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.0,
+        "n": 3122,
+        "low_rate": 0.0060858424,
+        "medium_rate": 0.2392696989,
+        "high_rate": 0.7546444587
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.0,
+        "n": 459,
+        "low_rate": 0.2679738562,
+        "medium_rate": 0.1830065359,
+        "high_rate": 0.5490196078
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.0,
+        "n": 3581,
+        "low_rate": 0.039653728,
+        "medium_rate": 0.2320580843,
+        "high_rate": 0.7282881877
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.0001,
+        "n": 3122,
+        "low_rate": 0.0060858424,
+        "medium_rate": 0.2392696989,
+        "high_rate": 0.7546444587
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.0001,
+        "n": 459,
+        "low_rate": 0.2679738562,
+        "medium_rate": 0.1830065359,
+        "high_rate": 0.5490196078
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.0001,
+        "n": 3581,
+        "low_rate": 0.039653728,
+        "medium_rate": 0.2320580843,
+        "high_rate": 0.7282881877
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.0003,
+        "n": 3122,
+        "low_rate": 0.0060858424,
+        "medium_rate": 0.2392696989,
+        "high_rate": 0.7546444587
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.0003,
+        "n": 459,
+        "low_rate": 0.2679738562,
+        "medium_rate": 0.1830065359,
+        "high_rate": 0.5490196078
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.0003,
+        "n": 3581,
+        "low_rate": 0.039653728,
+        "medium_rate": 0.2320580843,
+        "high_rate": 0.7282881877
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.001,
+        "n": 3122,
+        "low_rate": 0.0060858424,
+        "medium_rate": 0.2399103139,
+        "high_rate": 0.7540038437
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.001,
+        "n": 459,
+        "low_rate": 0.2679738562,
+        "medium_rate": 0.1851851852,
+        "high_rate": 0.5468409586
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.001,
+        "n": 3581,
+        "low_rate": 0.039653728,
+        "medium_rate": 0.2328958392,
+        "high_rate": 0.7274504328
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.003,
+        "n": 3122,
+        "low_rate": 0.0060858424,
+        "medium_rate": 0.2408712364,
+        "high_rate": 0.7530429212
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.003,
+        "n": 459,
+        "low_rate": 0.2701525054,
+        "medium_rate": 0.1851851852,
+        "high_rate": 0.5446623094
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.003,
+        "n": 3581,
+        "low_rate": 0.0399329796,
+        "medium_rate": 0.233733594,
+        "high_rate": 0.7263334264
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.01,
+        "n": 3122,
+        "low_rate": 0.0067264574,
+        "medium_rate": 0.2469570788,
+        "high_rate": 0.7463164638
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.01,
+        "n": 459,
+        "low_rate": 0.2745098039,
+        "medium_rate": 0.1895424837,
+        "high_rate": 0.5359477124
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.01,
+        "n": 3581,
+        "low_rate": 0.041049986,
+        "medium_rate": 0.2395978777,
+        "high_rate": 0.7193521363
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.03,
+        "n": 3122,
+        "low_rate": 0.0073670724,
+        "medium_rate": 0.2629724536,
+        "high_rate": 0.7296604741
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.03,
+        "n": 459,
+        "low_rate": 0.2788671024,
+        "medium_rate": 0.2091503268,
+        "high_rate": 0.5119825708
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.03,
+        "n": 3581,
+        "low_rate": 0.0421669925,
+        "medium_rate": 0.2560737224,
+        "high_rate": 0.7017592851
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.1,
+        "n": 3122,
+        "low_rate": 0.0089686099,
+        "medium_rate": 0.3321588725,
+        "high_rate": 0.6588725176
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.1,
+        "n": 459,
+        "low_rate": 0.3180827887,
+        "medium_rate": 0.2810457516,
+        "high_rate": 0.4008714597
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.1,
+        "n": 3581,
+        "low_rate": 0.0485897794,
+        "medium_rate": 0.3256073722,
+        "high_rate": 0.6258028484
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "lambda": 0.3,
+        "n": 3122,
+        "low_rate": 0.0166559898,
+        "medium_rate": 0.5195387572,
+        "high_rate": 0.463805253
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "lambda": 0.3,
+        "n": 459,
+        "low_rate": 0.4248366013,
+        "medium_rate": 0.4270152505,
+        "high_rate": 0.1481481481
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 0.3,
+        "n": 3581,
+        "low_rate": 0.0689751466,
+        "medium_rate": 0.5076794192,
+        "high_rate": 0.4233454342
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "lambda": 1.0,
+        "n": 3122,
+        "low_rate": 0.0429212044,
+        "medium_rate": 0.8802049968,
+        "high_rate": 0.0768737988
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "lambda": 1.0,
+        "n": 459,
+        "low_rate": 0.5751633987,
+        "medium_rate": 0.4139433551,
+        "high_rate": 0.0108932462
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 1.0,
+        "n": 3581,
+        "low_rate": 0.1111421391,
+        "medium_rate": 0.8204412175,
+        "high_rate": 0.0684166434
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "lambda": 3.0,
+        "n": 3122,
+        "low_rate": 0.0832799488,
+        "medium_rate": 0.9160794363,
+        "high_rate": 0.000640615
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "lambda": 3.0,
+        "n": 459,
+        "low_rate": 0.8431372549,
+        "medium_rate": 0.1568627451,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 3.0,
+        "n": 3581,
+        "low_rate": 0.1806757889,
+        "medium_rate": 0.8187657079,
+        "high_rate": 0.0005585032
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "lambda": 10.0,
+        "n": 3122,
+        "low_rate": 0.3942985266,
+        "medium_rate": 0.6057014734,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "lambda": 10.0,
+        "n": 459,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 10.0,
+        "n": 3581,
+        "low_rate": 0.4719352136,
+        "medium_rate": 0.5280647864,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "lambda": 30.0,
+        "n": 3122,
+        "low_rate": 0.9599615631,
+        "medium_rate": 0.0400384369,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "lambda": 30.0,
+        "n": 459,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 30.0,
+        "n": 3581,
+        "low_rate": 0.9650935493,
+        "medium_rate": 0.0349064507,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "lambda": 100.0,
+        "n": 3122,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "lambda": 100.0,
+        "n": 459,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "pooled_rows",
+        "lambda": 100.0,
+        "n": 3581,
+        "low_rate": 1.0,
+        "medium_rate": 0.0,
+        "high_rate": 0.0
+      }
+    ],
+    "source-only-comparison": [
+      {
+        "method": "train_best_single",
+        "source_dataset": "routerbench",
+        "selected_train_tier": "high",
+        "n": 3122,
+        "mean_quality": 0.8152946829,
+        "mean_actual_cost_source_units": 0.0080674504,
+        "relative_cost": 1.0,
+        "low_rate": 0.0,
+        "medium_rate": 0.0,
+        "high_rate": 1.0
+      },
+      {
+        "method": "train_budget_fixed",
+        "source_dataset": "routerbench",
+        "selected_train_tier": "medium",
+        "n": 3122,
+        "mean_quality": 0.7295003203,
+        "mean_actual_cost_source_units": 0.0005728922,
+        "relative_cost": 0.0543689059,
+        "low_rate": 0.0,
+        "medium_rate": 1.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "train_best_single",
+        "source_dataset": "xroutebench",
+        "selected_train_tier": "high",
+        "n": 459,
+        "mean_quality": 0.7382798997,
+        "mean_actual_cost_source_units": 0.0004578922,
+        "relative_cost": 1.0,
+        "low_rate": 0.0,
+        "medium_rate": 0.0,
+        "high_rate": 1.0
+      },
+      {
+        "method": "train_budget_fixed",
+        "source_dataset": "xroutebench",
+        "selected_train_tier": "medium",
+        "n": 459,
+        "mean_quality": 0.7190058586,
+        "mean_actual_cost_source_units": 4.97016e-05,
+        "relative_cost": 0.0797513514,
+        "low_rate": 0.0,
+        "medium_rate": 1.0,
+        "high_rate": 0.0
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "selected_train_tier": null,
+        "n": 3122,
+        "mean_quality": 0.6009929532,
+        "mean_actual_cost_source_units": 0.0007471759,
+        "relative_cost": 0.0763592687,
+        "low_rate": 0.5858424087,
+        "medium_rate": 0.3715566944,
+        "high_rate": 0.0426008969
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "selected_train_tier": null,
+        "n": 459,
+        "mean_quality": 0.6750990718,
+        "mean_actual_cost_source_units": 0.0001182387,
+        "relative_cost": 0.2342652663,
+        "low_rate": 0.7320261438,
+        "medium_rate": 0.0631808279,
+        "high_rate": 0.2047930283
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "selected_train_tier": null,
+        "n": 3122,
+        "mean_quality": 0.7959961563,
+        "mean_actual_cost_source_units": 0.0040585214,
+        "relative_cost": 0.4941705939,
+        "low_rate": 0.0038436899,
+        "medium_rate": 0.5547725817,
+        "high_rate": 0.4413837284
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "selected_train_tier": null,
+        "n": 459,
+        "mean_quality": 0.7393695347,
+        "mean_actual_cost_source_units": 0.0002182056,
+        "relative_cost": 0.4596364722,
+        "low_rate": 0.265795207,
+        "medium_rate": 0.3464052288,
+        "high_rate": 0.3877995643
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "selected_train_tier": null,
+        "n": 3122,
+        "mean_quality": 0.742008328,
+        "mean_actual_cost_source_units": 0.0012185174,
+        "relative_cost": 0.1358311045,
+        "low_rate": 0.0429212044,
+        "medium_rate": 0.8802049968,
+        "high_rate": 0.0768737988
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "selected_train_tier": null,
+        "n": 459,
+        "mean_quality": 0.7449678771,
+        "mean_actual_cost_source_units": 0.0002151225,
+        "relative_cost": 0.4526859615,
+        "low_rate": 0.3180827887,
+        "medium_rate": 0.2810457516,
+        "high_rate": 0.4008714597
+      }
+    ],
+    "within-source-category-comparison": [
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "n": 39,
+        "mean_quality": 0.4871794872,
+        "train_budget_fixed_quality": 0.358974359,
+        "quality_delta_vs_train_budget_fixed": 0.1282051282,
+        "medium_rate": 0.1538461538,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "n": 1147,
+        "mean_quality": 0.6163905841,
+        "train_budget_fixed_quality": 0.8639930253,
+        "quality_delta_vs_train_budget_fixed": -0.2476024412,
+        "medium_rate": 0.1848299913,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "n": 8,
+        "mean_quality": 0.5375,
+        "train_budget_fixed_quality": 0.5625,
+        "quality_delta_vs_train_budget_fixed": -0.025,
+        "medium_rate": 0.25,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "n": 1258,
+        "mean_quality": 0.6319554849,
+        "train_budget_fixed_quality": 0.7186009539,
+        "quality_delta_vs_train_budget_fixed": -0.086645469,
+        "medium_rate": 0.3966613672,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "n": 670,
+        "mean_quality": 0.523880597,
+        "train_budget_fixed_quality": 0.5432835821,
+        "quality_delta_vs_train_budget_fixed": -0.0194029851,
+        "medium_rate": 0.6582089552,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "n": 11,
+        "mean_quality": 0.0,
+        "train_budget_fixed_quality": 0.0,
+        "quality_delta_vs_train_budget_fixed": 0.0,
+        "medium_rate": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "n": 45,
+        "mean_quality": 1.0,
+        "train_budget_fixed_quality": 0.9777777778,
+        "quality_delta_vs_train_budget_fixed": 0.0222222222,
+        "medium_rate": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "n": 41,
+        "mean_quality": 0.8292682927,
+        "train_budget_fixed_quality": 0.8780487805,
+        "quality_delta_vs_train_budget_fixed": -0.0487804878,
+        "medium_rate": 0.0975609756,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "n": 42,
+        "mean_quality": 0.6904761905,
+        "train_budget_fixed_quality": 0.7857142857,
+        "quality_delta_vs_train_budget_fixed": -0.0952380952,
+        "medium_rate": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "n": 47,
+        "mean_quality": 0.6382978723,
+        "train_budget_fixed_quality": 0.6808510638,
+        "quality_delta_vs_train_budget_fixed": -0.0425531915,
+        "medium_rate": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "n": 40,
+        "mean_quality": 0.7,
+        "train_budget_fixed_quality": 0.825,
+        "quality_delta_vs_train_budget_fixed": -0.125,
+        "medium_rate": 0.15,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "n": 13,
+        "mean_quality": 0.0,
+        "train_budget_fixed_quality": 0.0,
+        "quality_delta_vs_train_budget_fixed": 0.0,
+        "medium_rate": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "n": 47,
+        "mean_quality": 0.7021276596,
+        "train_budget_fixed_quality": 0.5744680851,
+        "quality_delta_vs_train_budget_fixed": 0.1276595745,
+        "medium_rate": 0.2978723404,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "n": 35,
+        "mean_quality": 0.6,
+        "train_budget_fixed_quality": 0.7142857143,
+        "quality_delta_vs_train_budget_fixed": -0.1142857143,
+        "medium_rate": 0.0285714286,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "n": 46,
+        "mean_quality": 0.8260869565,
+        "train_budget_fixed_quality": 0.8913043478,
+        "quality_delta_vs_train_budget_fixed": -0.0652173913,
+        "medium_rate": 0.0434782609,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "n": 7,
+        "mean_quality": 0.7142857143,
+        "train_budget_fixed_quality": 0.8571428571,
+        "quality_delta_vs_train_budget_fixed": -0.1428571429,
+        "medium_rate": 0.2857142857,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "n": 46,
+        "mean_quality": 0.8913043478,
+        "train_budget_fixed_quality": 0.9347826087,
+        "quality_delta_vs_train_budget_fixed": -0.0434782609,
+        "medium_rate": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "n": 39,
+        "mean_quality": 0.1505249734,
+        "train_budget_fixed_quality": 0.257017669,
+        "quality_delta_vs_train_budget_fixed": -0.1064926955,
+        "medium_rate": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "n": 39,
+        "mean_quality": 0.7179487179,
+        "train_budget_fixed_quality": 0.358974359,
+        "quality_delta_vs_train_budget_fixed": 0.358974359,
+        "medium_rate": 0.0256410256,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "n": 1147,
+        "mean_quality": 0.9014821273,
+        "train_budget_fixed_quality": 0.8639930253,
+        "quality_delta_vs_train_budget_fixed": 0.037489102,
+        "medium_rate": 0.7471665214,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "n": 8,
+        "mean_quality": 0.7,
+        "train_budget_fixed_quality": 0.5625,
+        "quality_delta_vs_train_budget_fixed": 0.1375,
+        "medium_rate": 0.5,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "n": 1258,
+        "mean_quality": 0.7877583466,
+        "train_budget_fixed_quality": 0.7186009539,
+        "quality_delta_vs_train_budget_fixed": 0.0691573927,
+        "medium_rate": 0.5222575517,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "n": 670,
+        "mean_quality": 0.6365671642,
+        "train_budget_fixed_quality": 0.5432835821,
+        "quality_delta_vs_train_budget_fixed": 0.0932835821,
+        "medium_rate": 0.3179104478,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "n": 11,
+        "mean_quality": 0.0,
+        "train_budget_fixed_quality": 0.0,
+        "quality_delta_vs_train_budget_fixed": 0.0,
+        "medium_rate": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "n": 45,
+        "mean_quality": 0.9777777778,
+        "train_budget_fixed_quality": 0.9777777778,
+        "quality_delta_vs_train_budget_fixed": 0.0,
+        "medium_rate": 0.6,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "n": 41,
+        "mean_quality": 0.8536585366,
+        "train_budget_fixed_quality": 0.8780487805,
+        "quality_delta_vs_train_budget_fixed": -0.0243902439,
+        "medium_rate": 0.5365853659,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "n": 42,
+        "mean_quality": 0.7380952381,
+        "train_budget_fixed_quality": 0.7857142857,
+        "quality_delta_vs_train_budget_fixed": -0.0476190476,
+        "medium_rate": 0.880952381,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "n": 47,
+        "mean_quality": 0.7872340426,
+        "train_budget_fixed_quality": 0.6808510638,
+        "quality_delta_vs_train_budget_fixed": 0.1063829787,
+        "medium_rate": 0.0212765957,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "n": 40,
+        "mean_quality": 0.8,
+        "train_budget_fixed_quality": 0.825,
+        "quality_delta_vs_train_budget_fixed": -0.025,
+        "medium_rate": 0.3,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "n": 13,
+        "mean_quality": 0.0,
+        "train_budget_fixed_quality": 0.0,
+        "quality_delta_vs_train_budget_fixed": 0.0,
+        "medium_rate": 0.0769230769,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "n": 47,
+        "mean_quality": 0.7234042553,
+        "train_budget_fixed_quality": 0.5744680851,
+        "quality_delta_vs_train_budget_fixed": 0.1489361702,
+        "medium_rate": 0.1489361702,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "n": 35,
+        "mean_quality": 0.7142857143,
+        "train_budget_fixed_quality": 0.7142857143,
+        "quality_delta_vs_train_budget_fixed": 0.0,
+        "medium_rate": 0.2,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "n": 46,
+        "mean_quality": 0.9347826087,
+        "train_budget_fixed_quality": 0.8913043478,
+        "quality_delta_vs_train_budget_fixed": 0.0434782609,
+        "medium_rate": 0.1956521739,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "n": 7,
+        "mean_quality": 0.8571428571,
+        "train_budget_fixed_quality": 0.8571428571,
+        "quality_delta_vs_train_budget_fixed": 0.0,
+        "medium_rate": 0.1428571429,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "n": 46,
+        "mean_quality": 0.8913043478,
+        "train_budget_fixed_quality": 0.9347826087,
+        "quality_delta_vs_train_budget_fixed": -0.0434782609,
+        "medium_rate": 0.7608695652,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "n": 39,
+        "mean_quality": 0.2915542678,
+        "train_budget_fixed_quality": 0.257017669,
+        "quality_delta_vs_train_budget_fixed": 0.0345365989,
+        "medium_rate": 0.0,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "code",
+        "n": 39,
+        "mean_quality": 0.4871794872,
+        "train_budget_fixed_quality": 0.358974359,
+        "quality_delta_vs_train_budget_fixed": 0.1282051282,
+        "medium_rate": 0.5641025641,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "commonsense",
+        "n": 1147,
+        "mean_quality": 0.8639930253,
+        "train_budget_fixed_quality": 0.8639930253,
+        "quality_delta_vs_train_budget_fixed": 0.0,
+        "medium_rate": 0.9843068875,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "conversation",
+        "n": 8,
+        "mean_quality": 0.6,
+        "train_budget_fixed_quality": 0.5625,
+        "quality_delta_vs_train_budget_fixed": 0.0375,
+        "medium_rate": 0.875,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "knowledge",
+        "n": 1258,
+        "mean_quality": 0.720190779,
+        "train_budget_fixed_quality": 0.7186009539,
+        "quality_delta_vs_train_budget_fixed": 0.0015898251,
+        "medium_rate": 0.9372019078,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "category": "math",
+        "n": 670,
+        "mean_quality": 0.5906716418,
+        "train_budget_fixed_quality": 0.5432835821,
+        "quality_delta_vs_train_budget_fixed": 0.0473880597,
+        "medium_rate": 0.6134328358,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "aime_2020_2024",
+        "n": 11,
+        "mean_quality": 0.0,
+        "train_budget_fixed_quality": 0.0,
+        "quality_delta_vs_train_budget_fixed": 0.0,
+        "medium_rate": 0.0,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "arc_challenge",
+        "n": 45,
+        "mean_quality": 1.0,
+        "train_budget_fixed_quality": 0.9777777778,
+        "quality_delta_vs_train_budget_fixed": 0.0222222222,
+        "medium_rate": 0.2222222222,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "boolq",
+        "n": 41,
+        "mean_quality": 0.8292682927,
+        "train_budget_fixed_quality": 0.8780487805,
+        "quality_delta_vs_train_budget_fixed": -0.0487804878,
+        "medium_rate": 0.4146341463,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "commonsense_qa",
+        "n": 42,
+        "mean_quality": 0.7619047619,
+        "train_budget_fixed_quality": 0.7857142857,
+        "quality_delta_vs_train_budget_fixed": -0.0238095238,
+        "medium_rate": 0.3333333333,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "gsm8k",
+        "n": 47,
+        "mean_quality": 0.8085106383,
+        "train_budget_fixed_quality": 0.6808510638,
+        "quality_delta_vs_train_budget_fixed": 0.1276595745,
+        "medium_rate": 0.0638297872,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "hellaswag",
+        "n": 40,
+        "mean_quality": 0.825,
+        "train_budget_fixed_quality": 0.825,
+        "quality_delta_vs_train_budget_fixed": 0.0,
+        "medium_rate": 0.275,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "human_eval",
+        "n": 13,
+        "mean_quality": 0.0,
+        "train_budget_fixed_quality": 0.0,
+        "quality_delta_vs_train_budget_fixed": 0.0,
+        "medium_rate": 0.1538461538,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "math",
+        "n": 47,
+        "mean_quality": 0.7234042553,
+        "train_budget_fixed_quality": 0.5744680851,
+        "quality_delta_vs_train_budget_fixed": 0.1489361702,
+        "medium_rate": 0.0638297872,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "mbpp",
+        "n": 35,
+        "mean_quality": 0.6857142857,
+        "train_budget_fixed_quality": 0.7142857143,
+        "quality_delta_vs_train_budget_fixed": -0.0285714286,
+        "medium_rate": 0.2571428571,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "mmlu",
+        "n": 46,
+        "mean_quality": 0.9130434783,
+        "train_budget_fixed_quality": 0.8913043478,
+        "quality_delta_vs_train_budget_fixed": 0.0217391304,
+        "medium_rate": 0.5217391304,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "mmlu_pro",
+        "n": 7,
+        "mean_quality": 0.8571428571,
+        "train_budget_fixed_quality": 0.8571428571,
+        "quality_delta_vs_train_budget_fixed": 0.0,
+        "medium_rate": 0.2857142857,
+        "small_sample_n_lt_30": true
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "openbook_qa",
+        "n": 46,
+        "mean_quality": 0.9565217391,
+        "train_budget_fixed_quality": 0.9347826087,
+        "quality_delta_vs_train_budget_fixed": 0.0217391304,
+        "medium_rate": 0.5869565217,
+        "small_sample_n_lt_30": false
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "category": "squad",
+        "n": 39,
+        "mean_quality": 0.2548783479,
+        "train_budget_fixed_quality": 0.257017669,
+        "quality_delta_vs_train_budget_fixed": -0.0021393211,
+        "medium_rate": 0.1794871795,
+        "small_sample_n_lt_30": false
+      }
+    ],
+    "r0-label-diagnostic": [
+      {
+        "source_dataset": "routerbench",
+        "train_majority_label": "easy",
+        "dev_n": 3122,
+        "source_only_label_accuracy": 0.4807815503,
+        "r0_raw_argmax_t1_accuracy": 0.5884048687
+      },
+      {
+        "source_dataset": "xroutebench",
+        "train_majority_label": "easy",
+        "dev_n": 459,
+        "source_only_label_accuracy": 0.5816993464,
+        "r0_raw_argmax_t1_accuracy": 0.7211328976
+      }
+    ],
+    "medium-cost-policy-effect": [
+      {
+        "method": "ordinal",
+        "source_dataset": "routerbench",
+        "lambda_zero_medium_rate": 0.3715566944,
+        "locked_medium_rate": 0.3715566944
+      },
+      {
+        "method": "ordinal",
+        "source_dataset": "xroutebench",
+        "lambda_zero_medium_rate": 0.0610021786,
+        "locked_medium_rate": 0.0631808279
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "routerbench",
+        "lambda_zero_medium_rate": 0.233504164,
+        "locked_medium_rate": 0.5547725817
+      },
+      {
+        "method": "pointwise",
+        "source_dataset": "xroutebench",
+        "lambda_zero_medium_rate": 0.2374727669,
+        "locked_medium_rate": 0.3464052288
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "routerbench",
+        "lambda_zero_medium_rate": 0.2392696989,
+        "locked_medium_rate": 0.8802049968
+      },
+      {
+        "method": "pairwise",
+        "source_dataset": "xroutebench",
+        "lambda_zero_medium_rate": 0.1830065359,
+        "locked_medium_rate": 0.2810457516
+      }
+    ]
+  },
+  "limitations": [
+    "T1 labels are benchmark-derived difficulty proxies, not human gold.",
+    "Routing actions are source-local model choices, not difficulty classes.",
+    "Category taxonomies differ by source; categories are not silently merged.",
+    "Small cells and single-seed descriptive differences do not establish superiority.",
+    "Raw costs are only compared within a source; no shared currency is assumed.",
+    "No latest RouterArena inference is present; RouterArena is not substituted with other benchmarks."
+  ]
+}

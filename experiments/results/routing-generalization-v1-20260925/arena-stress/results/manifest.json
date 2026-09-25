@@ -1,0 +1,27 @@
+{
+  "files": {
+    "r1-balanced-predictions.parquet": {
+      "sha256": "c42506a762340070713d9a1e611fe3895df8c349da91d3f990d36b3d9413398c",
+      "size_bytes": 1071015
+    },
+    "r1-natural-predictions.parquet": {
+      "sha256": "7e0c5b9035766592a352af1c8edfffc5dcd981737416687bd4201c9dbe52fd34",
+      "size_bytes": 1071401
+    },
+    "r3-balanced-predictions.parquet": {
+      "sha256": "8af8ad45eade443944d93f6352650269dddc382cb061d7ab25acb4bbbfae1672",
+      "size_bytes": 1071468
+    },
+    "r3-natural-predictions.parquet": {
+      "sha256": "d2af275bfe5f18f8dd7a25155bd498c1ff3565aa32c08c89c9410df536264968",
+      "size_bytes": 1071531
+    },
+    "summary.json": {
+      "sha256": "c4831781a91f9eb205f39ae9eef3bb4c5861b8e415f8bae9c60182b2677ef3b2",
+      "size_bytes": 351512
+    }
+  },
+  "protocol_sha256": "7709e0fc7c0407b1f1107bd93fe042460504aa0680406be5f9a547e1fd1ec449",
+  "schema_version": "g1-arena-stress-results-v1",
+  "selection_lock_sha256": "c6fad17c23390305d62769e30f213c8381db620679c949ac6a80bd3695ee75f3"
+}

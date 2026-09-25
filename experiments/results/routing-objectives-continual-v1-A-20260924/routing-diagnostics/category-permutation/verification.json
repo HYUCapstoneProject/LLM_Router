@@ -1,0 +1,10 @@
+{
+  "schema_version": "dev-category-permutation-visuals-v1",
+  "source_input_sha256": "a387148ae29c34383ab2442a011ef20f110dacff97ff3c19eb4446da1f6ad55c",
+  "artifact_hashes_verified": true,
+  "stored_null_draw_means_and_quantiles_recomputed": true,
+  "new_inference": false,
+  "new_permutation": false,
+  "range_is_confidence_interval": false,
+  "costs_are_source_local": true
+}

@@ -1,0 +1,562 @@
+{
+  "schema_version": "g1-holdout-pool-analysis-v1",
+  "input_path": "ml/artifacts/routing-generalization-v1/dataset/task_holdout.parquet",
+  "input_sha256": "55c15423af987ab092b2e1661534d8e5cf0783bfbb43431bcdcb7246b1f6ba69",
+  "rows": 1807,
+  "analysis_role": "post-selection diagnostic; no policy or candidate reselection",
+  "contains_raw_questions": false,
+  "sources": {
+    "routerbench": {
+      "overall": {
+        "rows": 1173,
+        "candidates": {
+          "low": {
+            "model_ids": [
+              "mistralai/mistral-7b-chat"
+            ],
+            "quality": {
+              "mean": 0.5959079283887468,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            },
+            "success": {
+              "mean": 0.5959079283887468,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            },
+            "actual_cost": {
+              "mean": 8.859607843137254e-05,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            }
+          },
+          "medium": {
+            "model_ids": [
+              "zero-one-ai/Yi-34B-Chat"
+            ],
+            "quality": {
+              "mean": 0.7919863597612958,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            },
+            "success": {
+              "mean": 0.7919863597612958,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            },
+            "actual_cost": {
+              "mean": 0.00036127058823529415,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            }
+          },
+          "high": {
+            "model_ids": [
+              "gpt-4-1106-preview"
+            ],
+            "quality": {
+              "mean": 0.9019607843137255,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            },
+            "success": {
+              "mean": 0.9019607843137255,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            },
+            "actual_cost": {
+              "mean": 0.005955200341005968,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            }
+          }
+        }
+      },
+      "tasks": {
+        "arc_challenge": {
+          "rows": 910,
+          "candidates": {
+            "low": {
+              "model_ids": [
+                "mistralai/mistral-7b-chat"
+              ],
+              "quality": {
+                "mean": 0.6758241758241759,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "success": {
+                "mean": 0.6758241758241759,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "actual_cost": {
+                "mean": 0.00010027384615384616,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              }
+            },
+            "medium": {
+              "model_ids": [
+                "zero-one-ai/Yi-34B-Chat"
+              ],
+              "quality": {
+                "mean": 0.9043956043956044,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "success": {
+                "mean": 0.9043956043956044,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "actual_cost": {
+                "mean": 0.0004002953846153847,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              }
+            },
+            "high": {
+              "model_ids": [
+                "gpt-4-1106-preview"
+              ],
+              "quality": {
+                "mean": 0.9571428571428572,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "success": {
+                "mean": 0.9571428571428572,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "actual_cost": {
+                "mean": 0.005023692307692307,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              }
+            }
+          },
+          "source_row_fraction": 0.7757885763000852
+        },
+        "mbpp": {
+          "rows": 263,
+          "candidates": {
+            "low": {
+              "model_ids": [
+                "mistralai/mistral-7b-chat"
+              ],
+              "quality": {
+                "mean": 0.3193916349809886,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "success": {
+                "mean": 0.3193916349809886,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "actual_cost": {
+                "mean": 4.819011406844107e-05,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              }
+            },
+            "medium": {
+              "model_ids": [
+                "zero-one-ai/Yi-34B-Chat"
+              ],
+              "quality": {
+                "mean": 0.40304182509505704,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "success": {
+                "mean": 0.40304182509505704,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "actual_cost": {
+                "mean": 0.00022624182509505705,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              }
+            },
+            "high": {
+              "model_ids": [
+                "gpt-4-1106-preview"
+              ],
+              "quality": {
+                "mean": 0.7110266159695817,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "success": {
+                "mean": 0.7110266159695817,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "actual_cost": {
+                "mean": 0.009178288973384031,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              }
+            }
+          },
+          "source_row_fraction": 0.22421142369991476
+        }
+      },
+      "equal_task_macro": {
+        "low": {
+          "quality": 0.49760790540258226,
+          "success": 0.49760790540258226,
+          "actual_cost": 7.423198011114361e-05
+        },
+        "medium": {
+          "quality": 0.6537187147453307,
+          "success": 0.6537187147453307,
+          "actual_cost": 0.0003132686048552209
+        },
+        "high": {
+          "quality": 0.8340847365562194,
+          "success": 0.8340847365562194,
+          "actual_cost": 0.007100990640538168
+        }
+      },
+      "quality_high_minus_low": 0.30605285592497866,
+      "quality_high_minus_low_contributions": {
+        "arc_challenge": {
+          "rows": 910,
+          "source_row_fraction": 0.7757885763000852,
+          "quality_high_minus_low": 0.2813186813186813,
+          "quality_high_minus_medium": 0.05274725274725275,
+          "weighted_high_minus_low_contribution": 0.21824381926683717,
+          "fraction_of_source_high_minus_low_gap": 0.713091922005571
+        },
+        "mbpp": {
+          "rows": 263,
+          "source_row_fraction": 0.22421142369991476,
+          "quality_high_minus_low": 0.3916349809885932,
+          "quality_high_minus_medium": 0.30798479087452474,
+          "weighted_high_minus_low_contribution": 0.08780903665814152,
+          "fraction_of_source_high_minus_low_gap": 0.286908077994429
+        }
+      },
+      "quality_success_numeric_equal": true,
+      "quality_values_binary": true
+    },
+    "xroutebench": {
+      "overall": {
+        "rows": 634,
+        "candidates": {
+          "low": {
+            "model_ids": [
+              "gpt-oss-20b"
+            ],
+            "quality": {
+              "mean": 0.7034700315457413,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            },
+            "success": {
+              "mean": 0.7034700315457413,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            },
+            "actual_cost": {
+              "mean": 1.3754495268138805e-05,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            }
+          },
+          "medium": {
+            "model_ids": [
+              "gpt-oss-120b"
+            ],
+            "quality": {
+              "mean": 0.7350157728706624,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            },
+            "success": {
+              "mean": 0.7350157728706624,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            },
+            "actual_cost": {
+              "mean": 4.886190851735016e-05,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            }
+          },
+          "high": {
+            "model_ids": [
+              "llama-4-maverick"
+            ],
+            "quality": {
+              "mean": 0.49842271293375395,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            },
+            "success": {
+              "mean": 0.49842271293375395,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            },
+            "actual_cost": {
+              "mean": 0.0002542191640378549,
+              "missing_count": 0,
+              "missing_rate": 0.0
+            }
+          }
+        }
+      },
+      "tasks": {
+        "arc_challenge": {
+          "rows": 311,
+          "candidates": {
+            "low": {
+              "model_ids": [
+                "gpt-oss-20b"
+              ],
+              "quality": {
+                "mean": 0.9581993569131833,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "success": {
+                "mean": 0.9581993569131833,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "actual_cost": {
+                "mean": 5.776527331189711e-06,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              }
+            },
+            "medium": {
+              "model_ids": [
+                "gpt-oss-120b"
+              ],
+              "quality": {
+                "mean": 0.9742765273311897,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "success": {
+                "mean": 0.9742765273311897,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "actual_cost": {
+                "mean": 2.0620900321543408e-05,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              }
+            },
+            "high": {
+              "model_ids": [
+                "llama-4-maverick"
+              ],
+              "quality": {
+                "mean": 0.932475884244373,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "success": {
+                "mean": 0.932475884244373,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "actual_cost": {
+                "mean": 0.00035582614147909965,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              }
+            }
+          },
+          "source_row_fraction": 0.49053627760252366
+        },
+        "human_eval": {
+          "rows": 90,
+          "candidates": {
+            "low": {
+              "model_ids": [
+                "gpt-oss-20b"
+              ],
+              "quality": {
+                "mean": 0.011111111111111112,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "success": {
+                "mean": 0.011111111111111112,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "actual_cost": {
+                "mean": 2.8525555555555554e-05,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              }
+            },
+            "medium": {
+              "model_ids": [
+                "gpt-oss-120b"
+              ],
+              "quality": {
+                "mean": 0.0,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "success": {
+                "mean": 0.0,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "actual_cost": {
+                "mean": 0.00011419666666666666,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              }
+            },
+            "high": {
+              "model_ids": [
+                "llama-4-maverick"
+              ],
+              "quality": {
+                "mean": 0.0,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "success": {
+                "mean": 0.0,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "actual_cost": {
+                "mean": 0.0002084408888888889,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              }
+            }
+          },
+          "source_row_fraction": 0.14195583596214512
+        },
+        "mbpp": {
+          "rows": 233,
+          "candidates": {
+            "low": {
+              "model_ids": [
+                "gpt-oss-20b"
+              ],
+              "quality": {
+                "mean": 0.630901287553648,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "success": {
+                "mean": 0.630901287553648,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "actual_cost": {
+                "mean": 1.8697639484978545e-05,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              }
+            },
+            "medium": {
+              "model_ids": [
+                "gpt-oss-120b"
+              ],
+              "quality": {
+                "mean": 0.6995708154506438,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "success": {
+                "mean": 0.6995708154506438,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "actual_cost": {
+                "mean": 6.132038626609442e-05,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              }
+            },
+            "high": {
+              "model_ids": [
+                "llama-4-maverick"
+              ],
+              "quality": {
+                "mean": 0.11158798283261803,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "success": {
+                "mean": 0.11158798283261803,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              },
+              "actual_cost": {
+                "mean": 0.00013628042918454935,
+                "missing_count": 0,
+                "missing_rate": 0.0
+              }
+            }
+          },
+          "source_row_fraction": 0.3675078864353312
+        }
+      },
+      "equal_task_macro": {
+        "low": {
+          "quality": 0.5334039185259808,
+          "success": 0.5334039185259808,
+          "actual_cost": 1.7666574123907937e-05
+        },
+        "medium": {
+          "quality": 0.5579491142606111,
+          "success": 0.5579491142606111,
+          "actual_cost": 6.537931775143482e-05
+        },
+        "high": {
+          "quality": 0.3480212890256637,
+          "success": 0.3480212890256637,
+          "actual_cost": 0.00023351581985084596
+        }
+      },
+      "quality_high_minus_low": -0.20504731861198738,
+      "quality_high_minus_low_contributions": {
+        "arc_challenge": {
+          "rows": 311,
+          "source_row_fraction": 0.49053627760252366,
+          "quality_high_minus_low": -0.02572347266881029,
+          "quality_high_minus_medium": -0.04180064308681672,
+          "weighted_high_minus_low_contribution": -0.012618296529968454,
+          "fraction_of_source_high_minus_low_gap": 0.061538461538461535
+        },
+        "human_eval": {
+          "rows": 90,
+          "source_row_fraction": 0.14195583596214512,
+          "quality_high_minus_low": -0.011111111111111112,
+          "quality_high_minus_medium": 0.0,
+          "weighted_high_minus_low_contribution": -0.0015772870662460567,
+          "fraction_of_source_high_minus_low_gap": 0.007692307692307692
+        },
+        "mbpp": {
+          "rows": 233,
+          "source_row_fraction": 0.3675078864353312,
+          "quality_high_minus_low": -0.51931330472103,
+          "quality_high_minus_medium": -0.5879828326180258,
+          "weighted_high_minus_low_contribution": -0.19085173501577285,
+          "fraction_of_source_high_minus_low_gap": 0.9307692307692307
+        }
+      },
+      "quality_success_numeric_equal": true,
+      "quality_values_binary": true
+    }
+  }
+}

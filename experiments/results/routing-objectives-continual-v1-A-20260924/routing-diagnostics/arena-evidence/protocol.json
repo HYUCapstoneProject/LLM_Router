@@ -1,0 +1,220 @@
+{
+  "action_order": [
+    "low",
+    "medium",
+    "high"
+  ],
+  "arena_dataset_version": "routeworks-routerarena-a4a062ce3313b56bb09c042e1bc37b61d34e3bd8",
+  "arena_revision": "a4a062ce3313b56bb09c042e1bc37b61d34e3bd8",
+  "attention_implementation": "eager",
+  "batch_size": 16,
+  "cost_quality_claim_allowed": false,
+  "counts": {
+    "full": {
+      "excluded_by_reason": {
+        "development_overlap": 18,
+        "duplicate_content_within_split": 2,
+        "missing_question": 1
+      },
+      "kept": 8379,
+      "labels": {
+        "easy": 3979,
+        "hard": 1964,
+        "medium": 2436
+      },
+      "raw": 8400
+    },
+    "robustness": {
+      "excluded_by_reason": {
+        "embedded_answer": 2,
+        "full_reference_excluded": 3,
+        "refusal_placeholder": 3
+      },
+      "kept": 412,
+      "labels": {
+        "easy": 197,
+        "hard": 106,
+        "medium": 109
+      },
+      "raw": 420
+    }
+  },
+  "dtype": "float32",
+  "full_slices": {
+    "rb_service_aligned": 7351,
+    "rb_unseen": 1028
+  },
+  "input_contract": "structure-preserving-v2",
+  "label_projection": [
+    "easy",
+    "medium",
+    "hard"
+  ],
+  "lambda_cost": 0.0,
+  "max_length": 512,
+  "models": {
+    "ordinal": {
+      "model_artifacts": {
+        "_SUCCESS": {
+          "sha256": "37a40f08d8548dba289b9b0bb35bcf63b359f6d37ee86044ebc6b6da080b9ec1",
+          "size_bytes": 9
+        },
+        "artifact_manifest.json": {
+          "sha256": "f121c475ca381d73b03b413aa4f8f3be177b6d83d9313790ed95592fc87c5aee",
+          "size_bytes": 1219
+        },
+        "config.json": {
+          "sha256": "ec78dcebe3890eaf422a55e3261f70a8579cdd4298cb51ec0fcc2949538646b5",
+          "size_bytes": 1492
+        },
+        "metrics.json": {
+          "sha256": "a3b6b0b2a1e876280faf42b1a1c4e39c303c947e77aeb05918a9755ee86c7fa0",
+          "size_bytes": 2908
+        },
+        "model.safetensors": {
+          "sha256": "e1a40fec7d269d8f925b5391e4f5e75df5d0fedbb1e37b4eea96521e27b1a6a7",
+          "size_bytes": 598442860
+        },
+        "special_tokens_map.json": {
+          "sha256": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049",
+          "size_bytes": 694
+        },
+        "tokenizer.json": {
+          "sha256": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+          "size_bytes": 3583228
+        },
+        "tokenizer_config.json": {
+          "sha256": "626c86908d7c711f93b0feffd8657b782cc2727b391f9be190240e8cafb626d5",
+          "size_bytes": 21031
+        },
+        "training_config.json": {
+          "sha256": "ccbad2aeae5ee063593526c23cc573a41e4b693910a7ce81071a8036def999da",
+          "size_bytes": 669
+        }
+      },
+      "model_dir_recorded": "/content/router-v1-durable-staging/full/final-model"
+    },
+    "pairwise": {
+      "model_artifacts": {
+        "_SUCCESS": {
+          "sha256": "37a40f08d8548dba289b9b0bb35bcf63b359f6d37ee86044ebc6b6da080b9ec1",
+          "size_bytes": 9
+        },
+        "artifact_manifest.json": {
+          "sha256": "02b152f389affdff59428e4a9ee699ac18135e1da470c7ec1cb9f9f3c39a2d02",
+          "size_bytes": 1169
+        },
+        "config.json": {
+          "sha256": "27ff11fc2fa1e944ebcdf47c838a8432a6b85af47111b592668385e4de5c8a09",
+          "size_bytes": 1540
+        },
+        "metrics.json": {
+          "sha256": "92f1e7636fee0117ac4e8bf56c942cc5b3174907d6d62676877e1a0a6e3b81d1",
+          "size_bytes": 2447
+        },
+        "model.safetensors": {
+          "sha256": "6e7380ac954d839dc98370664a12f588b49638b5d5e2ffc71b2eaf19b8c6f193",
+          "size_bytes": 598442860
+        },
+        "special_tokens_map.json": {
+          "sha256": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049",
+          "size_bytes": 694
+        },
+        "tokenizer.json": {
+          "sha256": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+          "size_bytes": 3583228
+        },
+        "tokenizer_config.json": {
+          "sha256": "2966a59b9e9cf122279aec1249e22e5bc7ad8430c754e95031b13fd128d4e560",
+          "size_bytes": 20840
+        },
+        "training_config.json": {
+          "sha256": "5a484ef8976a943aafc15cb2e5fb1d5b011e2b16e80ffb6ae6d29858d435f4e6",
+          "size_bytes": 751
+        }
+      },
+      "model_dir_recorded": "/content/router-objective-results/full/pairwise/model"
+    },
+    "pointwise": {
+      "model_artifacts": {
+        "_SUCCESS": {
+          "sha256": "37a40f08d8548dba289b9b0bb35bcf63b359f6d37ee86044ebc6b6da080b9ec1",
+          "size_bytes": 9
+        },
+        "artifact_manifest.json": {
+          "sha256": "02112cdc8babe81139ef1d72cc109221335fc785e1d1ced3e27e3668f7b7cc39",
+          "size_bytes": 1170
+        },
+        "config.json": {
+          "sha256": "7f821a24095a05f416d2934f959abd213cf3b52452c46734ec7c4c5682641a98",
+          "size_bytes": 1544
+        },
+        "metrics.json": {
+          "sha256": "884fbb51a79f30278c3c7a2665154725d8a5e42520d5470a0d5558b31be99b0f",
+          "size_bytes": 2447
+        },
+        "model.safetensors": {
+          "sha256": "b49696de6904cb647cd03671cfdfb8901728fc59a8e568fba1b0be141e5326d3",
+          "size_bytes": 598442860
+        },
+        "special_tokens_map.json": {
+          "sha256": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049",
+          "size_bytes": 694
+        },
+        "tokenizer.json": {
+          "sha256": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+          "size_bytes": 3583228
+        },
+        "tokenizer_config.json": {
+          "sha256": "2966a59b9e9cf122279aec1249e22e5bc7ad8430c754e95031b13fd128d4e560",
+          "size_bytes": 20840
+        },
+        "training_config.json": {
+          "sha256": "91d404a5cf42e9aebaaad7e57b8e392bbd56392988e0a9ef6053864f29293624",
+          "size_bytes": 753
+        }
+      },
+      "model_dir_recorded": "/content/router-objective-results/full/pointwise/model"
+    }
+  },
+  "preprocessing_version": "routerarena-structure-preserving-diagnostic-v1",
+  "production_activation_authorized": false,
+  "projection_policy": "fixed_lambda_zero_action_slot_argmax",
+  "r1_r2_interpretation": "action_slot_projection_alignment_not_difficulty_classification",
+  "raw_sub10_rows": 809,
+  "robustness": "paired_full_reference_with_inherited_official_label_no_independent_count_addition",
+  "schema_version": "routing-arena-diagnostics-v1",
+  "script_sha256": "714d782cdc4ed21788fe45730d471489ceb86481332837293e3bf2ee47b12ed0",
+  "selection_influence": false,
+  "source_files": {
+    "arena_config": {
+      "sha256": "29e557fd9fe494dd82dfacd5ed0b276d43429cfa03e56fb4a740d0b02f1b412e",
+      "size_bytes": 1571
+    },
+    "development_config": {
+      "sha256": "371702da6111df2de4fecaab9e3030265b7c0f272fa3faecc4d4826f07fc6960",
+      "size_bytes": 4985
+    },
+    "development_metadata": {
+      "original_path": "ml/artifacts/modernbert-initial-v1/dataset/metadata.parquet",
+      "sha256": "f516805774cd336d2c69f5b39d3bf357b598c7f11809966546f1136a61542740",
+      "size_bytes": 30219806
+    },
+    "full": {
+      "sha256": "358a6bb4160320b5cb5b68d6d0a885c89b128b06d3dea267d77ed6daeebe4369",
+      "size_bytes": 3674459
+    },
+    "robustness": {
+      "sha256": "6012eeea11e2d7b2018155e65c35ad887e9daa70e45aa38a40321da74d0cc2e9",
+      "size_bytes": 233165
+    },
+    "sub_10": {
+      "sha256": "e7b4b7579e98df0b83202324357d0b91af78666ddbf1038a513d19edaf58efd5",
+      "size_bytes": 380482
+    }
+  },
+  "source_policy_transfer": "none_no_source_lambda_or_service_policy_inferred",
+  "sub10_additional_inference": false,
+  "tie_breaker": "low_then_medium_then_high",
+  "validation_winner_unchanged": "pointwise"
+}

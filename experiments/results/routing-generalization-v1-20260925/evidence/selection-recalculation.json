@@ -1,0 +1,140 @@
+{
+  "schema_version": "g1-independent-metric-verification-v1",
+  "tolerance": 1e-12,
+  "method": "Recompute policies and fixed-policy metrics from sealed local score rows using checksum-matched frozen source; also check default metrics directly with NumPy.",
+  "holdout_evaluated": false,
+  "model_weights_verification": "SKIPPED: model files not downloaded locally; parent reports separate remote SHA verification",
+  "checks": {
+    "root_and_lock_seals": true,
+    "frozen_source_matches_plan_and_lock": true,
+    "workspace_source_matches_frozen": {
+      "generalization/data.py": true,
+      "generalization/training.py": true,
+      "objective_comparison/objectives.py": true,
+      "objective_comparison/training.py": true,
+      "training/modernbert_checkpointing.py": true,
+      "training/modernbert_training.py": true,
+      "generalization/evaluation.py": true,
+      "objective_comparison/evaluation.py": true
+    },
+    "calibration_policies_recomputed": true,
+    "calibration_reports_match": true,
+    "selection_fixed_policy_reports_match": true,
+    "default_metrics_independent_numpy_match": true,
+    "winner_and_eligibility_match": true,
+    "source_score_ids_order_outcomes_validated": true
+  },
+  "errors": [],
+  "selection_lock_sha256": "c6fad17c23390305d62769e30f213c8381db620679c949ac6a80bd3695ee75f3",
+  "verified": true,
+  "selected_arm": "r1-natural",
+  "eligible_arms": [
+    "r1-natural",
+    "r3-natural",
+    "r3-balanced"
+  ],
+  "compared_numeric_values": 1504,
+  "maximum_absolute_numeric_difference": 0.0,
+  "verified_local_artifacts": [
+    "r1-natural/calibration-scores.parquet",
+    "r1-natural/selection-scores.parquet",
+    "r1-natural/training.parquet",
+    "r1-balanced/calibration-scores.parquet",
+    "r1-balanced/selection-scores.parquet",
+    "r1-balanced/training.parquet",
+    "r3-natural/calibration-scores.parquet",
+    "r3-natural/selection-scores.parquet",
+    "r3-natural/training.parquet",
+    "r3-balanced/calibration-scores.parquet",
+    "r3-balanced/selection-scores.parquet",
+    "r3-balanced/training.parquet"
+  ],
+  "skipped_model_artifacts": [
+    "r1-natural/model/_SUCCESS",
+    "r1-natural/model/artifact_manifest.json",
+    "r1-natural/model/config.json",
+    "r1-natural/model/metrics.json",
+    "r1-natural/model/model.safetensors",
+    "r1-natural/model/special_tokens_map.json",
+    "r1-natural/model/tokenizer.json",
+    "r1-natural/model/tokenizer_config.json",
+    "r1-natural/model/training_config.json",
+    "r1-balanced/model/_SUCCESS",
+    "r1-balanced/model/artifact_manifest.json",
+    "r1-balanced/model/config.json",
+    "r1-balanced/model/metrics.json",
+    "r1-balanced/model/model.safetensors",
+    "r1-balanced/model/special_tokens_map.json",
+    "r1-balanced/model/tokenizer.json",
+    "r1-balanced/model/tokenizer_config.json",
+    "r1-balanced/model/training_config.json",
+    "r3-natural/model/_SUCCESS",
+    "r3-natural/model/artifact_manifest.json",
+    "r3-natural/model/config.json",
+    "r3-natural/model/metrics.json",
+    "r3-natural/model/model.safetensors",
+    "r3-natural/model/special_tokens_map.json",
+    "r3-natural/model/tokenizer.json",
+    "r3-natural/model/tokenizer_config.json",
+    "r3-natural/model/training_config.json",
+    "r3-balanced/model/_SUCCESS",
+    "r3-balanced/model/artifact_manifest.json",
+    "r3-balanced/model/config.json",
+    "r3-balanced/model/metrics.json",
+    "r3-balanced/model/model.safetensors",
+    "r3-balanced/model/special_tokens_map.json",
+    "r3-balanced/model/tokenizer.json",
+    "r3-balanced/model/tokenizer_config.json",
+    "r3-balanced/model/training_config.json"
+  ],
+  "direct_numpy_default_metrics": {
+    "r1-natural": {
+      "routerbench": {
+        "mean_quality": 0.7681553398058253,
+        "mean_actual_cost": 0.0037779850485436892,
+        "relative_cost": 0.4456393323459307
+      },
+      "xroutebench": {
+        "mean_quality": 0.7354152689946305,
+        "mean_actual_cost": 0.0001330788188976378,
+        "relative_cost": 0.4079093401476186
+      }
+    },
+    "r1-balanced": {
+      "routerbench": {
+        "mean_quality": 0.7686407766990292,
+        "mean_actual_cost": 0.0039596056310679615,
+        "relative_cost": 0.46793702851932484
+      },
+      "xroutebench": {
+        "mean_quality": 0.7268762653575697,
+        "mean_actual_cost": 0.00016604547244094487,
+        "relative_cost": 0.5197968007529779
+      }
+    },
+    "r3-natural": {
+      "routerbench": {
+        "mean_quality": 0.7464320388349515,
+        "mean_actual_cost": 0.003560249611650485,
+        "relative_cost": 0.41890778820843155
+      },
+      "xroutebench": {
+        "mean_quality": 0.6561896309942622,
+        "mean_actual_cost": 7.33634251968504e-05,
+        "relative_cost": 0.20523776016898176
+      }
+    },
+    "r3-balanced": {
+      "routerbench": {
+        "mean_quality": 0.7478883495145632,
+        "mean_actual_cost": 0.0034989909708737863,
+        "relative_cost": 0.41138701858502513
+      },
+      "xroutebench": {
+        "mean_quality": 0.6560802696644285,
+        "mean_actual_cost": 4.276484251968504e-05,
+        "relative_cost": 0.10138743428213633
+      }
+    }
+  }
+}

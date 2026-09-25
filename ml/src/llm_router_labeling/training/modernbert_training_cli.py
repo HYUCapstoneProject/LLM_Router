@@ -47,6 +47,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Override config device (auto, cpu, mps, cuda)",
     )
     parser.add_argument(
+        "--objective",
+        choices=("ordinal", "pointwise", "pairwise"),
+        default="ordinal",
+        help="Training objective; pointwise/pairwise require complete observed targets",
+    )
+    parser.add_argument(
         "--max-train-steps",
         type=int,
         help="Override the config step limit for a bounded smoke run",
@@ -115,6 +121,7 @@ def main() -> None:
             else None
         ),
         on_progress=publish_progress if args.observability_run_uri else None,
+        objective_method=args.objective,
     )
     if args.observability_run_uri:
         write_observability_json(

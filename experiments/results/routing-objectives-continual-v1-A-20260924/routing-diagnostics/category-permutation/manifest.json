@@ -1,0 +1,33 @@
+{
+  "schema_version": "dev-category-permutation-artifacts-v1",
+  "files": {
+    "original-audit.json": {
+      "sha256": "a387148ae29c34383ab2442a011ef20f110dacff97ff3c19eb4446da1f6ad55c",
+      "size_bytes": 639369
+    },
+    "original-audit.md": {
+      "sha256": "901cfc9a4b03009285b988bd0ec404bcd862e12694d307ffb6213addebdadc85",
+      "size_bytes": 3061
+    },
+    "original-audit.py": {
+      "sha256": "4d4dcfc47d9cadf097dc42539b33c82577084cb24b27e36964cc5b68b7ae9cb4",
+      "size_bytes": 7976
+    },
+    "posthoc-quality-cost-ranges.png": {
+      "sha256": "ac8be67247776cf0adeb2fbf0f365c5ba8dfb1c620a850f3912ccad01c610c66",
+      "size_bytes": 127786
+    },
+    "ranges.csv": {
+      "sha256": "a4eb21edd9e8fed5b9676b5f8c3a4437271e1fb2d4d81e19f1a3a7d9554e64eb",
+      "size_bytes": 2318
+    },
+    "render.py": {
+      "sha256": "acbaa719ae7a0ed183ce04dee62dd7ad39300b6a93986e6036506b42fa5ec5d1",
+      "size_bytes": 5827
+    },
+    "verification.json": {
+      "sha256": "8079360e6aa90e8fd0df770ab1f6596c928d671629134a723605d9df70a728c0",
+      "size_bytes": 379
+    }
+  }
+}

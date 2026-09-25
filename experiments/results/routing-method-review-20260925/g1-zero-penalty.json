@@ -1,0 +1,712 @@
+{
+  "schema_version": "g1-zero-penalty-posthoc-v1",
+  "interpretation": "Post-hoc diagnostic with no inference-time cost penalty. R3 training already includes cost; this does not remove cost from its learned objective. Mean observed benchmark quality is not difficulty classification accuracy. Source macro equally weights sources. No model or policy reselection.",
+  "selection_lock_sha256": "c6fad17c23390305d62769e30f213c8381db620679c949ac6a80bd3695ee75f3",
+  "selected_arm_unchanged": "r1-natural",
+  "winner_reselected": false,
+  "artifacts": {
+    "merged-runs/r1-natural/selection-scores.parquet": {
+      "sha256": "d7273a53bdbed7e27d0789c4aa29ef4e7fdf0ab0af5d5913412dd1bccb21d001",
+      "size_bytes": 1364957
+    },
+    "merged-runs/r1-balanced/selection-scores.parquet": {
+      "sha256": "ba4c270e9a7bfd340ba1751abecb16b5d670bafe0255cf70d6fe4d1e68a8f52e",
+      "size_bytes": 1364966
+    },
+    "merged-runs/r3-natural/selection-scores.parquet": {
+      "sha256": "7e8aaeeb01cc03c579ad3115a5b173ed47058dd14f42197e1d09856604b683b1",
+      "size_bytes": 1364946
+    },
+    "merged-runs/r3-balanced/selection-scores.parquet": {
+      "sha256": "0ec6de322e9594ea16709946d2f6154dd9da964a33d86e4dfc788d0661b43163",
+      "size_bytes": 1364951
+    },
+    "holdout-scores/r1-natural-scores.parquet": {
+      "sha256": "83a815cbd295382d9a4b747e04a20baa298a88c955e104368ae172d642aacd2e",
+      "size_bytes": 795363
+    },
+    "holdout-scores/r1-balanced-scores.parquet": {
+      "sha256": "6eac567c9ad85bc4180f7844f90ad89b5e4e536a6f2a1e96780db525ea098133",
+      "size_bytes": 795364
+    },
+    "holdout-scores/r3-natural-scores.parquet": {
+      "sha256": "122c78a5fdf9d14120f7667943e8252f3b4ac209b21c36bb177aa80a7bae67dc",
+      "size_bytes": 795348
+    },
+    "holdout-scores/r3-balanced-scores.parquet": {
+      "sha256": "bdbccbb4a0bf4765a4f89b31e1b48f8890176e41d6b7e14142822180fc0ac1fb",
+      "size_bytes": 795353
+    }
+  },
+  "stages": {
+    "selection": {
+      "r1-natural": {
+        "source_macro_quality": 0.7643393983920943,
+        "source_macro_success": 0.7516608057487959,
+        "source_macro_actual_cost": 0.00309296208986316,
+        "per_source": {
+          "routerbench": {
+            "rows": 2060,
+            "mean_observed_quality": 0.7915776699029127,
+            "mean_actual_cost": 0.006036395242718446,
+            "mean_observed_success": 0.7946601941747573,
+            "per_task": {
+              "gsm8k": {
+                "rows": 477,
+                "mean_observed_quality": 0.6273584905660378,
+                "mean_actual_cost": 0.0066013283018867925,
+                "mean_observed_success": 0.6415094339622641
+              },
+              "hellaswag": {
+                "rows": 625,
+                "mean_observed_quality": 0.9024,
+                "mean_actual_cost": 0.0030356671999999998,
+                "mean_observed_success": 0.9024
+              },
+              "mmlu_family": {
+                "rows": 871,
+                "mean_observed_quality": 0.8048220436280138,
+                "mean_actual_cost": 0.008081135476463835,
+                "mean_observed_success": 0.8048220436280138
+              },
+              "mtbench": {
+                "rows": 5,
+                "mean_observed_quality": 0.48,
+                "mean_actual_cost": 0.017287999999999998,
+                "mean_observed_success": 0.4
+              },
+              "winogrande": {
+                "rows": 82,
+                "mean_observed_quality": 0.7804878048780488,
+                "mean_actual_cost": 0.003216336585365854,
+                "mean_observed_success": 0.7804878048780488
+              }
+            }
+          },
+          "xroutebench": {
+            "rows": 254,
+            "mean_observed_quality": 0.7371011268812758,
+            "mean_actual_cost": 0.000149528937007874,
+            "mean_observed_success": 0.7086614173228346,
+            "per_task": {
+              "aime": {
+                "rows": 5,
+                "mean_observed_quality": 0.2,
+                "mean_actual_cost": 1.076e-05,
+                "mean_observed_success": 0.2
+              },
+              "boolq": {
+                "rows": 22,
+                "mean_observed_quality": 0.8181818181818182,
+                "mean_actual_cost": 9.550909090909092e-05,
+                "mean_observed_success": 0.8181818181818182
+              },
+              "commonsense_qa": {
+                "rows": 37,
+                "mean_observed_quality": 0.7567567567567568,
+                "mean_actual_cost": 0.00020647324324324322,
+                "mean_observed_success": 0.7567567567567568
+              },
+              "gsm8k": {
+                "rows": 18,
+                "mean_observed_quality": 1.0,
+                "mean_actual_cost": 0.00021654277777777777,
+                "mean_observed_success": 1.0
+              },
+              "hellaswag": {
+                "rows": 30,
+                "mean_observed_quality": 0.8333333333333334,
+                "mean_actual_cost": 8.0772e-05,
+                "mean_observed_success": 0.8333333333333334
+              },
+              "math_competition": {
+                "rows": 40,
+                "mean_observed_quality": 0.675,
+                "mean_actual_cost": 0.00014204925,
+                "mean_observed_success": 0.675
+              },
+              "mmlu_family": {
+                "rows": 32,
+                "mean_observed_quality": 0.90625,
+                "mean_actual_cost": 0.00019419781250000002,
+                "mean_observed_success": 0.90625
+              },
+              "openbook_qa": {
+                "rows": 34,
+                "mean_observed_quality": 0.9411764705882353,
+                "mean_actual_cost": 0.0002425517647058823,
+                "mean_observed_success": 0.9411764705882353
+              },
+              "squad": {
+                "rows": 36,
+                "mean_observed_quality": 0.25621350632900136,
+                "mean_actual_cost": 4.782916666666666e-05,
+                "mean_observed_success": 0.05555555555555555
+              }
+            }
+          }
+        },
+        "default_budget_quality": 0.7517853044002278,
+        "default_budget_relative_cost": 0.42677433624677463,
+        "route_actions_equals_independent_raw_argmax": true
+      },
+      "r1-balanced": {
+        "source_macro_quality": 0.7639025658778908,
+        "source_macro_success": 0.7516072930204113,
+        "source_macro_actual_cost": 0.0032308917204342175,
+        "per_source": {
+          "routerbench": {
+            "rows": 2060,
+            "mean_observed_quality": 0.7977669902912622,
+            "mean_actual_cost": 0.006282140291262136,
+            "mean_observed_success": 0.8024271844660195,
+            "per_task": {
+              "gsm8k": {
+                "rows": 477,
+                "mean_observed_quality": 0.6331236897274634,
+                "mean_actual_cost": 0.006655852830188679,
+                "mean_observed_success": 0.6540880503144654
+              },
+              "hellaswag": {
+                "rows": 625,
+                "mean_observed_quality": 0.9056,
+                "mean_actual_cost": 0.0032803820799999998,
+                "mean_observed_success": 0.9056
+              },
+              "mmlu_family": {
+                "rows": 871,
+                "mean_observed_quality": 0.8140068886337543,
+                "mean_actual_cost": 0.008479259242250287,
+                "mean_observed_success": 0.8140068886337543
+              },
+              "mtbench": {
+                "rows": 5,
+                "mean_observed_quality": 0.48,
+                "mean_actual_cost": 0.017287999999999998,
+                "mean_observed_success": 0.4
+              },
+              "winogrande": {
+                "rows": 82,
+                "mean_observed_quality": 0.7804878048780488,
+                "mean_actual_cost": 0.00297870243902439,
+                "mean_observed_success": 0.7804878048780488
+              }
+            }
+          },
+          "xroutebench": {
+            "rows": 254,
+            "mean_observed_quality": 0.7300381414645196,
+            "mean_actual_cost": 0.0001796431496062992,
+            "mean_observed_success": 0.7007874015748031,
+            "per_task": {
+              "aime": {
+                "rows": 5,
+                "mean_observed_quality": 0.2,
+                "mean_actual_cost": 9.918799999999999e-05,
+                "mean_observed_success": 0.2
+              },
+              "boolq": {
+                "rows": 22,
+                "mean_observed_quality": 0.8181818181818182,
+                "mean_actual_cost": 3.060818181818182e-05,
+                "mean_observed_success": 0.8181818181818182
+              },
+              "commonsense_qa": {
+                "rows": 37,
+                "mean_observed_quality": 0.7297297297297297,
+                "mean_actual_cost": 0.00027876324324324327,
+                "mean_observed_success": 0.7297297297297297
+              },
+              "gsm8k": {
+                "rows": 18,
+                "mean_observed_quality": 1.0,
+                "mean_actual_cost": 0.00021307888888888888,
+                "mean_observed_success": 1.0
+              },
+              "hellaswag": {
+                "rows": 30,
+                "mean_observed_quality": 0.8333333333333334,
+                "mean_actual_cost": 0.000207231,
+                "mean_observed_success": 0.8333333333333334
+              },
+              "math_competition": {
+                "rows": 40,
+                "mean_observed_quality": 0.65,
+                "mean_actual_cost": 0.00014765175,
+                "mean_observed_success": 0.65
+              },
+              "mmlu_family": {
+                "rows": 32,
+                "mean_observed_quality": 0.9375,
+                "mean_actual_cost": 0.00023021374999999998,
+                "mean_observed_success": 0.9375
+              },
+              "openbook_qa": {
+                "rows": 34,
+                "mean_observed_quality": 0.9411764705882353,
+                "mean_actual_cost": 0.00026106235294117645,
+                "mean_observed_success": 0.9411764705882353
+              },
+              "squad": {
+                "rows": 36,
+                "mean_observed_quality": 0.2341579981107775,
+                "mean_actual_cost": 5.401166666666668e-05,
+                "mean_observed_success": 0.027777777777777776
+              }
+            }
+          }
+        },
+        "default_budget_quality": 0.7477585210282994,
+        "default_budget_relative_cost": 0.49386691463615134,
+        "route_actions_equals_independent_raw_argmax": true
+      },
+      "r3-natural": {
+        "source_macro_quality": 0.7013108349146069,
+        "source_macro_success": 0.6848367861784268,
+        "source_macro_actual_cost": 0.0018168065184236677,
+        "per_source": {
+          "routerbench": {
+            "rows": 2060,
+            "mean_observed_quality": 0.7464320388349515,
+            "mean_actual_cost": 0.003560249611650485,
+            "mean_observed_success": 0.7436893203883496,
+            "per_task": {
+              "gsm8k": {
+                "rows": 477,
+                "mean_observed_quality": 0.5749475890985325,
+                "mean_actual_cost": 0.0035123631027253665,
+                "mean_observed_success": 0.5639412997903563
+              },
+              "hellaswag": {
+                "rows": 625,
+                "mean_observed_quality": 0.888,
+                "mean_actual_cost": 0.0018875004799999999,
+                "mean_observed_success": 0.888
+              },
+              "mmlu_family": {
+                "rows": 871,
+                "mean_observed_quality": 0.7416762342135477,
+                "mean_actual_cost": 0.004979893455797933,
+                "mean_observed_success": 0.7416762342135477
+              },
+              "mtbench": {
+                "rows": 5,
+                "mean_observed_quality": 0.48,
+                "mean_actual_cost": 0.00634056,
+                "mean_observed_success": 0.4
+              },
+              "winogrande": {
+                "rows": 82,
+                "mean_observed_quality": 0.7317073170731707,
+                "mean_actual_cost": 0.0013395024390243904,
+                "mean_observed_success": 0.7317073170731707
+              }
+            }
+          },
+          "xroutebench": {
+            "rows": 254,
+            "mean_observed_quality": 0.6561896309942622,
+            "mean_actual_cost": 7.33634251968504e-05,
+            "mean_observed_success": 0.6259842519685039,
+            "per_task": {
+              "aime": {
+                "rows": 5,
+                "mean_observed_quality": 0.2,
+                "mean_actual_cost": 0.000191184,
+                "mean_observed_success": 0.2
+              },
+              "boolq": {
+                "rows": 22,
+                "mean_observed_quality": 0.7727272727272727,
+                "mean_actual_cost": 1.0388636363636365e-05,
+                "mean_observed_success": 0.7727272727272727
+              },
+              "commonsense_qa": {
+                "rows": 37,
+                "mean_observed_quality": 0.6486486486486487,
+                "mean_actual_cost": 3.243297297297298e-05,
+                "mean_observed_success": 0.6486486486486487
+              },
+              "gsm8k": {
+                "rows": 18,
+                "mean_observed_quality": 1.0,
+                "mean_actual_cost": 0.00021654277777777777,
+                "mean_observed_success": 1.0
+              },
+              "hellaswag": {
+                "rows": 30,
+                "mean_observed_quality": 0.5333333333333333,
+                "mean_actual_cost": 3.877766666666667e-05,
+                "mean_observed_success": 0.5333333333333333
+              },
+              "math_competition": {
+                "rows": 40,
+                "mean_observed_quality": 0.65,
+                "mean_actual_cost": 9.352050000000002e-05,
+                "mean_observed_success": 0.65
+              },
+              "mmlu_family": {
+                "rows": 32,
+                "mean_observed_quality": 0.84375,
+                "mean_actual_cost": 0.00011235999999999999,
+                "mean_observed_success": 0.84375
+              },
+              "openbook_qa": {
+                "rows": 34,
+                "mean_observed_quality": 0.8529411764705882,
+                "mean_actual_cost": 9.54420588235294e-05,
+                "mean_observed_success": 0.8529411764705882
+              },
+              "squad": {
+                "rows": 36,
+                "mean_observed_quality": 0.2408935075706273,
+                "mean_actual_cost": 1.6870833333333338e-05,
+                "mean_observed_success": 0.027777777777777776
+              }
+            }
+          }
+        },
+        "default_budget_quality": 0.7013108349146069,
+        "default_budget_relative_cost": 0.31207277418870666,
+        "route_actions_equals_independent_raw_argmax": true
+      },
+      "r3-balanced": {
+        "source_macro_quality": 0.7041348523614551,
+        "source_macro_success": 0.6872907270086385,
+        "source_macro_actual_cost": 0.0017792043664475192,
+        "per_source": {
+          "routerbench": {
+            "rows": 2060,
+            "mean_observed_quality": 0.748252427184466,
+            "mean_actual_cost": 0.0035138176699029125,
+            "mean_observed_success": 0.7446601941747573,
+            "per_task": {
+              "gsm8k": {
+                "rows": 477,
+                "mean_observed_quality": 0.5723270440251572,
+                "mean_actual_cost": 0.003360508595387841,
+                "mean_observed_success": 0.5576519916142557
+              },
+              "hellaswag": {
+                "rows": 625,
+                "mean_observed_quality": 0.8896,
+                "mean_actual_cost": 0.0018975033600000003,
+                "mean_observed_success": 0.8896
+              },
+              "mmlu_family": {
+                "rows": 871,
+                "mean_observed_quality": 0.748564867967853,
+                "mean_actual_cost": 0.0049894890929965555,
+                "mean_observed_success": 0.748564867967853
+              },
+              "mtbench": {
+                "rows": 5,
+                "mean_observed_quality": 0.48,
+                "mean_actual_cost": 0.00634056,
+                "mean_observed_success": 0.4
+              },
+              "winogrande": {
+                "rows": 82,
+                "mean_observed_quality": 0.7073170731707317,
+                "mean_actual_cost": 0.0008782243902439027,
+                "mean_observed_success": 0.7073170731707317
+              }
+            }
+          },
+          "xroutebench": {
+            "rows": 254,
+            "mean_observed_quality": 0.6600172775384442,
+            "mean_actual_cost": 4.459106299212599e-05,
+            "mean_observed_success": 0.6299212598425197,
+            "per_task": {
+              "aime": {
+                "rows": 5,
+                "mean_observed_quality": 0.2,
+                "mean_actual_cost": 4.62e-06,
+                "mean_observed_success": 0.2
+              },
+              "boolq": {
+                "rows": 22,
+                "mean_observed_quality": 0.7727272727272727,
+                "mean_actual_cost": 1.0388636363636365e-05,
+                "mean_observed_success": 0.7727272727272727
+              },
+              "commonsense_qa": {
+                "rows": 37,
+                "mean_observed_quality": 0.6756756756756757,
+                "mean_actual_cost": 4.664864864864865e-06,
+                "mean_observed_success": 0.6756756756756757
+              },
+              "gsm8k": {
+                "rows": 18,
+                "mean_observed_quality": 1.0,
+                "mean_actual_cost": 0.00019799222222222223,
+                "mean_observed_success": 1.0
+              },
+              "hellaswag": {
+                "rows": 30,
+                "mean_observed_quality": 0.5333333333333333,
+                "mean_actual_cost": 3.877766666666667e-05,
+                "mean_observed_success": 0.5333333333333333
+              },
+              "math_competition": {
+                "rows": 40,
+                "mean_observed_quality": 0.65,
+                "mean_actual_cost": 6.947299999999999e-05,
+                "mean_observed_success": 0.65
+              },
+              "mmlu_family": {
+                "rows": 32,
+                "mean_observed_quality": 0.84375,
+                "mean_actual_cost": 6.83221875e-05,
+                "mean_observed_success": 0.84375
+              },
+              "openbook_qa": {
+                "rows": 34,
+                "mean_observed_quality": 0.8529411764705882,
+                "mean_actual_cost": 1.3259999999999998e-05,
+                "mean_observed_success": 0.8529411764705882
+              },
+              "squad": {
+                "rows": 36,
+                "mean_observed_quality": 0.24012190263235567,
+                "mean_actual_cost": 2.1072777777777778e-05,
+                "mean_observed_success": 0.027777777777777776
+              }
+            }
+          }
+        },
+        "default_budget_quality": 0.7019843095894958,
+        "default_budget_relative_cost": 0.25638722643358075,
+        "route_actions_equals_independent_raw_argmax": true
+      }
+    },
+    "task_holdout": {
+      "r1-natural": {
+        "source_macro_quality": 0.6851449947692696,
+        "source_macro_success": 0.6851449947692696,
+        "source_macro_actual_cost": 0.0023762264074564127,
+        "per_source": {
+          "routerbench": {
+            "rows": 1173,
+            "mean_observed_quality": 0.8687127024722933,
+            "mean_actual_cost": 0.004546083887468031,
+            "mean_observed_success": 0.8687127024722933,
+            "per_task": {
+              "arc_challenge": {
+                "rows": 910,
+                "mean_observed_quality": 0.9483516483516483,
+                "mean_actual_cost": 0.0040260208791208785,
+                "mean_observed_success": 0.9483516483516483
+              },
+              "mbpp": {
+                "rows": 263,
+                "mean_observed_quality": 0.5931558935361216,
+                "mean_actual_cost": 0.00634554144486692,
+                "mean_observed_success": 0.5931558935361216
+              }
+            }
+          },
+          "xroutebench": {
+            "rows": 634,
+            "mean_observed_quality": 0.501577287066246,
+            "mean_actual_cost": 0.00020636892744479497,
+            "mean_observed_success": 0.501577287066246,
+            "per_task": {
+              "arc_challenge": {
+                "rows": 311,
+                "mean_observed_quality": 0.9356913183279743,
+                "mean_actual_cost": 0.00025850765273311896,
+                "mean_observed_success": 0.9356913183279743
+              },
+              "human_eval": {
+                "rows": 90,
+                "mean_observed_quality": 0.0,
+                "mean_actual_cost": 0.0002084408888888889,
+                "mean_observed_success": 0.0
+              },
+              "mbpp": {
+                "rows": 233,
+                "mean_observed_quality": 0.11587982832618025,
+                "mean_actual_cost": 0.00013597570815450643,
+                "mean_observed_success": 0.11587982832618025
+              }
+            }
+          }
+        },
+        "default_budget_quality": 0.6526216850750723,
+        "default_budget_relative_cost": 0.412800559546568,
+        "route_actions_equals_independent_raw_argmax": true
+      },
+      "r1-balanced": {
+        "source_macro_quality": 0.6990837481611765,
+        "source_macro_success": 0.6990837481611765,
+        "source_macro_actual_cost": 0.0027492310733216617,
+        "per_source": {
+          "routerbench": {
+            "rows": 1173,
+            "mean_observed_quality": 0.8934356351236147,
+            "mean_actual_cost": 0.005289512020460358,
+            "mean_observed_success": 0.8934356351236147,
+            "per_task": {
+              "arc_challenge": {
+                "rows": 910,
+                "mean_observed_quality": 0.9461538461538461,
+                "mean_actual_cost": 0.004235070549450549,
+                "mean_observed_success": 0.9461538461538461
+              },
+              "mbpp": {
+                "rows": 263,
+                "mean_observed_quality": 0.7110266159695817,
+                "mean_actual_cost": 0.008937959695817491,
+                "mean_observed_success": 0.7110266159695817
+              }
+            }
+          },
+          "xroutebench": {
+            "rows": 634,
+            "mean_observed_quality": 0.5047318611987381,
+            "mean_actual_cost": 0.0002089501261829653,
+            "mean_observed_success": 0.5047318611987381,
+            "per_task": {
+              "arc_challenge": {
+                "rows": 311,
+                "mean_observed_quality": 0.9453376205787781,
+                "mean_actual_cost": 0.00026354135048231516,
+                "mean_observed_success": 0.9453376205787781
+              },
+              "human_eval": {
+                "rows": 90,
+                "mean_observed_quality": 0.0,
+                "mean_actual_cost": 0.0002084408888888889,
+                "mean_observed_success": 0.0
+              },
+              "mbpp": {
+                "rows": 233,
+                "mean_observed_quality": 0.11158798283261803,
+                "mean_actual_cost": 0.00013628042918454935,
+                "mean_observed_success": 0.11158798283261803
+              }
+            }
+          }
+        },
+        "default_budget_quality": 0.6695442406835179,
+        "default_budget_relative_cost": 0.5672134806246948,
+        "route_actions_equals_independent_raw_argmax": true
+      },
+      "r3-natural": {
+        "source_macro_quality": 0.6849755675140718,
+        "source_macro_success": 0.6849755675140718,
+        "source_macro_actual_cost": 0.001332418146284299,
+        "per_source": {
+          "routerbench": {
+            "rows": 1173,
+            "mean_observed_quality": 0.8431372549019608,
+            "mean_actual_cost": 0.002572909462915601,
+            "mean_observed_success": 0.8431372549019608,
+            "per_task": {
+              "arc_challenge": {
+                "rows": 910,
+                "mean_observed_quality": 0.8956043956043956,
+                "mean_actual_cost": 0.001090211208791209,
+                "mean_observed_success": 0.8956043956043956
+              },
+              "mbpp": {
+                "rows": 263,
+                "mean_observed_quality": 0.6615969581749049,
+                "mean_actual_cost": 0.007703158174904944,
+                "mean_observed_success": 0.6615969581749049
+              }
+            }
+          },
+          "xroutebench": {
+            "rows": 634,
+            "mean_observed_quality": 0.526813880126183,
+            "mean_actual_cost": 9.192682965299684e-05,
+            "mean_observed_success": 0.526813880126183,
+            "per_task": {
+              "arc_challenge": {
+                "rows": 311,
+                "mean_observed_quality": 0.9646302250803859,
+                "mean_actual_cost": 3.26508038585209e-05,
+                "mean_observed_success": 0.9646302250803859
+              },
+              "human_eval": {
+                "rows": 90,
+                "mean_observed_quality": 0.0,
+                "mean_actual_cost": 0.00020731944444444446,
+                "mean_observed_success": 0.0
+              },
+              "mbpp": {
+                "rows": 233,
+                "mean_observed_quality": 0.1459227467811159,
+                "mean_actual_cost": 0.0001264740772532189,
+                "mean_observed_success": 0.1459227467811159
+              }
+            }
+          }
+        },
+        "default_budget_quality": 0.6849755675140718,
+        "default_budget_relative_cost": 0.37427783125279035,
+        "route_actions_equals_independent_raw_argmax": true
+      },
+      "r3-balanced": {
+        "source_macro_quality": 0.6833982804478258,
+        "source_macro_success": 0.6833982804478258,
+        "source_macro_actual_cost": 0.0013444067144222935,
+        "per_source": {
+          "routerbench": {
+            "rows": 1173,
+            "mean_observed_quality": 0.8431372549019608,
+            "mean_actual_cost": 0.0026044480818414326,
+            "mean_observed_success": 0.8431372549019608,
+            "per_task": {
+              "arc_challenge": {
+                "rows": 910,
+                "mean_observed_quality": 0.8989010989010989,
+                "mean_actual_cost": 0.0010748923076923076,
+                "mean_observed_success": 0.8989010989010989
+              },
+              "mbpp": {
+                "rows": 263,
+                "mean_observed_quality": 0.6501901140684411,
+                "mean_actual_cost": 0.007896827376425856,
+                "mean_observed_success": 0.6501901140684411
+              }
+            }
+          },
+          "xroutebench": {
+            "rows": 634,
+            "mean_observed_quality": 0.5236593059936908,
+            "mean_actual_cost": 8.436534700315457e-05,
+            "mean_observed_success": 0.5236593059936908,
+            "per_task": {
+              "arc_challenge": {
+                "rows": 311,
+                "mean_observed_quality": 0.9581993569131833,
+                "mean_actual_cost": 1.6596334405144694e-05,
+                "mean_observed_success": 0.9581993569131833
+              },
+              "human_eval": {
+                "rows": 90,
+                "mean_observed_quality": 0.0,
+                "mean_actual_cost": 0.0002084408888888889,
+                "mean_observed_success": 0.0
+              },
+              "mbpp": {
+                "rows": 233,
+                "mean_observed_quality": 0.1459227467811159,
+                "mean_actual_cost": 0.0001268948068669528,
+                "mean_observed_success": 0.1459227467811159
+              }
+            }
+          }
+        },
+        "default_budget_quality": 0.6829720229883203,
+        "default_budget_relative_cost": 0.3593482022872374,
+        "route_actions_equals_independent_raw_argmax": true
+      }
+    }
+  },
+  "verified": true
+}

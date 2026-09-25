@@ -1,0 +1,85 @@
+method,category,paired_n,same_action_rate
+ordinal,"00 Computer science, knowledge, and systems",42,0.5714285714285714
+ordinal,02 Library and information sciences,19,0.3684210526315789
+ordinal,10 Philosophy,8,0.625
+ordinal,15 Psychology,8,0.5
+ordinal,16 Philosophical logic,5,0.6
+ordinal,17 Ethics,21,0.7142857142857143
+ordinal,"30 Social sciences, sociology, and anthropology",3,0.0
+ordinal,33 Economics,21,0.7142857142857143
+ordinal,34 Law,9,0.5555555555555556
+ordinal,36 Social problems,4,0.25
+ordinal,40 Language,45,0.5111111111111111
+ordinal,50 Science,8,0.375
+ordinal,51 Mathematics,27,0.48148148148148145
+ordinal,53 Physics,5,0.4
+ordinal,54 Chemistry,4,1.0
+ordinal,55 Earth sciences and geology,15,0.2
+ordinal,57 Biology,7,0.42857142857142855
+ordinal,59 Animals (Zoology),2,0.0
+ordinal,61 Medicine and health,47,0.7446808510638298
+ordinal,62 Engineering,19,0.631578947368421
+ordinal,65 Management and public relations,4,0.0
+ordinal,70 Arts,5,0.6
+ordinal,78 Music,11,0.7272727272727273
+ordinal,"79 Sports, games and entertainment",7,0.8571428571428571
+ordinal,"80 Literature, rhetoric and criticism",27,0.5925925925925926
+ordinal,90 History,26,0.5384615384615384
+ordinal,91 Geography,9,0.0
+ordinal,92 Biography and genealogy,4,0.0
+pairwise,"00 Computer science, knowledge, and systems",42,0.5714285714285714
+pairwise,02 Library and information sciences,19,0.631578947368421
+pairwise,10 Philosophy,8,0.75
+pairwise,15 Psychology,8,0.875
+pairwise,16 Philosophical logic,5,1.0
+pairwise,17 Ethics,21,0.9523809523809523
+pairwise,"30 Social sciences, sociology, and anthropology",3,0.3333333333333333
+pairwise,33 Economics,21,0.6190476190476191
+pairwise,34 Law,9,0.7777777777777778
+pairwise,36 Social problems,4,0.25
+pairwise,40 Language,45,0.4888888888888889
+pairwise,50 Science,8,0.875
+pairwise,51 Mathematics,27,0.7037037037037037
+pairwise,53 Physics,5,0.6
+pairwise,54 Chemistry,4,1.0
+pairwise,55 Earth sciences and geology,15,0.5333333333333333
+pairwise,57 Biology,7,0.8571428571428571
+pairwise,59 Animals (Zoology),2,0.5
+pairwise,61 Medicine and health,47,0.5106382978723404
+pairwise,62 Engineering,19,0.6842105263157895
+pairwise,65 Management and public relations,4,0.5
+pairwise,70 Arts,5,0.8
+pairwise,78 Music,11,0.5454545454545454
+pairwise,"79 Sports, games and entertainment",7,1.0
+pairwise,"80 Literature, rhetoric and criticism",27,0.7037037037037037
+pairwise,90 History,26,0.46153846153846156
+pairwise,91 Geography,9,0.4444444444444444
+pairwise,92 Biography and genealogy,4,0.5
+pointwise,"00 Computer science, knowledge, and systems",42,0.8095238095238095
+pointwise,02 Library and information sciences,19,0.8947368421052632
+pointwise,10 Philosophy,8,0.75
+pointwise,15 Psychology,8,0.875
+pointwise,16 Philosophical logic,5,1.0
+pointwise,17 Ethics,21,0.9523809523809523
+pointwise,"30 Social sciences, sociology, and anthropology",3,0.6666666666666666
+pointwise,33 Economics,21,0.7142857142857143
+pointwise,34 Law,9,0.8888888888888888
+pointwise,36 Social problems,4,0.5
+pointwise,40 Language,45,0.7333333333333333
+pointwise,50 Science,8,0.875
+pointwise,51 Mathematics,27,0.7777777777777778
+pointwise,53 Physics,5,0.6
+pointwise,54 Chemistry,4,0.75
+pointwise,55 Earth sciences and geology,15,0.7333333333333333
+pointwise,57 Biology,7,0.5714285714285714
+pointwise,59 Animals (Zoology),2,1.0
+pointwise,61 Medicine and health,47,0.7872340425531915
+pointwise,62 Engineering,19,0.8421052631578947
+pointwise,65 Management and public relations,4,0.75
+pointwise,70 Arts,5,0.8
+pointwise,78 Music,11,0.7272727272727273
+pointwise,"79 Sports, games and entertainment",7,1.0
+pointwise,"80 Literature, rhetoric and criticism",27,0.8518518518518519
+pointwise,90 History,26,0.8461538461538461
+pointwise,91 Geography,9,0.7777777777777778
+pointwise,92 Biography and genealogy,4,0.5

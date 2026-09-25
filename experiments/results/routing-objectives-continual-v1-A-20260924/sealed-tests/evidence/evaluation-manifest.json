@@ -1,0 +1,22 @@
+{
+  "artifacts": {
+    "matched-random-runs.parquet": {
+      "path": "/content/router-sealed-eval-results-v1/evaluation/matched-random-runs.parquet",
+      "sha256": "c6776c798d00a405cffdaf2009ff4236c3cbb1200998fe29e04f114c5492082e",
+      "size_bytes": 79804
+    },
+    "predictions.parquet": {
+      "path": "/content/router-sealed-eval-results-v1/evaluation/predictions.parquet",
+      "sha256": "f94229fd2ca05272551bb2ca3f9543f689a68107f25bca638e73518c072b0b1a",
+      "size_bytes": 983229
+    },
+    "summary.json": {
+      "path": "/content/router-sealed-eval-results-v1/evaluation/summary.json",
+      "sha256": "29108d02c4f37967ce1bcc69351b56c54cc9df98fcbc601c2b0cd4d5546f254f",
+      "size_bytes": 133993
+    }
+  },
+  "inference_manifest_sha256": "1ebcba56c737a61575c7a3a5ec996eb9fb686d8b6c22fcc689674e00481df1eb",
+  "protocol_sha256": "133c093cd569e4d699439585037aa28e8843365e0297aedf8f2c797833114f6b",
+  "schema_version": "routing-sealed-evaluation-artifacts-v1"
+}

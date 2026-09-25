@@ -1,0 +1,28 @@
+{
+  "artifacts": {
+    "r1-balanced-scores.parquet": {
+      "sha256": "6eac567c9ad85bc4180f7844f90ad89b5e4e536a6f2a1e96780db525ea098133",
+      "size_bytes": 795364
+    },
+    "r1-natural-scores.parquet": {
+      "sha256": "83a815cbd295382d9a4b747e04a20baa298a88c955e104368ae172d642aacd2e",
+      "size_bytes": 795363
+    },
+    "r3-balanced-scores.parquet": {
+      "sha256": "bdbccbb4a0bf4765a4f89b31e1b48f8890176e41d6b7e14142822180fc0ac1fb",
+      "size_bytes": 795353
+    },
+    "r3-natural-scores.parquet": {
+      "sha256": "122c78a5fdf9d14120f7667943e8252f3b4ac209b21c36bb177aa80a7bae67dc",
+      "size_bytes": 795348
+    }
+  },
+  "device": "cuda",
+  "eval_batch_size": 16,
+  "max_length": 512,
+  "production_approved": false,
+  "schema_version": "generalization-holdout-inference-v1",
+  "selected_arm": "r1-natural",
+  "selection_lock_sha256": "c6fad17c23390305d62769e30f213c8381db620679c949ac6a80bd3695ee75f3",
+  "task_holdout_accessed": true
+}

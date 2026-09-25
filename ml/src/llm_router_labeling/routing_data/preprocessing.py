@@ -26,6 +26,8 @@ from ..training.routerbench_preprocessing import (
     assign_duplicate_groups,
     clean_model_input_text,
 )
+from .text import clean_text, clean_xroute_text, structured_duplicate_key, compatible_near_duplicate
+from .continual import assign_continual_splits
 
 
 LABELS = ("easy", "medium", "hard")
@@ -49,6 +51,11 @@ OUTPUT_COLUMNS = (
     "dataset_version",
     "label_rule_version",
     "preprocessing_version",
+    "split_version",
+    "label_origin",
+    "source_sample_weight",
+    "query_sha256",
+    "input_sha256",
 )
 
 
@@ -122,7 +129,12 @@ def _routerbench_accepted(labeled: pd.DataFrame, models: Sequence[str]) -> pd.Da
     )
     thresholds = pd.Series(np.where(continuous, 0.70, 1.0), index=labeled.index)
     values = labeled.loc[:, list(models)].apply(pd.to_numeric, errors="coerce")
-    return values.ge(thresholds, axis="index").where(values.notna())
+    if (values.notna() & (~values.ge(0) | values.gt(1))).any().any():
+        raise RoutingDataError("RouterBench has performance outside [0, 1]")
+    exact_known = identities.str.contains(r"mmlu|hellaswag|arc-challenge|winogrande", regex=True)
+    result = values.ge(thresholds, axis="index").astype("boolean").where(values.notna())
+    result.loc[~(continuous | exact_known)] = pd.NA
+    return result
 
 
 def _load_routerbench(config: Mapping[str, Any], root: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -165,17 +177,23 @@ def _load_routerbench(config: Mapping[str, Any], root: Path) -> tuple[pd.DataFra
         validate="one_to_one",
     )
     merged = merged.loc[merged["included_in_training"].astype(bool)].copy()
+    if config.get("input_contract") == "structure-preserving-v2":
+        # Rebuild from raw queries, not the legacy collapsed input artifact.
+        merged["model_input_text"] = merged["query_text"].map(clean_text)
     merged["sample_id"] = "routerbench:" + merged["sample_id"].astype(str)
     merged["source_dataset"] = "routerbench"
     merged["source_split"] = merged["split"].astype(str)
     merged["category"] = merged["domain"].astype(str)
     merged["source_task"] = merged["eval_name"].astype(str)
-    merged["valid_model_count"] = len(models)
     aligned_accepted = accepted.loc[
         merged["sample_id"].str.removeprefix("routerbench:")
     ].copy()
     aligned_accepted.index = merged["sample_id"]
     merged["accepted_model_count"] = aligned_accepted.astype("boolean").sum(axis=1).to_numpy()
+    merged["valid_model_count"] = aligned_accepted.notna().sum(axis=1).to_numpy()
+    merged["overall_solve_rate"] = merged["accepted_model_count"] / merged["valid_model_count"].replace(0, np.nan)
+    if merged["overall_solve_rate"].isna().any():
+        raise RoutingDataError("RouterBench contains a query without valid registered outcomes")
     merged["label_confidence"] = merged["label_confidence"].fillna("high").astype(str)
     merged["sample_weight"] = pd.to_numeric(merged["sample_weight"], errors="raise")
     return merged, aligned_accepted
@@ -188,6 +206,7 @@ def _validate_xroute_rows(
     candidates: Sequence[str],
     exact_metrics: set[str],
     continuous_metrics: set[str],
+    structured: bool = False,
 ) -> pd.DataFrame:
     required = {
         "task_name",
@@ -209,7 +228,7 @@ def _validate_xroute_rows(
     invalid_range = output["performance"].notna() & ~output["performance"].between(0, 1)
     if invalid_range.any():
         raise RoutingDataError(f"xRouteBench {split} has performance outside [0, 1]")
-    output["normalized_query"] = output["query"].map(normalize_for_duplicate_detection)
+    output["normalized_query"] = output["query"].map(structured_duplicate_key if structured else normalize_for_duplicate_detection)
     if output["normalized_query"].eq("").any():
         raise RoutingDataError(f"xRouteBench {split} has an empty normalized query")
     source_identifier = output["task_id"].where(
@@ -248,6 +267,7 @@ def _pivot_xroute(
     source_split: str,
     candidates: Sequence[str],
     minimum_valid: int,
+    structured: bool = False,
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, int]]:
     first = frame.sort_values(["query_key", "model_name"], kind="stable").groupby(
         "query_key", sort=True, as_index=False
@@ -275,7 +295,7 @@ def _pivot_xroute(
         first["task_id"].notna(), first["embedding_id"]
     ).astype(str)
     first["query_text"] = first["query"].astype(str)
-    first["model_input_text"] = first["query"].map(_strip_xroute_wrapper)
+    first["model_input_text"] = first["query"].map(clean_xroute_text if structured else _strip_xroute_wrapper)
     first["label_confidence"] = np.where(valid_count.eq(len(candidates)), "high", "medium")
     first["sample_weight"] = np.where(valid_count.eq(len(candidates)), 1.0, 0.5)
     first["split"] = "external_test" if source_split == "test" else "train"
@@ -723,6 +743,13 @@ def _apply_selected_label(frame: pd.DataFrame, selected: Mapping[str, Any], conf
     output["dataset_version"] = str(config["dataset_version"])
     output["label_rule_version"] = str(config["label_rule_version"]) + ":" + str(selected["candidate_id"])
     output["preprocessing_version"] = str(config["preprocessing_version"])
+    output["split_version"] = str(config["split_version"])
+    output["label_origin"] = "benchmark_difficulty"
+    output["source_sample_weight"] = output["sample_weight"]
+    if config.get("effective_sample_weight") == 1.0:
+        output["sample_weight"] = 1.0
+    for source, destination in (("query_text", "query_sha256"), ("model_input_text", "input_sha256")):
+        output[destination] = output[source].map(lambda text: hashlib.sha256(str(text).encode()).hexdigest())
     return output.loc[:, OUTPUT_COLUMNS]
 
 
@@ -759,6 +786,13 @@ def build_comparison_dataset(
     routerarena_path: Path | None,
     output_dir: Path,
 ) -> dict[str, Any]:
+    if output_dir.exists() and any(output_dir.iterdir()):
+        raise RoutingDataError("Output directory must be new/empty; never mix dataset versions")
+    structured = config.get("input_contract") == "structure-preserving-v2"
+    for source in config["routerbench"].get("raw_sources", {}).values():
+        _verify_file(project_root / str(source["local_path"]), source)
+    if config.get("require_routerarena_overlap_check") and (routerarena_path is None or not routerarena_path.is_file()):
+        raise RoutingDataError("A sealed RouterArena input is required for the overlap check")
     xconfig = config["xroutebench"]
     source_paths = {
         name: xroute_data_dir / str(source["filename"])
@@ -783,12 +817,14 @@ def build_comparison_dataset(
             candidates=candidates,
             exact_metrics=exact_metrics,
             continuous_metrics=continuous_metrics,
+            structured=structured,
         )
         pivoted, accepted, metrics = _pivot_xroute(
             raw,
             source_split=source_split,
             candidates=candidates,
             minimum_valid=int(xconfig["minimum_valid_models"]),
+            structured=structured,
         )
         xroute_frames.append(pivoted.loc[pivoted["eligible"]].copy())
         xroute_accepted.append(accepted.loc[pivoted.loc[pivoted["eligible"], "sample_id"]])
@@ -798,12 +834,25 @@ def build_comparison_dataset(
 
     routerbench, routerbench_accept = _load_routerbench(config, project_root)
     combined = pd.concat([routerbench, xroute], ignore_index=True, sort=False)
+    if combined["model_input_text"].str.strip().eq("").any():
+        raise RoutingDataError("Input cleaning produced empty text")
+    audit = combined[["sample_id", "source_dataset", "source_task", "query_text", "model_input_text"]].copy()
+    audit["legacy_word_key"] = audit["model_input_text"].map(normalize_for_duplicate_detection)
+    collisions = audit.groupby("legacy_word_key")["model_input_text"].nunique()
+    input_audit = {
+        "legacy_word_key_collision_groups": int((collisions > 1).sum()),
+        "legacy_word_key_collision_sample_ids": sorted(audit.loc[audit["legacy_word_key"].isin(collisions[collisions > 1].index), "sample_id"].tolist()),
+        "source_task_ids_with_multiple_queries": int((audit.groupby(["source_dataset", "source_task"])["query_text"].nunique() > 1).sum()),
+        "policy": "structure_preserving_exact_and_conservative_near" if structured else "legacy_word_key",
+    }
     dedup = config["deduplication"]
+    dedup_options = ({"normalizer": structured_duplicate_key, "near_duplicate_guard": compatible_near_duplicate} if structured else {})
     combined["duplicate_group_id"], duplicate_metrics = assign_duplicate_groups(
         combined["model_input_text"],
         jaccard_threshold=float(dedup["near_duplicate_jaccard_threshold"]),
         minimum_tokens=int(dedup["near_duplicate_min_tokens"]),
         maximum_bucket_size=int(dedup["near_duplicate_max_bucket_size"]),
+        **dedup_options,
     )
     xmask = combined["source_dataset"].eq("xroutebench")
     xworking = combined.loc[xmask].copy()
@@ -819,7 +868,7 @@ def build_comparison_dataset(
     combined.loc[xmask, "split"] = xworking["split"].to_numpy()
 
     pre_dedup = combined.copy()
-    contamination: dict[str, Any] = {"routerarena_overlap_rows": 0}
+    contamination: dict[str, Any] = {"routerarena_overlap_rows": 0, "check_executed": False}
     if routerarena_path is not None and routerarena_path.is_file():
         routerarena = pd.read_parquet(routerarena_path, columns=["sample_id", "model_input_text"])
         augmented = pd.concat(
@@ -837,6 +886,7 @@ def build_comparison_dataset(
             jaccard_threshold=float(dedup["near_duplicate_jaccard_threshold"]),
             minimum_tokens=int(dedup["near_duplicate_min_tokens"]),
             maximum_bucket_size=int(dedup["near_duplicate_max_bucket_size"]),
+            **dedup_options,
         )
         arena_groups = set(augmented.loc[augmented["_kind"].eq("routerarena"), "_group"])
         contaminated_ids = set(
@@ -846,6 +896,7 @@ def build_comparison_dataset(
             ].astype(str)
         )
         contamination["routerarena_overlap_rows"] = len(contaminated_ids)
+        contamination.update(check_executed=True, routerarena_sha256=_sha256(routerarena_path), excluded_sample_ids=sorted(contaminated_ids))
         overlap_counts = (
             combined.loc[combined["sample_id"].isin(contaminated_ids)]
             .groupby(["source_dataset", "split"])
@@ -858,6 +909,9 @@ def build_comparison_dataset(
         combined = combined.loc[~combined["sample_id"].isin(contaminated_ids)].copy()
 
     combined, dedup_metrics = _deduplicate_with_priority(combined)
+    if config.get("continual_split"):
+        combined = assign_continual_splits(combined, config)
+        pre_dedup = combined.copy()
     accepted_by_source = {
         "routerbench": routerbench_accept.loc[
             combined.loc[combined["source_dataset"].eq("routerbench"), "sample_id"]
@@ -891,6 +945,13 @@ def build_comparison_dataset(
     output_dir.mkdir(parents=True, exist_ok=True)
     for subdir in ("train", "validation", "test", "threshold", "coverage"):
         (output_dir / subdir).mkdir(parents=True, exist_ok=True)
+    if config.get("continual_split"):
+        (output_dir / "sealed").mkdir()
+        for split in ("gate", "stream", "retention_test"):
+            t1_data.loc[t1_data["split"].eq(split)].to_parquet(output_dir / "sealed" / f"{split}.parquet", index=False)
+        t1_data.to_parquet(output_dir / "metadata.parquet", index=False)
+        # This is the only projection passed to the Colab trainer.
+        t1_data.loc[t1_data["split"].isin(["train", "validation"])].to_parquet(output_dir / "training.parquet", index=False)
     t1_data.loc[t1_data["split"].eq("train")].to_parquet(
         output_dir / "train" / "training.parquet", index=False
     )
@@ -977,6 +1038,7 @@ def build_comparison_dataset(
         },
     )
     write_json(output_dir / "contamination-report.json", contamination)
+    write_json(output_dir / "input-audit.json", input_audit)
     write_json(
         output_dir / "experiment-config.json",
         {
@@ -989,7 +1051,7 @@ def build_comparison_dataset(
     )
     counts = {
         split: int(t1_data["split"].eq(split).sum())
-        for split in ("train", "validation", "test", "external_test")
+        for split in sorted(t1_data["split"].unique())
     }
     manifest = _write_manifest(
         output_dir,
@@ -1005,6 +1067,14 @@ def build_comparison_dataset(
             "duplicate_metrics": duplicate_metrics,
             "deduplication": dedup_metrics,
             "xroutebench": xroute_metrics,
+            "input_contract": config.get("input_contract", "legacy"),
+            "effective_sample_weight": config.get("effective_sample_weight", "source_metadata"),
+            "threshold_selection_partition": "D_initial_train" if config.get("continual_split") else "train",
+            "continual_split": config.get("continual_split"),
+            "source_artifacts": {
+                str(path.relative_to(project_root)) if path.is_relative_to(project_root) else str(path): {"sha256": _sha256(path), "size_bytes": path.stat().st_size}
+                for path in [*(project_root / str(config["routerbench"][key]) for key in ("labeled_path", "metadata_path", "model_tiers_path")), *(project_root / str(source["local_path"]) for source in config["routerbench"].get("raw_sources", {}).values()), *source_paths.values()]
+            },
         },
     )
     return manifest

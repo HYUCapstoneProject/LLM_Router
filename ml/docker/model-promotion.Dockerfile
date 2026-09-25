@@ -18,6 +18,7 @@ WORKDIR /opt/llm-router
 COPY ml/docker/model-promotion.pyproject.toml /opt/llm-router/ml/pyproject.toml
 RUN mkdir -p \
         /opt/llm-router/ml/src/llm_router_labeling/deployment \
+        /opt/llm-router/ml/src/llm_router_labeling/training \
         /opt/llm-router/ml/src/llm_router_labeling/shared
 COPY ml/src/llm_router_labeling/__init__.py /opt/llm-router/ml/src/llm_router_labeling/__init__.py
 COPY ml/src/llm_router_labeling/deployment/__init__.py /opt/llm-router/ml/src/llm_router_labeling/deployment/__init__.py
@@ -27,6 +28,8 @@ COPY ml/src/llm_router_labeling/deployment/deploy_gate.py /opt/llm-router/ml/src
 COPY ml/src/llm_router_labeling/deployment/deploy_gate_cli.py /opt/llm-router/ml/src/llm_router_labeling/deployment/deploy_gate_cli.py
 COPY ml/src/llm_router_labeling/deployment/model_publish.py /opt/llm-router/ml/src/llm_router_labeling/deployment/model_publish.py
 COPY ml/src/llm_router_labeling/deployment/model_publish_cli.py /opt/llm-router/ml/src/llm_router_labeling/deployment/model_publish_cli.py
+COPY ml/src/llm_router_labeling/training/__init__.py /opt/llm-router/ml/src/llm_router_labeling/training/__init__.py
+COPY ml/src/llm_router_labeling/training/routing_policy.py /opt/llm-router/ml/src/llm_router_labeling/training/routing_policy.py
 COPY ml/src/llm_router_labeling/shared/__init__.py /opt/llm-router/ml/src/llm_router_labeling/shared/__init__.py
 COPY ml/src/llm_router_labeling/shared/dataset_io.py /opt/llm-router/ml/src/llm_router_labeling/shared/dataset_io.py
 COPY ml/src/llm_router_labeling/shared/object_store.py /opt/llm-router/ml/src/llm_router_labeling/shared/object_store.py

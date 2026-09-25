@@ -10,9 +10,11 @@ to the active model, and swaps it without a process restart.
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
-from typing import Any, Mapping
+from tempfile import TemporaryDirectory
+from typing import Any
 
 from ..shared.dataset_io import sha256_file, write_json
 from ..shared.object_store import ObjectStore, ObjectStoreError, parse_gcs_uri
@@ -25,6 +27,8 @@ from .model_package import (
 CURRENT_SCHEMA_VERSION = "router-current-model-v1"
 CURRENT_POINTER_FILENAME = "CURRENT.json"
 MANIFEST_FILENAME = "model_manifest.json"
+PACKAGE_IDENTITY_FILENAME = "PACKAGE_IDENTITY.json"
+PACKAGE_IDENTITY_SCHEMA_VERSION = "router-package-identity-v1"
 
 
 class ModelPublishError(RuntimeError):
@@ -43,8 +47,76 @@ def current_pointer_uri(root_uri: str) -> str:
     return str(parse_gcs_uri(root_uri).child(CURRENT_POINTER_FILENAME))
 
 
-def _package_files(package_dir: Path) -> list[Path]:
-    return sorted(path for path in package_dir.iterdir() if path.is_file())
+def _reserve_package_identity(
+    *,
+    root_uri: str,
+    model_version: str,
+    identity: Mapping[str, Any],
+    object_store: ObjectStore,
+) -> None:
+    """Claim a physical version once; only identical candidate retries may write.
+
+    The claim stays at the version root even after package retention cleanup.
+    No timestamp is included, so retries after a partial upload compare equal.
+    """
+    identity_uri = str(
+        parse_gcs_uri(root_uri).child(model_version, PACKAGE_IDENTITY_FILENAME)
+    )
+
+    def check_existing(raw: str) -> None:
+        try:
+            existing = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise ModelPublishError(
+                f"Invalid immutable package identity at {identity_uri}"
+            ) from exc
+        if existing != identity:
+            raise ModelPublishError(
+                f"Physical model version {model_version!r} is already reserved "
+                "for a different package; use a new model_version"
+            )
+
+    existing = object_store.read_text(identity_uri)
+    if existing is not None:
+        check_existing(existing)
+        return
+
+    # An older publisher may have populated this version without an identity.
+    # Its payload cannot safely be inferred from a possibly partial upload.
+    occupied = any(
+        object_store.list_uris(prefix)
+        for prefix in (
+            candidate_uri(root_uri, model_version),
+            approved_uri(root_uri, model_version),
+        )
+    )
+    if occupied:
+        # A concurrent new publisher may have claimed and uploaded since our
+        # first read. In that case the immutable identity settles the race.
+        existing = object_store.read_text(identity_uri)
+        if existing is not None:
+            check_existing(existing)
+            return
+        raise ModelPublishError(
+            f"Physical model version {model_version!r} contains an unclaimed "
+            "legacy package; use a new model_version"
+        )
+
+    try:
+        object_store.write_text(
+            identity_uri,
+            json.dumps(identity, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
+            if_generation_match=None,
+        )
+    except ObjectStoreError as exc:
+        # A failed create-only write can mean a competing writer won (or that
+        # our write succeeded but its response was lost). Never overwrite it.
+        existing = object_store.read_text(identity_uri)
+        if existing is None:
+            raise ModelPublishError(
+                f"Could not reserve immutable package identity: {identity_uri}"
+            ) from exc
+        check_existing(existing)
 
 
 def publish_candidate(
@@ -58,7 +130,8 @@ def publish_candidate(
     """Upload a validated candidate package to ``<root>/<version>/candidate/``.
 
     The package is validated locally before a single byte is uploaded, so a
-    malformed package can never occupy a candidate path.
+    malformed package can never occupy a candidate path. A create-only identity
+    reservation prevents a different payload from reusing a physical version.
     """
     package_dir = Path(package_dir).resolve()
     try:
@@ -76,8 +149,27 @@ def publish_candidate(
             "Refusing to publish a candidate that failed the deploy gate"
         )
 
+    identity = {
+        "schema_version": PACKAGE_IDENTITY_SCHEMA_VERSION,
+        "model_version": model_version,
+        "package_schema_version": validation["schema_version"],
+        "candidate_manifest_sha256": sha256_file(package_dir / MANIFEST_FILENAME),
+        "files": validation["verified_files"],
+    }
+    _reserve_package_identity(
+        root_uri=root_uri,
+        model_version=model_version,
+        identity=identity,
+        object_store=object_store,
+    )
     destination = candidate_uri(root_uri, model_version)
-    uploaded = _upload_package(package_dir, destination, object_store)
+    uploaded = _upload_package(
+        package_dir,
+        destination,
+        object_store,
+        files=identity["files"],
+        manifest_sha256=identity["candidate_manifest_sha256"],
+    )
     return {
         "model_version": model_version,
         "package_uri": destination,
@@ -87,14 +179,31 @@ def publish_candidate(
 
 
 def _upload_package(
-    package_dir: Path, destination_uri: str, object_store: ObjectStore
+    package_dir: Path,
+    destination_uri: str,
+    object_store: ObjectStore,
+    *,
+    files: Mapping[str, str],
+    manifest_sha256: str,
 ) -> list[str]:
+    """Upload only validated manifest entries, publishing the manifest last."""
     base = parse_gcs_uri(destination_uri)
+    checksums = {**files, MANIFEST_FILENAME: manifest_sha256}
+    names = sorted(name for name in files if name != MANIFEST_FILENAME)
+    names.append(MANIFEST_FILENAME)
+    # Detect changes between validation/reservation and upload before sending
+    # any file, then recheck each file immediately before its upload.
+    for name in names:
+        if sha256_file(package_dir / name) != checksums[name]:
+            raise ModelPublishError(f"Package changed after validation: {name}")
     uploaded: list[str] = []
-    for path in _package_files(package_dir):
-        target = str(base.child(path.name))
+    for name in names:
+        path = package_dir / name
+        if sha256_file(path) != checksums[name]:
+            raise ModelPublishError(f"Package changed after validation: {name}")
+        target = str(base.child(name))
         object_store.upload_file(path, target)
-        uploaded.append(path.name)
+        uploaded.append(name)
     return uploaded
 
 
@@ -138,11 +247,18 @@ def approve_candidate(
             f"Candidate package has no {MANIFEST_FILENAME}: {source}"
         )
     try:
-        validate_model_package(staging, manifest_path)
+        validation = validate_model_package(staging, manifest_path)
     except ModelPackageError as exc:
         raise ModelPublishError(
             f"Candidate package failed re-validation: {exc}"
         ) from exc
+
+    if validation.get("automatic_promotion_supported") is False:
+        raise ModelPublishError(
+            "Automatic promotion is not supported for this model package: "
+            "model-package-v2 requires an objective-aware deployment gate; "
+            "the legacy CE gate cannot approve it or change CURRENT.json"
+        )
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if manifest.get("model_version") != model_version:
@@ -165,12 +281,18 @@ def approve_candidate(
     write_json(manifest_path, manifest)
     # The manifest lists every other file's checksum, so rewriting it does not
     # invalidate the package. Re-validate to prove that.
-    validate_model_package(staging, manifest_path)
+    validation = validate_model_package(staging, manifest_path)
 
     if previous and not allow_pointer_rollback:
         _reject_pointer_rollback(previous, manifest)
 
-    _upload_package(staging, destination, object_store)
+    _upload_package(
+        staging,
+        destination,
+        object_store,
+        files=validation["verified_files"],
+        manifest_sha256=sha256_file(manifest_path),
+    )
 
     pointer_uri = current_pointer_uri(root_uri)
     pointer = {
@@ -312,7 +434,11 @@ def rollback_current_pointer(
     object_store: ObjectStore,
     approved_by: str,
 ) -> dict[str, Any]:
-    """Point ``CURRENT.json`` back at the previously approved model."""
+    """Verify the previous approved package, then atomically restore its pointer."""
+    pointer_uri = current_pointer_uri(root_uri)
+    # Capture the generation before reading the pointer. A concurrent promotion
+    # while the previous package downloads must make the final CAS fail.
+    pointer_generation = object_store.generation(pointer_uri)
     pointer = read_current_pointer(root_uri, object_store=object_store)
     if pointer is None:
         raise ModelPublishError(f"No {CURRENT_POINTER_FILENAME} to roll back")
@@ -320,25 +446,75 @@ def rollback_current_pointer(
     previous_uri = pointer.get("previous_package_uri")
     if not previous_version or not previous_uri:
         raise ModelPublishError("Current pointer has no previous model to roll back to")
+    previous_version = str(previous_version)
+    previous_uri = str(previous_uri).rstrip("/")
+    if previous_uri != approved_uri(root_uri, previous_version):
+        raise ModelPublishError(
+            "Rollback target must be the previous version's approved package"
+        )
+
+    with TemporaryDirectory(prefix="llm-router-rollback-") as directory:
+        staging = Path(directory)
+        manifest_path = staging / MANIFEST_FILENAME
+        try:
+            download_package(previous_uri, staging, object_store=object_store)
+            validation = validate_model_package(staging, manifest_path)
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest_sha256 = sha256_file(manifest_path)
+        except (
+            ModelPackageError,
+            ObjectStoreError,
+            OSError,
+            ValueError,
+            TypeError,
+        ) as exc:
+            raise ModelPublishError(
+                f"Previous approved package failed rollback validation: {exc}"
+            ) from exc
+        if validation["gate_status"] != "approved":
+            raise ModelPublishError("Rollback target has not been approved")
+        if validation["model_version"] != previous_version:
+            raise ModelPublishError(
+                "Rollback target manifest model_version does not match the pointer"
+            )
+
+    version_metadata: dict[str, str] = {}
+    for field in ("logical_model_version", "training_mode", "pipeline_run_id"):
+        value = manifest.get(field)
+        if value is not None:
+            if not isinstance(value, str) or not value.strip():
+                raise ModelPublishError(f"Rollback target has invalid {field} metadata")
+            version_metadata[field] = value
 
     approved_at = (
         datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     )
     rolled_back = {
-        **pointer,
-        "model_version": str(previous_version),
-        "package_uri": str(previous_uri),
+        "schema_version": CURRENT_SCHEMA_VERSION,
+        "model_version": previous_version,
+        "package_uri": previous_uri,
         "previous_model_version": pointer.get("model_version"),
         "previous_package_uri": pointer.get("package_uri"),
         "approved_at": approved_at,
         "approved_by": approved_by,
+        "pipeline_run_id": None,
+        "id2label": EXPECTED_ID2LABEL,
+        "manifest_sha256": manifest_sha256,
+        **version_metadata,
         "rolled_back_from": pointer.get("model_version"),
     }
-    pointer_uri = current_pointer_uri(root_uri)
+    retained = pointer.get("retained_model_versions", [])
+    if isinstance(retained, list) and all(
+        isinstance(version, str) for version in retained
+    ):
+        # This is storage retention state, not metadata of the restored model.
+        rolled_back["retained_model_versions"] = sorted(
+            {previous_version, str(pointer["model_version"]), *retained}
+        )
     object_store.write_text(
         pointer_uri,
         json.dumps(rolled_back, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        if_generation_match=object_store.generation(pointer_uri),
+        if_generation_match=pointer_generation,
     )
     return rolled_back
 
@@ -359,11 +535,7 @@ def download_package(
         raise ModelPublishError(f"Failed to list {package_uri}: {exc}") from exc
     for uri in uris:
         object_name = parse_gcs_uri(uri).prefix
-        relative = (
-            object_name[len(prefix) :]
-            if object_name.startswith(prefix)
-            else object_name
-        )
+        relative = object_name.removeprefix(prefix)
         if not relative or "/" in relative:
             # Model packages are flat by contract; nested objects are not part of it.
             continue

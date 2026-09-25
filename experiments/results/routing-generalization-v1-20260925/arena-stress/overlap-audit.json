@@ -1,0 +1,213 @@
+{
+  "algorithm": "structured_exact_plus_simhash_candidates_jaccard_with_operator_negation_indent_guard",
+  "deduplication": {
+    "near_duplicate_jaccard_threshold": 0.9,
+    "near_duplicate_max_bucket_size": 200,
+    "near_duplicate_min_tokens": 5
+  },
+  "development_metadata_role": "all_development_roles_excluding_original_tests",
+  "development_rows": 35733,
+  "development_splits": {
+    "gate": 3581,
+    "retention_test": 1797,
+    "stream": 5368,
+    "train": 21406,
+    "validation": 3581
+  },
+  "exact_arena_overlap_rows": 0,
+  "exact_or_near_arena_overlap_rows": 18,
+  "group_metrics": {
+    "duplicate_group_count": 44388,
+    "duplicate_row_count": 159,
+    "near_duplicate_candidate_pair_count": 22942,
+    "near_duplicate_pair_count": 196,
+    "near_duplicate_skipped_large_bucket_count": 0
+  },
+  "limitations": [
+    "Near-duplicate candidate generation is approximate; skipped large buckets are counted.",
+    "Shared benchmark names alone do not prove contamination; cross-dataset source IDs are not assumed equivalent.",
+    "Historical RouterArena observations exist; this is not a claim that the benchmark has never been viewed."
+  ],
+  "overlap_group_members": [
+    {
+      "duplicate_group_id": "dup-21d1a25ac380858e",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-formal-logic.val.101"
+    },
+    {
+      "duplicate_group_id": "dup-3e9ffd59047f1d97",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-formal-logic.val.115"
+    },
+    {
+      "duplicate_group_id": "dup-5fa26cc23d8e9abb",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-formal-logic.val.124"
+    },
+    {
+      "duplicate_group_id": "dup-caec04838cea17f4",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-formal-logic.val.24"
+    },
+    {
+      "duplicate_group_id": "dup-5b1adcd819d294b0",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-formal-logic.val.25"
+    },
+    {
+      "duplicate_group_id": "dup-031e76b057b164d1",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-formal-logic.val.30"
+    },
+    {
+      "duplicate_group_id": "dup-0f30769ea59a8419",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-formal-logic.val.31"
+    },
+    {
+      "duplicate_group_id": "dup-23ae2ca723785b06",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-formal-logic.val.33"
+    },
+    {
+      "duplicate_group_id": "dup-7a47f67dd32fb57a",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-formal-logic.val.35"
+    },
+    {
+      "duplicate_group_id": "dup-8ab48f2c2529e783",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-formal-logic.val.49"
+    },
+    {
+      "duplicate_group_id": "dup-dae3579bdfadcbde",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-formal-logic.val.57"
+    },
+    {
+      "duplicate_group_id": "dup-d51504e37c23c748",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-formal-logic.val.60"
+    },
+    {
+      "duplicate_group_id": "dup-e7d6ebbf25e97165",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-international-law.val.111"
+    },
+    {
+      "duplicate_group_id": "dup-19ea97ff21fcfcff",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-machine-learning.val.90"
+    },
+    {
+      "duplicate_group_id": "dup-56025e78eea1c0c0",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-management.val.77"
+    },
+    {
+      "duplicate_group_id": "dup-72becdd1e78bb5ee",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-moral-disputes.val.299"
+    },
+    {
+      "duplicate_group_id": "dup-48006826ddc82dce",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-prehistory.val.4"
+    },
+    {
+      "duplicate_group_id": "dup-514f1ec8f623ac72",
+      "kind": "development",
+      "sample_id": "routerbench:mmlu-professional-medicine.val.104"
+    },
+    {
+      "duplicate_group_id": "dup-19ea97ff21fcfcff",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLUPro_computer science_9204"
+    },
+    {
+      "duplicate_group_id": "dup-72becdd1e78bb5ee",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLUPro_philosophy_9706"
+    },
+    {
+      "duplicate_group_id": "dup-0f30769ea59a8419",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLUPro_philosophy_9956"
+    },
+    {
+      "duplicate_group_id": "dup-23ae2ca723785b06",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLU_formal_logic_33"
+    },
+    {
+      "duplicate_group_id": "dup-dae3579bdfadcbde",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLU_formal_logic_57"
+    },
+    {
+      "duplicate_group_id": "dup-031e76b057b164d1",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLU_formal_logic_30"
+    },
+    {
+      "duplicate_group_id": "dup-7a47f67dd32fb57a",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLU_formal_logic_35"
+    },
+    {
+      "duplicate_group_id": "dup-caec04838cea17f4",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLU_formal_logic_24"
+    },
+    {
+      "duplicate_group_id": "dup-3e9ffd59047f1d97",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLU_formal_logic_115"
+    },
+    {
+      "duplicate_group_id": "dup-5fa26cc23d8e9abb",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLU_formal_logic_124"
+    },
+    {
+      "duplicate_group_id": "dup-d51504e37c23c748",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLU_formal_logic_60"
+    },
+    {
+      "duplicate_group_id": "dup-8ab48f2c2529e783",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLU_formal_logic_49"
+    },
+    {
+      "duplicate_group_id": "dup-21d1a25ac380858e",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLU_formal_logic_101"
+    },
+    {
+      "duplicate_group_id": "dup-5b1adcd819d294b0",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLU_formal_logic_25"
+    },
+    {
+      "duplicate_group_id": "dup-e7d6ebbf25e97165",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLUPro_law_1103"
+    },
+    {
+      "duplicate_group_id": "dup-514f1ec8f623ac72",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLUPro_health_5448"
+    },
+    {
+      "duplicate_group_id": "dup-56025e78eea1c0c0",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLU_management_77"
+    },
+    {
+      "duplicate_group_id": "dup-48006826ddc82dce",
+      "kind": "arena",
+      "sample_id": "routerarena:full:MMLUPro_history_4612"
+    }
+  ]
+}

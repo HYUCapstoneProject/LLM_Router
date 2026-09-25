@@ -79,7 +79,9 @@ class FeedbackRetrainingPreprocessingTest(unittest.TestCase):
         self.assertEqual(len(result.metrics["canonical_batch_digest"]), 64)
         self.assertEqual(
             result.metrics["canonical_batch_digest"],
-            canonical_training_digest(result.training.iloc[::-1].reset_index(drop=True)),
+            canonical_training_digest(
+                result.training.iloc[::-1].reset_index(drop=True)
+            ),
         )
 
     def test_merge_replaces_train_conflict_and_protects_holdout(self) -> None:
@@ -126,6 +128,73 @@ class FeedbackRetrainingPreprocessingTest(unittest.TestCase):
         self.assertEqual(result.metrics["accepted_feedback_row_count"], 1)
         self.assertEqual(result.metrics["excluded_feedback_row_count"], 1)
         self.assertEqual(result.metrics["replaced_base_row_count"], 1)
+
+    def test_structured_feedback_keeps_operators_case_and_indentation(self) -> None:
+        template = (
+            load_feedback_events(self.events_path, self.manifest["data_format"])
+            .iloc[0]
+            .to_dict()
+        )
+        questions = [
+            "Compute x+y",
+            "Compute x-y",
+            "  if X:\n    return Y",
+            "if X:\n    return Y",
+        ]
+        events = pd.DataFrame(
+            [
+                {
+                    **template,
+                    "event_id": f"event-{i}",
+                    "request_id": f"request-{i}",
+                    "question": question,
+                    "initial_label": "easy",
+                    "final_label": "hard",
+                    "user_satisfied": True,
+                    "pii_redacted": True,
+                    "escalation_count": 1,
+                }
+                for i, question in enumerate(questions)
+            ]
+        )
+        config = {**self.config, "input_contract": "structure-preserving-v2"}
+        result = prepare_feedback_training_dataset(
+            events, {**self.manifest, "event_count": 4}, config
+        )
+        self.assertEqual(set(result.training["model_input_text"]), set(questions))
+        self.assertEqual(result.metrics["training_row_count"], 4)
+        self.assertNotEqual(
+            result.metrics["canonical_batch_digest"],
+            canonical_training_digest(result.training),
+        )
+        self.assertEqual(
+            result.metrics["canonical_batch_digest"],
+            canonical_training_digest(
+                result.training.iloc[::-1], input_contract="structure-preserving-v2"
+            ),
+        )
+        base = pd.DataFrame(
+            [
+                {
+                    "sample_id": "heldout",
+                    "model_input_text": "Compute x+y",
+                    "difficulty_label": "medium",
+                    "sample_weight": 1.0,
+                    "split": "test",
+                    "duplicate_group_id": "heldout-group",
+                }
+            ],
+            columns=TRAINING_COLUMNS,
+        )
+        merged = merge_feedback_with_base_training(base, result.training, config)
+        self.assertEqual(merged.metrics["excluded_feedback_row_count"], 1)
+        self.assertIn("Compute x-y", set(merged.training["model_input_text"]))
+        self.assertEqual(
+            merged.training.loc[
+                merged.training["split"].eq("test"), "difficulty_label"
+            ].tolist(),
+            ["medium"],
+        )
 
     def test_compact_rehearsal_is_small_balanced_and_deterministic(self) -> None:
         feedback = self._prepare().training
@@ -191,9 +260,7 @@ class FeedbackRetrainingPreprocessingTest(unittest.TestCase):
             self.assertFalse(
                 _reserve_unique_batch(args, duplicate_metrics, object_store=store)
             )
-            self.assertEqual(
-                duplicate_metrics["failure_code"], "NO_UNIQUE_FEEDBACK"
-            )
+            self.assertEqual(duplicate_metrics["failure_code"], "NO_UNIQUE_FEEDBACK")
 
 
 if __name__ == "__main__":

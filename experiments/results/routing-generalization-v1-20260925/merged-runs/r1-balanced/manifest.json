@@ -1,0 +1,61 @@
+{
+  "arm": "r1-balanced",
+  "artifacts": {
+    "calibration-scores.parquet": {
+      "sha256": "d94f0c78b8066d76a64810b301c55469a45b06af552c74d0b36d9aa56bb8b16b",
+      "size_bytes": 1326446
+    },
+    "model/_SUCCESS": {
+      "sha256": "37a40f08d8548dba289b9b0bb35bcf63b359f6d37ee86044ebc6b6da080b9ec1",
+      "size_bytes": 9
+    },
+    "model/artifact_manifest.json": {
+      "sha256": "51eccfb7f0f6e93cf2825d01cbc1101f9a38b9bdb16f458cf183d2b6f30ebf72",
+      "size_bytes": 1287
+    },
+    "model/config.json": {
+      "sha256": "7f821a24095a05f416d2934f959abd213cf3b52452c46734ec7c4c5682641a98",
+      "size_bytes": 1544
+    },
+    "model/metrics.json": {
+      "sha256": "beaff79c7e48a6f393fd915296976687358819f52e516b5bc9edf75d05f598f1",
+      "size_bytes": 2453
+    },
+    "model/model.safetensors": {
+      "sha256": "810e11c6b2f7c4ee9f14e02e46beba6c7a6f156e41a12d4c2768b9398b9ec14c",
+      "size_bytes": 598442860
+    },
+    "model/special_tokens_map.json": {
+      "sha256": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049",
+      "size_bytes": 694
+    },
+    "model/tokenizer.json": {
+      "sha256": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+      "size_bytes": 3583228
+    },
+    "model/tokenizer_config.json": {
+      "sha256": "2966a59b9e9cf122279aec1249e22e5bc7ad8430c754e95031b13fd128d4e560",
+      "size_bytes": 20840
+    },
+    "model/training_config.json": {
+      "sha256": "739f407bede7a3a0b7c86219a941c4347adf621f8ae8652fae48f65e1126669d",
+      "size_bytes": 747
+    },
+    "selection-scores.parquet": {
+      "sha256": "ba4c270e9a7bfd340ba1751abecb16b5d670bafe0255cf70d6fe4d1e68a8f52e",
+      "size_bytes": 1364966
+    },
+    "training.parquet": {
+      "sha256": "15b122ba54b6150a4c5beeaea90a564ef5b0bbcf15f06a02855e90b66d3bfd2f",
+      "size_bytes": 17258146
+    }
+  },
+  "objective_method": "pointwise",
+  "optimizer_steps": 2007,
+  "policy_or_arm_selected": false,
+  "production_approved": false,
+  "run_plan_sha256": "2af44383db60b190692bf4ad7378f1d012551d7cb709b1d85078159457286be9",
+  "schema_version": "generalization-four-arm-run-v1",
+  "task_holdout_accessed": false,
+  "training_view": "balanced"
+}

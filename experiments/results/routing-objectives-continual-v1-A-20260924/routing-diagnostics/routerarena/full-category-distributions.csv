@@ -1,0 +1,337 @@
+dimension,value,method,label_or_projected_slot,count,denominator,fraction
+category,"00 Computer science, knowledge, and systems",official,easy,417,1003,0.41575274177467597
+category,02 Library and information sciences,official,easy,275,396,0.6944444444444444
+category,10 Philosophy,official,easy,36,120,0.3
+category,15 Psychology,official,easy,121,187,0.6470588235294118
+category,16 Philosophical logic,official,easy,60,95,0.631578947368421
+category,17 Ethics,official,easy,185,283,0.6537102473498233
+category,"30 Social sciences, sociology, and anthropology",official,easy,3,55,0.05454545454545454
+category,33 Economics,official,easy,183,426,0.4295774647887324
+category,34 Law,official,easy,64,157,0.40764331210191085
+category,36 Social problems,official,easy,47,61,0.7704918032786885
+category,40 Language,official,easy,209,700,0.2985714285714286
+category,50 Science,official,easy,30,114,0.2631578947368421
+category,51 Mathematics,official,easy,262,601,0.43594009983361065
+category,53 Physics,official,easy,44,97,0.4536082474226804
+category,54 Chemistry,official,easy,43,90,0.4777777777777778
+category,55 Earth sciences and geology,official,easy,258,329,0.78419452887538
+category,57 Biology,official,easy,117,143,0.8181818181818182
+category,59 Animals (Zoology),official,easy,20,25,0.8
+category,61 Medicine and health,official,easy,636,991,0.6417759838546923
+category,62 Engineering,official,easy,126,335,0.3761194029850746
+category,65 Management and public relations,official,easy,59,72,0.8194444444444444
+category,70 Arts,official,easy,59,154,0.38311688311688313
+category,"00 Computer science, knowledge, and systems",official,medium,377,1003,0.37587238285144564
+category,02 Library and information sciences,official,medium,85,396,0.21464646464646464
+category,10 Philosophy,official,medium,39,120,0.325
+category,15 Psychology,official,medium,48,187,0.25668449197860965
+category,16 Philosophical logic,official,medium,31,95,0.3263157894736842
+category,17 Ethics,official,medium,85,283,0.3003533568904594
+category,"30 Social sciences, sociology, and anthropology",official,medium,18,55,0.32727272727272727
+category,33 Economics,official,medium,163,426,0.3826291079812207
+category,34 Law,official,medium,63,157,0.4012738853503185
+category,36 Social problems,official,medium,9,61,0.14754098360655737
+category,40 Language,official,medium,167,700,0.23857142857142857
+category,50 Science,official,medium,25,114,0.21929824561403508
+category,51 Mathematics,official,medium,250,601,0.415973377703827
+category,53 Physics,official,medium,42,97,0.4329896907216495
+category,54 Chemistry,official,medium,34,90,0.37777777777777777
+category,55 Earth sciences and geology,official,medium,58,329,0.1762917933130699
+category,57 Biology,official,medium,17,143,0.11888111888111888
+category,59 Animals (Zoology),official,medium,5,25,0.2
+category,61 Medicine and health,official,medium,242,991,0.24419778002018164
+category,62 Engineering,official,medium,167,335,0.49850746268656715
+category,65 Management and public relations,official,medium,11,72,0.1527777777777778
+category,70 Arts,official,medium,39,154,0.2532467532467532
+category,"00 Computer science, knowledge, and systems",official,hard,209,1003,0.20837487537387836
+category,02 Library and information sciences,official,hard,36,396,0.09090909090909091
+category,10 Philosophy,official,hard,45,120,0.375
+category,15 Psychology,official,hard,18,187,0.0962566844919786
+category,16 Philosophical logic,official,hard,4,95,0.042105263157894736
+category,17 Ethics,official,hard,13,283,0.045936395759717315
+category,"30 Social sciences, sociology, and anthropology",official,hard,34,55,0.6181818181818182
+category,33 Economics,official,hard,80,426,0.18779342723004694
+category,34 Law,official,hard,30,157,0.1910828025477707
+category,36 Social problems,official,hard,5,61,0.08196721311475409
+category,40 Language,official,hard,324,700,0.46285714285714286
+category,50 Science,official,hard,59,114,0.5175438596491229
+category,51 Mathematics,official,hard,89,601,0.1480865224625624
+category,53 Physics,official,hard,11,97,0.1134020618556701
+category,54 Chemistry,official,hard,13,90,0.14444444444444443
+category,55 Earth sciences and geology,official,hard,13,329,0.03951367781155015
+category,57 Biology,official,hard,9,143,0.06293706293706294
+category,59 Animals (Zoology),official,hard,0,25,0.0
+category,61 Medicine and health,official,hard,113,991,0.11402623612512613
+category,62 Engineering,official,hard,42,335,0.1253731343283582
+category,65 Management and public relations,official,hard,2,72,0.027777777777777776
+category,70 Arts,official,hard,56,154,0.36363636363636365
+category,"00 Computer science, knowledge, and systems",ordinal,easy,278,1003,0.27716849451645065
+category,02 Library and information sciences,ordinal,easy,263,396,0.6641414141414141
+category,10 Philosophy,ordinal,easy,69,120,0.575
+category,15 Psychology,ordinal,easy,137,187,0.732620320855615
+category,16 Philosophical logic,ordinal,easy,15,95,0.15789473684210525
+category,17 Ethics,ordinal,easy,56,283,0.1978798586572438
+category,"30 Social sciences, sociology, and anthropology",ordinal,easy,42,55,0.7636363636363637
+category,33 Economics,ordinal,easy,193,426,0.45305164319248825
+category,34 Law,ordinal,easy,122,157,0.7770700636942676
+category,36 Social problems,ordinal,easy,60,61,0.9836065573770492
+category,40 Language,ordinal,easy,518,700,0.74
+category,50 Science,ordinal,easy,50,114,0.43859649122807015
+category,51 Mathematics,ordinal,easy,116,601,0.1930116472545757
+category,53 Physics,ordinal,easy,46,97,0.4742268041237113
+category,54 Chemistry,ordinal,easy,31,90,0.34444444444444444
+category,55 Earth sciences and geology,ordinal,easy,282,329,0.8571428571428571
+category,57 Biology,ordinal,easy,117,143,0.8181818181818182
+category,59 Animals (Zoology),ordinal,easy,15,25,0.6
+category,61 Medicine and health,ordinal,easy,357,991,0.3602421796165489
+category,62 Engineering,ordinal,easy,56,335,0.16716417910447762
+category,65 Management and public relations,ordinal,easy,66,72,0.9166666666666666
+category,70 Arts,ordinal,easy,98,154,0.6363636363636364
+category,"00 Computer science, knowledge, and systems",ordinal,medium,387,1003,0.38584247258225324
+category,02 Library and information sciences,ordinal,medium,122,396,0.30808080808080807
+category,10 Philosophy,ordinal,medium,44,120,0.36666666666666664
+category,15 Psychology,ordinal,medium,48,187,0.25668449197860965
+category,16 Philosophical logic,ordinal,medium,71,95,0.7473684210526316
+category,17 Ethics,ordinal,medium,227,283,0.8021201413427562
+category,"30 Social sciences, sociology, and anthropology",ordinal,medium,13,55,0.23636363636363636
+category,33 Economics,ordinal,medium,169,426,0.3967136150234742
+category,34 Law,ordinal,medium,30,157,0.1910828025477707
+category,36 Social problems,ordinal,medium,1,61,0.01639344262295082
+category,40 Language,ordinal,medium,172,700,0.24571428571428572
+category,50 Science,ordinal,medium,53,114,0.4649122807017544
+category,51 Mathematics,ordinal,medium,321,601,0.5341098169717138
+category,53 Physics,ordinal,medium,46,97,0.4742268041237113
+category,54 Chemistry,ordinal,medium,47,90,0.5222222222222223
+category,55 Earth sciences and geology,ordinal,medium,46,329,0.1398176291793313
+category,57 Biology,ordinal,medium,23,143,0.16083916083916083
+category,59 Animals (Zoology),ordinal,medium,10,25,0.4
+category,61 Medicine and health,ordinal,medium,598,991,0.6034308779011099
+category,62 Engineering,ordinal,medium,179,335,0.5343283582089552
+category,65 Management and public relations,ordinal,medium,6,72,0.08333333333333333
+category,70 Arts,ordinal,medium,55,154,0.35714285714285715
+category,"00 Computer science, knowledge, and systems",ordinal,hard,338,1003,0.3369890329012961
+category,02 Library and information sciences,ordinal,hard,11,396,0.027777777777777776
+category,10 Philosophy,ordinal,hard,7,120,0.058333333333333334
+category,15 Psychology,ordinal,hard,2,187,0.0106951871657754
+category,16 Philosophical logic,ordinal,hard,9,95,0.09473684210526316
+category,17 Ethics,ordinal,hard,0,283,0.0
+category,"30 Social sciences, sociology, and anthropology",ordinal,hard,0,55,0.0
+category,33 Economics,ordinal,hard,64,426,0.15023474178403756
+category,34 Law,ordinal,hard,5,157,0.03184713375796178
+category,36 Social problems,ordinal,hard,0,61,0.0
+category,40 Language,ordinal,hard,10,700,0.014285714285714285
+category,50 Science,ordinal,hard,11,114,0.09649122807017543
+category,51 Mathematics,ordinal,hard,164,601,0.27287853577371046
+category,53 Physics,ordinal,hard,5,97,0.05154639175257732
+category,54 Chemistry,ordinal,hard,12,90,0.13333333333333333
+category,55 Earth sciences and geology,ordinal,hard,1,329,0.00303951367781155
+category,57 Biology,ordinal,hard,3,143,0.02097902097902098
+category,59 Animals (Zoology),ordinal,hard,0,25,0.0
+category,61 Medicine and health,ordinal,hard,36,991,0.03632694248234107
+category,62 Engineering,ordinal,hard,100,335,0.29850746268656714
+category,65 Management and public relations,ordinal,hard,0,72,0.0
+category,70 Arts,ordinal,hard,1,154,0.006493506493506494
+category,"00 Computer science, knowledge, and systems",pointwise,easy,71,1003,0.0707876370887338
+category,02 Library and information sciences,pointwise,easy,0,396,0.0
+category,10 Philosophy,pointwise,easy,1,120,0.008333333333333333
+category,15 Psychology,pointwise,easy,0,187,0.0
+category,16 Philosophical logic,pointwise,easy,0,95,0.0
+category,17 Ethics,pointwise,easy,0,283,0.0
+category,"30 Social sciences, sociology, and anthropology",pointwise,easy,6,55,0.10909090909090909
+category,33 Economics,pointwise,easy,6,426,0.014084507042253521
+category,34 Law,pointwise,easy,0,157,0.0
+category,36 Social problems,pointwise,easy,0,61,0.0
+category,40 Language,pointwise,easy,63,700,0.09
+category,50 Science,pointwise,easy,3,114,0.02631578947368421
+category,51 Mathematics,pointwise,easy,3,601,0.004991680532445923
+category,53 Physics,pointwise,easy,0,97,0.0
+category,54 Chemistry,pointwise,easy,0,90,0.0
+category,55 Earth sciences and geology,pointwise,easy,0,329,0.0
+category,57 Biology,pointwise,easy,0,143,0.0
+category,59 Animals (Zoology),pointwise,easy,0,25,0.0
+category,61 Medicine and health,pointwise,easy,22,991,0.022199798183652877
+category,62 Engineering,pointwise,easy,0,335,0.0
+category,65 Management and public relations,pointwise,easy,0,72,0.0
+category,70 Arts,pointwise,easy,3,154,0.01948051948051948
+category,"00 Computer science, knowledge, and systems",pointwise,medium,82,1003,0.08175473579262213
+category,02 Library and information sciences,pointwise,medium,37,396,0.09343434343434344
+category,10 Philosophy,pointwise,medium,7,120,0.058333333333333334
+category,15 Psychology,pointwise,medium,13,187,0.06951871657754011
+category,16 Philosophical logic,pointwise,medium,2,95,0.021052631578947368
+category,17 Ethics,pointwise,medium,6,283,0.02120141342756184
+category,"30 Social sciences, sociology, and anthropology",pointwise,medium,3,55,0.05454545454545454
+category,33 Economics,pointwise,medium,17,426,0.03990610328638498
+category,34 Law,pointwise,medium,0,157,0.0
+category,36 Social problems,pointwise,medium,1,61,0.01639344262295082
+category,40 Language,pointwise,medium,107,700,0.15285714285714286
+category,50 Science,pointwise,medium,3,114,0.02631578947368421
+category,51 Mathematics,pointwise,medium,55,601,0.09151414309484193
+category,53 Physics,pointwise,medium,7,97,0.07216494845360824
+category,54 Chemistry,pointwise,medium,16,90,0.17777777777777778
+category,55 Earth sciences and geology,pointwise,medium,25,329,0.07598784194528875
+category,57 Biology,pointwise,medium,15,143,0.1048951048951049
+category,59 Animals (Zoology),pointwise,medium,0,25,0.0
+category,61 Medicine and health,pointwise,medium,43,991,0.04339051463168517
+category,62 Engineering,pointwise,medium,23,335,0.06865671641791045
+category,65 Management and public relations,pointwise,medium,2,72,0.027777777777777776
+category,70 Arts,pointwise,medium,16,154,0.1038961038961039
+category,"00 Computer science, knowledge, and systems",pointwise,hard,850,1003,0.847457627118644
+category,02 Library and information sciences,pointwise,hard,359,396,0.9065656565656566
+category,10 Philosophy,pointwise,hard,112,120,0.9333333333333333
+category,15 Psychology,pointwise,hard,174,187,0.93048128342246
+category,16 Philosophical logic,pointwise,hard,93,95,0.9789473684210527
+category,17 Ethics,pointwise,hard,277,283,0.9787985865724381
+category,"30 Social sciences, sociology, and anthropology",pointwise,hard,46,55,0.8363636363636363
+category,33 Economics,pointwise,hard,403,426,0.9460093896713615
+category,34 Law,pointwise,hard,157,157,1.0
+category,36 Social problems,pointwise,hard,60,61,0.9836065573770492
+category,40 Language,pointwise,hard,530,700,0.7571428571428571
+category,50 Science,pointwise,hard,108,114,0.9473684210526315
+category,51 Mathematics,pointwise,hard,543,601,0.9034941763727121
+category,53 Physics,pointwise,hard,90,97,0.9278350515463918
+category,54 Chemistry,pointwise,hard,74,90,0.8222222222222222
+category,55 Earth sciences and geology,pointwise,hard,304,329,0.9240121580547113
+category,57 Biology,pointwise,hard,128,143,0.8951048951048951
+category,59 Animals (Zoology),pointwise,hard,25,25,1.0
+category,61 Medicine and health,pointwise,hard,926,991,0.934409687184662
+category,62 Engineering,pointwise,hard,312,335,0.9313432835820895
+category,65 Management and public relations,pointwise,hard,70,72,0.9722222222222222
+category,70 Arts,pointwise,hard,135,154,0.8766233766233766
+category,"00 Computer science, knowledge, and systems",pairwise,easy,125,1003,0.12462612163509472
+category,02 Library and information sciences,pairwise,easy,3,396,0.007575757575757576
+category,10 Philosophy,pairwise,easy,6,120,0.05
+category,15 Psychology,pairwise,easy,0,187,0.0
+category,16 Philosophical logic,pairwise,easy,0,95,0.0
+category,17 Ethics,pairwise,easy,0,283,0.0
+category,"30 Social sciences, sociology, and anthropology",pairwise,easy,11,55,0.2
+category,33 Economics,pairwise,easy,13,426,0.03051643192488263
+category,34 Law,pairwise,easy,0,157,0.0
+category,36 Social problems,pairwise,easy,11,61,0.18032786885245902
+category,40 Language,pairwise,easy,162,700,0.23142857142857143
+category,50 Science,pairwise,easy,9,114,0.07894736842105263
+category,51 Mathematics,pairwise,easy,31,601,0.051580698835274545
+category,53 Physics,pairwise,easy,0,97,0.0
+category,54 Chemistry,pairwise,easy,0,90,0.0
+category,55 Earth sciences and geology,pairwise,easy,0,329,0.0
+category,57 Biology,pairwise,easy,1,143,0.006993006993006993
+category,59 Animals (Zoology),pairwise,easy,0,25,0.0
+category,61 Medicine and health,pairwise,easy,13,991,0.013118062563067608
+category,62 Engineering,pairwise,easy,8,335,0.023880597014925373
+category,65 Management and public relations,pairwise,easy,1,72,0.013888888888888888
+category,70 Arts,pairwise,easy,6,154,0.03896103896103896
+category,"00 Computer science, knowledge, and systems",pairwise,medium,145,1003,0.14456630109670987
+category,02 Library and information sciences,pairwise,medium,46,396,0.11616161616161616
+category,10 Philosophy,pairwise,medium,24,120,0.2
+category,15 Psychology,pairwise,medium,43,187,0.22994652406417113
+category,16 Philosophical logic,pairwise,medium,13,95,0.1368421052631579
+category,17 Ethics,pairwise,medium,7,283,0.024734982332155476
+category,"30 Social sciences, sociology, and anthropology",pairwise,medium,15,55,0.2727272727272727
+category,33 Economics,pairwise,medium,88,426,0.20657276995305165
+category,34 Law,pairwise,medium,20,157,0.12738853503184713
+category,36 Social problems,pairwise,medium,37,61,0.6065573770491803
+category,40 Language,pairwise,medium,283,700,0.4042857142857143
+category,50 Science,pairwise,medium,19,114,0.16666666666666666
+category,51 Mathematics,pairwise,medium,45,601,0.07487520798668885
+category,53 Physics,pairwise,medium,11,97,0.1134020618556701
+category,54 Chemistry,pairwise,medium,13,90,0.14444444444444443
+category,55 Earth sciences and geology,pairwise,medium,74,329,0.22492401215805471
+category,57 Biology,pairwise,medium,48,143,0.3356643356643357
+category,59 Animals (Zoology),pairwise,medium,6,25,0.24
+category,61 Medicine and health,pairwise,medium,266,991,0.2684157416750757
+category,62 Engineering,pairwise,medium,20,335,0.05970149253731343
+category,65 Management and public relations,pairwise,medium,16,72,0.2222222222222222
+category,70 Arts,pairwise,medium,43,154,0.2792207792207792
+category,"00 Computer science, knowledge, and systems",pairwise,hard,733,1003,0.7308075772681955
+category,02 Library and information sciences,pairwise,hard,347,396,0.8762626262626263
+category,10 Philosophy,pairwise,hard,90,120,0.75
+category,15 Psychology,pairwise,hard,144,187,0.7700534759358288
+category,16 Philosophical logic,pairwise,hard,82,95,0.8631578947368421
+category,17 Ethics,pairwise,hard,276,283,0.9752650176678446
+category,"30 Social sciences, sociology, and anthropology",pairwise,hard,29,55,0.5272727272727272
+category,33 Economics,pairwise,hard,325,426,0.7629107981220657
+category,34 Law,pairwise,hard,137,157,0.8726114649681529
+category,36 Social problems,pairwise,hard,13,61,0.21311475409836064
+category,40 Language,pairwise,hard,255,700,0.36428571428571427
+category,50 Science,pairwise,hard,86,114,0.7543859649122807
+category,51 Mathematics,pairwise,hard,525,601,0.8735440931780366
+category,53 Physics,pairwise,hard,86,97,0.8865979381443299
+category,54 Chemistry,pairwise,hard,77,90,0.8555555555555555
+category,55 Earth sciences and geology,pairwise,hard,255,329,0.7750759878419453
+category,57 Biology,pairwise,hard,94,143,0.6573426573426573
+category,59 Animals (Zoology),pairwise,hard,19,25,0.76
+category,61 Medicine and health,pairwise,hard,712,991,0.7184661957618567
+category,62 Engineering,pairwise,hard,307,335,0.9164179104477612
+category,65 Management and public relations,pairwise,hard,55,72,0.7638888888888888
+category,70 Arts,pairwise,hard,105,154,0.6818181818181818
+category,78 Music,official,easy,99,240,0.4125
+category,"79 Sports, games and entertainment",official,easy,140,306,0.45751633986928103
+category,"80 Literature, rhetoric and criticism",official,easy,113,700,0.16142857142857142
+category,90 History,official,easy,222,497,0.44668008048289737
+category,91 Geography,official,easy,109,150,0.7266666666666667
+category,92 Biography and genealogy,official,easy,42,52,0.8076923076923077
+category,78 Music,official,medium,116,240,0.48333333333333334
+category,"79 Sports, games and entertainment",official,medium,100,306,0.32679738562091504
+category,"80 Literature, rhetoric and criticism",official,medium,68,700,0.09714285714285714
+category,90 History,official,medium,139,497,0.2796780684104628
+category,91 Geography,official,medium,29,150,0.19333333333333333
+category,92 Biography and genealogy,official,medium,9,52,0.17307692307692307
+category,78 Music,official,hard,25,240,0.10416666666666667
+category,"79 Sports, games and entertainment",official,hard,66,306,0.21568627450980393
+category,"80 Literature, rhetoric and criticism",official,hard,519,700,0.7414285714285714
+category,90 History,official,hard,136,497,0.27364185110663986
+category,91 Geography,official,hard,12,150,0.08
+category,92 Biography and genealogy,official,hard,1,52,0.019230769230769232
+category,78 Music,ordinal,easy,86,240,0.35833333333333334
+category,"79 Sports, games and entertainment",ordinal,easy,91,306,0.2973856209150327
+category,"80 Literature, rhetoric and criticism",ordinal,easy,482,700,0.6885714285714286
+category,90 History,ordinal,easy,446,497,0.89738430583501
+category,91 Geography,ordinal,easy,122,150,0.8133333333333334
+category,92 Biography and genealogy,ordinal,easy,46,52,0.8846153846153846
+category,78 Music,ordinal,medium,147,240,0.6125
+category,"79 Sports, games and entertainment",ordinal,medium,214,306,0.6993464052287581
+category,"80 Literature, rhetoric and criticism",ordinal,medium,137,700,0.1957142857142857
+category,90 History,ordinal,medium,49,497,0.09859154929577464
+category,91 Geography,ordinal,medium,28,150,0.18666666666666668
+category,92 Biography and genealogy,ordinal,medium,6,52,0.11538461538461539
+category,78 Music,ordinal,hard,7,240,0.029166666666666667
+category,"79 Sports, games and entertainment",ordinal,hard,1,306,0.0032679738562091504
+category,"80 Literature, rhetoric and criticism",ordinal,hard,81,700,0.11571428571428571
+category,90 History,ordinal,hard,2,497,0.004024144869215292
+category,91 Geography,ordinal,hard,0,150,0.0
+category,92 Biography and genealogy,ordinal,hard,0,52,0.0
+category,78 Music,pointwise,easy,0,240,0.0
+category,"79 Sports, games and entertainment",pointwise,easy,0,306,0.0
+category,"80 Literature, rhetoric and criticism",pointwise,easy,10,700,0.014285714285714285
+category,90 History,pointwise,easy,11,497,0.022132796780684104
+category,91 Geography,pointwise,easy,12,150,0.08
+category,92 Biography and genealogy,pointwise,easy,0,52,0.0
+category,78 Music,pointwise,medium,25,240,0.10416666666666667
+category,"79 Sports, games and entertainment",pointwise,medium,160,306,0.5228758169934641
+category,"80 Literature, rhetoric and criticism",pointwise,medium,139,700,0.19857142857142857
+category,90 History,pointwise,medium,41,497,0.08249496981891348
+category,91 Geography,pointwise,medium,43,150,0.2866666666666667
+category,92 Biography and genealogy,pointwise,medium,4,52,0.07692307692307693
+category,78 Music,pointwise,hard,215,240,0.8958333333333334
+category,"79 Sports, games and entertainment",pointwise,hard,146,306,0.477124183006536
+category,"80 Literature, rhetoric and criticism",pointwise,hard,551,700,0.7871428571428571
+category,90 History,pointwise,hard,445,497,0.8953722334004024
+category,91 Geography,pointwise,hard,95,150,0.6333333333333333
+category,92 Biography and genealogy,pointwise,hard,48,52,0.9230769230769231
+category,78 Music,pairwise,easy,0,240,0.0
+category,"79 Sports, games and entertainment",pairwise,easy,2,306,0.006535947712418301
+category,"80 Literature, rhetoric and criticism",pairwise,easy,19,700,0.027142857142857142
+category,90 History,pairwise,easy,32,497,0.06438631790744467
+category,91 Geography,pairwise,easy,32,150,0.21333333333333335
+category,92 Biography and genealogy,pairwise,easy,0,52,0.0
+category,78 Music,pairwise,medium,55,240,0.22916666666666666
+category,"79 Sports, games and entertainment",pairwise,medium,185,306,0.6045751633986928
+category,"80 Literature, rhetoric and criticism",pairwise,medium,330,700,0.4714285714285714
+category,90 History,pairwise,medium,176,497,0.35412474849094566
+category,91 Geography,pairwise,medium,62,150,0.41333333333333333
+category,92 Biography and genealogy,pairwise,medium,18,52,0.34615384615384615
+category,78 Music,pairwise,hard,185,240,0.7708333333333334
+category,"79 Sports, games and entertainment",pairwise,hard,119,306,0.3888888888888889
+category,"80 Literature, rhetoric and criticism",pairwise,hard,351,700,0.5014285714285714
+category,90 History,pairwise,hard,289,497,0.5814889336016097
+category,91 Geography,pairwise,hard,56,150,0.37333333333333335
+category,92 Biography and genealogy,pairwise,hard,34,52,0.6538461538461539
