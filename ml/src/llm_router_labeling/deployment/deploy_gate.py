@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
+from ..training.routing_policy import LENGTH_CONTRACT_VERSION
+
 SCHEMA_VERSION = "deploy-gate-result-v1"
 
 
@@ -65,6 +67,27 @@ def evaluate_deploy_gate(
             "passed": True,
         },
     ]
+    if "length_contract_version" in package_validation:
+        if package_validation["length_contract_version"] != LENGTH_CONTRACT_VERSION:
+            raise DeployGateError("Unsupported package length_contract_version")
+        inference_length = package_validation.get("inference_max_length")
+        if type(inference_length) is not int or inference_length not in {512, 8192}:
+            raise DeployGateError("Package inference_max_length must be an explicit 512 or 8192")
+        if baseline_metrics is None:
+            raise DeployGateError("Explicit inference length qualification requires baseline metrics")
+        for role, metrics in (("candidate", candidate_metrics), ("baseline", baseline_metrics)):
+            actual = _contract_value(metrics, "model_info.max_length")
+            if type(actual) is not int or actual <= 0:
+                raise DeployGateError(f"{role} model_info.max_length must be a positive integer")
+            checks.append(
+                {
+                    "name": f"{role}.inference_max_length",
+                    "operator": "==",
+                    "actual": actual,
+                    "threshold": inference_length,
+                    "passed": actual == inference_length,
+                }
+            )
     expected_contract = rules.get("required_evaluation_contract", {})
     if not isinstance(expected_contract, Mapping):
         raise DeployGateError("required_evaluation_contract must be an object")
@@ -137,6 +160,13 @@ def evaluate_deploy_gate(
     failed_checks = [check for check in checks if not check["passed"]]
     return {
         "schema_version": SCHEMA_VERSION,
+        **(
+            {
+                "length_contract_version": package_validation["length_contract_version"],
+                "inference_max_length": package_validation["inference_max_length"],
+            }
+            if "length_contract_version" in package_validation else {}
+        ),
         "passed": not failed_checks,
         "candidate_model_version": candidate_model_version,
         "baseline_model_version": baseline_model_version,

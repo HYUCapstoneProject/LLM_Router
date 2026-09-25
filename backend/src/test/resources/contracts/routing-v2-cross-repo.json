@@ -1,0 +1,137 @@
+{
+  "approvalMode": "candidate-contract-test-not-promotion",
+  "cases": [
+    {
+      "actualOutputLabels": [
+        "easy",
+        "medium",
+        "hard"
+      ],
+      "canonicalPolicySha256": "c9c5e64442246bf93954a1d6acaabf952ac5d091460e8e482d5ff0bcc6f25052",
+      "checkpointConfigSha256": "2192ca5dc597028e219e574845dc694c15b6ea87269bfddcef423825d803d87c",
+      "currentTierAliases": [
+        "easy",
+        "medium",
+        "hard"
+      ],
+      "objective": "ordinal",
+      "packageManifestSha256": "deb65ee61da15a977f0f4d70e0bd572a9df6df8aaa3b128aa63a9bb1f1b00563",
+      "packagedConfigSha256": "1efae2a7a9c3e85688f5a4e4f24c284e4a97bd37eb0bb54ba8945ae85dcbd281",
+      "policyFileSha256": "430d2467669957c8d4123ede09d3c0a21120000f7575f64b34c96b732869ce3b",
+      "response": {
+        "action": "medium",
+        "actionScores": {
+          "high": 0.13712383712303652,
+          "low": 0.11226750126164492,
+          "medium": 0.7506086616153185
+        },
+        "candidateModelIds": {
+          "high": "fixture-provider/large-model-v1",
+          "low": "fixture-provider/small-model-v1",
+          "medium": "fixture-provider/mid-model-v1"
+        },
+        "candidatePoolVersion": "fixture-service-pool-v1",
+        "confidence": 0.7506086616153185,
+        "model": "sonnet",
+        "modelVersion": "router-synthetic-ordinal",
+        "objective": "ordinal",
+        "policySha256": "c9c5e64442246bf93954a1d6acaabf952ac5d091460e8e482d5ff0bcc6f25052",
+        "policyVersion": "fixture-policy-v2",
+        "schemaVersion": "router-decision-v2",
+        "scoreSemantics": "difficulty_class_probabilities",
+        "tier": "medium"
+      }
+    },
+    {
+      "actualOutputLabels": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "canonicalPolicySha256": "be1db3bffe07d6acd2ad2da5896edfaa878144308104d1c7995dd7461d432e7d",
+      "checkpointConfigSha256": "339430572a18e6fc27615751863e4500b9e0ec059ae711640aa617abc2ca9587",
+      "currentTierAliases": [
+        "easy",
+        "medium",
+        "hard"
+      ],
+      "objective": "pointwise",
+      "packageManifestSha256": "84f48ff6c073769ed7d88a30bef36c31faad6ac84c54d5c61401e0ae38c2ab88",
+      "packagedConfigSha256": "339430572a18e6fc27615751863e4500b9e0ec059ae711640aa617abc2ca9587",
+      "policyFileSha256": "6838e84e0f7f32968e4e0ce30990534224054a304bde84fd75962798a7389744",
+      "response": {
+        "action": "medium",
+        "actionScores": {
+          "high": 0.574442519725829,
+          "low": 0.5249791878505392,
+          "medium": 0.8807970779778823
+        },
+        "candidateModelIds": {
+          "high": "fixture-provider/large-model-v1",
+          "low": "fixture-provider/small-model-v1",
+          "medium": "fixture-provider/mid-model-v1"
+        },
+        "candidatePoolVersion": "fixture-service-pool-v1",
+        "confidence": 0.8807970779778823,
+        "model": "sonnet",
+        "modelVersion": "router-synthetic-pointwise",
+        "objective": "pointwise",
+        "policySha256": "be1db3bffe07d6acd2ad2da5896edfaa878144308104d1c7995dd7461d432e7d",
+        "policyVersion": "fixture-policy-v2",
+        "schemaVersion": "router-decision-v2",
+        "scoreSemantics": "independent_success_probabilities",
+        "tier": "medium"
+      }
+    },
+    {
+      "actualOutputLabels": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "canonicalPolicySha256": "5895c07dd7dc40afb62c599fd94e77bd168682c6caf12e8bf79b399c4df74d64",
+      "checkpointConfigSha256": "49a0651d9deca4585b57f43f5e1fb87284d03a43c3609538c02cddaa43d3d383",
+      "currentTierAliases": [
+        "easy",
+        "medium",
+        "hard"
+      ],
+      "objective": "pairwise",
+      "packageManifestSha256": "35d32b5f3bca3eecef52db545a7d797ffeeb69accf8c2e343f175b27f8b788d3",
+      "packagedConfigSha256": "49a0651d9deca4585b57f43f5e1fb87284d03a43c3609538c02cddaa43d3d383",
+      "policyFileSha256": "3e64c49793007b16c1b395137ac95e0edb4004ad709e73f9f11ad5a95223eb67",
+      "response": {
+        "action": "medium",
+        "actionScores": {
+          "high": 0.30000001192092896,
+          "low": 0.10000000149011612,
+          "medium": 2.0
+        },
+        "candidateModelIds": {
+          "high": "fixture-provider/large-model-v1",
+          "low": "fixture-provider/small-model-v1",
+          "medium": "fixture-provider/mid-model-v1"
+        },
+        "candidatePoolVersion": "fixture-service-pool-v1",
+        "confidence": null,
+        "model": "sonnet",
+        "modelVersion": "router-synthetic-pairwise",
+        "objective": "pairwise",
+        "policySha256": "5895c07dd7dc40afb62c599fd94e77bd168682c6caf12e8bf79b399c4df74d64",
+        "policyVersion": "fixture-policy-v2",
+        "schemaVersion": "router-decision-v2",
+        "scoreSemantics": "relative_quality_scores",
+        "tier": "medium"
+      }
+    }
+  ],
+  "legacyResponse": {
+    "confidence": 0.7506087422370911,
+    "model": "sonnet",
+    "modelVersion": "router-synthetic-legacy",
+    "tier": "medium"
+  },
+  "rollbackPointerManifestCorrect": true,
+  "schemaVersion": "synthetic-routing-cross-repo-v1",
+  "syntheticOnly": true
+}

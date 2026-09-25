@@ -1,0 +1,112 @@
+{
+  "model_files": {
+    "metrics.json": "a3b6b0b2a1e876280faf42b1a1c4e39c303c947e77aeb05918a9755ee86c7fa0",
+    "_SUCCESS": "37a40f08d8548dba289b9b0bb35bcf63b359f6d37ee86044ebc6b6da080b9ec1",
+    "artifact_manifest.json": "8fe545e4d4eb8e9fb7d009d41752d03c905f20577207426bf32de52527b73de2",
+    "training_config.json": "ccbad2aeae5ee063593526c23cc573a41e4b693910a7ce81071a8036def999da",
+    "special_tokens_map.json": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049",
+    "model.safetensors": "e1a40fec7d269d8f925b5391e4f5e75df5d0fedbb1e37b4eea96521e27b1a6a7",
+    "config.json": "ec78dcebe3890eaf422a55e3261f70a8579cdd4298cb51ec0fcc2949538646b5",
+    "tokenizer_config.json": "626c86908d7c711f93b0feffd8657b782cc2727b391f9be190240e8cafb626d5",
+    "tokenizer.json": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30"
+  },
+  "torch": "2.5.1+cu124",
+  "transformers": "4.48.3",
+  "device": "cuda",
+  "attention": "eager",
+  "dtype": "float32",
+  "max_lengths": [
+    512,
+    8192
+  ],
+  "datasets": {
+    "arena": {
+      "sha256": "d84be2fdad3ed9753d2cba93fdbe479025800b762d13b5b2c92565573e32925f",
+      "rows": 8791,
+      "short_rows": 8003,
+      "long_rows": 788,
+      "above8192": 8,
+      "short_token_ids_equal": true,
+      "512": {
+        "seconds": 165.69872403144836,
+        "score_sha256": "2608105028c80a4bc88f9ae55b08f5ef9f51b3805f3ef4f6a636b561ef65bf38",
+        "computed_rows": 8791,
+        "peak_allocated_bytes": 884443136,
+        "peak_reserved_bytes": 903872512
+      },
+      "8192": {
+        "seconds": 292.988139629364,
+        "score_sha256": "ea4de7b6f5ac92ac53a5afeb5c19cfef4c829fc90b2b32828d1e9db8c1520318",
+        "computed_rows": 8791,
+        "peak_allocated_bytes": 7787477504,
+        "peak_reserved_bytes": 14740881408
+      }
+    },
+    "validation": {
+      "sha256": "aa9d973fcf886c7465fbf9e06701984d099cd74a5eabf508cc610845613edef8",
+      "rows": 3581,
+      "short_rows": 3571,
+      "long_rows": 10,
+      "above8192": 0,
+      "short_token_ids_equal": true,
+      "512": {
+        "seconds": 48.12432336807251,
+        "score_sha256": "596f8e793c55a92d88a703fa810b49015e1cf6e6b7314e196ebd8dadef0ee5df",
+        "computed_rows": 3581,
+        "peak_allocated_bytes": 780995072,
+        "peak_reserved_bytes": 9059696640
+      },
+      "8192": {
+        "seconds": 48.23125958442688,
+        "score_sha256": "c655911481462518c01854a587c89c6c91e7d166d3157cfc3053e7e3cc591069",
+        "computed_rows": 3581,
+        "peak_allocated_bytes": 863433728,
+        "peak_reserved_bytes": 9059696640
+      }
+    },
+    "test_routerbench": {
+      "sha256": "0a3e0d5c417fe87e2473d2b56172b447a4efc989622fe3ed26fe9d13113abc18",
+      "rows": 3473,
+      "short_rows": 3466,
+      "long_rows": 7,
+      "above8192": 0,
+      "short_token_ids_equal": true,
+      "512": {
+        "seconds": 46.24529457092285,
+        "score_sha256": "e22554472ff3d0f53f1a93d591a6e3ecd716262574ca2af5ce2874306a347bd4",
+        "computed_rows": 3473,
+        "peak_allocated_bytes": 780995072,
+        "peak_reserved_bytes": 9059696640
+      },
+      "8192": {
+        "seconds": 46.16130495071411,
+        "score_sha256": "c0b7e166d3871b715ee6d3a3d676f03b6aa02e7edbd7c5acc4099e4050d40ad1",
+        "computed_rows": 3473,
+        "peak_allocated_bytes": 916687360,
+        "peak_reserved_bytes": 9059696640
+      }
+    },
+    "test_xroutebench": {
+      "sha256": "d6fde0899a5ed06950ecec4d958832e0de8a5e9f32c09f7ead37cd9c25e71cef",
+      "rows": 3729,
+      "short_rows": 3706,
+      "long_rows": 23,
+      "above8192": 0,
+      "short_token_ids_equal": true,
+      "512": {
+        "seconds": 44.68621897697449,
+        "score_sha256": "9c4303386a4e01d6ae7d9cf0c9657da0b27cd377f3998854b6cb8d12c43ff082",
+        "computed_rows": 3729,
+        "peak_allocated_bytes": 780995072,
+        "peak_reserved_bytes": 9059696640
+      },
+      "8192": {
+        "seconds": 45.71500635147095,
+        "score_sha256": "2d1a62e50e0511de81bafebda863fa42d9946a244c370427ed1773be0567f448",
+        "computed_rows": 3729,
+        "peak_allocated_bytes": 1222965760,
+        "peak_reserved_bytes": 9059696640
+      }
+    }
+  }
+}

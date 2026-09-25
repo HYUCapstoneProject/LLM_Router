@@ -38,7 +38,7 @@ def add_model_qualification_tasks(
         artifact_uri=routerarena_dataset_uri,
         artifact_class=dsl.Dataset,
         reimport=False,
-    ).set_display_name("Import RouterArena evaluation data")
+    ).set_display_name("Import protected evaluation data")
     evaluation_config = dsl.importer(
         artifact_uri=evaluation_config_uri,
         artifact_class=dsl.Artifact,
@@ -68,7 +68,7 @@ def add_model_qualification_tasks(
         batch_id=batch_id,
         candidate_model_version=candidate_model_version,
     )
-    evaluation_task.set_display_name("Evaluate candidate on RouterArena")
+    evaluation_task.set_display_name("Evaluate candidate on frozen qualification data")
     configure_cpu_task(
         evaluation_task,
         image=evaluation_image,
@@ -103,6 +103,7 @@ def add_model_qualification_tasks(
         gate_rules=gate_rules.output,
         candidate_model_version=candidate_model_version,
         baseline_model_version=baseline_model_version,
+        model_publish_root_uri=model_publish_root_uri,
         observability_run_uri=observability_run_uri,
         batch_id=batch_id,
     )

@@ -62,4 +62,26 @@ class RetrainingStatusTest {
         // gate 는 통과했지만 FastAPI 는 이전 known-good 모델로 응답하고 있다.
         assertThat(loadFailed.activationStatus()).isEqualTo("loadFailed");
     }
+
+    @Test
+    void pollingContinuesUntilActivationResolvesAndNeverConfirmsStaleResults() {
+        for (String activation : new String[]{"pending", "active", "loadFailed", "superseded", "notApplicable"}) {
+            RetrainingStatus fresh = new RetrainingStatus("retraining-status-v1", "b-1", "succeeded",
+                    "complete", true, false, null,
+                    new RetrainingStatus.Activation(activation, "router-v2", "router-v2"));
+            assertThat(fresh.isPollingComplete()).isEqualTo(!"pending".equals(activation));
+            RetrainingStatus stale = new RetrainingStatus(fresh.schemaVersion(), fresh.batchId(),
+                    fresh.status(), fresh.stage(), true, true, null, fresh.activation());
+            assertThat(stale.isPollingComplete()).isFalse();
+        }
+        assertThat(of("succeeded", true, false).isPollingComplete()).isFalse();
+        assertThat(of("failed", true, false).isPollingComplete()).isTrue();
+    }
+
+    @Test
+    void activeFlagWithoutMatchingVersionsCannotCompletePolling() {
+        var status = new RetrainingStatus("retraining-status-v1", "b-1", "succeeded", "complete",
+                true, false, null, new RetrainingStatus.Activation("active", "router-v2", "router-v1"));
+        assertThat(status.isPollingComplete()).isFalse();
+    }
 }

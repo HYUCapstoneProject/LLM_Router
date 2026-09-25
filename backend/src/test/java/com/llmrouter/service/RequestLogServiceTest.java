@@ -22,7 +22,7 @@ class RequestLogServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new RequestLogService(jdbc);
+        service = new RequestLogService(jdbc, tools.jackson.databind.json.JsonMapper.builder().build());
     }
 
     @Test
@@ -51,6 +51,36 @@ class RequestLogServiceTest {
         assertThat(args.getValue()[17]).isEqualTo("success");
         assertThat(args.getValue()[18]).isNull();
         assertThat(args.getValue()[19]).isEqualTo(RequestLogEntry.MATCH_SEMANTIC);
+    }
+
+    @Test
+    void v1DoesNotRequireTheNewColumnAndBindsEveryPlaceholder() {
+        service.record(RequestLogEntry.builder().requestId("00000000-0000-0000-0000-000000000001")
+                .question("q").build());
+        ArgumentCaptor<String> sql = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Object[]> args = ArgumentCaptor.forClass(Object[].class);
+        verify(jdbc).update(sql.capture(), args.capture());
+        assertThat(sql.getValue()).doesNotContain("routing_decision");
+        assertThat(sql.getValue().chars().filter(c -> c == '?').count()).isEqualTo(args.getValue().length);
+    }
+
+    @Test
+    void storesCompleteV2ProvenanceAsJsonWithoutInventingAnOutcome() {
+        var decision = new com.llmrouter.client.RouterClassification.DecisionMetadata(
+                "pointwise", "policy-v1", "a".repeat(64), "pool-v1",
+                java.util.Map.of("low", "small", "medium", "mid", "high", "large"), "medium",
+                "independent_success_probabilities", java.util.Map.of("low", 0.3, "medium", 0.8, "high", 0.9));
+        service.record(RequestLogEntry.builder().requestId("00000000-0000-0000-0000-000000000001")
+                .question("q").routingDecision(decision).build());
+        ArgumentCaptor<String> sql = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Object[]> args = ArgumentCaptor.forClass(Object[].class);
+        verify(jdbc).update(sql.capture(), args.capture());
+        assertThat(sql.getValue()).contains("routing_decision", "?::jsonb");
+        assertThat(sql.getValue().chars().filter(c -> c == '?').count()).isEqualTo(args.getValue().length);
+        var mapper = tools.jackson.databind.json.JsonMapper.builder().build();
+        var json = mapper.readTree((String) args.getValue()[25]);
+        assertThat(json).isEqualTo(mapper.valueToTree(decision));
+        assertThat(json.has("success")).isFalse();
     }
 
     @Test

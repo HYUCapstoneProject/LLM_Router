@@ -10,6 +10,7 @@ from typing import Any
 
 from ..shared.dataset_io import sha256_file, write_json
 from ..training.routing_policy import (
+    LENGTH_CONTRACT_VERSION,
     OUTPUT_LABEL_ORDERS,
     RoutingPolicyError,
     load_routing_policy,
@@ -45,6 +46,10 @@ OPTIONAL_METADATA_FIELDS = {
     "logical_model_version",
     "training_mode",
     "training_fingerprint",
+    "input_contract",
+    "length_contract_version",
+    "training_max_length",
+    "inference_max_length",
 }
 POLICY_METADATA_FIELDS = {
     "objective",
@@ -103,11 +108,70 @@ def _policy_metadata(metadata: Mapping[str, Any]) -> None:
         )
     if metadata["input_contract"] != "structure-preserving-v2":
         raise ModelPackageError("V2 input_contract must be structure-preserving-v2")
+    allowed_lengths = (
+        {512, 8192} if "length_contract_version" in metadata else {512}
+    )
     if (
         type(metadata["tokenizer_max_length"]) is not int
-        or metadata["tokenizer_max_length"] != 512
+        or metadata["tokenizer_max_length"] not in allowed_lengths
     ):
-        raise ModelPackageError("V2 tokenizer_max_length must be exactly 512")
+        raise ModelPackageError(
+            f"V2 tokenizer_max_length must be in {sorted(allowed_lengths)}"
+        )
+
+
+def _validate_input_length_contract(
+    package_dir: Path, metadata: Mapping[str, Any]
+) -> None:
+    """Validate immutable training history independently from serving length."""
+    has_contract = "length_contract_version" in metadata
+    if not has_contract and {"training_max_length", "inference_max_length"} & metadata.keys():
+        raise ModelPackageError("Separate lengths require length_contract_version")
+    if has_contract and metadata["length_contract_version"] != LENGTH_CONTRACT_VERSION:
+        raise ModelPackageError("Unsupported package length_contract_version")
+    if not has_contract and "input_contract" not in metadata:
+        return
+    if metadata.get("input_contract") != "structure-preserving-v2":
+        raise ModelPackageError("Explicit input contract must be structure-preserving-v2")
+    training = _load_json(package_dir / "training_config.json")
+    if training.get("input_contract", "structure-preserving-v2") != "structure-preserving-v2":
+        raise ModelPackageError("Training input contract differs from package input contract")
+    if (
+        _package_schema(metadata) == SCHEMA_VERSION
+        and training.get("objective_method", "ordinal") != "ordinal"
+    ):
+        raise ModelPackageError("Explicit v1 input contract requires ordinal training")
+    if not has_contract:
+        if (
+            type(metadata.get("tokenizer_max_length")) is not int
+            or metadata["tokenizer_max_length"] != 512
+            or type(training.get("max_length")) is not int
+            or training["max_length"] != 512
+        ):
+            raise ModelPackageError("Legacy structured package requires 512-token limits")
+        return
+    config = _load_json(package_dir / "config.json")
+    values = {
+        "training_max_length": metadata.get("training_max_length"),
+        "inference_max_length": metadata.get("inference_max_length"),
+        "tokenizer_max_length": metadata.get("tokenizer_max_length"),
+        "training_config.max_length": training.get("max_length"),
+        "config.max_position_embeddings": config.get("max_position_embeddings"),
+    }
+    for name, value in values.items():
+        if type(value) is not int or value <= 0:
+            raise ModelPackageError(f"{name} must be a positive integer")
+    if values["training_max_length"] != values["training_config.max_length"]:
+        raise ModelPackageError("training_max_length differs from preserved training history")
+    if (
+        values["inference_max_length"] not in {512, 8192}
+        or values["tokenizer_max_length"] != values["inference_max_length"]
+    ):
+        raise ModelPackageError("Length contract requires matching 512 or 8192 inference limits")
+    if max(values["training_max_length"], values["inference_max_length"]) > values[
+        "config.max_position_embeddings"
+    ]:
+        raise ModelPackageError("Package length exceeds the checkpoint native position limit")
 
 
 def _validate_checkpoint_contract(
@@ -185,12 +249,13 @@ def _validate_policy_contract(package_dir: Path, metadata: Mapping[str, Any]) ->
     if (
         policy.input_contract != metadata["input_contract"]
         or policy.max_length != metadata["tokenizer_max_length"]
+        or policy.length_contract_version != metadata.get("length_contract_version")
     ):
         raise ModelPackageError(
             "V2 policy input contract does not match package metadata"
         )
     training = _load_json(package_dir / "training_config.json")
-    if (
+    if "length_contract_version" not in metadata and (
         type(training.get("max_length")) is not int
         or training["max_length"] != policy.max_length
     ):
@@ -267,6 +332,7 @@ def validate_model_package(
             raise ModelPackageError(f"SHA-256 mismatch for {relative_name}")
         verified[str(relative_name)] = actual_sha256
 
+    _validate_input_length_contract(package_dir, manifest)
     if schema == POLICY_SCHEMA_VERSION:
         if files["routing_policy.json"] != manifest["routing_policy_sha256"]:
             raise ModelPackageError("V2 routing policy SHA must match its files entry")
@@ -287,6 +353,14 @@ def validate_model_package(
         "gate_status": str(manifest["gate_status"]),
         "id2label": checkpoint_contract["id2label"],
         "verified_files": verified,
+        **{
+            field: manifest[field]
+            for field in (
+                "input_contract", "length_contract_version",
+                "training_max_length", "inference_max_length",
+            )
+            if field in manifest
+        },
         **(
             {
                 "objective": manifest["objective"],
@@ -335,6 +409,7 @@ def create_model_manifest(
     )
     if absent:
         raise ModelPackageError(f"Model package is missing files: {absent}")
+    _validate_input_length_contract(package_dir, metadata)
     if schema == POLICY_SCHEMA_VERSION:
         _validate_policy_contract(package_dir, metadata)
 

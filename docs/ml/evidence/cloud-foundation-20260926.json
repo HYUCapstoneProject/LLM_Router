@@ -1,0 +1,339 @@
+{
+  "cloud_errors": [],
+  "cloud_inventory_verified": true,
+  "config_sha256": "9b3578cfff1591d8a341c1449c05a1fd75ab42ae78bb649a2aa84b03537d0470",
+  "deployment_ready": false,
+  "iam_effective_access_verified": false,
+  "inventory": {
+    "apis": [
+      "aiplatform.googleapis.com",
+      "analyticshub.googleapis.com",
+      "artifactregistry.googleapis.com",
+      "autoscaling.googleapis.com",
+      "bigquery.googleapis.com",
+      "bigqueryconnection.googleapis.com",
+      "bigquerydatapolicy.googleapis.com",
+      "bigquerydatatransfer.googleapis.com",
+      "bigquerymigration.googleapis.com",
+      "bigqueryreservation.googleapis.com",
+      "bigquerystorage.googleapis.com",
+      "cloudapis.googleapis.com",
+      "cloudbuild.googleapis.com",
+      "cloudresourcemanager.googleapis.com",
+      "cloudtrace.googleapis.com",
+      "compute.googleapis.com",
+      "container.googleapis.com",
+      "containerfilesystem.googleapis.com",
+      "containerregistry.googleapis.com",
+      "dataform.googleapis.com",
+      "dataplex.googleapis.com",
+      "datastore.googleapis.com",
+      "dns.googleapis.com",
+      "file.googleapis.com",
+      "gkebackup.googleapis.com",
+      "iam.googleapis.com",
+      "iamcredentials.googleapis.com",
+      "logging.googleapis.com",
+      "monitoring.googleapis.com",
+      "networkconnectivity.googleapis.com",
+      "oslogin.googleapis.com",
+      "pubsub.googleapis.com",
+      "run.googleapis.com",
+      "secretmanager.googleapis.com",
+      "servicemanagement.googleapis.com",
+      "serviceusage.googleapis.com",
+      "sql-component.googleapis.com",
+      "storage-api.googleapis.com",
+      "storage-component.googleapis.com",
+      "storage.googleapis.com",
+      "telemetry.googleapis.com"
+    ],
+    "bucket": {
+      "lifecycle_config": {
+        "rule": [
+          {
+            "action": {
+              "type": "Delete"
+            },
+            "condition": {
+              "age": 1,
+              "matchesPrefix": [
+                "pipeline-root/"
+              ]
+            }
+          }
+        ]
+      },
+      "location": "US-WEST1",
+      "name": "llm-router-mlserver",
+      "public_access_prevention": "enforced",
+      "soft_delete_policy": {
+        "effectiveTime": "2026-08-15T06:37:03.201000+00:00",
+        "retentionDurationSeconds": "604800"
+      },
+      "uniform_bucket_level_access": true
+    },
+    "bucket_iam": {
+      "bindings": [
+        {
+          "members": [
+            "projectEditor:project-763753da-fa8f-4afd-b31",
+            "projectOwner:project-763753da-fa8f-4afd-b31"
+          ],
+          "role": "roles/storage.legacyBucketOwner"
+        },
+        {
+          "members": [
+            "projectViewer:project-763753da-fa8f-4afd-b31"
+          ],
+          "role": "roles/storage.legacyBucketReader"
+        },
+        {
+          "members": [
+            "projectEditor:project-763753da-fa8f-4afd-b31",
+            "projectOwner:project-763753da-fa8f-4afd-b31"
+          ],
+          "role": "roles/storage.legacyObjectOwner"
+        },
+        {
+          "members": [
+            "projectViewer:project-763753da-fa8f-4afd-b31"
+          ],
+          "role": "roles/storage.legacyObjectReader"
+        },
+        {
+          "members": [
+            "serviceAccount:vertex-pipeline-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com",
+            "serviceAccount:vertex-training-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com"
+          ],
+          "role": "roles/storage.objectAdmin"
+        },
+        {
+          "condition": {
+            "expression": "resource.name.startsWith(\"projects/_/buckets/llm-router-mlserver/objects/datasets/continual-feedback/\")",
+            "title": "continualFeedbackWriter"
+          },
+          "members": [
+            "serviceAccount:llm-router-serving-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com"
+          ],
+          "role": "roles/storage.objectUser"
+        },
+        {
+          "members": [
+            "serviceAccount:llm-router-serving-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com"
+          ],
+          "role": "roles/storage.objectViewer"
+        }
+      ],
+      "version": 1
+    },
+    "pipeline_account": {
+      "email": "vertex-pipeline-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com",
+      "uniqueId": "113717354455754082925"
+    },
+    "pipeline_iam": {
+      "bindings": [
+        {
+          "members": [
+            "serviceAccount:llm-router-serving-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com"
+          ],
+          "role": "roles/iam.serviceAccountUser"
+        }
+      ],
+      "version": 1
+    },
+    "project_iam": {
+      "bindings": [
+        {
+          "members": [
+            "serviceAccount:service-1051465904174@gcp-sa-aiplatform-cc.iam.gserviceaccount.com"
+          ],
+          "role": "roles/aiplatform.customCodeServiceAgent"
+        },
+        {
+          "members": [
+            "serviceAccount:service-1051465904174@gcp-sa-aiplatform.iam.gserviceaccount.com"
+          ],
+          "role": "roles/aiplatform.serviceAgent"
+        },
+        {
+          "members": [
+            "serviceAccount:llm-router-serving-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com",
+            "serviceAccount:vertex-pipeline-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com"
+          ],
+          "role": "roles/aiplatform.user"
+        },
+        {
+          "members": [
+            "serviceAccount:service-1051465904174@gcp-sa-artifactregistry.iam.gserviceaccount.com"
+          ],
+          "role": "roles/artifactregistry.serviceAgent"
+        },
+        {
+          "members": [
+            "serviceAccount:1051465904174@cloudbuild.gserviceaccount.com"
+          ],
+          "role": "roles/cloudbuild.builds.builder"
+        },
+        {
+          "members": [
+            "serviceAccount:service-1051465904174@gcp-sa-cloudbuild.iam.gserviceaccount.com"
+          ],
+          "role": "roles/cloudbuild.serviceAgent"
+        },
+        {
+          "members": [
+            "serviceAccount:1051465904174@cloudservices.gserviceaccount.com"
+          ],
+          "role": "roles/compute.instanceGroupManagerServiceAgent"
+        },
+        {
+          "members": [
+            "serviceAccount:service-1051465904174@compute-system.iam.gserviceaccount.com"
+          ],
+          "role": "roles/compute.serviceAgent"
+        },
+        {
+          "members": [
+            "serviceAccount:service-1051465904174@container-engine-robot.iam.gserviceaccount.com"
+          ],
+          "role": "roles/container.serviceAgent"
+        },
+        {
+          "members": [
+            "serviceAccount:service-1051465904174@containerregistry.iam.gserviceaccount.com"
+          ],
+          "role": "roles/containerregistry.ServiceAgent"
+        },
+        {
+          "members": [
+            "serviceAccount:service-1051465904174@cloud-filer.iam.gserviceaccount.com"
+          ],
+          "role": "roles/file.serviceAgent"
+        },
+        {
+          "members": [
+            "serviceAccount:llm-router-serving-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com",
+            "serviceAccount:vertex-pipeline-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com",
+            "serviceAccount:vertex-training-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com"
+          ],
+          "role": "roles/logging.logWriter"
+        },
+        {
+          "members": [
+            "user:<redacted>",
+            "user:<redacted>"
+          ],
+          "role": "roles/owner"
+        },
+        {
+          "members": [
+            "serviceAccount:service-1051465904174@gcp-sa-pubsub.iam.gserviceaccount.com"
+          ],
+          "role": "roles/pubsub.serviceAgent"
+        },
+        {
+          "members": [
+            "serviceAccount:1051465904174-compute@developer.gserviceaccount.com"
+          ],
+          "role": "roles/run.builder"
+        },
+        {
+          "members": [
+            "serviceAccount:service-1051465904174@serverless-robot-prod.iam.gserviceaccount.com"
+          ],
+          "role": "roles/run.serviceAgent"
+        }
+      ],
+      "version": 1
+    },
+    "repository": {
+      "dockerConfig": {
+        "immutableTags": true
+      },
+      "format": "DOCKER",
+      "mode": "STANDARD_REPOSITORY",
+      "name": "projects/project-763753da-fa8f-4afd-b31/locations/us-west1/repositories/llm-router"
+    },
+    "repository_iam": {
+      "bindings": [
+        {
+          "members": [
+            "serviceAccount:llm-router-serving-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com",
+            "serviceAccount:vertex-pipeline-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com",
+            "serviceAccount:vertex-training-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com"
+          ],
+          "role": "roles/artifactregistry.reader"
+        }
+      ],
+      "version": 1
+    },
+    "training_account": {
+      "email": "vertex-training-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com",
+      "uniqueId": "100564540235921986878"
+    },
+    "training_iam": {
+      "bindings": [
+        {
+          "members": [
+            "serviceAccount:vertex-pipeline-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com"
+          ],
+          "role": "roles/iam.serviceAccountUser"
+        }
+      ],
+      "version": 1
+    },
+    "vm": {
+      "machineType": "https://www.googleapis.com/compute/v1/projects/project-763753da-fa8f-4afd-b31/zones/us-west1-a/machineTypes/e2-standard-2",
+      "name": "llm-router-serving",
+      "serviceAccounts": [
+        {
+          "email": "llm-router-serving-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com",
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ]
+        }
+      ],
+      "status": "RUNNING"
+    }
+  },
+  "local_errors": [],
+  "mutations_performed": false,
+  "observed_at": "2026-09-25T15:47:24.667522+00:00",
+  "postdeploy_checks_pending": [
+    "Verify mounted model/SQLite volumes, UID 10001 writes, and backup restoration.",
+    "Verify running identities, secret injection and Spring-to-FastAPI connectivity.",
+    "Measure 8192-token FastAPI latency, peak memory and concurrency on the target VM.",
+    "Verify accepted batch -> Vertex -> gate -> CURRENT -> serving activation.",
+    "Verify retry, load failure, concurrent promotion and previous-package rollback."
+  ],
+  "predeploy_checks_pending": [
+    "Review inherited project and bucket IAM, conditions, and object-list permissions.",
+    "Verify Serving -> Pipeline SA and Pipeline -> Training SA actAs on those accounts.",
+    "Verify per-identity reads/writes and Vertex-managed image-pull identity permissions.",
+    "Confirm billing credit/budget, GPU quota and bounded job concurrency before runs.",
+    "Review lifecycle retention against current/previous/anchor and durable evidence.",
+    "Bind actual image digests, IR/config/data hashes and objective-specific gate evidence."
+  ],
+  "publication_redaction": {
+    "note": "Personal IAM principal identifiers redacted. This is the pre-change inventory, not evidence that proposed namespace writes are authorized.",
+    "personal_principals_redacted": 2,
+    "source_audit_sha256": "45b9f709a5a833bf155b9c153b37c726585de901a10e2c4c2f280bb6474a96b4"
+  },
+  "release_inputs_pending": [
+    "r0: pin gate_rules_uri and its immutable evidence before release.",
+    "r0: pin baseline_metrics_uri and its immutable evidence before release.",
+    "r0: pin approved_baseline_uri and its immutable evidence before release.",
+    "r0: pin pipeline_template_uri and its immutable evidence before release.",
+    "r1: pin gate_rules_uri and its immutable evidence before release.",
+    "r1: pin baseline_metrics_uri and its immutable evidence before release.",
+    "r1: pin approved_baseline_uri and its immutable evidence before release.",
+    "r1: pin pipeline_template_uri and its immutable evidence before release.",
+    "Pin data_processing image digest, then compile and hash matching IR.",
+    "Pin training image digest, then compile and hash matching IR.",
+    "Pin evaluation image digest, then compile and hash matching IR.",
+    "Pin promotion image digest, then compile and hash matching IR."
+  ],
+  "schema_version": "router-cloud-foundation-audit-v1",
+  "status": "cloud_verified"
+}

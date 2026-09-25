@@ -8,6 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.json.JsonMapper;
+
+import java.util.Arrays;
 
 /** 요청 단위 성공·실패 기록. 비용, 실패율, 지연시간 분석의 원천 데이터다. */
 @Slf4j
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 public class RequestLogService {
 
     private final JdbcTemplate jdbc;
+    private final JsonMapper jsonMapper;
 
     private static final String INSERT_SQL = """
             INSERT INTO request_log
@@ -29,6 +33,19 @@ public class RequestLogService {
             VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
+    // v1은 기존 SQL을 사용한다. v2만 migration 09의 nullable 컬럼을 요구한다.
+    private static final String INSERT_WITH_DECISION_SQL = """
+            INSERT INTO request_log
+                (request_id, question, conversation_id, tier, model_id,
+                 router_model_version, router_confidence, embed_model_version,
+                 cache_hit, similarity, cache_entry_id,
+                 input_tokens, output_tokens, latency_ms, fallback_reason,
+                 parent_request_id, origin, status, error_type, cache_match_type,
+                 rerank_score, rerank_model_version, rerank_would_reject,
+                 rerank_candidate_count, rerank_would_reorder, routing_decision)
+            VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb)
+            """;
+
     private static final String INSERT_FAILURE_SQL = """
             INSERT INTO request_log
                 (request_id, question, tier, cache_hit,
@@ -38,7 +55,7 @@ public class RequestLogService {
 
     public void record(RequestLogEntry entry) {
         try {
-            jdbc.update(INSERT_SQL,
+            Object[] parameters = {
                     entry.requestId(),
                     entry.question(),
                     entry.conversationId(),
@@ -63,7 +80,14 @@ public class RequestLogService {
                     entry.rerankModelVersion(),
                     entry.rerankWouldReject(),
                     entry.rerankCandidateCount(),
-                    entry.rerankWouldReorder());
+                    entry.rerankWouldReorder()};
+            if (entry.routingDecision() == null) {
+                jdbc.update(INSERT_SQL, parameters);
+            } else {
+                Object[] withDecision = Arrays.copyOf(parameters, parameters.length + 1);
+                withDecision[parameters.length] = jsonMapper.writeValueAsString(entry.routingDecision());
+                jdbc.update(INSERT_WITH_DECISION_SQL, withDecision);
+            }
         } catch (Exception error) {
             // 관측 로그 적재 실패가 사용자 응답을 막으면 안 된다.
             log.error("request_log 적재 실패 requestId={} origin={}",

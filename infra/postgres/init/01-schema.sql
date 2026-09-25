@@ -90,6 +90,8 @@ CREATE TABLE request_log (
     -- 재학습 전후 비교에 필수. 어느 모델 버전이 내린 판정인지 알아야 한다.
     router_model_version VARCHAR(128),
     router_confidence    REAL,
+    -- R0/R1 v2 판정의 정책/후보 provenance. v1, 캐시, 분류 폴백은 NULL.
+    routing_decision     JSONB,
     embed_model_version  VARCHAR(64),
 
     cache_hit            BOOLEAN      NOT NULL,
@@ -222,7 +224,7 @@ CREATE UNIQUE INDEX uq_escalation_log_tier ON escalation_log (request_id, final_
 
 -- ─────────────────────────────────────────────────────────────
 -- 재학습 피드백 배치 (04 API Contract)
--- migrations/08-feedback-batch.sql 과 같은 내용이다. 둘은 항상 같이 고친다.
+-- migrations/08-feedback-batch.sql 및 10-feedback-batch-snapshot.sql 적용 후 구조다.
 -- ─────────────────────────────────────────────────────────────
 
 -- 어느 배치로 나갔는가. NULL = 아직 안 나감.
@@ -241,6 +243,9 @@ CREATE TABLE feedback_batch (
     batch_id                VARCHAR(200) PRIMARY KEY,
     event_count             INTEGER      NOT NULL,
     events_fingerprint      CHAR(64),
+    -- Immutable outbound request; retries never read mutable escalation rows.
+    request_payload         JSONB,
+    polling_complete        BOOLEAN      NOT NULL DEFAULT false,
 
     -- 202 응답에서 받은 값
     pipeline_run_id         TEXT,          -- Google resource name. URL 이 아니다.
@@ -270,6 +275,6 @@ CREATE TABLE feedback_batch (
 
 CREATE INDEX idx_feedback_batch_pending
     ON feedback_batch (last_polled_at NULLS FIRST)
-    WHERE pipeline_status NOT IN ('succeeded', 'rejected', 'failed', 'cancelled');
+    WHERE polling_complete = false;
 
 CREATE INDEX idx_feedback_batch_submitted_at ON feedback_batch (submitted_at DESC);

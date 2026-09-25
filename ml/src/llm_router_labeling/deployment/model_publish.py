@@ -23,12 +23,14 @@ from .model_package import (
     ModelPackageError,
     validate_model_package,
 )
+from .promotion_evidence import PromotionEvidenceError, promotion_contract
 
 CURRENT_SCHEMA_VERSION = "router-current-model-v1"
 CURRENT_POINTER_FILENAME = "CURRENT.json"
 MANIFEST_FILENAME = "model_manifest.json"
 PACKAGE_IDENTITY_FILENAME = "PACKAGE_IDENTITY.json"
 PACKAGE_IDENTITY_SCHEMA_VERSION = "router-package-identity-v1"
+APPROVAL_IDENTITY_FILENAME = "APPROVAL_IDENTITY.json"
 
 
 class ModelPublishError(RuntimeError):
@@ -45,6 +47,45 @@ def approved_uri(root_uri: str, model_version: str) -> str:
 
 def current_pointer_uri(root_uri: str) -> str:
     return str(parse_gcs_uri(root_uri).child(CURRENT_POINTER_FILENAME))
+
+
+def _reserve_approval_identity(
+    root_uri: str, model_version: str, intent: dict[str, Any], object_store: ObjectStore
+) -> str:
+    """Pin approval metadata before writes so same-version races cannot corrupt it."""
+    uri = str(parse_gcs_uri(root_uri).child(model_version, APPROVAL_IDENTITY_FILENAME))
+    existing = object_store.read_text(uri)
+    if existing is None:
+        record = {
+            **intent,
+            "schema_version": "router-approval-identity-v1",
+            "approved_at": datetime.now(timezone.utc)
+            .isoformat(timespec="seconds")
+            .replace("+00:00", "Z"),
+        }
+        try:
+            object_store.write_text(
+                uri, json.dumps(record, sort_keys=True), if_generation_match=None
+            )
+            existing = json.dumps(record)
+        except ObjectStoreError:
+            existing = object_store.read_text(uri)
+            if existing is None:
+                raise
+    try:
+        record = json.loads(existing)
+    except (TypeError, json.JSONDecodeError) as exc:
+        raise ModelPublishError("Invalid approval identity") from exc
+    if (
+        not isinstance(record, dict)
+        or record.get("schema_version") != "router-approval-identity-v1"
+        or any(record.get(key) != value for key, value in intent.items())
+        or not isinstance(record.get("approved_at"), str)
+    ):
+        raise ModelPublishError(
+            "Physical model version already has a different approval identity"
+        )
+    return record["approved_at"]
 
 
 def _reserve_package_identity(
@@ -216,6 +257,8 @@ def approve_candidate(
     pipeline_run_id: str | None = None,
     work_dir: Path,
     allow_pointer_rollback: bool = False,
+    expected_baseline_model_version: str | None = None,
+    expected_baseline_manifest_sha256: str | None = None,
     logical_model_version: str | None = None,
     training_mode: str | None = None,
     retention_anchor_model_version: str | None = None,
@@ -228,8 +271,21 @@ def approve_candidate(
     """
     source = candidate_uri(root_uri, model_version)
     destination = approved_uri(root_uri, model_version)
+    initial_generation = object_store.generation(current_pointer_uri(root_uri))
     previous = read_current_pointer(root_uri, object_store=object_store)
+    if object_store.generation(current_pointer_uri(root_uri)) != initial_generation:
+        raise ModelPublishError("CURRENT changed while reading the baseline")
     previous_version = previous.get("model_version") if previous else None
+    if (
+        expected_baseline_model_version is not None
+        and previous_version != expected_baseline_model_version
+    ):
+        raise ModelPublishError("CURRENT no longer matches the qualified baseline")
+    if expected_baseline_manifest_sha256 is not None and (
+        not previous
+        or previous.get("manifest_sha256") != expected_baseline_manifest_sha256
+    ):
+        raise ModelPublishError("CURRENT baseline manifest differs from qualification")
     if previous_version == model_version:
         raise ModelPublishError(
             f"{model_version} is already the current approved model"
@@ -261,13 +317,30 @@ def approve_candidate(
         )
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    try:
+        promotion_contract(manifest, {"schema_version": "deploy-gate-result-v1"})
+    except PromotionEvidenceError as exc:
+        raise ModelPublishError(str(exc)) from exc
     if manifest.get("model_version") != model_version:
         raise ModelPublishError(
             f"Candidate manifest model_version is {manifest.get('model_version')!r}, "
             f"expected {model_version!r}"
         )
-    approved_at = (
-        datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    candidate_manifest_sha256 = sha256_file(manifest_path)
+    if previous and not allow_pointer_rollback:
+        _reject_pointer_rollback(previous, manifest)
+    approved_at = _reserve_approval_identity(
+        root_uri,
+        model_version,
+        {
+            "candidate_manifest_sha256": candidate_manifest_sha256,
+            "approved_by": approved_by,
+            "pipeline_run_id": pipeline_run_id,
+            "logical_model_version": logical_model_version,
+            "training_mode": training_mode,
+            "previous_pointer_generation": initial_generation,
+        },
+        object_store,
     )
     manifest["gate_status"] = "approved"
     manifest["approved_at"] = approved_at
@@ -283,9 +356,6 @@ def approve_candidate(
     # invalidate the package. Re-validate to prove that.
     validation = validate_model_package(staging, manifest_path)
 
-    if previous and not allow_pointer_rollback:
-        _reject_pointer_rollback(previous, manifest)
-
     _upload_package(
         staging,
         destination,
@@ -299,6 +369,8 @@ def approve_candidate(
         "schema_version": CURRENT_SCHEMA_VERSION,
         "model_version": model_version,
         "package_uri": destination,
+        "candidate_manifest_sha256": candidate_manifest_sha256,
+        "previous_pointer_generation": initial_generation,
         "previous_model_version": previous_version,
         "previous_package_uri": previous.get("package_uri") if previous else None,
         "approved_at": approved_at,
@@ -320,7 +392,7 @@ def approve_candidate(
     object_store.write_text(
         pointer_uri,
         json.dumps(pointer, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        if_generation_match=object_store.generation(pointer_uri),
+        if_generation_match=initial_generation,
     )
     pointer["retention_warnings"] = _prune_model_packages(
         root_uri=root_uri,

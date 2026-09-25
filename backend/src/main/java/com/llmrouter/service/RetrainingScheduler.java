@@ -83,7 +83,7 @@ public class RetrainingScheduler {
                 RetrainingStatus status = retrainingClient.status(batchId);
                 repository.recordStatus(batchId, status);
 
-                if (status.isTerminal()) {
+                if (status.isPollingComplete()) {
                     logTerminal(batchId, status);
                 }
             } catch (RetrainingClientException error) {

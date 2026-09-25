@@ -1,6 +1,6 @@
 # ML 최종 실험 명세
 
-기준일: 2026-09-25. 데이터·라우팅 비교·평가·재학습·캐시·실행 관리의 **현재 기준은 이 파일 하나**다. 과거 설정·실험 기록은 [Deprecated settings](../deprecated-settings.md), 설치·CLI 입구는 [ml/README](../../ml/README.md), 프로젝트 개요·협업 규칙은 [문서 시작점](../README.md)을 따른다. 프로젝트 결정 원장은 memorize다.
+기준일: 2026-09-26. 데이터·라우팅 비교·평가·재학습·캐시·실행 관리의 **현재 기준은 이 파일 하나**다. 과거 설정·실험 기록은 [Deprecated settings](../deprecated-settings.md), 설치·CLI 입구는 [ml/README](../../ml/README.md), 프로젝트 개요·협업 규칙은 [문서 시작점](../README.md)을 따른다. 프로젝트 결정 원장은 memorize다.
 
 > 어떤 조건에서 임베딩 캐시와 에스컬레이션 피드백 학습을 결합한 라우팅 시스템이 더 나은 비용–품질 균형을 만드는가?
 
@@ -93,6 +93,27 @@ R0는 hard 재현율 15.02%, hard→easy 오분류율 52.34%였다. Always-easy 
 같은 원천·카테고리 안에서 선택을 1,000회 재배정한 사후 D_dev 진단에서는 R1/R2의 RouterBench 품질이 재배정 범위보다 높았지만 비용도 높았다. xRouteBench는 세 방법 모두 그 품질 범위 안이었다. 이는 질문별 선택 정보의 보조 진단이며, 그 범위는 신뢰구간이나 독립 test 검정이 아니다. [재배정 진단 원본](../../experiments/results/routing-objectives-continual-v1-A-20260924/routing-diagnostics/category-permutation/original-audit.md).
 
 따라서 **R1의 기존 개발검증 선정은 유지하되, 보지 않은 task에서의 일반화와 실제 서비스 후보에 대한 성공·비용 성능은 별도 검증한다.** 이를 위해 일반화용 데이터 버전과 R1/R3×학습 분포 실험을 추가한다. 기존 결과를 좋은 결과로 바꾸기 위한 test 재튜닝이나 Arena의 학습 편입이 목적이 아니다. 이번 결과는 로컬에 보존했고 추가 GCS 업로드·운영 활성화는 하지 않았다. 평가 T4는 개인 `alexyoo0506@gmail.com` Colab에서 실행 후 종료했으며, 관측 잔액은 190.65→189.83 CU였다.
+
+<a id="context-length-adoption"></a>
+### 1.2. 8,192토큰 추론 채택의 근거와 적용 범위 — 2026-09-26
+
+**R0와 R1의 새 서비스 패키지는 추론 최대 길이 8,192를 목표로 구현한다.** 동일 체크포인트를 재학습 없이 평가한 결과와 사용자의 적용 결정을 반영한다. 512로 학습했다는 사실을 8,192로 학습한 것으로 바꾸지 않는다. 과거 [길이 검증 원본 보고서](../../experiments/results/context-length-qualification-20260925/REPORT.md)의 9월 25일 운영 전환 보류 판단은 그대로 보존한다. 이번 결정은 코드·패키지의 적용 목표를 확정한 것으로, 원본 결과나 미측정 운영 성능을 사후에 통과 처리하는 결정은 아니다.
+
+| 검증 항목 | R0 | 선정 후보 G1 R1-natural | 적용 판단에 쓰는 범위 |
+|---|---|---|---|
+| 동일 가중치 8,192 추론 | 전체 평가 완료, T4 OOM 없음 | 전체 평가 완료, T4 OOM 없음 | 추가 학습 없이 길이를 늘려 실행할 수 있다는 근거 |
+| 내부 검증·고정 test | D_dev/RouterBench/xRouteBench 정확도 60.542%/57.357%/66.130%로 동일 | calibration/selection/holdout 선택 품질 .757790/.751785/.652622로 동일 | 관측 데이터에서 핵심 품질 점수가 유지됨 |
+| RouterArena 전체 라벨 일치율 | 45.483% → 45.387% | 23.571% → 23.857% | 후보 선택 품질과 구분한 외부 난이도 진단 |
+| RouterArena 512 초과 748문항 | 33.155% → 32.086%; 변화 −1.070pp, 95% CI [−3.209,+1.070] | 56.417% → 59.626%; 변화 +3.209pp, 95% CI [+1.604,+4.813] | R0의 이득·동등성은 미입증, R1 장문 라벨 정렬은 개선 |
+| 비용 변화 | 내부 후보 품질 동일; xRouteBench 선택 1건 변화 | calibration 상대 비용 .428741 → .429315 | 동일 정확도라도 선택·비용이 바뀔 수 있음 |
+
+A R1도 별도 평가했으며 RouterArena 장문 일치율은 54.278%→56.551%, 실제 후보 품질은 동일했다. xRouteBench 상대 비용 .537229→.537993은 기존 .50 예산 초과가 조금 커진 결과다. G1 R1-natural의 실제 후보 결과가 있는 장문은 calibration 10개·selection 8개뿐이고 holdout에는 없다. RouterArena에는 현재 서비스 Claude 후보의 정답 결과가 없으므로 위 개선을 Claude 성공률 개선으로 표현하지 않는다. 8,192 초과 원문 8개는 여전히 잘리며, 변형 및 초장문 소표본의 하락도 원본에 남겼다.
+
+채택 이유는 **검증된 8,192 추론 가능성, 내부 품질 유지, 512에서 잘리던 문맥을 사용하는 공통 인터페이스**다. R0의 장문 성능 향상을 전제하지 않으며 불확실성을 공개한 상태로 구현한다. 같은 모델 계열 안에서 R0/R1을 비교하므로 서로 다른 모델과의 과거 공정 비교를 위해 선택한 512를 영구적인 서비스 제한으로 유지할 필요는 없다. 다만 실제 서비스의 품질·비용 gate와 자원 한도는 통과해야 한다.
+
+새 계약은 `length_contract_version=train-inference-lengths-v1`, 실제 학습 기록인 `training_max_length=512`, `inference_max_length=8192`, 호환 필드 `tokenizer_max_length=8192`를 기록한다. R1 policy의 `max_length`는 추론 길이이며 manifest와 일치해야 한다. `config.json.max_position_embeddings`보다 큰 길이는 거부한다. 과거 training config·실험 manifest·기존 GCS package는 소급 수정하지 않는다. 향후 재학습 길이를 8,192로 늘리는 것은 별도 자원 검증을 거쳐 새 training config에 기록하며, 이번 추론 길이 채택으로 자동 변경하지 않는다.
+
+후보와 기준 모델은 **같은 8,192 입력·전처리·정책 계약**으로 gate 평가한다. 기존 512 지표를 새 8,192 승격 근거로 재사용하지 않는다. GPU 배치 총시간이나 Colab CPU 전체 프로세스 시간을 FastAPI 응답 지연으로 해석하지 않는다. 실제 VM의 p50/p95·최대 메모리·동시 요청·Spring timeout 검증은 배포 후 단계이며, 통과 전에는 자동 재학습·운영 포인터 전환을 완료로 표시하지 않는다.
 
 <a id="data"></a>
 ## 2. 데이터·전처리
@@ -1214,7 +1235,7 @@ R0/R1/R2의 개발 검증 우승 방법과 즉시 운영 가능한 package는 �
 
 다음 인수 조건을 구현·검증한 후에만 채택 방법의 `1.0` 및 이후 재학습 모델을 활성화한다.
 
-1. **모델·정책 package:** objective ID, output/score 의미, action 순서, source별 `arms.json` hash, 실제 서비스 모델 mapping·가격/decision-cost version, 선택 budget·λ, 512-token 입력 계약과 policy hash를 함께 보존한다. serving loader가 지원하지 않는 objective/contract를 거부하도록 한다. 현재 softmax argmax는 λ=0인 경로이므로 R0가 이겨도 비교에서 동결한 정책과 자동으로 같아지는 것은 아니다.
+1. **모델·정책 package:** objective ID, output/score 의미, action 순서, source별 `arms.json` hash, 실제 서비스 모델 mapping·가격/decision-cost version, 선택 budget·λ, 학습/추론 길이를 분리한 입력 계약과 policy hash를 함께 보존한다. 새 R0/R1 추론 목표는 8,192이며 [채택 근거](#context-length-adoption)를 따른다. serving loader가 지원하지 않는 objective/contract를 거부하도록 한다. 현재 softmax argmax는 λ=0인 경로이므로 R0가 이겨도 비교에서 동결한 정책과 자동으로 같아지는 것은 아니다.
 2. **추론·응답:** offline evaluator와 online adapter에 같은 logits를 주었을 때 score·action·동률 처리의 일치를 검사한다. API에는 objective·policy version과 score 의미를 식별할 수 있는 계약이 필요하다. R1/R2의 action을 기존 tier 문자열로 전달할 때는 low/medium/high의 서비스 호환 투영임을 명시하고 인지 난이도 prediction이라고 부르지 않는다. 현 응답의 필수 숫자 `confidence`를 R2의 임의 softmax 값으로 채우지 않으며, 명시적인 별도 score 또는 nullable confidence를 지원하는 versioned 응답을 마련한다. Spring의 실제 모델 선택과 fallback도 같은 policy version을 기록한다.
 3. **후보 pool 이전:** A의 low/medium/high는 source마다 다른 역사적 실제 모델이다. 공개 source를 입력으로 모르는 서비스 요청에 source별 evaluator 정책을 그대로 적용할 수 없다. 하나의 서비스 후보 pool과 질문에서 사용 가능한 decision cost를 별도로 고정하고 mapping을 검증한다. Haiku/Sonnet/Opus에 이름을 대응시키는 것만으로 공개 benchmark의 품질·확률·비용이 이전되었다고 주장하지 않는다.
 4. **Feedback target과 loss:** 현 `initialLabel/finalLabel/userSatisfied`는 최종 만족과 escalation 경로의 일부만 담는다. 미호출 후보를 실패 0으로 채우거나, 중간 호출을 추정하거나, 만족=true를 객관적인 quality 점수로 만들지 않는다. R1의 online target에는 실제 호출별 모델 ID·관측 결과·판정 기준·관측 mask가 필요하며, loss는 관측된 후보 항에만 적용한다. 사용자 만족을 success proxy로 쓰면 별도 target version과 편향을 기록한다. R2에는 같은 질문의 관측된 두 응답에 대한 비교 가능한 quality/명시적 preference가 필요하다. 공개 quality 차이가 없는 online preference를 별도 loss/weight로 사용하면 초기 R2와의 차이를 이름·manifest에 남긴다. 근거가 부족한 행은 해당 target 업데이트에서 제외하고 제외 사유를 기록한다.
@@ -1226,6 +1247,37 @@ R0/R1/R2의 개발 검증 우승 방법과 즉시 운영 가능한 package는 �
 2026-09-24 코드 점검에서 Spring의 [`EscalationEvent`](../../backend/src/main/java/com/llmrouter/dto/EscalationEvent.java)는 명시적 만족 버튼이 없고 체인 종료를 `userSatisfied=true`로 간주한다고 문서화한다. 이 신호를 실제 만족 관측이나 객관적인 정답으로 표시하지 않는다. 초기 공개 데이터 비교와 온라인 피드백 수집 변경은 별도 실행이며, 명시적 만족·선호 입력의 추가 여부는 사용자 확인 중이다.
 
 로컬 구현 증거: `2bb4395`의 [정책 helper](../../ml/src/llm_router_labeling/training/routing_policy.py)와 v2 후보 패키지는 세 목적함수의 score/action 및 기존 tier 투영을 검증한다. `2d0e503`은 물리 버전별 파일·정책 identity를 고정하고 현재 CE gate로 v2가 자동 승인되는 것을 차단한다. `e565f21`은 이전 approved 패키지의 실제 SHA와 메타데이터로 롤백한다. 이는 실제 서비스 policy 값의 선정·게시·활성화 완료를 뜻하지 않는다.
+
+<a id="common-first-implementation"></a>
+### 5.11. 공통 기반을 먼저 완성하는 R0·R1 구현 순서 — 2026-09-26
+
+두 저장소의 원격 main을 기준으로 `feat/retraining-common-foundation`을 만들고, 검증한 공통 커밋에서 `feat/r0-retraining-8192`와 `feat/r1-retraining-8192`를 각각 분기한다. 이전 작업 브랜치·미커밋 변경은 별도 원본 작업 공간에 보존하며 공통 코드와 섞어 병합하지 않는다. Spring 담당자가 확인할 변경 목록은 [공통 Spring 인계 문서](SPRING_COMMON_HANDOFF.md)에 기록한다. 현재 단계는 로컬 코드·브랜치 작성이며 main 병합·원격 push·운영 전환을 완료했다고 표시하지 않는다.
+
+| 순서 | 공통으로 먼저 만들 항목 | 완료 판단 | 시점 |
+|---|---|---|---|
+| 1 | 학습/추론 길이 manifest, 전처리, package/policy hash, 시작 적재·hot reload | R0/v1·R1/v2 생산자→소비자 fixture 일치, 잘못된 새 package 거부 및 기존 모델 유지 | 분기 전 |
+| 2 | Spring v2 계약·정책 provenance, feedback 원자적 claim, 요청 snapshot·멱등 재시도, PII 검사, 상태 polling | 기존 v1 회귀와 PostgreSQL 동시 제출·rollback·migration 검증 | 분기 전 |
+| 3 | GCS 경로·API·IAM·서비스 계정·AR·보존 정책 | 실제 inventory, 새 feedback 경로의 VM 계정 접근 확인, 기존 CURRENT 보존 | 분기 전 |
+| 4 | 승격 증거·CURRENT CAS·실제 활성화 상태 | Vertex 성공만으로 승격 성공을 만들지 않고 gate/manifest/pipeline/batch/hash 결합 확인 | 분기 전 |
+| 5 | R0/R1별 target·loss·gate·release 설정 | 아래 방법별 계약을 각 브랜치에서 검증; 실제 release 입력 누락 시 차단 | 공통 커밋 후 병렬 |
+| 6 | 방법별 이미지 digest→IR→config/data SHA 고정·게시 | smoke gate·빈 baseline·미확정 정책을 차단하고 새 immutable 객체로 보존 | 방법별 코드 확정 후 |
+| 7 | 실제 서버 환경·지연·메모리·연결 및 재학습 E2E | 202→학습→gate→CURRENT→실제 적재, 실패·재시도·rollback 검증 | 서버 배포 후 |
+
+**실제 서비스는 R1 한 방식만 운영한다.** R0는 교체 가능한 별도 구현 브랜치로 유지하며, R0↔R1 전환 때 기존 API 경로·요청·응답 필드를 바꾸지 않는다. Spring은 기존 `/router/classify`와 feedback API를 계속 사용하고 서버 내부의 모델·loss·정책·설정만 전환한다. v2 상세 진단 경로가 존재해도 서비스 연결의 필수 조건으로 만들지 않는다.
+
+공통 cloud namespace는 `gs://llm-router-mlserver/releases/r0/`와 `.../r1/`이다. 두 방식의 설정 경로는 예약하되 **GCS에는 활성 방식의 모델 그룹만 둔다.** 두 모델 그룹을 동시에 운영·보존하는 계획이 아니다. feedback·control·관측·SQLite는 방법을 식별해 잘못된 이력을 재사용하지 않으며, 활성 방식의 registry·CURRENT만 연결한다. 임시 Vertex artifact만 `pipeline-root/r0/`와 `pipeline-root/r1/`에 두며 이 prefix에는 기존 1일 lifecycle 삭제가 적용된다. 모델·평가 원본·현재/직전/anchor는 그 임시 prefix에 두지 않는다. 동일 서비스 계정을 공유한 경로 분리는 권한상 완전 격리를 의미하지 않는다. [실제 cloud 증거와 재검사 도구](CLOUD_FOUNDATION.md)를 연결하며 inventory 확인과 실제 계정별 접근, 배포 준비 완료를 구분한다.
+
+모델 그룹 교체 순서는 자동 재학습·승격 중지 및 진행 작업 종료 → 기존 그룹의 current/previous/anchor·tokenizer·policy·manifest·gate 증거를 개인 Drive로 보존 → **Drive 원격 재읽기와 파일별 SHA 검증** → 기존 GCS 모델 객체를 generation 조건으로 제거 → 새 그룹 게시·CURRENT 설정 → 실제 로딩·API 호환 확인 → 재학습 재개다. Drive Desktop 폴더에 복사된 것만으로 원격 보존 완료로 판단하지 않는다. 두 그룹의 GCS 동시 존재를 허용하지 않으므로 교체 도중 짧은 유지보수 구간을 계획하고, 실패 시 Drive 보존본으로 복구한다. 같은 방식의 버전업에서는 current/previous/anchor를 유지할 수 있지만 다른 방식의 이전 그룹은 Drive에서 관리한다. 현재 단계에서는 기존 운영 모델을 삭제하거나 교체하지 않았다.
+
+| 구분 | R0 브랜치 | R1 브랜치 |
+|---|---|---|
+| Spring | 기존 escalation의 finalLabel proxy 유지, 공통 batch/retry/polling 적용 | 실제 호출 모델·정책과 연결된 명시적 관측 target·판정 출처·관측 mask 수집; 종료=true를 성공으로 사용하지 않음 |
+| FastAPI·전처리 | 구조 보존 입력과 8,192 추론, finalLabel CE 데이터 계약 | 8,192 pointwise 추론, 별도 관측 feedback 계약·정책/pool 검증 |
+| ML 재학습 | 기존 난이도 CE, 보호 split·replay 유지 | 관측된 후보 항에만 BCE, 미호출 후보는 결측, target/mask를 replay까지 보존 |
+| 승격 | 보호 D_gate의 분류 품질·회귀 및 동일 길이 baseline | 동결 서비스 pool의 선택 품질·비용 gate; CE 점수로 대신 승인 금지 |
+| 배포 기본 | 자동 제출·활성화는 검증된 release 입력이 있을 때만 | 동일; benchmark 모델 ID를 Claude로 이름만 바꾼 release 금지 |
+
+공통 부분이라고 해서 배포 후 검증을 미리 완료 처리하지 않는다. 컨테이너의 실제 UID·볼륨·ADC·secret, Spring→FastAPI 연결, 8,192 p95/메모리, CURRENT와 실제 로딩 모델의 일치는 서버가 준비된 뒤 측정한다. Spring 기존 15초 timeout은 측정 없이 임의로 늘리지 않는다. 지금 존재하지 않는 실제 서비스 pool 결과·baseline·gate 기준은 만들어 넣지 않고 release 준비 검사에서 누락을 명시한다.
 
 <a id="cache"></a>
 ## 6. 캐시 실험
@@ -1625,7 +1677,7 @@ retraining-runs/<batch>/observability-v1/
 research/<experiment-version>/  독립 dataset·prediction·snapshot·비용 ledger
 ```
 
-임시 pipeline artifact에는 별도 lifecycle을 적용하되 durable model/research 결과를 함께 만료시키지 않는다. [lifecycle 예시](../../ml/config/gcs_pipeline_artifacts_lifecycle.example.json)는 실제 prefix와 복구 요구에 맞춰 검토한다. 모델은 current/previous/anchor, 연구 증거는 연구 retention 정책으로 보존한다.
+임시 pipeline artifact에는 별도 lifecycle을 적용하되 durable model/research 결과를 함께 만료시키지 않는다. [lifecycle 예시](../../ml/config/gcs_pipeline_artifacts_lifecycle.example.json)는 실제 prefix와 복구 요구에 맞춰 검토한다. 활성 방식 안의 모델은 current/previous/anchor를 보존한다. R0↔R1 교체로 비활성화되는 모델 그룹은 원격 Drive 보존·SHA 검증 후 GCS에서 제거한다. 연구 결과의 비모델 증거는 연구 retention 정책으로 보존하고, 연구 archive에 포함된 checkpoint도 교체 시 모델 inventory에 포함한다.
 
 <a id="execution-6"></a>
 ### 7.6. 실험별 필수 산출물
