@@ -76,7 +76,7 @@
   },
   "deployment_policy": {
     "service_mode": "single-active-objective",
-    "target_profile": "r1",
+    "target_profile": "r0",
     "http_contract": "existing-v1-unchanged",
     "gcs_model_groups": "active-objective-only",
     "inactive_model_storage": "google-drive",

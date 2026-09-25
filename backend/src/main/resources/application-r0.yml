@@ -1,0 +1,9 @@
+# R0 is a swap profile on the same existing API. Select with SPRING_PROFILES_ACTIVE=r0.
+# Supply the real internal URL/token/version via the existing environment variables.
+llm:
+  router:
+    mode: ${ROUTER_MODE:fastapi}
+    classify-contract: v1
+  retraining:
+    # Actual 8192 baseline, D_dev pilot, frozen D_gate and cloud activation are pending.
+    auto-submit: false

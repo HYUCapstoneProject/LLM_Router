@@ -70,6 +70,8 @@ PYTHONPATH=ml/src .venv/bin/python -m llm_router_labeling.objective_comparison.c
 
 `ordinal`이라는 기존 CLI 값은 **일반 3-class cross entropy인 R0**를 뜻한다. `regret`는 구현되어 있어도 현재 최소 실험의 필수 비교군이 아니다. RouterDC·BGE+kNN·캐시·feedback 실험 전체의 실행기가 준비되어 있다는 의미도 아니다.
 
+R0 교체 브랜치의 로컬 release 준비기는 `PYTHONPATH=ml/src .venv/bin/python ml/scripts/prepare-r0-release.py --help`로 확인한다. 필수 실제 baseline·pilot·8192 평가 SHA 및 출력 계약은 [R0 release 문서](../docs/ml/R0_RELEASE_CONFIG.md)를 따른다.
+
 ## 실행과 검증
 
 공통 데이터 동결 → 소규모 pilot → 비교 학습 → validation 정책 동결 → 최종 test 순서를 따른다. 운영 기본 config에 과거 v2의 8192-token·balanced 설정이 있어도 신규 공정 비교의 설정으로 자동 재사용하지 않는다.

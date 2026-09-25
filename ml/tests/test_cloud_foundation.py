@@ -251,11 +251,9 @@ def test_single_active_unchanged_api_policy_is_required(config, key, value):
     assert validate_config(config)[0]
 
 
-def test_only_active_profile_release_inputs_are_required(config):
+@pytest.mark.parametrize("active,inactive", [("r0", "r1"), ("r1", "r0")])
+def test_only_active_profile_release_inputs_are_required(config, active, inactive):
+    config["deployment_policy"]["target_profile"] = active
     pending = audit(config)["release_inputs_pending"]
-    assert any(item.startswith("r1:") for item in pending)
-    assert not any(item.startswith("r0:") for item in pending)
-    config["deployment_policy"]["target_profile"] = "r0"
-    pending = audit(config)["release_inputs_pending"]
-    assert any(item.startswith("r0:") for item in pending)
-    assert not any(item.startswith("r1:") for item in pending)
+    assert any(item.startswith(f"{active}:") for item in pending)
+    assert not any(item.startswith(f"{inactive}:") for item in pending)
