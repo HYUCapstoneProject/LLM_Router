@@ -152,7 +152,11 @@ class GcsObjectStore:
         return self._get_client().bucket(parsed.bucket).blob(parsed.prefix)
 
     def upload_file(self, source: Path, destination_uri: str) -> None:
-        self._blob(destination_uri).upload_from_filename(str(source))
+        blob = self._blob(destination_uri)
+        # Bound each resumable transfer chunk on slower developer uplinks. This
+        # does not change immutable package identity or CURRENT generation CAS.
+        blob.chunk_size = 8 * 1024 * 1024
+        blob.upload_from_filename(str(source), timeout=(20, 120))
 
     def download_file(self, source_uri: str, destination: Path) -> None:
         destination.parent.mkdir(parents=True, exist_ok=True)
