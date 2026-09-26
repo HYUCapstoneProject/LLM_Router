@@ -262,6 +262,7 @@ def approve_candidate(
     logical_model_version: str | None = None,
     training_mode: str | None = None,
     retention_anchor_model_version: str | None = None,
+    initial_qualification: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Copy a candidate to ``approved/`` and move the ``CURRENT.json`` pointer.
 
@@ -275,6 +276,20 @@ def approve_candidate(
     previous = read_current_pointer(root_uri, object_store=object_store)
     if object_store.generation(current_pointer_uri(root_uri)) != initial_generation:
         raise ModelPublishError("CURRENT changed while reading the baseline")
+    if initial_qualification is not None:
+        gate = initial_qualification
+        generation = gate.get("expected_current_generation")
+        if (
+            gate.get("qualification_mode") != "initial_baseline"
+            or gate.get("passed") is not True
+            or gate.get("candidate_model_version") != model_version
+            or gate.get("model_publish_root_uri") != root_uri.rstrip("/")
+            or "expected_current_generation" not in gate
+            or (generation is not None and (type(generation) is not int or generation <= 0))
+            or generation != initial_generation
+            or training_mode != "initial_training"
+        ):
+            raise ModelPublishError("Initial qualification identity, mode or CURRENT generation mismatch")
     previous_version = previous.get("model_version") if previous else None
     if (
         expected_baseline_model_version is not None
@@ -327,6 +342,15 @@ def approve_candidate(
             f"expected {model_version!r}"
         )
     candidate_manifest_sha256 = sha256_file(manifest_path)
+    if initial_qualification is not None:
+        from .promotion_evidence import validate_gate_package_binding
+
+        try:
+            validate_gate_package_binding(manifest, initial_qualification)
+        except PromotionEvidenceError as exc:
+            raise ModelPublishError(str(exc)) from exc
+        if initial_qualification.get("candidate_manifest_sha256") != candidate_manifest_sha256:
+            raise ModelPublishError("Initial qualification candidate manifest checksum mismatch")
     if previous and not allow_pointer_rollback:
         _reject_pointer_rollback(previous, manifest)
     approved_at = _reserve_approval_identity(

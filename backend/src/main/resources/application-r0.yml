@@ -1,4 +1,5 @@
-# R0 is a swap profile on the same existing API. Select with SPRING_PROFILES_ACTIVE=r0.
+# R0 retraining keeps the existing API. Production: SPRING_PROFILES_ACTIVE=prod,r0.
+# Keep prod active: its gateway-key startup guard is required for deployment.
 # Supply the real internal URL/token/version via the existing environment variables.
 llm:
   router:

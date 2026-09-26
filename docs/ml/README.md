@@ -1,6 +1,6 @@
 # ML 최종 실험 명세
 
-기준일: 2026-09-26. 데이터·라우팅 비교·평가·재학습·캐시·실행 관리의 **현재 기준은 이 파일 하나**다. 과거 설정·실험 기록은 [Deprecated settings](../deprecated-settings.md), 설치·CLI 입구는 [ml/README](../../ml/README.md), 프로젝트 개요·협업 규칙은 [문서 시작점](../README.md)을 따른다. 프로젝트 결정 원장은 memorize다.
+기준일: 2026-09-27. 데이터·라우팅 비교·평가·재학습·캐시·실행 관리의 **현재 기준은 이 파일 하나**다. 과거 설정·실험 기록은 [Deprecated settings](../deprecated-settings.md), 설치·CLI 입구는 [ml/README](../../ml/README.md), 프로젝트 개요·협업 규칙은 [문서 시작점](../README.md)을 따른다. 프로젝트 결정 원장은 memorize다.
 
 > 어떤 조건에서 임베딩 캐시와 에스컬레이션 피드백 학습을 결합한 라우팅 시스템이 더 나은 비용–품질 균형을 만드는가?
 
@@ -1263,7 +1263,7 @@ R0/R1/R2의 개발 검증 우승 방법과 즉시 운영 가능한 package는 �
 | 6 | 방법별 이미지 digest→IR→config/data SHA 고정·게시 | smoke gate·빈 baseline·미확정 정책을 차단하고 새 immutable 객체로 보존 | 방법별 코드 확정 후 |
 | 7 | 실제 서버 환경·지연·메모리·연결 및 재학습 E2E | 202→학습→gate→CURRENT→실제 적재, 실패·재시도·rollback 검증 | 서버 배포 후 |
 
-**실제 서비스는 R1 한 방식만 운영한다.** R0는 교체 가능한 별도 구현 브랜치로 유지하며, R0↔R1 전환 때 기존 API 경로·요청·응답 필드를 바꾸지 않는다. Spring은 기존 `/router/classify`와 feedback API를 계속 사용하고 서버 내부의 모델·loss·정책·설정만 전환한다. v2 상세 진단 경로가 존재해도 서비스 연결의 필수 조건으로 만들지 않는다.
+**2026-09-27 변경: 기존 큰 A 데이터로 R0 학습한 ModernBERT를 초기 서비스 및 재학습의 출발점으로 채택한다.** 이 결정은 9월 26일의 R1 운영 우선 방침을 대체한다. R1 관측 수집·재학습은 연구 브랜치에 보존하고 운영 범위에서 보류한다. R1→R0 전환 학습이 아니며 기존 R0 체크포인트의 실제 manifest·SHA·데이터 이력을 확인해 사용한다. 학습 길이 512 이력은 유지하고 추론·승격 비교는 8192로 검증한다. 출발 모델 보존 기록은 A train 21,406·dev 3,581·2,007 step의 `modernbert-initial-v1-20260924`이며, archive·weights SHA와 재검증 경계는 [사용자 인계](R0_USER_HANDOFF.md#출발-모델)에 기록한다. 향후 R0↔R1 전환 때 기존 API 경로·요청·응답 필드를 바꾸지 않는다. Spring은 기존 `/router/classify`와 feedback API를 계속 사용하고 서버 내부의 모델·loss·정책·설정만 전환한다. v2 상세 진단 경로가 존재해도 서비스 연결의 필수 조건으로 만들지 않는다.
 
 공통 cloud namespace는 `gs://llm-router-mlserver/releases/r0/`와 `.../r1/`이다. 두 방식의 설정 경로는 예약하되 **GCS에는 활성 방식의 모델 그룹만 둔다.** 두 모델 그룹을 동시에 운영·보존하는 계획이 아니다. feedback·control·관측·SQLite는 방법을 식별해 잘못된 이력을 재사용하지 않으며, 활성 방식의 registry·CURRENT만 연결한다. 임시 Vertex artifact만 `pipeline-root/r0/`와 `pipeline-root/r1/`에 두며 이 prefix에는 기존 1일 lifecycle 삭제가 적용된다. 모델·평가 원본·현재/직전/anchor는 그 임시 prefix에 두지 않는다. 동일 서비스 계정을 공유한 경로 분리는 권한상 완전 격리를 의미하지 않는다. [실제 cloud 증거와 재검사 도구](CLOUD_FOUNDATION.md)를 연결하며 inventory 확인과 실제 계정별 접근, 배포 준비 완료를 구분한다.
 
@@ -1277,22 +1277,22 @@ R0/R1/R2의 개발 검증 우승 방법과 즉시 운영 가능한 package는 �
 | 승격 | 보호 D_gate의 분류 품질·회귀 및 동일 길이 baseline | 동결 서비스 pool의 선택 품질·비용 gate; CE 점수로 대신 승인 금지 |
 | 배포 기본 | 자동 제출·활성화는 검증된 release 입력이 있을 때만 | 동일; benchmark 모델 ID를 Claude로 이름만 바꾼 release 금지 |
 
-R0 교체 브랜치의 실제 입력·CLI·Spring/FastAPI 설정 계약은 [R0 release 실행 인터페이스](R0_RELEASE_CONFIG.md)에 연결한다. 이 브랜치의 cloud target은 r0이며 운영 기본 목표 R1을 전역 변경한 것이 아니다. 로컬 준비기는 8192 approved baseline과 D_dev pilot·D_gate 증거가 없으면 release를 생성하지 않는다.
+R0 교체 브랜치의 실제 입력·CLI·Spring/FastAPI 설정 계약은 [R0 release 실행 인터페이스](R0_RELEASE_CONFIG.md)에 연결한다. 이 브랜치의 cloud target은 r0이며 2026-09-27부터 운영 재학습의 중심이다. 로컬 준비기는 8192 approved baseline과 D_dev pilot·D_gate 증거가 없으면 release를 생성하지 않는다.
 
 공통 부분이라고 해서 배포 후 검증을 미리 완료 처리하지 않는다. 컨테이너의 실제 UID·볼륨·ADC·secret, Spring→FastAPI 연결, 8,192 p95/메모리, CURRENT와 실제 로딩 모델의 일치는 서버가 준비된 뒤 측정한다. Spring 기존 15초 timeout은 측정 없이 임의로 늘리지 않는다. 지금 존재하지 않는 실제 서비스 pool 결과·baseline·gate 기준은 만들어 넣지 않고 release 준비 검사에서 누락을 명시한다.
 
 <a id="post-implementation-work"></a>
-### 5.12. 파이프라인·서비스 코드 완성 이후 남은 작업 — 2026-09-26
+### 5.12. 파이프라인·서비스 코드 완성 이후 남은 작업 — 2026-09-27
 
-코드 구현 완료, 실제 서비스 인수, 전체 연구 완료는 서로 다른 단계다. 기본 운영은 R1이며 R0는 교체 브랜치로 유지한다. A의 R0/R1/R2, G1의 R1/R3 natural/balanced, 고정 holdout·RouterArena 및 512→8192 길이 비교는 이미 수행했으므로 아래 목록을 이 실험의 전면 재실행 요구로 읽지 않는다.
+코드 구현 완료, 실제 서비스 인수, 전체 연구 완료는 서로 다른 단계다. 기본 운영은 기존 A의 R0이며 R1은 연구 브랜치로 보존한다. A의 R0/R1/R2, G1의 R1/R3 natural/balanced, 고정 holdout·RouterArena 및 512→8192 길이 비교는 이미 수행했으므로 아래 목록을 이 실험의 전면 재실행 요구로 읽지 않는다.
 
-**아직 코드 단계에서 남은 연결.** R1의 명시적 관측 저장·내부 export, 부분 관측 masked BCE, 기존 API를 유지하는 추론 프로필, 품질·비용 qualification 함수는 로컬 구성요소다. 실제 판정 수집→관측 배치 제출→Vertex 재학습→R1 전용 승격 증거·publisher 연결을 완료한 것은 아니다. 기존 finalLabel CE 입력을 R1 성공 라벨로 바꾸거나 R0 gate로 R1을 승인하지 않으며, 이 연결 전에는 legacy 자동 제출을 차단한다. 이 문단의 미완료 구현을 아래의 배포 후 시험만 남은 상태로 표시하지 않는다.
+**보류한 R1 연구 연결.** 다음 항목은 R0 출시의 선행 조건이 아니다. R1의 명시적 관측 저장·내부 export, 부분 관측 masked BCE, 기존 API를 유지하는 추론 프로필, 품질·비용 qualification 함수는 로컬 구성요소다. 실제 판정 수집→관측 배치 제출→Vertex 재학습→R1 전용 승격 증거·publisher 연결을 완료한 것은 아니다. 기존 finalLabel CE 입력을 R1 성공 라벨로 바꾸거나 R0 gate로 R1을 승인하지 않으며, 이 연결 전에는 legacy 자동 제출을 차단한다. 이 문단의 미완료 구현을 아래의 배포 후 시험만 남은 상태로 표시하지 않는다.
 
 | 운영 순서 | 코드 완성 이후 수행할 작업 | 완료 증거 |
 |---|---|---|
-| 1. 실제 서비스 모델·정책 확정 | 실제 후보 3개의 고정 모델 ID, 단가/의사결정 비용 버전, 비용 가중치 λ와 policy를 확정한다. 공개 benchmark pool의 성공률을 실제 Claude 성공률로 이름만 바꾸지 않는다. | 후보 pool·policy·모델 파일 hash와 선정 근거 |
-| 2. 운영 데이터·기준 모델·승격 시험 준비 | 명시적으로 판정된 실제 호출 결과와 보호된 D_dev/D_gate를 준비한다. 학습은 관측 후보만 사용하지만 공정한 R1 승격 비교에는 동일 문항의 세 후보 결과가 필요하다. 동일8192 baseline과 품질·비용·domain 회귀 허용치를 D_dev에서 동결한다. | 데이터/평가 manifest·SHA, baseline, 동결 기준 및 실제 평가 결과 |
-| 3. R1 배포 | image digest→새 Vertex IR→config/data/model SHA를 고정한다. 계정별 실제 IAM·image pull·quota·비용 한도, DB migration·SQLite/볼륨·secret을 확인한다. 기존 그룹을 Drive에서 원격 재읽기·SHA 검증한 후 교체하여 GCS에는 활성 모델 그룹 하나만 둔다. | 재현 가능한 release, Drive 보존/교체 기록, 기존 API 연결 및 실제 적재 모델 |
+| 1. R0 출발 모델 확인 | 큰 A 데이터로 학습한 기존 R0의 checkpoint·tokenizer·manifest·학습 데이터 이력을 검증한다. G1 R1/R3 또는 R1→R0 변환 모델을 대신 쓰지 않는다. 실제 tier→서비스 모델 매핑도 확인한다. | 출발 모델·데이터 manifest·SHA, 기존512 학습 및 새8192 추론 기록 |
+| 2. R0 기준 모델·승격 시험 준비 | 동일8192 기준 모델과 보호된 D_dev/D_gate를 사용하고 분류 품질·회귀 기준을 D_dev에서 동결한다. 기존 finalLabel은 대리 라벨이며 체인 종료를 명시적 성공으로 보지 않는다. 기존 데이터 복습을 유지하고 상위 단계 편중·비용을 관찰한다. | 데이터/평가 manifest·SHA, 승인 baseline, 동결 기준 및 실제 평가 결과 |
+| 3. R0 배포 | image digest→새 Vertex IR→config/data/model SHA를 고정한다. 계정별 실제 IAM·image pull·quota·비용 한도, DB migration·SQLite/볼륨·secret을 확인한다. 기존 그룹을 Drive에서 원격 재읽기·SHA 검증한 후 교체하여 GCS에는 활성 모델 그룹 하나만 둔다. | 재현 가능한 release, Drive 보존/교체 기록, 기존 API 연결 및 실제 적재 모델 |
 | 4. 실제 서버8192 시험 | 짧은/긴 입력의 p50/p95, 최대 메모리, 동시 요청, timeout·fallback을 측정한다. 기존 Spring 15초 timeout의 적합성을 결과로 판단한다. | 대상 VM 측정 보고서; Colab GPU의 forward 성공으로 대체하지 않음 |
 | 5. 전체 재학습·복구 시험 | 유효 피드백→학습→승격 시험→CURRENT→서버 실제 적재를 실행한다. 중복 제출·재시도·동시 요청·gate 탈락·적재 실패·rollback·Drive 복구도 확인한다. | 배치별 로그/지표/승격 증거와 서버 modelVersion 일치; 단순202 또는 Vertex 성공만으로 완료 처리하지 않음 |
 
@@ -1306,7 +1306,7 @@ R0 교체 브랜치의 실제 입력·CLI·Spring/FastAPI 설정 계약은 [R0 r
 | 공정한 기준선·논문 비교 | source-only B의 실제 공통 세 후보에서 TF-IDF, BGE+kNN, ModernBERT 및 RouterDC를 같은 조건으로 비교한다. finalist 추가 seed, confidence 보정, group bootstrap을 마무리한다. |
 | 인지 수준·최종 보고서 | blind 주석·통제 문항쌍과 사람 검증을 수행하고, 난이도 label 일치·후보 선택 품질·인지 정렬을 분리해 재현 가능한 보고서와 그림을 완성한다. |
 
-권장 실행 순서는 **남은 R1 연결 구현 → 운영 인수1~5 → 재학습 효과 → 캐시 → 외부 일반화·논문 비교 보완**이다. 독립적인 데이터 적합성 조사·보고서 정리는 병렬로 진행할 수 있다.
+권장 실행 순서는 **R0 공통·운영 코드 통합 → 운영 인수1~5 → 재학습 효과 → 캐시 → 외부 일반화·논문 비교 보완**이다. 독립적인 데이터 적합성 조사·보고서 정리는 병렬로 진행할 수 있다. 사용자가 직접 확인할 작업과 Spring 담당자 인계는 [R0 사용자 인계](R0_USER_HANDOFF.md)에 정리한다. R1의 연구 선정 결과는 그대로 보존하며 운영 선택 변경을 실험 우승 변경으로 표현하지 않는다.
 
 <a id="cache"></a>
 ## 6. 캐시 실험

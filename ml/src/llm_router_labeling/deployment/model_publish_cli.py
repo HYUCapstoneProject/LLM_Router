@@ -151,6 +151,7 @@ def main() -> None:
         result["gate_result"] = gate
     elif args.command == "approve":
         resumed_pointer = None
+        gate = {}
         if args.publish_result:
             published = _read_json(args.publish_result)
             expected_uri = candidate_uri(args.root_uri, args.model_version)
@@ -207,6 +208,11 @@ def main() -> None:
                 != published.get("candidate_manifest_sha256")
             ):
                 raise SystemExit("Publish evidence is not bound to a passing gate")
+            if gate.get("qualification_mode") == "initial_baseline":
+                if args.training_mode != "initial_training":
+                    raise SystemExit("Initial qualification cannot authorize feedback retraining")
+                if gate.get("model_publish_root_uri") != args.root_uri.rstrip("/"):
+                    raise SystemExit("Initial qualification belongs to another model registry")
             if args.observability_run_uri:
                 if (
                     gate.get("batch_id") != args.batch_id
@@ -266,6 +272,7 @@ def main() -> None:
                     logical_model_version=args.logical_model_version,
                     training_mode=args.training_mode,
                     retention_anchor_model_version=args.retention_anchor_model_version,
+                    initial_qualification=(gate if gate.get("qualification_mode") == "initial_baseline" else None),
                 )
     elif args.command == "rollback":
         result = rollback_current_pointer(

@@ -111,7 +111,7 @@ docker exec -i llmrouter-postgres psql -U llmrouter -d llmrouter < 01-schema.sql
 # 게이트웨이
 docker run -d --name llm-router-backend --restart unless-stopped \
   --network host \
-  -e SPRING_PROFILES_ACTIVE=prod \
+  -e SPRING_PROFILES_ACTIVE=prod,r0 \
   -e ANTHROPIC_API_KEY=<KEY> \
   -e POSTGRES_PASSWORD=<DB_PASSWORD> \
   -e GATEWAY_KEY=<공유 시크릿> \
@@ -121,7 +121,7 @@ docker run -d --name llm-router-backend --restart unless-stopped \
   $REPO/gateway:v1
 ```
 
-> `SPRING_PROFILES_ACTIVE=prod` 를 반드시 넣는다.
+> R0 운영에서는 `SPRING_PROFILES_ACTIVE=prod,r0` 를 넣는다. `r0`만 활성화하면 아래 `prod` 보안 검사가 빠지므로 단독으로 사용하지 않는다.
 > 이 프로파일에서 `GATEWAY_KEY` 가 비어 있으면 **기동 자체가 실패한다.**
 > 키 미설정은 "검증 통과"로 동작하므로(fail-open), 이 장치가 없으면
 > 환경변수를 빠뜨렸을 때 경고 없이 8080 이 무방비로 열린다.
@@ -150,24 +150,25 @@ curl -i http://<VM_EXTERNAL_IP>:8080/api/chat \
 > 로그만 조용히 비어간다.** 비용 그래프의 원천 데이터가 사라지는 것을
 > 나중에야 알아차리게 된다.
 
-마이그레이션 파일은 `infra/postgres/migrations/` 에 번호순으로 쌓인다.
-전부 `IF NOT EXISTS` 라 여러 번 돌려도 안전하니, 어디까지 적용했는지 모르겠으면
-처음부터 다 돌리면 된다.
+마이그레이션 파일은 `infra/postgres/migrations/`에 번호순으로 쌓인다. 기존 DB의 적용 이력과 백업을 먼저 확인한다. **R0 재학습 배포는 08까지 적용된 DB에 09와 10을 순서대로 추가한다.** 08 이전이라면 담당자가 누락 migration부터 순서대로 적용한다. 새 빈 DB는 최신 `init/01-schema.sql`을 사용한다. R1 전용 migration 11은 R0 배포에 필요하지 않다.
+
+배포 중 자동·수동 재학습 제출을 중지하고 진행 배치를 대조한다. migration 10은 snapshot이 없는 미접수 과거 배치를 격리하므로 단순 컬럼 추가로 취급하지 않는다. [Spring 인계](../docs/ml/SPRING_COMMON_HANDOFF.md)의 복구 절차를 따른다.
 
 ```bash
-# 1. VM 으로 복사
-gcloud compute scp infra/postgres/migrations/*.sql \
+# 08까지 적용된 기존 DB 대상. 현재 배포 대상 프로젝트/VM을 확인한 뒤 실행.
+gcloud compute scp infra/postgres/migrations/09-routing-decision.sql \
+  infra/postgres/migrations/10-feedback-batch-snapshot.sql \
   llm-router-workspace:/tmp/ --zone=asia-northeast3-a
 
-# 2. VM 안에서 적용 (컨테이너 교체 전!)
 gcloud compute ssh llm-router-workspace --zone=asia-northeast3-a
-for f in /tmp/0*.sql; do
-  echo "--- $f"
-  docker exec -i llmrouter-postgres psql -U llmrouter -d llmrouter -v ON_ERROR_STOP=1 < "$f"
+# VM 안에서, 컨테이너 교체 전에 실행. 실패하면 다음 파일 적용을 중지.
+for f in /tmp/09-routing-decision.sql /tmp/10-feedback-batch-snapshot.sql; do
+  docker exec -i llmrouter-postgres psql -U llmrouter -d llmrouter -v ON_ERROR_STOP=1 < "$f" || break
 done
-
-# 3. 그 다음에 게이트웨이 컨테이너 교체
+# 두 파일 모두 성공한 기록 확인 후 게이트웨이 컨테이너 교체.
 ```
+
+`/tmp/0*.sql` 패턴은 10 이상을 누락하므로 사용하지 않는다. 기존 자동 배포 도우미는 컨테이너 환경변수를 보존하며 `prod,r0`를 새로 선택하지 않는다. 운영 담당자가 profile과 자동 제출 중지 상태를 명시적으로 확인해야 한다.
 
 적용 여부는 컬럼 존재로 확인한다.
 

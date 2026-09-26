@@ -1,6 +1,6 @@
 # R0 교체 프로필과 release 준비 계약
 
-이 문서는 `feat/r0-retraining-8192`의 실행 인터페이스다. 전체 결정·실험 해석은 [최종 실험 명세](README.md#context-length-adoption), 공통 선행 작업과 단일 활성 모델 정책은 [공통 구현 순서](README.md#common-first-implementation)를 따른다. 기본 운영 목표 R1을 바꾸는 문서가 아니며, R0로 교체할 때 사용하는 별도 브랜치다. 이 브랜치의 `cloud-foundation-v1.json`만 `target_profile=r0`다.
+이 문서는 `feat/r0-retraining-8192`의 실행 인터페이스다. 전체 결정·실험 해석은 [최종 실험 명세](README.md#context-length-adoption), 공통 선행 작업과 단일 활성 모델 정책은 [공통 구현 순서](README.md#common-first-implementation)를 따른다. 2026-09-27 사용자 결정에 따라 기존 큰 A 데이터로 학습한 R0를 운영 재학습의 출발점으로 사용한다. R1 도입과 R1→R0 전환 학습은 보류한다. 이 브랜치의 `cloud-foundation-v1.json`만 `target_profile=r0`다.
 
 ## 길이·API·학습 계약
 
@@ -53,7 +53,7 @@ PYTHONPATH=ml/src .venv/bin/python ml/scripts/prepare-r0-release.py \
 
 ## Spring과 FastAPI 설정
 
-Spring은 `SPRING_PROFILES_ACTIVE=r0`와 기존 `ROUTER_BASE_URL`, `ROUTER_API_TOKEN`, `ROUTER_MODEL_VERSION`을 사용한다. `application-r0.yml`은 FastAPI/v1을 선택하고 자동 제출을 중지한다. `ROUTER_READ_TIMEOUT=PT15S` 등 기존 timeout은 실제 서버 측정 없이 늘리지 않았다. 로컬 stub이 필요하면 `ROUTER_MODE=stub`을 명시한다.
+Spring은 `SPRING_PROFILES_ACTIVE=prod,r0`와 기존 `ROUTER_BASE_URL`, `ROUTER_API_TOKEN`, `ROUTER_MODEL_VERSION`을 사용한다. `application-r0.yml`은 FastAPI/v1을 선택하고 자동 제출을 중지한다. `ROUTER_READ_TIMEOUT=PT15S` 등 기존 timeout은 실제 서버 측정 없이 늘리지 않았다. 로컬 stub이 필요하면 `ROUTER_MODE=stub`을 명시한다.
 
 FastAPI 저장소의 `deploy/r0.env.example`은 R0 registry/CURRENT, feedback/control/observability, `/app/var/r0/` cache/SQLite, 실제 공통 프로젝트·서비스 계정을 고정한다. 실제 secret, 승인 baseline version, full code SHA와 생성한 release/IR/data URI를 채운 후 다음 로컬 검사를 실행한다.
 
@@ -68,3 +68,23 @@ PYTHONPATH=src .venv/bin/python scripts/validate-r0-profile.py --env-file deploy
 GCS에는 활성 objective의 모델 그룹 하나만 둔다. R0/R1의 예약된 namespace metadata와 공통 IAM 존재를 두 모델 그룹 배포로 해석하지 않는다. 교체 전에 제출·승격을 중지하고 진행 중인 작업을 종료한다. 기존 current/previous/anchor와 policy/tokenizer/manifest/gate·승격 증거, 복구용 상태를 개인 Drive로 보존한 뒤 원격으로 다시 읽어 파일별 SHA를 검증한다. 그 후 기존 GCS 그룹을 generation 조건으로 제거하고 새 R0 그룹을 게시한다. Drive Desktop 복사만으로 검증 완료를 표시하지 않는다. 다른 objective의 GCS 그룹을 동시에 남기지 않으므로 교체 구간의 중단 및 Drive 복구 절차가 필요하다.
 
 배포 이후에만 확인 가능한 항목은 실제 UID/볼륨/ADC/secret, Spring 연결, VM의 8192 p50/p95·최대 메모리·동시 요청, 202→Vertex→gate→CURRENT→활성 모델 일치, 실패·재시도·rollback이다. 공통 `router-promotion-evidence-v1`은 candidate/approved manifest·지표·gate·batch/job·CURRENT SHA와 CAS를 검증한다. Vertex `SUCCEEDED`만으로 승격이나 활성화를 완료 처리하지 않는다. R1/v2를 이 CE gate로 승인하는 경로는 열지 않았다.
+
+## 첫 R0 8192 baseline의 별도 qualification
+
+이미 approved baseline이 있어야 하는 일반 release 준비기와 처음 모델을 등록하는 절차를 분리한다. `ml/scripts/qualify-r0-initial.py`는 보호된 D_gate의 **실제 8192 평가 결과**를 candidate package의 파일 SHA와 대조하고, D_dev에서 미리 동결한 **절대 품질 하한**을 적용한다. 자기 자신을 baseline으로 넣거나 512 평가 metadata만 바꾸는 경로가 아니다. 이 CLI는 로컬 gate 증거만 기록하며 GCS 게시·CURRENT 변경·GPU 실행은 하지 않는다.
+
+필수 입력은 다음과 같다.
+
+- `--candidate-package`, `--gate-metrics`, `--development-metrics`: 실제 초기 R0 패키지와 해당 모델의 8192 D_gate/D_dev 지표.
+- `--gate-dataset`, `--development-dataset`, `--config-dir`: frozen 데이터 SHA와 평가 계약. D_dev와 D_gate는 서로 다른 데이터다.
+- `--rules-path`, `--pilot-report`: `r0-initial-rules-v1`와 `r0-initial-pilot-v1`. macro-F1, hard recall, 각 source/domain macro-F1 절대 하한을 외부에서 명시하고, baseline 대비 delta는 사용하지 않는다. 도구에 기본 하한은 없다.
+- `--root-uri`, `--expected-current-generation`: 게시 대상 registry와 확인한 CURRENT generation. CURRENT가 없을 때만 `absent`를 명시한다.
+- `--output`: 아직 존재하지 않는 새 결과 파일. 불합격도 증거를 기록하고 exit 2로 종료한다.
+
+`rules.required_evaluation_contract`는 D_gate의 role/split/version/data SHA/label semantics/order/model_info.max_length/dataset contract 전체를 고정한다. `threshold_selection`은 D_dev SHA, `frozen_before_gate=true`, pilot report 원본 SHA를 고정한다. pilot은 초기 candidate version/weights SHA, D_dev metrics SHA, 길이8192, `selected_rules`(threshold_selection을 제외한 rules)를 묶는다. 이 동결 선언 자체가 실행 시각을 증명하지는 않으므로 D_gate 실행 전 파일·로그 보존이 필요하다. 초기 gate 통과는 내부 난이도 라벨에 대한 qualification이며 실제 Claude 응답 품질이나 서버 성능 보장은 아니다.
+
+통과 결과는 기존 `deploy-gate-result-v1`에 `qualification_mode=initial_baseline`을 명시한다. 기존 publisher의 `publish-candidate --gate-result`와 `approve --publish-result --training-mode initial_training`을 사용하며, 승인 시 모델·패키지·registry·qualification 당시 CURRENT generation이 일치해야 한다. 중간에 CURRENT가 바뀌면 거부하고 마지막 pointer 쓰기도 기존 generation CAS로 보호한다. 이 증거로 일반 feedback 재학습을 승인할 수 없다. 최초 승인 이후에는 기존 `prepare-r0-release.py`가 요구하는 approved baseline과 회귀 한도를 이용한다.
+
+초기 qualification의 소표본 domain 예외는 `initial-small-domain-report-only-v1`로 명시한다. **D_dev domain 문항 수가 30 미만**이면 그 domain은 숫자 하한을 넣지 않고 `insufficient_support`, `quality_unverified=true`, 실제 문항 수를 기록한다. qualification 도구는 SHA가 고정된 D_dev parquet의 category→domain 매핑으로 문항 수를 다시 계산하여 예외 목록과 대조한다. 전체 macro-F1·hard recall·두 source와 충분한 표본의 domain 하한은 계속 필수다. D_gate에도 제외 domain 지표를 출력하며, 결과의 `quality_unverified_domains`와 `automatic_feedback_submission_authorized=false`를 유지한다. 이 예외는 초기 등록만 대상으로 하며 일반 재학습 회귀 gate를 완화하지 않는다.
+
+2026-09-27 D_dev에서 duplicate_group_id 단위 bootstrap 1,000회(seed 42)의 pointwise 양측 95% 구간 하단(2.5 percentile)을 초기 라벨 일관성 하한으로 선택했다. conversation은 8문항이고 하한이 0이므로 위 명시 정책의 보고 전용 대상이다. 0을 통과용 threshold로 쓰거나 임의 양수로 바꾸지 않았다. 동결은 D_gate 실행 전에 이루어졌으며, 서비스 대화 품질의 보증이나 독립 검증에서의 개선 증거로 해석하지 않는다. 전체 실제 파일과 SHA는 `ml/artifacts/r0-release-20260927/qualification/development-provenance.json`에 있다.
