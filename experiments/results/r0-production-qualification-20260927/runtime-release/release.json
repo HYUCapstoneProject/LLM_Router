@@ -1,0 +1,56 @@
+{
+  "base_dataset_sha256": "74835d16e293e2bf04244a952a63b8c12dc28fa27e1ab03b106d5095a855e85f",
+  "base_manifest_sha256": "f5b98ee1cbba5c5cf2d56e7e1e124ee06b36541fd4feba6782c2855fb33c853f",
+  "baseline_manifest_sha256": "68dd3b9cd5c13bd5275e4d0ac05fcfbc7f8c7e1e9d112908d5181873590ad1d2",
+  "baseline_metrics_sha256": "7455e59b00ff396346f1995f75658eb131d55f9e13b3669ea3f9865cf339139f",
+  "baseline_model_version": "router-modernbert-r0-a-20260927-v1",
+  "cloud_deployed": false,
+  "code_commit": "1300f763b61376e183be102152d2a50966e7bb75",
+  "development_dataset_sha256": "fb698a992f05b88bfd4488c7de0abe515e52107c8435a46fa9a45bfb63b7f4d0",
+  "files": {
+    "baseline-metrics.json": {
+      "sha256": "7455e59b00ff396346f1995f75658eb131d55f9e13b3669ea3f9865cf339139f",
+      "size_bytes": 13147
+    },
+    "development.json": {
+      "sha256": "6844965872106fcd2333db3db0e148fb0e3d0c26e2933675be42bc78bd2746f3",
+      "size_bytes": 1813
+    },
+    "evaluation.json": {
+      "sha256": "02cfc85e15b742e425380facc9aee38e87afe042a8de7f86661728037f6d05ba",
+      "size_bytes": 1798
+    },
+    "feedback.json": {
+      "sha256": "fa9a5817318aeb16f3394e33d9930be83f0f9fa6b316378f36def29e38e2fcb6",
+      "size_bytes": 2072
+    },
+    "gate-rules.json": {
+      "sha256": "b5887c4e6155e1d573c6960f801fe5aeb6076bed7e9e584993061d60575a2b61",
+      "size_bytes": 5879
+    },
+    "package-metadata.json": {
+      "sha256": "86a162df3c22fcab34047b62cedcc872064e0ed6ac89ed36f527440265684feb",
+      "size_bytes": 950
+    },
+    "training.json": {
+      "sha256": "d694367d7aa6d05b31a787af423449a7ebfd106ad29905c113d6fb1a92b41e3b",
+      "size_bytes": 808
+    }
+  },
+  "gate_dataset_sha256": "94ed6c7be5966b37d7bb24aa5d37d35d1aed5e245b3a5b97b18a80cc944f4187",
+  "inference_max_length": 8192,
+  "length_contract_version": "train-inference-lengths-v1",
+  "model_approved": false,
+  "objective": "ordinal",
+  "pilot_metrics_sha256": "66a60a17dfd47f83e1b475d44cf145f53a150a3155d7a8c94f48ae34ff7b9492",
+  "pilot_report_sha256": "acbd868e6cfb50bdb2abe4694cac89034146632a5bbc6ba45262b9b5611fba51",
+  "remaining_release_checks": [
+    "Verify active group archive in Drive by remote readback/SHA before switching.",
+    "Build and pin all image digests; compile matching managed Vertex IR.",
+    "After the single-group switch, upload immutable R0 artifacts and configure URIs.",
+    "Verify a cloud run, CURRENT reconciliation, serving activation and rollback."
+  ],
+  "schema_version": "r0-release-config-v1",
+  "training_max_length": 512,
+  "version_policy_mode": "successfulHttpRequest"
+}

@@ -1,18 +1,23 @@
 package com.llmrouter.repository;
 
 import com.llmrouter.dto.EscalateAcceptance;
+import com.llmrouter.dto.EscalationEvent;
+import com.llmrouter.dto.FeedbackBatchRequest;
+import com.llmrouter.dto.RouterTier;
 import com.llmrouter.dto.RetrainingStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.sql.Array;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -69,6 +74,7 @@ public class FeedbackBatchRepository {
             """;
 
     private final JdbcTemplate jdbc;
+    private final JsonMapper jsonMapper;
 
     public int countEligible() {
         Integer count = jdbc.queryForObject(
@@ -76,53 +82,59 @@ public class FeedbackBatchRepository {
         return count == null ? 0 : count;
     }
 
-    public List<EscalationRow> findEligible(int limit) {
-        return jdbc.query("SELECT " + COLUMNS + " FROM escalation_log WHERE " + ELIGIBLE_PREDICATE
-                + " ORDER BY created_at LIMIT ?", ROW_MAPPER, limit);
-    }
-
-    /** 이미 제출한 배치의 이벤트를 그대로 복원한다. 재시도 payload 는 바뀌면 안 된다. */
-    public List<EscalationRow> findByBatch(String batchId) {
-        return jdbc.query("SELECT " + COLUMNS
-                + " FROM escalation_log WHERE exported_batch_id = ? ORDER BY created_at",
-                ROW_MAPPER, batchId);
-    }
-
-    /**
-     * 배치 행을 만들고 대상 이벤트에 batchId 를 찍는다. <b>반드시 한 트랜잭션이다.</b>
-     *
-     * <p>둘이 갈라지면 "찍혔는데 배치 행이 없는" 이벤트가 생기고, 그 행들은 대기 목록에도
-     * 배치 목록에도 안 잡혀 조용히 사라진다.
-     */
+    /** Select, claim and freeze the outbound request in one database transaction. */
     @Transactional
-    public String claim(List<Long> escalationIds, String trigger, String dayPrefix) {
-        for (int attempt = 1; attempt <= 50; attempt++) {
-            Integer used = jdbc.queryForObject(
-                    "SELECT count(*) FROM feedback_batch WHERE batch_id LIKE ?",
-                    Integer.class, dayPrefix + "%");
-            String batchId = "%s%04d".formatted(dayPrefix, (used == null ? 0 : used) + attempt);
-            try {
-                jdbc.update("INSERT INTO feedback_batch (batch_id, event_count, triggered_by)"
-                        + " VALUES (?, ?, ?)", batchId, escalationIds.size(), trigger);
-            } catch (DuplicateKeyException collision) {
-                continue;   // 동시 트리거. 다음 번호로 넘어간다.
-            }
-            // JdbcTemplate 은 Java 배열을 SQL 배열로 바인딩하지 않는다.
-            // ANY(?) 에 Long[] 을 넘기면 드라이버가 타입을 정하지 못해 실패한다.
-            String placeholders = IntStream.range(0, escalationIds.size())
-                    .mapToObj(i -> "?").collect(Collectors.joining(","));
-            Object[] params = new Object[escalationIds.size() + 1];
-            params[0] = batchId;
-            for (int i = 0; i < escalationIds.size(); i++) {
-                params[i + 1] = escalationIds.get(i);
-            }
-            jdbc.update("UPDATE escalation_log SET exported_batch_id = ? WHERE id IN ("
-                    + placeholders + ")", params);
-            return batchId;
+    public Optional<FeedbackBatchRequest> claimEligible(int limit, String trigger,
+                                                       String dayPrefix, Instant requestedAt) {
+        if (limit < 1) throw new IllegalArgumentException("batch size must be positive");
+        List<EscalationRow> rows = jdbc.query(
+                "SELECT " + COLUMNS + " FROM escalation_log WHERE " + ELIGIBLE_PREDICATE
+                        + " ORDER BY created_at, id LIMIT ? FOR UPDATE SKIP LOCKED", ROW_MAPPER, limit);
+        if (rows.isEmpty()) return Optional.empty();
+
+        String batchId = dayPrefix + UUID.randomUUID();
+        FeedbackBatchRequest request = new FeedbackBatchRequest(batchId, requestedAt,
+                rows.stream().map(FeedbackBatchRepository::toEvent).toList());
+        // The snapshot includes requestedAt and event values. Later escalation edits cannot
+        // mutate an already submitted request, even after a process restart.
+        jdbc.update("""
+                INSERT INTO feedback_batch (batch_id, event_count, triggered_by, request_payload)
+                VALUES (?, ?, ?, ?::jsonb)
+                """, batchId, rows.size(), trigger, jsonMapper.writeValueAsString(request));
+        String placeholders = IntStream.range(0, rows.size())
+                .mapToObj(i -> "?").collect(Collectors.joining(","));
+        Object[] params = new Object[rows.size() + 1];
+        params[0] = batchId;
+        for (int i = 0; i < rows.size(); i++) params[i + 1] = rows.get(i).id();
+        int claimed = jdbc.update("UPDATE escalation_log SET exported_batch_id = ?"
+                + " WHERE exported_batch_id IS NULL AND id IN (" + placeholders + ")", params);
+        if (claimed != rows.size()) {
+            throw new IllegalStateException("feedback event claim changed within transaction");
         }
-        throw new IllegalStateException("batchId 발급에 반복 실패했습니다");
+        return Optional.of(request);
     }
 
+    /** No fallback to mutable source rows when a legacy request has no snapshot. */
+    public Optional<FeedbackBatchRequest> findRequest(String batchId) {
+        return jdbc.query("""
+                SELECT request_payload FROM feedback_batch
+                 WHERE batch_id = ? AND request_payload IS NOT NULL
+                   AND pipeline_run_id IS NULL AND pipeline_status = 'submitted'
+                """, (rs, index) -> jsonMapper.readValue(
+                        rs.getString("request_payload"), FeedbackBatchRequest.class), batchId)
+                .stream().findFirst();
+    }
+
+    private static EscalationEvent toEvent(EscalationRow row) {
+        String[] path = row.escalationPath();
+        return new EscalationEvent("esc-" + row.id(), row.requestId(), row.question(),
+                RouterTier.fromLabel(row.initialTier()), path[0],
+                RouterTier.fromLabel(row.finalTier()), path[path.length - 1],
+                true, row.escalationSeq(), row.createdAt(), row.routerModelVersion(), true);
+    }
+
+    // A confirmed acceptance may resolve an earlier uncertain quarantine, but a duplicate
+    // 202 must not reset a job whose polling has already advanced beyond queued.
     @Transactional
     public void recordAcceptance(EscalateAcceptance acceptance) {
         jdbc.update("""
@@ -130,8 +142,9 @@ public class FeedbackBatchRepository {
                    SET pipeline_run_id = ?, logical_model_version = ?,
                        candidate_model_version = ?, training_mode = ?,
                        version_policy_mode = ?, status_url = ?,
-                       pipeline_status = 'queued'
-                 WHERE batch_id = ?
+                       pipeline_status = 'queued', failure_code = NULL,
+                       retryable = NULL, polling_complete = false
+                 WHERE batch_id = ? AND pipeline_run_id IS NULL
                 """,
                 acceptance.pipelineRunId(), acceptance.logicalModelVersion(),
                 acceptance.candidateModelVersion(), acceptance.trainingMode(),
@@ -146,13 +159,26 @@ public class FeedbackBatchRepository {
      */
     @Transactional
     public void release(String batchId, String failureCode) {
-        jdbc.update("UPDATE escalation_log SET exported_batch_id = NULL WHERE exported_batch_id = ?",
-                batchId);
-        jdbc.update("""
+        // Lock/transition the batch before touching its events. A late failure from another
+        // submission attempt must not release events after a 202 has already been recorded.
+        int changed = jdbc.update("""
                 UPDATE feedback_batch
                    SET pipeline_status = 'failed', failure_code = ?, retryable = false,
-                       completed_at = now()
-                 WHERE batch_id = ?
+                       completed_at = now(), polling_complete = true
+                 WHERE batch_id = ? AND pipeline_run_id IS NULL AND pipeline_status = 'submitted'
+                """, failureCode, batchId);
+        if (changed == 1) {
+            jdbc.update("UPDATE escalation_log SET exported_batch_id = NULL WHERE exported_batch_id = ?",
+                    batchId);
+        }
+    }
+
+    /** A conflict may already represent an accepted remote job. Keep its event ownership. */
+    public void quarantine(String batchId, String failureCode) {
+        jdbc.update("""
+                UPDATE feedback_batch SET pipeline_status = 'unknown', failure_code = ?,
+                       retryable = false, polling_complete = true
+                 WHERE batch_id = ? AND pipeline_run_id IS NULL AND pipeline_status = 'submitted'
                 """, failureCode, batchId);
     }
 
@@ -161,6 +187,7 @@ public class FeedbackBatchRepository {
         return jdbc.queryForList("""
                 SELECT batch_id FROM feedback_batch
                  WHERE pipeline_run_id IS NULL AND pipeline_status = 'submitted'
+                   AND request_payload IS NOT NULL
                  ORDER BY submitted_at
                 """, String.class);
     }
@@ -171,8 +198,8 @@ public class FeedbackBatchRepository {
      * <p>계약의 폴링 정책을 SQL 로 옮긴 것이다 — <b>202 수신 10초 후 시작, 이후 15초 →
      * 30초 → 60초 상한으로 backoff.</b> 애플리케이션에서 배치별 타이머를 들고 있으면
      * 재시작할 때마다 간격이 초기화되고, 인스턴스가 둘이면 서로 다른 주기로 같은 배치를
-     * 두드린다. 다음 호출 시점을 DB 의 {@code last_polled_at} 하나로 정하면 그 두 문제가
-     * 같이 사라진다.
+     * 두드린다. 다음 호출 시점을 DB 의 {@code last_polled_at} 하나로 정하면 재시작 후에도 대기 간격을 유지한다. 여러 인스턴스의 중복 조회는
+     * 가능하지만 조회와 동일 상태 반영은 멱등이다.
      *
      * <p>간격을 경과 시간으로 정하는 이유는 학습이 분 단위로 걸리기 때문이다. 제출 직후에는
      * 빨리 확인하고, 길어질수록 느슨하게 본다.
@@ -181,7 +208,7 @@ public class FeedbackBatchRepository {
         return jdbc.queryForList("""
                 SELECT batch_id FROM feedback_batch
                  WHERE pipeline_run_id IS NOT NULL
-                   AND pipeline_status NOT IN ('succeeded', 'rejected', 'failed', 'cancelled')
+                   AND polling_complete = false
                    AND (
                         (last_polled_at IS NULL
                              AND submitted_at < now() - interval '10 seconds')
@@ -198,7 +225,7 @@ public class FeedbackBatchRepository {
     /**
      * 폴링 결과를 반영한다.
      *
-     * <p>{@code completed_at} 은 terminal 일 때만 채운다. {@code stale=true} 처럼
+     * <p>{@code completed_at} 은 polling 완료일 때만 채운다. {@code stale=true} 처럼
      * "완료로 확정하지 않는" 구간을 완료로 적으면 실험 타임라인이 어긋난다.
      */
     @Transactional
@@ -207,17 +234,18 @@ public class FeedbackBatchRepository {
                 UPDATE feedback_batch
                    SET pipeline_status = ?, pipeline_stage = ?,
                        result_outcome = ?, failure_code = ?, retryable = ?,
-                       activation_status = ?,
+                       activation_status = ?, polling_complete = ?,
                        last_polled_at = now(),
-                       completed_at = CASE WHEN ?::boolean THEN now() ELSE completed_at END
+                       completed_at = CASE WHEN ?::boolean THEN COALESCE(completed_at, now()) ELSE NULL END
                  WHERE batch_id = ?
                 """,
                 status.status(), status.stage(),
                 status.result() == null ? null : status.result().outcome(),
-                status.failureCode(),
+                status.failureCode() != null ? status.failureCode()
+                        : "loadFailed".equals(status.activationStatus()) ? "MODEL_ACTIVATION_FAILED" : null,
                 status.result() == null ? null : status.result().retryable(),
-                status.activationStatus(),
-                status.isTerminal(),
+                status.activationStatus(), status.isPollingComplete(),
+                status.isPollingComplete(),
                 batchId);
     }
 

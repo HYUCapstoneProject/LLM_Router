@@ -1,0 +1,97 @@
+{
+  "automatic_feedback_submission_authorized": false,
+  "baseline_model_version": null,
+  "candidate_manifest_sha256": "5b10df21c666a6c81deb7348910f039afb012207c3af0011da9c3b81583fc9cb",
+  "candidate_metrics_sha256": "7455e59b00ff396346f1995f75658eb131d55f9e13b3669ea3f9865cf339139f",
+  "candidate_model_version": "router-modernbert-r0-a-20260927-v1",
+  "checks": [
+    {
+      "actual": 0.5082482903379232,
+      "name": "macro_f1",
+      "operator": ">=",
+      "passed": true,
+      "threshold": 0.49985175212750016
+    },
+    {
+      "actual": 0.22394678492239467,
+      "name": "per_class.hard.recall",
+      "operator": ">=",
+      "passed": true,
+      "threshold": 0.20971037334798576
+    },
+    {
+      "actual": 0.49480710378563336,
+      "name": "per_domain.code.macro_f1",
+      "operator": ">=",
+      "passed": true,
+      "threshold": 0.3029519221369598
+    },
+    {
+      "actual": 0.35481946456354957,
+      "name": "per_domain.commonsense.macro_f1",
+      "operator": ">=",
+      "passed": true,
+      "threshold": 0.34355974400401773
+    },
+    {
+      "actual": 0.43191726712882333,
+      "name": "per_domain.knowledge.macro_f1",
+      "operator": ">=",
+      "passed": true,
+      "threshold": 0.42903122661913434
+    },
+    {
+      "actual": 0.5428957833639639,
+      "name": "per_domain.math.macro_f1",
+      "operator": ">=",
+      "passed": true,
+      "threshold": 0.514666931974809
+    },
+    {
+      "actual": 0.6281842818428184,
+      "name": "per_domain.reading_comprehension.macro_f1",
+      "operator": ">=",
+      "passed": true,
+      "threshold": 0.534745669289293
+    },
+    {
+      "actual": 0.44473706490446246,
+      "name": "per_source_dataset.routerbench.macro_f1",
+      "operator": ">=",
+      "passed": true,
+      "threshold": 0.44313630941004756
+    },
+    {
+      "actual": 0.609158509755554,
+      "name": "per_source_dataset.xroutebench.macro_f1",
+      "operator": ">=",
+      "passed": true,
+      "threshold": 0.5445140696681611
+    }
+  ],
+  "cloud_deployed": false,
+  "expected_current_generation": null,
+  "failed_checks": [],
+  "gate_schema_version": "deploy-gate-result-v1",
+  "inference_max_length": 8192,
+  "length_contract_version": "train-inference-lengths-v1",
+  "model_publish_root_uri": "gs://llm-router-mlserver/releases/r0/models/router-modernbert",
+  "objective": "ordinal",
+  "package_schema_version": "model-package-v1",
+  "passed": true,
+  "pilot_report_sha256": "3904fa99b19ae995a8f0745f3d15127991ae42922cf53faf374eea50f117fe6f",
+  "qualification_mode": "initial_baseline",
+  "quality_unverified_domains": [
+    "conversation"
+  ],
+  "report_only_domains": {
+    "conversation": {
+      "development_row_count": 8,
+      "quality_unverified": true,
+      "reason": "insufficient_support"
+    }
+  },
+  "rules_sha256": "cc741b2e025f95cdec159a593db2dc29954ae0cb2f57154da27f0f14d018c132",
+  "rules_version": "r0-a-initial-8192-ddev-group-bootstrap-20260927-v1",
+  "schema_version": "deploy-gate-result-v1"
+}

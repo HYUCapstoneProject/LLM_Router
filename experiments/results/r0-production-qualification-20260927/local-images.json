@@ -1,0 +1,30 @@
+{
+  "schema_version": "release-images-v1",
+  "images": [
+    {
+      "local_ref": "llm-router-model-promotion:r0-20260927-upload8m",
+      "expected_image_id": "sha256:52d948ac88356655746ccbd5ccd880a4a33045d8b4e5948083d069bb9fcfb9e8",
+      "remote_ref": "us-west1-docker.pkg.dev/project-763753da-fa8f-4afd-b31/llm-router/llm-router-model-promotion:r0-1300f763-20260927"
+    },
+    {
+      "local_ref": "llm-router-data-processing:r0-20260927-upload8m",
+      "expected_image_id": "sha256:ce3066b1561ea41a36141b54a6027af8585e1db97a4db5b0ea56e31f9632cc29",
+      "remote_ref": "us-west1-docker.pkg.dev/project-763753da-fa8f-4afd-b31/llm-router/llm-router-data-processing:r0-1300f763-20260927"
+    },
+    {
+      "local_ref": "llm-router-modernbert-evaluation:r0-20260927-upload8m",
+      "expected_image_id": "sha256:6cfc3abf74d7a423572b40dec5bac796017ccd556299287b91d2a62616335d68",
+      "remote_ref": "us-west1-docker.pkg.dev/project-763753da-fa8f-4afd-b31/llm-router/llm-router-modernbert-evaluation:r0-1300f763-20260927"
+    },
+    {
+      "local_ref": "llm-router-modernbert-training:r0-20260927-upload8m",
+      "expected_image_id": "sha256:2b0dbf1449a4f21d8b120ad194e4a33352dd7655be1053d3fd4254d62b879362",
+      "remote_ref": "us-west1-docker.pkg.dev/project-763753da-fa8f-4afd-b31/llm-router/llm-router-modernbert-training:r0-1300f763-20260927"
+    },
+    {
+      "local_ref": "llm-router-serving:r0-20260927-local",
+      "expected_image_id": "sha256:e7ba5514b1304cf4b0147e742ae5dd19d7df0de59959e2cbe93c67941c7844c7",
+      "remote_ref": "us-west1-docker.pkg.dev/project-763753da-fa8f-4afd-b31/llm-router/llm-router-serving:r0-b8bfb94-20260927"
+    }
+  ]
+}

@@ -2,6 +2,10 @@
 
 2026-09-24 기록과 2026-09-25 인수 갱신. [최종 실험 명세](README.md#retraining-objective-handoff)를 실제 실행 상태와 연결한다.
 
+## 2026-09-26 공통 기반 우선 인수
+
+현재 실행 순서는 [단일 명세 §5.11](README.md#common-first-implementation), 8,192 추론 적용 근거는 [§1.2](README.md#context-length-adoption)를 따른다. 아래 9월 24~25일 내용은 당시 구현 이력이다. 현재 공통 작업 공간은 저장소 안의 `.worktrees/common-ml`과 `.worktrees/common-serving`이며, 소실된 `/private/tmp` 작업 공간을 실행 위치로 사용하지 않는다. 학습 512 기록은 보존하고 새 추론 길이는 8,192로 분리한다.
+
 ## 2026-09-25 구현 인수 갱신
 
 G1 네 arm 평가와 [통합 분석](../../experiments/results/routing-method-review-20260925/REVIEW.md)을 마쳤고, 사용자는 R1 방식의 구현 브랜치와 기존 R0 방식의 별도 완성 브랜치를 요청했다. 이는 연구 체크포인트의 즉시 운영 승인을 의미하지 않는다. R1-natural은 구현의 기준이며 실제 서비스 후보의 관측 데이터·비용 정책·승격 gate가 필요하다.

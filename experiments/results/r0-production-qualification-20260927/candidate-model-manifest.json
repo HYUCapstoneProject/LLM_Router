@@ -1,0 +1,38 @@
+{
+  "base_model": "answerdotai/ModernBERT-base@8949b909ec900327062f0ebf497f51aef5e6f0c8",
+  "code_commit": "eb016ac8183b1f4ef90a752153476a17898b3ed5",
+  "created_at": "2026-09-26T18:14:54+00:00",
+  "dataset_manifest_sha256": "f6a4cff1684bc2626a8901dbfda9f81e7d5d7e8753e5f48320cb1ada44c8cca4",
+  "dataset_version": "routerbench-xroutebench-continual-v1",
+  "evaluation_role": "continual_gate",
+  "evaluation_version": "routerbench-xroutebench-label-evaluation-r0-inference8192-v1",
+  "files": {
+    "config.json": "ec78dcebe3890eaf422a55e3261f70a8579cdd4298cb51ec0fcc2949538646b5",
+    "gate_metrics.json": "7455e59b00ff396346f1995f75658eb131d55f9e13b3669ea3f9865cf339139f",
+    "metrics.json": "a3b6b0b2a1e876280faf42b1a1c4e39c303c947e77aeb05918a9755ee86c7fa0",
+    "model.safetensors": "e1a40fec7d269d8f925b5391e4f5e75df5d0fedbb1e37b4eea96521e27b1a6a7",
+    "tokenizer.json": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+    "tokenizer_config.json": "626c86908d7c711f93b0feffd8657b782cc2727b391f9be190240e8cafb626d5",
+    "training_config.json": "ccbad2aeae5ee063593526c23cc573a41e4b693910a7ce81071a8036def999da"
+  },
+  "gate_status": "candidate",
+  "id2label": {
+    "0": "easy",
+    "1": "medium",
+    "2": "hard"
+  },
+  "inference_max_length": 8192,
+  "input_contract": "structure-preserving-v2",
+  "label_rule_version": "overall-solve-rate-grid-v1:h0.27-e0.64",
+  "length_contract_version": "train-inference-lengths-v1",
+  "logical_model_version": "1.0",
+  "model_version": "router-modernbert-r0-a-20260927-v1",
+  "preprocessing_version": "integrated-routing-preprocess-v2-structure",
+  "schema_version": "model-package-v1",
+  "split_version": "continual-60-10-10-15-5-v1-seed-42",
+  "tokenizer_max_length": 8192,
+  "training_fingerprint": "85ce726e524c369379b2acc01c55e71affa6119c5cc3e4af6835b21008bcc9f1",
+  "training_max_length": 512,
+  "training_mode": "initial_training",
+  "training_version": "modernbert-r0-initial-v1.0"
+}

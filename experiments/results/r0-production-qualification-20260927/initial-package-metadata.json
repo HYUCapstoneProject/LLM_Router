@@ -1,0 +1,23 @@
+{
+  "schema_version": "model-package-v1",
+  "model_version": "router-modernbert-r0-a-20260927-v1",
+  "base_model": "answerdotai/ModernBERT-base@8949b909ec900327062f0ebf497f51aef5e6f0c8",
+  "dataset_version": "routerbench-xroutebench-continual-v1",
+  "preprocessing_version": "integrated-routing-preprocess-v2-structure",
+  "split_version": "continual-60-10-10-15-5-v1-seed-42",
+  "label_rule_version": "overall-solve-rate-grid-v1:h0.27-e0.64",
+  "dataset_manifest_sha256": "f6a4cff1684bc2626a8901dbfda9f81e7d5d7e8753e5f48320cb1ada44c8cca4",
+  "training_version": "modernbert-r0-initial-v1.0",
+  "evaluation_version": "routerbench-xroutebench-label-evaluation-r0-inference8192-v1",
+  "evaluation_role": "continual_gate",
+  "tokenizer_max_length": 8192,
+  "length_contract_version": "train-inference-lengths-v1",
+  "training_max_length": 512,
+  "inference_max_length": 8192,
+  "objective": "ordinal",
+  "input_contract": "structure-preserving-v2",
+  "code_commit": "eb016ac8183b1f4ef90a752153476a17898b3ed5",
+  "training_fingerprint": "85ce726e524c369379b2acc01c55e71affa6119c5cc3e4af6835b21008bcc9f1",
+  "training_mode": "initial_training",
+  "logical_model_version": "1.0"
+}

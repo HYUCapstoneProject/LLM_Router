@@ -1,0 +1,10 @@
+# R0 retraining keeps the existing API. Production: SPRING_PROFILES_ACTIVE=prod,r0.
+# Keep prod active: its gateway-key startup guard is required for deployment.
+# Supply the real internal URL/token/version via the existing environment variables.
+llm:
+  router:
+    mode: ${ROUTER_MODE:fastapi}
+    classify-contract: v1
+  retraining:
+    # Keep disabled until cloud activation and end-to-end retraining are verified.
+    auto-submit: false

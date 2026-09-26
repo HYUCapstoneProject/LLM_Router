@@ -1,0 +1,121 @@
+{
+  "bootstrap_intervals": {
+    "macro_f1": {
+      "estimate": 0.51976681025937,
+      "lower": 0.49985175212750016,
+      "upper": 0.5414626444191806
+    },
+    "per_class.hard.recall": {
+      "estimate": 0.24944812362030905,
+      "lower": 0.20971037334798576,
+      "upper": 0.2917622898184189
+    },
+    "per_domain.code.macro_f1": {
+      "estimate": 0.3977503977503978,
+      "lower": 0.3029519221369598,
+      "upper": 0.48861107438185586
+    },
+    "per_domain.commonsense.macro_f1": {
+      "estimate": 0.36362420165728854,
+      "lower": 0.34355974400401773,
+      "upper": 0.381951499731598
+    },
+    "per_domain.conversation.macro_f1": {
+      "estimate": 0.25,
+      "lower": 0.0,
+      "upper": 0.5
+    },
+    "per_domain.knowledge.macro_f1": {
+      "estimate": 0.4567081024509347,
+      "lower": 0.42903122661913434,
+      "upper": 0.4825465627480668
+    },
+    "per_domain.math.macro_f1": {
+      "estimate": 0.5546481144877561,
+      "lower": 0.514666931974809,
+      "upper": 0.5924106350311596
+    },
+    "per_domain.reading_comprehension.macro_f1": {
+      "estimate": 0.615432098765432,
+      "lower": 0.534745669289293,
+      "upper": 0.7137078433426748
+    },
+    "per_source_dataset.routerbench.macro_f1": {
+      "estimate": 0.461652390079994,
+      "lower": 0.44313630941004756,
+      "upper": 0.4805668066983168
+    },
+    "per_source_dataset.xroutebench.macro_f1": {
+      "estimate": 0.5905260024663009,
+      "lower": 0.5445140696681611,
+      "upper": 0.6361678120059276
+    }
+  },
+  "candidate_model_version": "router-modernbert-r0-a-20260927-v1",
+  "candidate_weights_sha256": "e1a40fec7d269d8f925b5391e4f5e75df5d0fedbb1e37b4eea96521e27b1a6a7",
+  "dataset_sha256": "fb698a992f05b88bfd4488c7de0abe515e52107c8435a46fa9a45bfb63b7f4d0",
+  "evaluation_role": "development_calibration",
+  "frozen_at_utc": "2026-09-26T18:05:56.077025+00:00",
+  "gate_data_read": false,
+  "inference_max_length": 8192,
+  "length_contract_version": "train-inference-lengths-v1",
+  "objective": "ordinal",
+  "pilot_metrics_sha256": "66a60a17dfd47f83e1b475d44cf145f53a150a3155d7a8c94f48ae34ff7b9492",
+  "schema_version": "r0-initial-pilot-v1",
+  "selected_rules": {
+    "floor_selection_method": {
+      "interval": "pointwise two-sided 95% percentile interval; floor is 2.5th percentile",
+      "multiple_comparison_adjustment": false,
+      "note": "Initial label-consistency floors only; not actual service quality or evidence of improvement. D_dev was used during model development and is not an independent test. D_gate floors will not be retuned after observing D_gate.",
+      "resamples": 1000,
+      "resampling_unit": "duplicate_group_id",
+      "rows": 3581,
+      "seed": 42,
+      "subgroup_macro_policy": "macro_over_labels_with_true_support",
+      "unique_groups": 3581
+    },
+    "minimum_metrics": {
+      "macro_f1": 0.49985175212750016,
+      "per_class.hard.recall": 0.20971037334798576,
+      "per_domain.code.macro_f1": 0.3029519221369598,
+      "per_domain.commonsense.macro_f1": 0.34355974400401773,
+      "per_domain.knowledge.macro_f1": 0.42903122661913434,
+      "per_domain.math.macro_f1": 0.514666931974809,
+      "per_domain.reading_comprehension.macro_f1": 0.534745669289293,
+      "per_source_dataset.routerbench.macro_f1": 0.44313630941004756,
+      "per_source_dataset.xroutebench.macro_f1": 0.5445140696681611
+    },
+    "report_only_domains": {
+      "conversation": {
+        "development_row_count": 8,
+        "quality_unverified": true,
+        "reason": "insufficient_support"
+      }
+    },
+    "required_evaluation_contract": {
+      "dataset_contract.dataset_version": "routerbench-xroutebench-continual-v1",
+      "dataset_contract.label_rule_version": "overall-solve-rate-grid-v1:h0.27-e0.64",
+      "dataset_contract.preprocessing_version": "integrated-routing-preprocess-v2-structure",
+      "dataset_contract.split_version": "continual-60-10-10-15-5-v1-seed-42",
+      "dataset_sha256": "94ed6c7be5966b37d7bb24aa5d37d35d1aed5e245b3a5b97b18a80cc944f4187",
+      "evaluation_role": "continual_gate",
+      "evaluation_split": "gate",
+      "evaluation_version": "routerbench-xroutebench-label-evaluation-r0-inference8192-v1",
+      "label_order": [
+        "easy",
+        "medium",
+        "hard"
+      ],
+      "label_semantics": "overall-solve-rate-T1-label-agreement",
+      "model_info.max_length": 8192
+    },
+    "rules_version": "r0-a-initial-8192-ddev-group-bootstrap-20260927-v1",
+    "schema_version": "r0-initial-rules-v1",
+    "small_domain_policy": {
+      "frozen_before_gate": true,
+      "minimum_development_rows": 30,
+      "policy_version": "initial-small-domain-report-only-v1",
+      "scope": "initial_baseline_only"
+    }
+  }
+}

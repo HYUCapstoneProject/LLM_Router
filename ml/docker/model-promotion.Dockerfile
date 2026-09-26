@@ -28,6 +28,7 @@ COPY ml/src/llm_router_labeling/deployment/deploy_gate.py /opt/llm-router/ml/src
 COPY ml/src/llm_router_labeling/deployment/deploy_gate_cli.py /opt/llm-router/ml/src/llm_router_labeling/deployment/deploy_gate_cli.py
 COPY ml/src/llm_router_labeling/deployment/model_publish.py /opt/llm-router/ml/src/llm_router_labeling/deployment/model_publish.py
 COPY ml/src/llm_router_labeling/deployment/model_publish_cli.py /opt/llm-router/ml/src/llm_router_labeling/deployment/model_publish_cli.py
+COPY ml/src/llm_router_labeling/deployment/promotion_evidence.py /opt/llm-router/ml/src/llm_router_labeling/deployment/promotion_evidence.py
 COPY ml/src/llm_router_labeling/training/__init__.py /opt/llm-router/ml/src/llm_router_labeling/training/__init__.py
 COPY ml/src/llm_router_labeling/training/routing_policy.py /opt/llm-router/ml/src/llm_router_labeling/training/routing_policy.py
 COPY ml/src/llm_router_labeling/shared/__init__.py /opt/llm-router/ml/src/llm_router_labeling/shared/__init__.py

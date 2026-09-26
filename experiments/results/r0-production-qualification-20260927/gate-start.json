@@ -1,0 +1,13 @@
+{
+  "started_at_unix": 1790446064.061752,
+  "rules_sha256": "cc741b2e025f95cdec159a593db2dc29954ae0cb2f57154da27f0f14d018c132",
+  "pilot_sha256": "3904fa99b19ae995a8f0745f3d15127991ae42922cf53faf374eea50f117fe6f",
+  "weights_sha256": "e1a40fec7d269d8f925b5391e4f5e75df5d0fedbb1e37b4eea96521e27b1a6a7",
+  "dataset_sha256": "94ed6c7be5966b37d7bb24aa5d37d35d1aed5e245b3a5b97b18a80cc944f4187",
+  "torch": "2.5.1",
+  "transformers": "4.48.3",
+  "device": "cpu",
+  "attention": "eager",
+  "dtype": "float32",
+  "training_performed": false
+}

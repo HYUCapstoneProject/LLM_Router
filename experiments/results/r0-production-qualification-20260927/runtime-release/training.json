@@ -1,0 +1,34 @@
+{
+  "attention_implementation": "eager",
+  "device": "cuda",
+  "epochs": 3,
+  "eval_batch_size": 16,
+  "gradient_accumulation_steps": 4,
+  "gradient_checkpointing": true,
+  "gradient_clip_norm": 1.0,
+  "id2label": {
+    "0": "easy",
+    "1": "medium",
+    "2": "hard"
+  },
+  "label2id": {
+    "easy": 0,
+    "hard": 2,
+    "medium": 1
+  },
+  "learning_rate": 2e-05,
+  "max_length": 512,
+  "max_train_steps": null,
+  "model_id": "answerdotai/ModernBERT-base",
+  "model_revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+  "precision": "fp16",
+  "seed": 42,
+  "train_batch_size": 8,
+  "train_sampling_strategy": "shuffle",
+  "train_split": "train",
+  "training_version": "modernbert-r0-feedback-v1",
+  "truncation": true,
+  "validation_split": "validation",
+  "warmup_ratio": 0.1,
+  "weight_decay": 0.01
+}

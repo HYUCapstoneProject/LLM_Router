@@ -1,0 +1,97 @@
+{
+  "schema_version": "r0-runtime-inputs-v1",
+  "model_version": "router-modernbert-r0-a-20260927-v1",
+  "server_deployed": false,
+  "files": {
+    "gate-rules.json": {
+      "uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/gate-rules.json",
+      "sha256": "b5887c4e6155e1d573c6960f801fe5aeb6076bed7e9e584993061d60575a2b61",
+      "generation": 1790447357095727
+    },
+    "training.json": {
+      "uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/training.json",
+      "sha256": "d694367d7aa6d05b31a787af423449a7ebfd106ad29905c113d6fb1a92b41e3b",
+      "generation": 1790447358122723
+    },
+    "development.json": {
+      "uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/development.json",
+      "sha256": "6844965872106fcd2333db3db0e148fb0e3d0c26e2933675be42bc78bd2746f3",
+      "generation": 1790447359538037
+    },
+    "release.json": {
+      "uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/release.json",
+      "sha256": "0d03d17a3d4f5a1b99e002015f270d6d8ff4e3eb0e62549a942ab36a738edc72",
+      "generation": 1790447360589366
+    },
+    "package-metadata.json": {
+      "uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/package-metadata.json",
+      "sha256": "86a162df3c22fcab34047b62cedcc872064e0ed6ac89ed36f527440265684feb",
+      "generation": 1790447361916441
+    },
+    "feedback.json": {
+      "uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/feedback.json",
+      "sha256": "fa9a5817318aeb16f3394e33d9930be83f0f9fa6b316378f36def29e38e2fcb6",
+      "generation": 1790447363071046
+    },
+    "evaluation.json": {
+      "uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/evaluation.json",
+      "sha256": "02cfc85e15b742e425380facc9aee38e87afe042a8de7f86661728037f6d05ba",
+      "generation": 1790447364319945
+    },
+    "baseline-metrics.json": {
+      "uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/baseline-metrics.json",
+      "sha256": "7455e59b00ff396346f1995f75658eb131d55f9e13b3669ea3f9865cf339139f",
+      "generation": 1790447365510808
+    },
+    "evidence/gate-rules.json": {
+      "uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/evidence/gate-rules.json",
+      "sha256": "b5887c4e6155e1d573c6960f801fe5aeb6076bed7e9e584993061d60575a2b61",
+      "generation": 1790447366822653
+    },
+    "evidence/normal-calibration-evidence.json": {
+      "uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/evidence/normal-calibration-evidence.json",
+      "sha256": "fff16165054122f654cf2a5966443214c1c56e8d5338dad6f83540c66bebce44",
+      "generation": 1790447367899395
+    },
+    "evidence/pilot.json": {
+      "uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/evidence/pilot.json",
+      "sha256": "acbd868e6cfb50bdb2abe4694cac89034146632a5bbc6ba45262b9b5611fba51",
+      "generation": 1790447369252184
+    },
+    "evidence/normal-rules-body.json": {
+      "uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/evidence/normal-rules-body.json",
+      "sha256": "68a52a8f6b9c7a7bf4dd2d89ba564a06f05a82616212738dd6707213d0d50995",
+      "generation": 1790447370306382
+    },
+    "evidence/development-metrics.json": {
+      "uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/evidence/development-metrics.json",
+      "sha256": "66a60a17dfd47f83e1b475d44cf145f53a150a3155d7a8c94f48ae34ff7b9492",
+      "generation": 1790447371706672
+    },
+    "evidence/initial-qualification.json": {
+      "uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/evidence/initial-qualification.json",
+      "sha256": "8de44679e74a1c72906cc479cce210bd5f3dfb912d4f429c47ed84983d6752f9",
+      "generation": 1790447372791549
+    },
+    "training.parquet": {
+      "uri": "gs://llm-router-mlserver/releases/r0/datasets/base/r0-a-20260927-1300f76/training.parquet",
+      "sha256": "74835d16e293e2bf04244a952a63b8c12dc28fa27e1ab03b106d5095a855e85f",
+      "generation": 1790447381597652
+    },
+    "manifest.json": {
+      "uri": "gs://llm-router-mlserver/releases/r0/datasets/base/r0-a-20260927-1300f76/manifest.json",
+      "sha256": "f5b98ee1cbba5c5cf2d56e7e1e124ee06b36541fd4feba6782c2855fb33c853f",
+      "generation": 1790447388911745
+    },
+    "gate.parquet": {
+      "uri": "gs://llm-router-mlserver/releases/r0/datasets/evaluation/r0-a-20260927-1300f76/gate.parquet",
+      "sha256": "94ed6c7be5966b37d7bb24aa5d37d35d1aed5e245b3a5b97b18a80cc944f4187",
+      "generation": 1790447391058516
+    },
+    "validation.parquet": {
+      "uri": "gs://llm-router-mlserver/releases/r0/datasets/evaluation/r0-a-20260927-1300f76/development.parquet",
+      "sha256": "fb698a992f05b88bfd4488c7de0abe515e52107c8435a46fa9a45bfb63b7f4d0",
+      "generation": 1790447394360869
+    }
+  }
+}

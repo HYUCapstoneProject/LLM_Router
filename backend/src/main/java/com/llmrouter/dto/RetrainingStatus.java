@@ -70,6 +70,19 @@ public record RetrainingStatus(
         return status != null && TERMINAL_STATUSES.contains(status);
     }
 
+    /** Pipeline completion precedes activation; stale snapshots never end polling. */
+    public boolean isPollingComplete() {
+        if (!isTerminal()) return false;
+        if (!"succeeded".equals(status)) return true;
+        if (activation == null || activation.status() == null) return false;
+        return switch (activation.status()) {
+            case "active" -> activation.desiredModelVersion() != null
+                    && activation.desiredModelVersion().equals(activation.servingModelVersion());
+            case "loadFailed", "superseded", "notApplicable" -> true;
+            default -> false;
+        };
+    }
+
     public String failureCode() {
         return result == null ? null : result.failureCode();
     }

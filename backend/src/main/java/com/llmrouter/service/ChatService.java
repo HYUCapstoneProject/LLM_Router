@@ -176,6 +176,7 @@ public class ChatService {
                     .modelId(result.modelId())
                     .routerModelVersion(classification == null ? null : classification.modelVersion())
                     .routerConfidence(classification == null ? null : classification.confidence())
+                    .routingDecision(classification == null ? null : classification.decisionMetadata())
                     .embedModelVersion(embeddingResult == null ? null : embeddingResult.modelVersion())
                     .cacheHit(false)
                     .rerankScore(rerank.score())

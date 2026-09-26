@@ -1,0 +1,112 @@
+{
+  "model_files": {
+    "metrics.json": "f37c093862325238262a8566e5a477c9ef06441fc462e393afcb5d2362daffad",
+    "_SUCCESS": "37a40f08d8548dba289b9b0bb35bcf63b359f6d37ee86044ebc6b6da080b9ec1",
+    "artifact_manifest.json": "72517ae451826a42f29aa53814263b42c69e5b6de70791ec081d4b3243423549",
+    "training_config.json": "2177585994cf224b0e4ca80d91b08dde05c0c11b351f247a5633a0703b62245c",
+    "special_tokens_map.json": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049",
+    "model.safetensors": "fd6c31a8c0eb1590ff5d670e5e046fb0c3c10ba3c4046a53ede49518b7a6d7f7",
+    "config.json": "e78f7d49a6347a1d21084314410e3c17c2d149b35aeab36c7dadcf8ec138adca",
+    "tokenizer_config.json": "626c86908d7c711f93b0feffd8657b782cc2727b391f9be190240e8cafb626d5",
+    "tokenizer.json": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30"
+  },
+  "torch": "2.5.1+cu124",
+  "transformers": "4.48.3",
+  "device": "cuda",
+  "attention": "eager",
+  "dtype": "float32",
+  "max_lengths": [
+    512,
+    8192
+  ],
+  "datasets": {
+    "arena": {
+      "sha256": "d84be2fdad3ed9753d2cba93fdbe479025800b762d13b5b2c92565573e32925f",
+      "rows": 8791,
+      "short_rows": 8003,
+      "long_rows": 788,
+      "above8192": 8,
+      "short_token_ids_equal": true,
+      "512": {
+        "seconds": 172.93018674850464,
+        "score_sha256": "3444f1e3de020a5f3e9ea657448eed51c258beebf04a6727327010dfc33209d2",
+        "computed_rows": 8791,
+        "peak_allocated_bytes": 780995072,
+        "peak_reserved_bytes": 1761607680
+      },
+      "8192": {
+        "seconds": 296.5952157974243,
+        "score_sha256": "e9f161899137a3e633d3c0fbc3220b999f34168b31229c65c60e1cef456df8cd",
+        "computed_rows": 8791,
+        "peak_allocated_bytes": 7787477504,
+        "peak_reserved_bytes": 15317598208
+      }
+    },
+    "g1_calibration": {
+      "sha256": "5a45f175522fdcc5cc5dc2e88f70aa0523914ad9c6ed3466ab5d4f69596a9f7f",
+      "rows": 2275,
+      "short_rows": 2265,
+      "long_rows": 10,
+      "above8192": 0,
+      "short_token_ids_equal": true,
+      "512": {
+        "seconds": 31.08449912071228,
+        "score_sha256": "980cc55f8a3792b50e57be25a850e3de4a8119c33d72a54f5f12d356e5c94627",
+        "computed_rows": 2275,
+        "peak_allocated_bytes": 780995072,
+        "peak_reserved_bytes": 9032433664
+      },
+      "8192": {
+        "seconds": 32.38075661659241,
+        "score_sha256": "cff9fefb735c36700515e5f4f2652bfbd1f93bfcb7a1adc7bbdca0f146f09146",
+        "computed_rows": 2275,
+        "peak_allocated_bytes": 812486656,
+        "peak_reserved_bytes": 9032433664
+      }
+    },
+    "g1_selection": {
+      "sha256": "2a5d620d53b7dcd20232f17b0217fffc93a4fb7480f29f92b208a3925046fbf2",
+      "rows": 2314,
+      "short_rows": 2306,
+      "long_rows": 8,
+      "above8192": 0,
+      "short_token_ids_equal": true,
+      "512": {
+        "seconds": 32.78078651428223,
+        "score_sha256": "257aafb913309dc3e786be7baae053cc9b3e088b6d3936a155e07d0000b744ca",
+        "computed_rows": 2314,
+        "peak_allocated_bytes": 780995072,
+        "peak_reserved_bytes": 9032433664
+      },
+      "8192": {
+        "seconds": 33.02599310874939,
+        "score_sha256": "59b334a1890072f4c9112155ded869f0a91ba9f161989bf196a2f84615aaed5e",
+        "computed_rows": 2314,
+        "peak_allocated_bytes": 828156416,
+        "peak_reserved_bytes": 9032433664
+      }
+    },
+    "g1_task_holdout": {
+      "sha256": "55c15423af987ab092b2e1661534d8e5cf0783bfbb43431bcdcb7246b1f6ba69",
+      "rows": 1807,
+      "short_rows": 1807,
+      "long_rows": 0,
+      "above8192": 0,
+      "short_token_ids_equal": true,
+      "512": {
+        "seconds": 16.89459228515625,
+        "score_sha256": "2ffe2fdf9c2b0d55e64d08246a87aedc47a7f26cb6f571196318e2a401fe9b53",
+        "computed_rows": 1807,
+        "peak_allocated_bytes": 702295552,
+        "peak_reserved_bytes": 9032433664
+      },
+      "8192": {
+        "seconds": 16.314013719558716,
+        "score_sha256": "2ffe2fdf9c2b0d55e64d08246a87aedc47a7f26cb6f571196318e2a401fe9b53",
+        "computed_rows": 1807,
+        "peak_allocated_bytes": 702295552,
+        "peak_reserved_bytes": 9032433664
+      }
+    }
+  }
+}

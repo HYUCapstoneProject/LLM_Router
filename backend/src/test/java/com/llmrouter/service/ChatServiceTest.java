@@ -137,6 +137,21 @@ class ChatServiceTest {
     }
 
     @Test
+    void preservesPointwiseDecisionAlongsideTheActualCalledModel() {
+        ReflectionTestUtils.setField(service, "cacheEnabled", false);
+        var decision = new RouterClassification.DecisionMetadata("pointwise", "policy-v1", "a".repeat(64),
+                "pool-v1", java.util.Map.of("low", "model-e", "medium", "model-m", "high", "model-h"),
+                "medium", "independent_success_probabilities", java.util.Map.of("low", 0.2, "medium", 0.8, "high", 0.9));
+        when(routerService.classify("q"))
+                .thenReturn(new RouterClassification(RouterService.Tier.MEDIUM, 0.8, "router-r1", decision));
+        when(llmService.call(RouterService.Tier.MEDIUM, "q"))
+                .thenReturn(new LlmResult("answer", "medium", "model-m", 1, 2));
+        service.chat(request("q"));
+        verify(requestLogService).record(argThat(entry -> entry.routingDecision().equals(decision)
+                && entry.modelId().equals("model-m") && entry.routerModelVersion().equals("router-r1")));
+    }
+
+    @Test
     void unexpectedEmbeddingFailureIsRecordedWithoutTierAndRethrown() {
         RuntimeException failure = new RuntimeException("embed down");
         when(routerClient.embed("q")).thenThrow(failure);
@@ -189,6 +204,7 @@ class ChatServiceTest {
         verify(requestLogService).record(argThat(entry ->
                 entry.fallbackReason().equals("classify_unavailable")
                         && entry.routerModelVersion() == null
+                        && entry.routingDecision() == null
                         && entry.cacheEntryId().equals(10L)));
     }
 

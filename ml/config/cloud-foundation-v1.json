@@ -1,0 +1,93 @@
+{
+  "schema_version": "router-cloud-foundation-v1",
+  "project": "project-763753da-fa8f-4afd-b31",
+  "region": "us-west1",
+  "bucket": "llm-router-mlserver",
+  "artifact_repository": "llm-router",
+  "serving_instance": "llm-router-serving",
+  "serving_zone": "us-west1-a",
+  "source_note": "Actual GCP inventory and VM feedback-prefix access verified 2026-09-26 KST. Provisioned namespaces do not approve a model or complete effective access testing for Pipeline/Training identities.",
+  "service_accounts": {
+    "pipeline": "vertex-pipeline-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com",
+    "training": "vertex-training-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com",
+    "serving": "llm-router-serving-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com"
+  },
+  "required_apis": [
+    "aiplatform.googleapis.com",
+    "compute.googleapis.com",
+    "storage.googleapis.com",
+    "artifactregistry.googleapis.com",
+    "cloudbuild.googleapis.com",
+    "secretmanager.googleapis.com",
+    "logging.googleapis.com"
+  ],
+  "protected_current_uris": [
+    "gs://llm-router-mlserver/models/router-modernbert/CURRENT.json"
+  ],
+  "images": {
+    "data_processing": null,
+    "training": null,
+    "evaluation": null,
+    "promotion": null
+  },
+  "profiles": {
+    "r0": {
+      "namespace_status": "provisioned",
+      "config_root_uri": "gs://llm-router-mlserver/releases/r0/config",
+      "pipelines_root_uri": "gs://llm-router-mlserver/releases/r0/pipelines",
+      "feedback_root_uri": "gs://llm-router-mlserver/releases/r0/datasets/feedback",
+      "control_root_uri": "gs://llm-router-mlserver/releases/r0/retraining-control",
+      "observability_root_uri": "gs://llm-router-mlserver/releases/r0/retraining-runs",
+      "training_output_root_uri": "gs://llm-router-mlserver/releases/r0/vertex-training-output",
+      "registry_root_uri": "gs://llm-router-mlserver/releases/r0/models/router-modernbert",
+      "pipeline_artifacts_root_uri": "gs://llm-router-mlserver/pipeline-root/r0",
+      "current_pointer_uri": "gs://llm-router-mlserver/releases/r0/models/router-modernbert/CURRENT.json",
+      "sqlite_path": "/app/var/r0/retraining.sqlite3",
+      "gate_rules_uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/gate-rules.json",
+      "baseline_metrics_uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/baseline-metrics.json",
+      "approved_baseline_uri": "gs://llm-router-mlserver/releases/r0/models/router-modernbert/router-modernbert-r0-a-20260927-v1/approved",
+      "pipeline_template_uri": null,
+      "namespace_evidence": {
+        "path": "docs/ml/evidence/cloud-namespace-r0-20260926.json",
+        "sha256": "d910cf81c67543d41df72e60c7c3bca5e1d79810886600e5b7bfc0edce9cd14e"
+      }
+    },
+    "r1": {
+      "namespace_status": "provisioned",
+      "config_root_uri": "gs://llm-router-mlserver/releases/r1/config",
+      "pipelines_root_uri": "gs://llm-router-mlserver/releases/r1/pipelines",
+      "feedback_root_uri": "gs://llm-router-mlserver/releases/r1/datasets/feedback",
+      "control_root_uri": "gs://llm-router-mlserver/releases/r1/retraining-control",
+      "observability_root_uri": "gs://llm-router-mlserver/releases/r1/retraining-runs",
+      "training_output_root_uri": "gs://llm-router-mlserver/releases/r1/vertex-training-output",
+      "registry_root_uri": "gs://llm-router-mlserver/releases/r1/models/router-modernbert",
+      "pipeline_artifacts_root_uri": "gs://llm-router-mlserver/pipeline-root/r1",
+      "current_pointer_uri": "gs://llm-router-mlserver/releases/r1/models/router-modernbert/CURRENT.json",
+      "sqlite_path": "/app/var/r1/retraining.sqlite3",
+      "gate_rules_uri": null,
+      "baseline_metrics_uri": null,
+      "approved_baseline_uri": null,
+      "pipeline_template_uri": null,
+      "namespace_evidence": {
+        "path": "docs/ml/evidence/cloud-namespace-r1-20260926.json",
+        "sha256": "c7a7d0233b9a97519645a33245c4d16c395469a2b1a8461772978154271e80e9"
+      }
+    }
+  },
+  "deployment_policy": {
+    "service_mode": "single-active-objective",
+    "target_profile": "r0",
+    "http_contract": "existing-v1-unchanged",
+    "gcs_model_groups": "active-objective-only",
+    "inactive_model_storage": "google-drive",
+    "archive_account": "alexyoo0506@gmail.com",
+    "switch_requires_remote_archive_readback": true,
+    "switch_requires_no_inflight_retraining": true,
+    "cross_objective_gcs_overlap_allowed": false,
+    "same_objective_retention": [
+      "current",
+      "previous",
+      "anchor"
+    ]
+  }
+}

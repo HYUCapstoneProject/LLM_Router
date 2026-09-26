@@ -1,0 +1,115 @@
+{
+  "minimum_delta": {
+    "macro_f1": -0.019915058131869723,
+    "per_class.hard.recall": -0.03973775027232329,
+    "per_domain.code.macro_f1": -0.09479847561343796,
+    "per_domain.commonsense.macro_f1": -0.020064457653270806,
+    "per_domain.conversation.macro_f1": 0.0,
+    "per_domain.knowledge.macro_f1": -0.02767687583180034,
+    "per_domain.math.macro_f1": -0.03998118251294713,
+    "per_domain.reading_comprehension.macro_f1": -0.08068642947613913,
+    "per_source_dataset.routerbench.macro_f1": -0.018516080669946477,
+    "per_source_dataset.xroutebench.macro_f1": -0.046011932798139865
+  },
+  "minimum_metrics": {
+    "macro_f1": 0.49985175212750016,
+    "per_class.hard.recall": 0.20971037334798576,
+    "per_domain.code.macro_f1": 0.3029519221369598,
+    "per_domain.commonsense.macro_f1": 0.34355974400401773,
+    "per_domain.knowledge.macro_f1": 0.42903122661913434,
+    "per_domain.math.macro_f1": 0.514666931974809,
+    "per_domain.reading_comprehension.macro_f1": 0.534745669289293,
+    "per_source_dataset.routerbench.macro_f1": 0.44313630941004756,
+    "per_source_dataset.xroutebench.macro_f1": 0.5445140696681611
+  },
+  "regression_calibration": {
+    "calculation": {
+      "macro_f1": {
+        "allowed_regression": 0.019915058131869723,
+        "development_point_estimate": 0.5197668102593699,
+        "frozen_initial_lower_floor": 0.49985175212750016,
+        "minimum_delta": -0.019915058131869723
+      },
+      "per_class.hard.recall": {
+        "allowed_regression": 0.03973775027232329,
+        "development_point_estimate": 0.24944812362030905,
+        "frozen_initial_lower_floor": 0.20971037334798576,
+        "minimum_delta": -0.03973775027232329
+      },
+      "per_domain.code.macro_f1": {
+        "allowed_regression": 0.09479847561343796,
+        "development_point_estimate": 0.3977503977503978,
+        "frozen_initial_lower_floor": 0.3029519221369598,
+        "minimum_delta": -0.09479847561343796
+      },
+      "per_domain.commonsense.macro_f1": {
+        "allowed_regression": 0.020064457653270806,
+        "development_point_estimate": 0.36362420165728854,
+        "frozen_initial_lower_floor": 0.34355974400401773,
+        "minimum_delta": -0.020064457653270806
+      },
+      "per_domain.conversation.macro_f1": {
+        "development_point_estimate": 0.24999999999999997,
+        "development_row_count": 8,
+        "minimum_delta": 0.0,
+        "reason": "Insufficient D_dev support; no absolute floor and no width-derived regression allowance; decline from approved baseline is prohibited."
+      },
+      "per_domain.knowledge.macro_f1": {
+        "allowed_regression": 0.02767687583180034,
+        "development_point_estimate": 0.4567081024509347,
+        "frozen_initial_lower_floor": 0.42903122661913434,
+        "minimum_delta": -0.02767687583180034
+      },
+      "per_domain.math.macro_f1": {
+        "allowed_regression": 0.03998118251294713,
+        "development_point_estimate": 0.5546481144877561,
+        "frozen_initial_lower_floor": 0.514666931974809,
+        "minimum_delta": -0.03998118251294713
+      },
+      "per_domain.reading_comprehension.macro_f1": {
+        "allowed_regression": 0.08068642947613913,
+        "development_point_estimate": 0.6154320987654321,
+        "frozen_initial_lower_floor": 0.534745669289293,
+        "minimum_delta": -0.08068642947613913
+      },
+      "per_source_dataset.routerbench.macro_f1": {
+        "allowed_regression": 0.018516080669946477,
+        "development_point_estimate": 0.46165239007999403,
+        "frozen_initial_lower_floor": 0.44313630941004756,
+        "minimum_delta": -0.018516080669946477
+      },
+      "per_source_dataset.xroutebench.macro_f1": {
+        "allowed_regression": 0.046011932798139865,
+        "development_point_estimate": 0.5905260024663009,
+        "frozen_initial_lower_floor": 0.5445140696681611,
+        "minimum_delta": -0.046011932798139865
+      }
+    },
+    "candidate_evaluation_observed": false,
+    "frozen_at_utc": "2026-09-26T18:16:26.255108+00:00",
+    "interpretation": "D_dev empirical tolerances derived from the already frozen pointwise bootstrap interval width. This is not a paired candidate-versus-baseline hypothesis test and is not a service-quality guarantee. Freeze before any future candidate evaluation; do not tune using D_gate.",
+    "protected_gate_metrics_read": false,
+    "schema_version": "r0-future-regression-calibration-v1",
+    "source_development_metrics_sha256": "66a60a17dfd47f83e1b475d44cf145f53a150a3155d7a8c94f48ae34ff7b9492",
+    "source_initial_pilot_sha256": "3904fa99b19ae995a8f0745f3d15127991ae42922cf53faf374eea50f117fe6f",
+    "source_initial_rules_sha256": "cc741b2e025f95cdec159a593db2dc29954ae0cb2f57154da27f0f14d018c132"
+  },
+  "required_evaluation_contract": {
+    "dataset_contract.dataset_version": "routerbench-xroutebench-continual-v1",
+    "dataset_contract.label_rule_version": "overall-solve-rate-grid-v1:h0.27-e0.64",
+    "dataset_contract.preprocessing_version": "integrated-routing-preprocess-v2-structure",
+    "dataset_contract.split_version": "continual-60-10-10-15-5-v1-seed-42",
+    "dataset_sha256": "94ed6c7be5966b37d7bb24aa5d37d35d1aed5e245b3a5b97b18a80cc944f4187",
+    "evaluation_role": "continual_gate",
+    "evaluation_split": "gate",
+    "evaluation_version": "routerbench-xroutebench-label-evaluation-r0-inference8192-v1",
+    "label_order": [
+      "easy",
+      "medium",
+      "hard"
+    ],
+    "label_semantics": "overall-solve-rate-T1-label-agreement",
+    "model_info.max_length": 8192
+  },
+  "rules_version": "r0-a-continual-8192-ddev-width-20260927-v1"
+}

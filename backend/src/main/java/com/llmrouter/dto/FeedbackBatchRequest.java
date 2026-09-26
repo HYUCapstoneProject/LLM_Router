@@ -24,6 +24,10 @@ public record FeedbackBatchRequest(
         List<EscalationEvent> events
 ) {
 
+    public FeedbackBatchRequest {
+        events = List.copyOf(events);
+    }
+
     public static final String SCHEMA_VERSION = "feedback-inline-v1";
 
     public FeedbackBatchRequest(String batchId, Instant requestedAt, List<EscalationEvent> events) {

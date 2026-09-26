@@ -1,0 +1,5 @@
+{
+  "image": "r1/report/r1-length-deltas.png",
+  "visual_review": "Manually viewed rendered PNG; labels and axis titles are legible, plots and intervals present, no clipping or overlap observed. Full overview figure is prepared separately.",
+  "tables_reviewed": "R1_LENGTH_REPORT.md matches analyses, full/robustness separate, quality/success/cost semantics explicit."
+}

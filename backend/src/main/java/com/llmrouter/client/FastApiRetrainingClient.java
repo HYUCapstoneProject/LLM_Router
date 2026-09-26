@@ -23,6 +23,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.UUID;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -42,6 +43,13 @@ import java.util.function.Supplier;
 @Component
 @ConditionalOnProperty(name = "llm.router.mode", havingValue = "fastapi")
 public class FastApiRetrainingClient implements RetrainingClient {
+
+    private static final Set<String> STATUSES = Set.of("queued", "running", "cancelling", "paused",
+            "succeeded", "rejected", "failed", "cancelled", "unknown");
+    private static final Set<String> STAGES = Set.of("initializing", "feedbackPreparation",
+            "feedbackMerge", "training", "evaluation", "packaging", "gate", "publishing", "complete");
+    private static final Set<String> ACTIVATIONS = Set.of("pending", "active", "loadFailed",
+            "superseded", "notApplicable");
 
     private final RestClient restClient;
     private final String token;
@@ -77,22 +85,21 @@ public class FastApiRetrainingClient implements RetrainingClient {
 
     @Override
     public EscalateAcceptance submit(FeedbackBatchRequest request) {
-        EscalateAcceptance acceptance = invoke("escalate", () -> restClient.post()
+        var response = invoke("escalate", () -> restClient.post()
                 .uri("/escalate")
                 .headers(this::addHeaders)
                 .body(request)
                 .retrieve()
-                .body(EscalateAcceptance.class));
+                .toEntity(EscalateAcceptance.class));
+        EscalateAcceptance acceptance = response.getBody();
 
-        // batchId 가 어긋나면 이후 폴링이 엉뚱한 배치를 따라간다. 조용히 틀리느니 실패시킨다.
-        if (acceptance == null || acceptance.batchId() == null
-                || !acceptance.batchId().equals(request.batchId())) {
-            throw new RetrainingClientException(
-                    "FastAPI escalate 응답의 batchId가 요청과 다릅니다", null, null);
-        }
-        if (acceptance.statusUrl() == null || acceptance.statusUrl().isBlank()) {
-            throw new RetrainingClientException(
-                    "FastAPI escalate 응답에 statusUrl이 없습니다", null, null);
+        if (response.getStatusCode().value() != 202 || acceptance == null
+                || !"escalation-acceptance-v1".equals(acceptance.schemaVersion())
+                || !"accepted".equals(acceptance.status())
+                || !request.batchId().equals(acceptance.batchId())
+                || blank(acceptance.pipelineRunId()) || blank(acceptance.candidateModelVersion())
+                || !("/retraining-runs/" + request.batchId()).equals(acceptance.statusUrl())) {
+            throw contractMismatch("escalate");
         }
         return acceptance;
     }
@@ -108,9 +115,19 @@ public class FastApiRetrainingClient implements RetrainingClient {
                 .retrieve()
                 .body(RetrainingStatus.class));
 
-        if (status == null || status.status() == null || status.status().isBlank()) {
-            throw new RetrainingClientException(
-                    "FastAPI retraining-runs 응답이 계약과 다릅니다", null, null);
+        if (status == null || !"retraining-status-v1".equals(status.schemaVersion())
+                || !batchId.equals(status.batchId()) || status.status() == null
+                || !STATUSES.contains(status.status()) || status.stage() == null
+                || !STAGES.contains(status.stage()) || status.terminal() == null || status.stale() == null
+                || status.activation() == null || status.activationStatus() == null
+                || !ACTIVATIONS.contains(status.activationStatus())
+                || (!Boolean.TRUE.equals(status.stale()) && !"unknown".equals(status.status())
+                    && status.terminal() != RetrainingStatus.TERMINAL_STATUSES.contains(status.status()))
+                || ("active".equals(status.activationStatus())
+                    && (blank(status.activation().desiredModelVersion())
+                        || !status.activation().desiredModelVersion()
+                            .equals(status.activation().servingModelVersion())))) {
+            throw contractMismatch("retraining-runs");
         }
         return status;
     }
@@ -123,9 +140,10 @@ public class FastApiRetrainingClient implements RetrainingClient {
                 .retrieve()
                 .body(RouterModelStatus.class));
 
-        if (status == null || status.status() == null || status.status().isBlank()) {
-            throw new RetrainingClientException(
-                    "FastAPI router/model/current 응답이 계약과 다릅니다", null, null);
+        if (status == null || status.status() == null
+                || !Set.of("inSync", "loading", "loadFailed", "static", "unavailable").contains(status.status())
+                || ("inSync".equals(status.status()) && !status.isInSync())) {
+            throw contractMismatch("router/model/current");
         }
         return status;
     }
@@ -139,6 +157,16 @@ public class FastApiRetrainingClient implements RetrainingClient {
      */
     static String resolveStatusPath(String statusUrl) {
         return UriComponentsBuilder.fromUriString(statusUrl).build().getPath();
+    }
+
+    private static boolean blank(String value) {
+        return value == null || value.isBlank();
+    }
+
+    private static RetrainingClientException contractMismatch(String operation) {
+        // A malformed response does not prove that the remote submission was rejected.
+        return new RetrainingClientException("FastAPI " + operation + " 응답이 계약과 다릅니다",
+                null, "RESPONSE_CONTRACT_MISMATCH");
     }
 
     private void addHeaders(HttpHeaders headers) {

@@ -1,0 +1,25 @@
+{
+  "kind": "supervisor_only_recovered_from_completed_cli_stdout",
+  "device": "Colab CPU Intel Xeon 2.00 GHz; 2 vCPUs; model thread limit 1",
+  "individual_model_measurement_files_recovered": false,
+  "reason": "Subsequent Contents API returned file not found; next kernel read returned session lost 404/401",
+  "production_latency_qualified": false,
+  "measurements": [
+    {
+      "model": "ordinal",
+      "returncode": 0,
+      "stop_reason": null,
+      "rss_cap_bytes": 4294967296,
+      "sampled_peak_rss_bytes": 2448732160,
+      "wall_seconds_including_import_load_warmup_and_both_lengths": 130.00998730300034
+    },
+    {
+      "model": "g1-r1-natural",
+      "returncode": 0,
+      "stop_reason": null,
+      "rss_cap_bytes": 4294967296,
+      "sampled_peak_rss_bytes": 2464747520,
+      "wall_seconds_including_import_load_warmup_and_both_lengths": 124.55182175100072
+    }
+  ]
+}

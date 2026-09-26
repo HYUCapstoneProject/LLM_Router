@@ -1,6 +1,7 @@
 package com.llmrouter.dto;
 
 import lombok.Builder;
+import com.llmrouter.client.RouterClassification;
 
 /**
  * request_log 한 행. 비용 그래프의 원천 데이터다.
@@ -50,7 +51,8 @@ public record RequestLogEntry(
         String rerankModelVersion,
         Boolean rerankWouldReject,
         Integer rerankCandidateCount,
-        Boolean rerankWouldReorder
+        Boolean rerankWouldReorder,
+        RouterClassification.DecisionMetadata routingDecision
 ) {
     public static final String ORIGIN_CHAT = "chat";
     public static final String ORIGIN_ESCALATE = "escalate";

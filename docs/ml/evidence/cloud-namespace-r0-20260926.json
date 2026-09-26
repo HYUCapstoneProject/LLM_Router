@@ -1,0 +1,18 @@
+{
+  "iam_configuration_verified": true,
+  "namespace_object": {
+    "generation": "1790351633796221",
+    "object_uri": "gs://llm-router-mlserver/releases/r0/config/foundation-4bb430ad32f26e90eae50123397658a06ec73668e4ee508bfdc259cbc9f2c3ce.json",
+    "sha256": "4bb430ad32f26e90eae50123397658a06ec73668e4ee508bfdc259cbc9f2c3ce"
+  },
+  "namespace_sha256": "9bb10b7f3b7bcccea729c7e653dbca3c3ffb5c3109a9d93446a9d4870cc561ce",
+  "observed_at": "2026-09-25T15:53:53.059590+00:00",
+  "prefix_access_probe_verified": true,
+  "probe_scope": "Serving VM ADC created, read back and generation-conditionally deleted a unique feedback-prefix object in each profile. Pipeline/Training effective operations remain untested.",
+  "production_pointer_generation": "1786882332374746",
+  "production_pointer_sha256": "d2ef6f06ebf8a5c6f855d7c559ab4daa115ddafe83cdf93c0c00077c1634d1f9",
+  "production_pointer_unchanged": true,
+  "profile": "r0",
+  "schema_version": "router-namespace-provisioning-v1",
+  "serving_identity": "llm-router-serving-sa@project-763753da-fa8f-4afd-b31.iam.gserviceaccount.com"
+}

@@ -1,0 +1,70 @@
+{
+  "bootstrap_method": {
+    "interval": "pointwise two-sided 95% percentile interval; floor is 2.5th percentile",
+    "multiple_comparison_adjustment": false,
+    "note": "Initial label-consistency floors only; not actual service quality or evidence of improvement. D_dev was used during model development and is not an independent test. D_gate floors will not be retuned after observing D_gate.",
+    "resamples": 1000,
+    "resampling_unit": "duplicate_group_id",
+    "rows": 3581,
+    "seed": 42,
+    "subgroup_macro_policy": "macro_over_labels_with_true_support",
+    "unique_groups": 3581
+  },
+  "compared_shared_columns": [
+    "sample_id",
+    "source_dataset",
+    "source_split",
+    "category",
+    "source_task",
+    "query_text",
+    "model_input_text",
+    "valid_model_count",
+    "accepted_model_count",
+    "overall_solve_rate",
+    "difficulty_label",
+    "label_confidence",
+    "sample_weight",
+    "duplicate_group_id",
+    "split",
+    "dataset_version",
+    "label_rule_version",
+    "preprocessing_version",
+    "split_version",
+    "label_origin",
+    "source_sample_weight",
+    "query_sha256",
+    "input_sha256"
+  ],
+  "gate_data_read": false,
+  "metrics_sha256": "66a60a17dfd47f83e1b475d44cf145f53a150a3155d7a8c94f48ae34ff7b9492",
+  "pilot_sha256": "3904fa99b19ae995a8f0745f3d15127991ae42922cf53faf374eea50f117fe6f",
+  "rows": 3581,
+  "rules_sha256": "cc741b2e025f95cdec159a593db2dc29954ae0cb2f57154da27f0f14d018c132",
+  "sample_id_set_equal": true,
+  "schema_version": "r0-initial-ddev-provenance-v1",
+  "script_sha256": "060b98ae6ee37eff51e31710a7e1f66e64bcc0a1277907e9e4b2a9f0928a4b8d",
+  "shared_values_equal": true,
+  "source_files": {
+    "objective_dev": {
+      "path": "/Users/yoocheolmin/workspace/school/LLM_Router/ml/artifacts/routing-objective-continual-v1/dataset/validation.parquet",
+      "sha256": "aa9d973fcf886c7465fbf9e06701984d099cd74a5eabf508cc610845613edef8"
+    },
+    "original_dev": {
+      "path": "/Users/yoocheolmin/workspace/school/LLM_Router/ml/artifacts/modernbert-initial-v1/dataset/validation/validation.parquet",
+      "sha256": "fb698a992f05b88bfd4488c7de0abe515e52107c8435a46fa9a45bfb63b7f4d0"
+    },
+    "score_manifest": {
+      "path": "/Users/yoocheolmin/workspace/school/LLM_Router/experiments/results/context-length-qualification-20260925/r0/scores/manifest.json",
+      "sha256": "45907074b46564785720e8d0852777df9be8692e93b3c8deb7ee8e9a56c041b1"
+    },
+    "scores": {
+      "path": "/Users/yoocheolmin/workspace/school/LLM_Router/experiments/results/context-length-qualification-20260925/r0/scores/validation-8192.parquet",
+      "sha256": "c655911481462518c01854a587c89c6c91e7d166d3157cfc3053e7e3cc591069"
+    },
+    "weights": {
+      "path": "/Users/yoocheolmin/workspace/school/LLM_Router/ml/artifacts/r0-release-20260927/source/extracted/final-model/model.safetensors",
+      "sha256": "e1a40fec7d269d8f925b5391e4f5e75df5d0fedbb1e37b4eea96521e27b1a6a7"
+    }
+  },
+  "source_scores_join": "unique sample_id exact join reordered to frozen original D_dev"
+}

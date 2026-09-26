@@ -3,11 +3,8 @@ package com.llmrouter.service;
 import com.llmrouter.client.RetrainingClient;
 import com.llmrouter.client.RetrainingClientException;
 import com.llmrouter.dto.EscalateAcceptance;
-import com.llmrouter.dto.EscalationEvent;
 import com.llmrouter.dto.FeedbackBatchRequest;
-import com.llmrouter.dto.RouterTier;
 import com.llmrouter.repository.FeedbackBatchRepository;
-import com.llmrouter.repository.FeedbackBatchRepository.EscalationRow;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,11 +33,12 @@ import java.util.Optional;
  * 있다. 그때 "실패했으니 다시 고르자"고 하면 같은 이벤트가 새 batchId 로 또 나가고,
  * 계약상 그건 <b>다른 배치</b>라서 모델 버전이 한 번 더 올라간다. 되돌릴 수 없는 종류의
  * 실수다. 먼저 찍어 두면 재시도 때 {@code exported_batch_id} 로 같은 이벤트 집합을
- * 복원해 <b>같은 batchId</b> 로 다시 보낼 수 있다. 계약이 "재시도 때문에 새 batch ID 를
+ * 저장된 request snapshot으로 <b>같은 batchId</b> 로 다시 보낼 수 있다. 계약이 "재시도 때문에 새 batch ID 를
  * 만들거나 payload 를 나누지 않는다"고 한 것이 이 뜻이다.
  *
  * <p>대가는 명확하다. 비재시도 오류(422 등)로 끝나면 찍어 둔 행을 되돌려야 하고,
- * 그건 {@link FeedbackBatchRepository#release} 가 한다.
+ * 명확한 요청 검증 거부는 {@link FeedbackBatchRepository#release} 가 처리하고,
+ * 접수 여부가 불확실한 충돌은 이벤트 소유를 유지한 채 격리한다.
  */
 @Slf4j
 @Service
@@ -92,33 +90,24 @@ public class FeedbackBatchService {
      */
     public Optional<SubmissionResult> submitPending(String trigger) {
         guardPiiRedaction();
-        List<EscalationRow> rows = repository.findEligible(batchSize);
-        if (rows.isEmpty()) {
-            log.info("재학습 제출 대상이 없습니다 (trigger={})", trigger);
-            return Optional.empty();
-        }
-        String batchId = repository.claim(
-                rows.stream().map(EscalationRow::id).toList(),
-                trigger,
-                "feedback-" + DAY.format(Instant.now(clock)) + "-");
-        return Optional.of(submitClaimed(batchId, rows));
+        Instant requestedAt = Instant.now(clock);
+        return repository.claimEligible(batchSize, trigger,
+                        "feedback-" + DAY.format(requestedAt) + "-", requestedAt)
+                .map(this::submitClaimed);
     }
 
-    /**
-     * 접수되지 않은 채 남은 배치를 <b>같은 batchId·같은 payload</b> 로 다시 보낸다.
-     *
-     * <p>연결이 끊겼을 뿐 FastAPI 가 이미 접수했을 수도 있는데, 같은 내용이면 기존
-     * pipelineRunId 로 202 가 다시 온다(계약의 멱등성). 그래서 새로 고르지 않고 복원한다.
-     */
+    /** Retries use the stored request, including its original requestedAt. */
     public Optional<SubmissionResult> retrySubmission(String batchId) {
-        List<EscalationRow> rows = repository.findByBatch(batchId);
-        if (rows.isEmpty()) {
-            // 찍어 둔 행이 사라졌다면 payload 를 복원할 수 없다. 새 배치로 만들면
-            // 버전을 한 번 더 태우므로 자동으로 처리하지 않고 사람이 보게 남긴다.
-            log.error("재시도할 배치의 이벤트가 없습니다 batchId={} — 수동 확인이 필요합니다", batchId);
+        guardPiiRedaction();
+        Optional<FeedbackBatchRequest> request = repository.findRequest(batchId);
+        if (request.isEmpty()) {
+            log.error("재시도 payload가 없거나 이미 처리된 배치입니다 batchId={}", batchId);
             return Optional.empty();
         }
-        return Optional.of(submitClaimed(batchId, rows));
+        if (!batchId.equals(request.get().batchId())) {
+            throw new IllegalStateException("stored feedback payload batchId mismatch");
+        }
+        return request.map(this::submitClaimed);
     }
 
     /**
@@ -135,50 +124,35 @@ public class FeedbackBatchService {
         }
     }
 
-    private SubmissionResult submitClaimed(String batchId, List<EscalationRow> rows) {
-        List<EscalationEvent> events = rows.stream().map(this::toEvent).toList();
-        FeedbackBatchRequest request =
-                new FeedbackBatchRequest(batchId, Instant.now(clock), events);
+    private SubmissionResult submitClaimed(FeedbackBatchRequest request) {
+        String batchId = request.batchId();
+        int eventCount = request.events().size();
 
         try {
             EscalateAcceptance acceptance = retrainingClient.submit(request);
             repository.recordAcceptance(acceptance);
             log.info("재학습 배치 접수됨 batchId={} events={} candidate={}",
-                    batchId, events.size(), acceptance.candidateModelVersion());
-            return new SubmissionResult(batchId, events.size(), true, null);
+                    batchId, eventCount, acceptance.candidateModelVersion());
+            return new SubmissionResult(batchId, eventCount, true, null);
 
         } catch (RetrainingClientException error) {
             if (error.isRetryable()) {
                 // 배치 행과 exported_batch_id 를 그대로 둔다. 스케줄러가 같은 payload 로 다시 온다.
                 log.warn("재학습 제출 실패(재시도 대상) batchId={} code={}", batchId, error.code());
-                return new SubmissionResult(batchId, events.size(), false, error.code());
+                return new SubmissionResult(batchId, eventCount, false, error.code());
             }
-            // 되돌리지 않으면 이 이벤트들이 영영 어떤 배치에도 못 들어간다.
-            repository.release(batchId, error.code());
-            log.error("재학습 제출 실패(복구 불가) batchId={} code={} — 이벤트를 대기 상태로 되돌렸습니다",
-                    batchId, error.code());
-            return new SubmissionResult(batchId, events.size(), false, error.code());
+            // Only a definite validation rejection can release events. Conflict, auth and
+            // unknown failures need reconciliation; a remote job may already own this batch.
+            if (Integer.valueOf(422).equals(error.statusCode())
+                    && "REQUEST_VALIDATION_FAILED".equals(error.code())) {
+                repository.release(batchId, error.code());
+            } else {
+                repository.quarantine(batchId, error.code() == null
+                        ? "SUBMISSION_RECONCILIATION_REQUIRED" : error.code());
+            }
+            log.error("재학습 제출 중단 batchId={} code={}", batchId, error.code());
+            return new SubmissionResult(batchId, eventCount, false, error.code());
         }
-    }
-
-    private EscalationEvent toEvent(EscalationRow row) {
-        String[] path = row.escalationPath();
-        return new EscalationEvent(
-                "esc-" + row.id(),
-                row.requestId(),
-                row.question(),
-                RouterTier.fromLabel(row.initialTier()),
-                // initialModel 과 finalModel 을 둘 다 escalation_path 에서 뽑는다.
-                // final 만 final_model_id(claude-sonnet-4-6)로 쓰면 initial(haiku)과
-                // 표기 단위가 달라져 ML 쪽에서 같은 모델이 두 이름으로 보인다.
-                path[0],
-                RouterTier.fromLabel(row.finalTier()),
-                path[path.length - 1],
-                true,                   // 선별 쿼리가 user_satisfied = true 만 가져온다
-                row.escalationSeq(),
-                row.createdAt(),
-                row.routerModelVersion(),
-                true);                  // requirePiiRedaction 주석 참고
     }
 
     /**
