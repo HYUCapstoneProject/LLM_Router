@@ -1,0 +1,19 @@
+{
+  "base_model": "answerdotai/ModernBERT-base@8949b909ec900327062f0ebf497f51aef5e6f0c8",
+  "code_commit": "1300f763b61376e183be102152d2a50966e7bb75",
+  "dataset_manifest_sha256": "f6a4cff1684bc2626a8901dbfda9f81e7d5d7e8753e5f48320cb1ada44c8cca4",
+  "dataset_version": "routerbench-xroutebench-continual-v1",
+  "evaluation_role": "continual_gate",
+  "evaluation_version": "routerbench-xroutebench-label-evaluation-r0-inference8192-v1",
+  "inference_max_length": 8192,
+  "input_contract": "structure-preserving-v2",
+  "label_rule_version": "overall-solve-rate-grid-v1:h0.27-e0.64",
+  "length_contract_version": "train-inference-lengths-v1",
+  "objective": "ordinal",
+  "preprocessing_version": "integrated-routing-preprocess-v2-structure",
+  "schema_version": "model-package-v1",
+  "split_version": "continual-60-10-10-15-5-v1-seed-42",
+  "tokenizer_max_length": 8192,
+  "training_max_length": 512,
+  "training_version": "modernbert-r0-feedback-v1"
+}

@@ -1,0 +1,56 @@
+{
+  "acceptance": {
+    "minimum_escalation_count": 1,
+    "require_pii_redacted": true,
+    "require_strict_tier_increase": true,
+    "require_user_satisfied": true
+  },
+  "adapter_version": "feedback-continual-structure-v1",
+  "base_dataset_contract": {
+    "dataset_version": "routerbench-xroutebench-continual-v1",
+    "holdout_policy": "preserve-train-dev-protect-gate-retention-source-tests-exclude-stream",
+    "label_rule_version": "overall-solve-rate-grid-v1:h0.27-e0.64",
+    "preprocessing_version": "integrated-routing-preprocess-v2-structure",
+    "split_version": "continual-60-10-10-15-5-v1-seed-42"
+  },
+  "base_dataset_sha256": "74835d16e293e2bf04244a952a63b8c12dc28fa27e1ab03b106d5095a855e85f",
+  "base_manifest_sha256": "f5b98ee1cbba5c5cf2d56e7e1e124ee06b36541fd4feba6782c2855fb33c853f",
+  "base_row_count": 37567,
+  "candidate_feedback_schema_note": "R0 only: finalLabel is a legacy escalation proxy; chain completion is not objective answer correctness or observed per-candidate R1 success.",
+  "deployment_blockers": [],
+  "deployment_status": "approved",
+  "excluded_stream_row_count": 5368,
+  "feedback_target_contract": "observed-escalation-final-label-proxy-v1",
+  "input_contract": "structure-preserving-v2",
+  "label_order": [
+    "easy",
+    "medium",
+    "hard"
+  ],
+  "merge": {
+    "base_holdout_overlap_policy": "exclude_feedback",
+    "base_train_conflict_policy": "replace_exact_train_rows",
+    "compact_rehearsal": {
+      "seed": 20260912,
+      "train_rows_per_label": 32,
+      "validation_rows_per_label": 16
+    }
+  },
+  "merge_version": "feedback-continual-protected-base-v1",
+  "original_partition_row_counts": {
+    "external_test": 3729,
+    "gate": 3581,
+    "retention_test": 1797,
+    "test": 3473,
+    "train": 21406,
+    "validation": 3581
+  },
+  "sample_weight": {
+    "base": 1.0,
+    "maximum": 2.0,
+    "repeat_increment": 0.25
+  },
+  "schema_version": "feedback-export-v0.1",
+  "source_dataset_manifest_sha256": "f6a4cff1684bc2626a8901dbfda9f81e7d5d7e8753e5f48320cb1ada44c8cca4",
+  "training_objective": "ordinal"
+}

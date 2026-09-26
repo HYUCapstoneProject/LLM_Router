@@ -43,9 +43,9 @@
       "pipeline_artifacts_root_uri": "gs://llm-router-mlserver/pipeline-root/r0",
       "current_pointer_uri": "gs://llm-router-mlserver/releases/r0/models/router-modernbert/CURRENT.json",
       "sqlite_path": "/app/var/r0/retraining.sqlite3",
-      "gate_rules_uri": null,
-      "baseline_metrics_uri": null,
-      "approved_baseline_uri": null,
+      "gate_rules_uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/gate-rules.json",
+      "baseline_metrics_uri": "gs://llm-router-mlserver/releases/r0/config/r0-a-20260927-1300f76/baseline-metrics.json",
+      "approved_baseline_uri": "gs://llm-router-mlserver/releases/r0/models/router-modernbert/router-modernbert-r0-a-20260927-v1/approved",
       "pipeline_template_uri": null,
       "namespace_evidence": {
         "path": "docs/ml/evidence/cloud-namespace-r0-20260926.json",

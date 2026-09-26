@@ -1,0 +1,26 @@
+{
+  "pointer": {
+    "approved_at": "2026-09-26T18:23:58Z",
+    "approved_by": "automated-r0-initial-qualification",
+    "candidate_manifest_sha256": "5b10df21c666a6c81deb7348910f039afb012207c3af0011da9c3b81583fc9cb",
+    "id2label": {
+      "0": "easy",
+      "1": "medium",
+      "2": "hard"
+    },
+    "logical_model_version": "1.0",
+    "manifest_sha256": "68dd3b9cd5c13bd5275e4d0ac05fcfbc7f8c7e1e9d112908d5181873590ad1d2",
+    "model_version": "router-modernbert-r0-a-20260927-v1",
+    "package_uri": "gs://llm-router-mlserver/releases/r0/models/router-modernbert/router-modernbert-r0-a-20260927-v1/approved",
+    "pipeline_run_id": null,
+    "previous_model_version": null,
+    "previous_package_uri": null,
+    "previous_pointer_generation": null,
+    "retained_model_versions": [
+      "router-modernbert-r0-a-20260927-v1"
+    ],
+    "schema_version": "router-current-model-v1",
+    "training_mode": "initial_training"
+  },
+  "generation": 1790447191873881
+}

@@ -49,7 +49,7 @@ PYTHONPATH=ml/src .venv/bin/python ml/scripts/prepare-r0-release.py \
 
 출력은 `feedback.json`, `training.json`, `evaluation.json`, `development.json`, `baseline-metrics.json`, `gate-rules.json`, `package-metadata.json`, 그리고 파일 SHA·입력 SHA를 묶은 `release.json`이다. baseline 지표는 manifest와의 SHA 결합을 유지하도록 원본 bytes를 복사한다. package metadata에는 가짜 `model_version`을 넣지 않으며 KFP가 실제 후보 버전을 package CLI의 `--model-version`으로 공급한다. `feedback.json`의 approved는 전처리 config 사용 허용을 뜻한다. release는 항상 `cloud_deployed=false`, `model_approved=false`로 기록한다.
 
-현재 실제 8192 approved baseline·동결 pilot/rules·image digest·IR가 이 코드에 들어 있지 않다. 이 문서나 synthetic fixture로 누락을 대신하지 않는다. 초기 baseline의 qualification·등록은 별도 실제 승인 증거가 필요하며, 이 helper가 새 baseline을 승인해 주지 않는다.
+2026-09-27 실제 R0 8192 baseline의 초기 qualification·GCS 승인 등록과 D_dev pilot/rules 결합을 완료했다. 실제 파일·SHA는 [등록 검증 기록](../../experiments/results/r0-production-qualification-20260927/REPORT.md)에 있다. 이미지 digest·새 IR·운영 배포 인수는 아직 남아 있다. 이 문서나 synthetic fixture로 누락을 대신하지 않는다. 초기 baseline의 qualification·등록은 별도 실제 승인 증거가 필요하며, 이 helper가 새 baseline을 승인해 주지 않는다.
 
 ## Spring과 FastAPI 설정
 

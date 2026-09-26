@@ -33,3 +33,13 @@
 ## 남은 인수
 
 A R0 archive 검증(완료) → D_dev 기준 동결(완료)·8192 D_gate 평가 → 승인 package·이미지·파이프라인 설정 → DB/서버 배포 → 실제 8192 성능과 에스컬레이션 전체 흐름·복구 검증 순서다. 현재 운영 모델 교체나 성공한 실제 재학습을 완료했다고 표시하지 않는다. 기존 피드백의 최종 단계는 대리 라벨이므로 기존 학습 데이터 복습·보호 평가를 유지한다.
+
+## 이번에 직접 실행할 이미지 게시
+
+이 Mac에서 다음 명령은 검증한5개 이미지만 Artifact Registry에 게시하고 결과를 `ml/artifacts/r0-release-20260927/image-publication.json`에 남긴다. GPU 학습·VM 교체·CURRENT 변경은 하지 않는다. 모델과 학습 설정·보호 데이터의 GCS 게시는 이미 완료했다.
+
+```bash
+bash /Users/yoocheolmin/workspace/school/LLM_Router/ml/artifacts/r0-release-20260927/publish-images.sh
+```
+
+완료 후 알려주면 실제 digest로 새 IR을 컴파일·게시하고 FastAPI 설정 연결과 서버 검증을 이어간다. 오류가 나면 receipt를 지우거나 같은 명령을 반복하지 말고 오류 문구만 전달한다. 이 인계 시점에는 실제 서비스 모델 교체와 전체 재학습 검증은 완료되지 않았다.
