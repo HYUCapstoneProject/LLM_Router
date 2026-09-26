@@ -71,7 +71,8 @@ def test_proposed_config_is_locally_valid_but_not_release_ready(config):
     report = audit(config)
     assert report["status"] == "local_verified"
     assert report["local_errors"] == []
-    assert len(report["release_inputs_pending"]) == 8
+    # Baseline and gate URIs are published; four image digests and the IR remain.
+    assert len(report["release_inputs_pending"]) == 5
     assert report["deployment_ready"] is False
     assert report["cloud_inventory_verified"] is False
     assert report["mutations_performed"] is False

@@ -6,5 +6,5 @@ llm:
     mode: ${ROUTER_MODE:fastapi}
     classify-contract: v1
   retraining:
-    # Actual 8192 baseline, D_dev pilot, frozen D_gate and cloud activation are pending.
+    # Keep disabled until cloud activation and end-to-end retraining are verified.
     auto-submit: false
