@@ -1,0 +1,62 @@
+{
+  "floor_selection_method": {
+    "interval": "pointwise two-sided 95% percentile interval; floor is 2.5th percentile",
+    "multiple_comparison_adjustment": false,
+    "note": "Initial label-consistency floors only; not actual service quality or evidence of improvement. D_dev was used during model development and is not an independent test. D_gate floors will not be retuned after observing D_gate.",
+    "resamples": 1000,
+    "resampling_unit": "duplicate_group_id",
+    "rows": 3581,
+    "seed": 42,
+    "subgroup_macro_policy": "macro_over_labels_with_true_support",
+    "unique_groups": 3581
+  },
+  "minimum_metrics": {
+    "macro_f1": 0.49985175212750016,
+    "per_class.hard.recall": 0.20971037334798576,
+    "per_domain.code.macro_f1": 0.3029519221369598,
+    "per_domain.commonsense.macro_f1": 0.34355974400401773,
+    "per_domain.knowledge.macro_f1": 0.42903122661913434,
+    "per_domain.math.macro_f1": 0.514666931974809,
+    "per_domain.reading_comprehension.macro_f1": 0.534745669289293,
+    "per_source_dataset.routerbench.macro_f1": 0.44313630941004756,
+    "per_source_dataset.xroutebench.macro_f1": 0.5445140696681611
+  },
+  "report_only_domains": {
+    "conversation": {
+      "development_row_count": 8,
+      "quality_unverified": true,
+      "reason": "insufficient_support"
+    }
+  },
+  "required_evaluation_contract": {
+    "dataset_contract.dataset_version": "routerbench-xroutebench-continual-v1",
+    "dataset_contract.label_rule_version": "overall-solve-rate-grid-v1:h0.27-e0.64",
+    "dataset_contract.preprocessing_version": "integrated-routing-preprocess-v2-structure",
+    "dataset_contract.split_version": "continual-60-10-10-15-5-v1-seed-42",
+    "dataset_sha256": "94ed6c7be5966b37d7bb24aa5d37d35d1aed5e245b3a5b97b18a80cc944f4187",
+    "evaluation_role": "continual_gate",
+    "evaluation_split": "gate",
+    "evaluation_version": "routerbench-xroutebench-label-evaluation-r0-inference8192-v1",
+    "label_order": [
+      "easy",
+      "medium",
+      "hard"
+    ],
+    "label_semantics": "overall-solve-rate-T1-label-agreement",
+    "model_info.max_length": 8192
+  },
+  "rules_version": "r0-a-initial-8192-ddev-group-bootstrap-20260927-v1",
+  "schema_version": "r0-initial-rules-v1",
+  "small_domain_policy": {
+    "frozen_before_gate": true,
+    "minimum_development_rows": 30,
+    "policy_version": "initial-small-domain-report-only-v1",
+    "scope": "initial_baseline_only"
+  },
+  "threshold_selection": {
+    "dataset_sha256": "fb698a992f05b88bfd4488c7de0abe515e52107c8435a46fa9a45bfb63b7f4d0",
+    "evaluation_role": "development_calibration",
+    "frozen_before_gate": true,
+    "report_sha256": "3904fa99b19ae995a8f0745f3d15127991ae42922cf53faf374eea50f117fe6f"
+  }
+}
