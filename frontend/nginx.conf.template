@@ -52,10 +52,10 @@ server {
         # 아무나 우리 Claude 크레딧을 쓸 수 없다.
         proxy_set_header X-Gateway-Key     "${GATEWAY_KEY}";
 
-        # Opus 응답이 길면 30초를 넘길 수 있다. 기본 60초로는 부족할 때가 있다.
+        # CPU 장문 분류와 Claude 응답을 합한 대기 예산. 컨테이너 환경으로 조정한다.
         proxy_connect_timeout 10s;
-        proxy_send_timeout   120s;
-        proxy_read_timeout   120s;
+        proxy_send_timeout   ${NGINX_PROXY_SEND_TIMEOUT};
+        proxy_read_timeout   ${NGINX_PROXY_READ_TIMEOUT};
     }
 
     # SPA 라우팅 — 없는 경로는 index.html 로 넘긴다

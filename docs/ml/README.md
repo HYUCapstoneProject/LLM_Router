@@ -1792,3 +1792,13 @@ research/<experiment-version>/  독립 dataset·prediction·snapshot·비용 led
 | nAUC | 여러 비용 구간의 성능을 정규화해 요약한 수치 | 성공 확률이 아님. 기존 A와 G1의 지표 정의 차이를 확인해야 함 |
 
 실험을 읽을 때는 **어떤 문제집(dataset)을 어떻게 나누고(split), 무엇을 정답(target)으로 가르쳤으며, 어떤 규칙(policy)으로 선택했는지**를 먼저 확인한다. Manifest는 그 조건과 사용한 파일을 다시 확인하기 위한 설명서다.
+
+
+<a id="r0-long-context-http-budget"></a>
+### 2026-09-27 R0 장문 HTTP 대기 예산
+
+현재 CPU serving 검증에서 8,192토큰 단일 추론은 1 thread 기준 약 181.9초였고, 2 thread의 2,048토큰도 약 17.8초였다. 2 thread의 8,192토큰 단일 측정은 171.124초, OOM 0이었다. 이 수치는 별도 warm 반복 측정이나 p95 결과가 아니다. 8,192토큰 HTTP 200 및 OOM 없음은 입력 길이를 처리한다는 증거이며, 기존 15초 응답 목표를 통과했다는 뜻은 아니다. 현재 VM에서 장문 한 건에 수분이 걸릴 수 있으며 동시 장문 처리 성능도 별도 검증 대상이다.
+
+`prod,r0`의 라우터 read timeout 기본값을 240초로 두고, 한 요청은 1회만 시도해 timeout 뒤 동일한 긴 추론이 중복 실행되는 것을 피한다. `ROUTER_READ_TIMEOUT`과 `ROUTER_MAX_ATTEMPTS`로 명시적으로 조정할 수 있다. 공통/R1 기본값과 공개 API, 8,192토큰 입력 계약, 재학습 제출 60초 timeout은 유지한다.
+
+브라우저에 전체 응답을 한 번에 반환하므로 nginx 응답 대기에는 임베딩·분류·Claude 생성 시간이 함께 들어간다. frontend 컨테이너의 `NGINX_PROXY_READ_TIMEOUT`/`NGINX_PROXY_SEND_TIMEOUT` 기본값은 600초이며, 배포 스크립트도 Cloud Run 요청 timeout을 기본 600초로 설정한다(`FRONTEND_REQUEST_TIMEOUT`으로 변경 가능). 이는 장문 요청을 너무 일찍 끊지 않기 위한 대기 예산이며 응답 속도 개선이나 지연 SLO 달성의 근거가 아니다. 실제 운영 전환 후 응답 시간·메모리·동시성 확인이 필요하다.

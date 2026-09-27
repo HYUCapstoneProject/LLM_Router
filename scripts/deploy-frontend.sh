@@ -33,6 +33,7 @@ gcloud run deploy "$SERVICE" \
   --project "$PROJECT_ID" \
   --region "$REGION" \
   --source "$REPO_ROOT/frontend" \
+  --timeout "${FRONTEND_REQUEST_TIMEOUT:-600s}" \
   --allow-unauthenticated \
   --quiet
 

@@ -22,5 +22,7 @@ COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 ENV PORT=8080
 ENV BACKEND_URL=http://localhost:8080
 ENV GATEWAY_KEY=""
+ENV NGINX_PROXY_SEND_TIMEOUT=600s
+ENV NGINX_PROXY_READ_TIMEOUT=600s
 
 EXPOSE 8080

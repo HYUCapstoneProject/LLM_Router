@@ -53,7 +53,7 @@ PYTHONPATH=ml/src .venv/bin/python ml/scripts/prepare-r0-release.py \
 
 ## Spring과 FastAPI 설정
 
-Spring은 `SPRING_PROFILES_ACTIVE=prod,r0`와 기존 `ROUTER_BASE_URL`, `ROUTER_API_TOKEN`, `ROUTER_MODEL_VERSION`을 사용한다. `application-r0.yml`은 FastAPI/v1을 선택하고 자동 제출을 중지한다. `ROUTER_READ_TIMEOUT=PT15S` 등 기존 timeout은 실제 서버 측정 없이 늘리지 않았다. 로컬 stub이 필요하면 `ROUTER_MODE=stub`을 명시한다.
+Spring은 `SPRING_PROFILES_ACTIVE=prod,r0`와 기존 `ROUTER_BASE_URL`, `ROUTER_API_TOKEN`, `ROUTER_MODEL_VERSION`을 사용한다. `application-r0.yml`은 FastAPI/v1을 선택하고 자동 제출을 중지한다. 실제 CPU 장문 측정에 따라 R0의 기본값은 `ROUTER_READ_TIMEOUT=PT240S`, `ROUTER_MAX_ATTEMPTS=1`이며 환경변수로 조정할 수 있다. 입력 8,192토큰 지원과 기존 15초 응답 목표 충족은 구분한다. [단일 문서의 HTTP 대기 예산](README.md#r0-long-context-http-budget)에 실측 및 proxy 설정 근거를 기록했다. 로컬 stub이 필요하면 `ROUTER_MODE=stub`을 명시한다.
 
 FastAPI 저장소의 `deploy/r0.env.example`은 R0 registry/CURRENT, feedback/control/observability, `/app/var/r0/` cache/SQLite, 실제 공통 프로젝트·서비스 계정을 고정한다. 실제 secret, 승인 baseline version, full code SHA와 생성한 release/IR/data URI를 채운 후 다음 로컬 검사를 실행한다.
 
