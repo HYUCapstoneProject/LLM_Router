@@ -1,0 +1,24 @@
+{
+  "arm": "r1_to_r0",
+  "seed": 44,
+  "phase": "cycle-06",
+  "role": "dev",
+  "max_length": 8192,
+  "plan_sha256": "05fcfd4cef3ec83f0b7daee29df16a01b9ff30d48f84b119d337127c75e77185",
+  "data_sha256": "aa9d973fcf886c7465fbf9e06701984d099cd74a5eabf508cc610845613edef8",
+  "model_digest": "ef4376590ca81cfab1554bf131fae63cf6459e968488c29c15567d418441f99d",
+  "inference_seconds": 132.58182199400017,
+  "peak_cuda_allocated_bytes": 805638144,
+  "predictions_sha256": "7d398278f2bc621e3da8697bdaf9e4eb1ed540ee3449202380d58e0a02a6d43e",
+  "metrics": {
+    "rows": 3581,
+    "accuracy": 0.3755934096621056,
+    "macro_f1": 0.35735989542839014,
+    "hard_recall": 0.5253863134657837,
+    "under_route_rate": 0.10025132644512706,
+    "hard_to_easy_rate_all_rows": 0.014521083496230103,
+    "source_macro_f1": 0.3859026706428439,
+    "selected_quality": 0.7380816738240523,
+    "selected_actual_cost": 0.002356591817927953
+  }
+}

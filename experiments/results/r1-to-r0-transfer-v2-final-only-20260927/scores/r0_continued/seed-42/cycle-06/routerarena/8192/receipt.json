@@ -1,0 +1,22 @@
+{
+  "arm": "r0_continued",
+  "seed": 42,
+  "phase": "cycle-06",
+  "role": "routerarena",
+  "max_length": 8192,
+  "plan_sha256": "05fcfd4cef3ec83f0b7daee29df16a01b9ff30d48f84b119d337127c75e77185",
+  "data_sha256": "e60418d94ced38ba95115bad9a36247a699f14c20f67e49a39f15bc8fa40a308",
+  "model_digest": "0119634d1339f8ce68e8c23a928c0e30e91a5788173d24268665268b6bc41ba2",
+  "inference_seconds": 370.95906095899954,
+  "peak_cuda_allocated_bytes": 9442397696,
+  "predictions_sha256": "a054b39717d6f7ada0cc84fdbc6e64ba68929a5a9cd11e5d9761b7c05292512b",
+  "metrics": {
+    "rows": 8379,
+    "accuracy": 0.30313879937940086,
+    "macro_f1": 0.3047048035293141,
+    "hard_recall": 0.42820773930753564,
+    "under_route_rate": 0.16398138202649482,
+    "hard_to_easy_rate_all_rows": 0.02446592672156582,
+    "source_macro_f1": 0.3047048035293141
+  }
+}

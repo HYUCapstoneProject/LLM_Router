@@ -1,0 +1,24 @@
+{
+  "arm": "r1_frozen",
+  "seed": 0,
+  "phase": "baseline",
+  "role": "gate",
+  "max_length": 8192,
+  "plan_sha256": "05fcfd4cef3ec83f0b7daee29df16a01b9ff30d48f84b119d337127c75e77185",
+  "data_sha256": "baefa029ecf5946a248765cef2de7e311ed67981f962bb7dda3aba0d153090ba",
+  "model_digest": "494808c7bcdea0ef3707baae4a52eb1a484513eaa4cb1623517386cf2b511757",
+  "inference_seconds": 136.37976570599994,
+  "peak_cuda_allocated_bytes": 845450240,
+  "predictions_sha256": "6ecf40782d625325627f14747458af2eb121eed964cd64085effea23805d127b",
+  "metrics": {
+    "rows": 3581,
+    "accuracy": 0.25970399329796146,
+    "macro_f1": 0.2286686021287866,
+    "hard_recall": 0.541019955654102,
+    "under_route_rate": 0.064786372521642,
+    "hard_to_easy_rate_all_rows": 0.02010611561016476,
+    "source_macro_f1": 0.2132263622728303,
+    "selected_quality": 0.7911184625000641,
+    "selected_actual_cost": 0.0035416785395141026
+  }
+}

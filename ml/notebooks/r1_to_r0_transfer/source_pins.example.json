@@ -1,0 +1,19 @@
+{
+  "schema_version": "router-transfer-source-pins-v1",
+  "instructions": "Copy this file to source_pins.json outside Git. Supply real local files and verified SHA-256 values. Null values deliberately block execution. Use matched experiment-A R0/R1, not A R0 versus G1 R1-natural.",
+  "models": {
+    "r0": {
+      "path": null,
+      "files": {"model.safetensors": null, "config.json": null, "tokenizer.json": null, "tokenizer_config.json": null, "training_config.json": null},
+      "cohort": {"training_rows_sha256": null, "split_manifest_sha256": null, "label_definition_sha256": null, "candidate_pool_sha256": null, "backbone_revision": null, "initial_optimizer_steps": null, "initial_seed": null, "training_max_length": 512}
+    },
+    "r1": {
+      "path": null,
+      "files": {"model.safetensors": null, "config.json": null, "tokenizer.json": null, "tokenizer_config.json": null, "training_config.json": null},
+      "cohort": {"training_rows_sha256": null, "split_manifest_sha256": null, "label_definition_sha256": null, "candidate_pool_sha256": null, "backbone_revision": null, "initial_optimizer_steps": null, "initial_seed": null, "training_max_length": 512}
+    }
+  },
+  "data_sha256": {"train": null, "dev": null, "gate": null, "feedback": null, "forget": null, "routerarena": null},
+  "r1_policy": {"path": null, "sha256": null},
+  "runtime_contract": {"path": null, "sha256": null}
+}

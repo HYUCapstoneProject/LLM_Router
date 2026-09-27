@@ -1,0 +1,19 @@
+{
+  "plan_sha256": "05fcfd4cef3ec83f0b7daee29df16a01b9ff30d48f84b119d337127c75e77185",
+  "arm": "r1_to_r0",
+  "seed": 42,
+  "phase": "cycle-05",
+  "optimizer_steps": 100,
+  "this_invocation_seconds": 345.76695188700023,
+  "cumulative_training_seconds": 338.990881831,
+  "model_bytes": 602052884,
+  "model_files": {
+    "config.json": "ea1ce331e821e1905e6a26d39f6d16c4595a80ed425613228caed5a57e227c2b",
+    "metrics.json": "6536f43319b234f609e38970db2fe7ec33ba85390cd62d26f75e9aadb4f93930",
+    "model.safetensors": "9012f7f36b917dbcb442da5726d5af91978c496f2e82ac8d1922fcf55f9e21f4",
+    "special_tokens_map.json": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049",
+    "tokenizer.json": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+    "tokenizer_config.json": "2966a59b9e9cf122279aec1249e22e5bc7ad8430c754e95031b13fd128d4e560",
+    "training_config.json": "459331cda17b9327b4cda480f1ebe7a36c48ac199a1e664d1648381db350bf1e"
+  }
+}

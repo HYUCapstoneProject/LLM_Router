@@ -1,0 +1,24 @@
+{
+  "arm": "r0_continued",
+  "seed": 43,
+  "phase": "cycle-06",
+  "role": "gate",
+  "max_length": 8192,
+  "plan_sha256": "05fcfd4cef3ec83f0b7daee29df16a01b9ff30d48f84b119d337127c75e77185",
+  "data_sha256": "baefa029ecf5946a248765cef2de7e311ed67981f962bb7dda3aba0d153090ba",
+  "model_digest": "1819d4eeda3b2765a3800e1c412b3ccbfa2f603034e91d6daee43108a93cec41",
+  "inference_seconds": 131.28025095500016,
+  "peak_cuda_allocated_bytes": 845450240,
+  "predictions_sha256": "5c9416bb28b4a98b468eb1ae1d9049b0a5741fa7b5ea5abdb81862fe418dce0f",
+  "metrics": {
+    "rows": 3581,
+    "accuracy": 0.40686958950013963,
+    "macro_f1": 0.3963614371022312,
+    "hard_recall": 0.5942350332594235,
+    "under_route_rate": 0.09941357162803686,
+    "hard_to_easy_rate_all_rows": 0.012287070650656241,
+    "source_macro_f1": 0.4197811632250419,
+    "selected_quality": 0.742111591844367,
+    "selected_actual_cost": 0.0024860098994694216
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "checkpoint": {
+    "id2label": {
+      "0": "easy",
+      "1": "medium",
+      "2": "hard"
+    },
+    "label2id": {
+      "easy": 0,
+      "hard": 2,
+      "medium": 1
+    },
+    "model_weight_files": [
+      "model.safetensors"
+    ],
+    "reload_smoke_passed": true,
+    "reload_smoke_prediction": "easy"
+  },
+  "data": {
+    "input_row_count": 233,
+    "label_distribution": {
+      "easy": 48,
+      "hard": 86,
+      "medium": 99
+    },
+    "sampled_train_row_count_per_epoch": 185,
+    "train_row_count": 185,
+    "training_data_sha256": "f786065899a72a8a8675b458234fb1f384471c4889dbf2efa12304f711cfc9f6",
+    "validation_row_count": 48
+  },
+  "model": {
+    "attention_implementation": "eager",
+    "device": "cuda",
+    "model_id": "answerdotai/ModernBERT-base",
+    "model_revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+    "precision": "fp16"
+  },
+  "optimization": {
+    "effective_batch_size": 32,
+    "gradient_accumulation_steps": 4,
+    "gradient_clip_norm": 1.0,
+    "learning_rate": 2e-05,
+    "max_train_steps": 100,
+    "mean_train_loss": 0.31092467151312014,
+    "mean_weighted_train_loss": 0.31092467151312014,
+    "optimizer_steps": 100,
+    "planned_steps": 102,
+    "resumed_from_step": null,
+    "train_sample_weight_mean": 1.0,
+    "train_sampling_strategy": "shuffle",
+    "training_fingerprint": "44db487f0cf5da6ebfba4000f561e743cefdc89c487ff5f5426d1e4f1c601c0f",
+    "training_seconds": 337.2117118489996,
+    "warmup_steps": 10,
+    "weight_decay": 0.01
+  },
+  "runtime": {
+    "contract_passed": true,
+    "cuda_available": true,
+    "cuda_version": "12.4",
+    "mismatches": {},
+    "numpy_version": "2.1.2",
+    "pandas_version": "2.3.3",
+    "pyarrow_version": "21.0.0",
+    "python_minor": "3.12",
+    "python_version": "3.12.13",
+    "runtime_version": "modernbert-runtime-cu124-v1",
+    "torch_base_version": "2.5.1",
+    "torch_version": "2.5.1+cu124",
+    "transformers_version": "4.48.3"
+  },
+  "tokenization": {
+    "max_length": 512,
+    "token_count_max": 515,
+    "token_count_median": 79.0,
+    "token_count_min": 16,
+    "truncated_row_count": 1,
+    "truncation": true
+  },
+  "training_version": "r1-to-r0-transfer-v2-final-only-r1_to_r0-44-cycle-03",
+  "validation": {
+    "accuracy": 0.4583333333333333,
+    "loss": 3.593565382063389,
+    "macro_f1": 0.4461728395061728,
+    "per_class": {
+      "easy": {
+        "f1": 0.32,
+        "precision": 0.4444444444444444,
+        "recall": 0.25,
+        "support": 16
+      },
+      "hard": {
+        "f1": 0.5185185185185185,
+        "precision": 0.6363636363636364,
+        "recall": 0.4375,
+        "support": 16
+      },
+      "medium": {
+        "f1": 0.5,
+        "precision": 0.39285714285714285,
+        "recall": 0.6875,
+        "support": 16
+      }
+    },
+    "row_count": 48,
+    "weighted_loss": 3.593565382063389
+  }
+}

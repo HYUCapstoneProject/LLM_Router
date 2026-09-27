@@ -1,0 +1,243 @@
+{
+  "config": {
+    "experiment_id": "r1-to-r0-transfer-v2-final-only",
+    "schema_version": "router-transfer-experiment-v1",
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "train_max_length": 512,
+    "evaluation_max_lengths": [
+      8192
+    ],
+    "bridge_steps": 200,
+    "cycle_steps": 100,
+    "cycles": 6,
+    "new_feedback_per_cycle": 32,
+    "history_per_label": 32,
+    "base_per_label": 32,
+    "validation_per_label": 16,
+    "train_batch_size": 8,
+    "gradient_accumulation_steps": 4,
+    "eval_batch_size": 1,
+    "learning_rate": 2e-05,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.1,
+    "gradient_clip_norm": 1.0,
+    "gradient_checkpointing": true,
+    "precision": "fp16",
+    "attention_implementation": "eager",
+    "checkpoint_every_steps": 25,
+    "keep_last_checkpoints": 2,
+    "stream_seed": 20260927,
+    "minimum_dev_improvement": 0.01,
+    "maximum_forgetting_drop": 0.01,
+    "arena_policy": "sigmoid_argmax_no_cost_diagnostic",
+    "automatic_promotion": false,
+    "evaluation_schedule": "final_only"
+  },
+  "pins": {
+    "schema_version": "router-transfer-source-pins-v1",
+    "models": {
+      "r0": {
+        "path": "/content/drive/MyDrive/LLM_Router/transfer-experiments/inputs/experiment-A/models/r0",
+        "files": {
+          "_SUCCESS": "37a40f08d8548dba289b9b0bb35bcf63b359f6d37ee86044ebc6b6da080b9ec1",
+          "artifact_manifest.json": "f121c475ca381d73b03b413aa4f8f3be177b6d83d9313790ed95592fc87c5aee",
+          "config.json": "ec78dcebe3890eaf422a55e3261f70a8579cdd4298cb51ec0fcc2949538646b5",
+          "metrics.json": "a3b6b0b2a1e876280faf42b1a1c4e39c303c947e77aeb05918a9755ee86c7fa0",
+          "model.safetensors": "e1a40fec7d269d8f925b5391e4f5e75df5d0fedbb1e37b4eea96521e27b1a6a7",
+          "special_tokens_map.json": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049",
+          "tokenizer.json": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+          "tokenizer_config.json": "626c86908d7c711f93b0feffd8657b782cc2727b391f9be190240e8cafb626d5",
+          "training_config.json": "ccbad2aeae5ee063593526c23cc573a41e4b693910a7ce81071a8036def999da"
+        },
+        "cohort": {
+          "training_rows_sha256": "9c8a1fc0cce11888f4a66b2c120b227b14eab6408cef944d2a7d746a1a3505db",
+          "split_manifest_sha256": "f6a4cff1684bc2626a8901dbfda9f81e7d5d7e8753e5f48320cb1ada44c8cca4",
+          "label_definition_sha256": "a652d508ed0af054a2d2898ac7539fffefa8cd498c5ea6ae8ab24fd0b9ea9bf3",
+          "candidate_pool_sha256": "47052a8a02820804e3091f7b60aad25a06e8d0fe75eb1b974a23414b10ff4b20",
+          "backbone_revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+          "initial_optimizer_steps": 2007,
+          "initial_seed": 42,
+          "training_max_length": 512
+        }
+      },
+      "r1": {
+        "path": "/content/drive/MyDrive/LLM_Router/transfer-experiments/inputs/experiment-A/models/r1",
+        "files": {
+          "_SUCCESS": "37a40f08d8548dba289b9b0bb35bcf63b359f6d37ee86044ebc6b6da080b9ec1",
+          "artifact_manifest.json": "02112cdc8babe81139ef1d72cc109221335fc785e1d1ced3e27e3668f7b7cc39",
+          "config.json": "7f821a24095a05f416d2934f959abd213cf3b52452c46734ec7c4c5682641a98",
+          "metrics.json": "884fbb51a79f30278c3c7a2665154725d8a5e42520d5470a0d5558b31be99b0f",
+          "model.safetensors": "b49696de6904cb647cd03671cfdfb8901728fc59a8e568fba1b0be141e5326d3",
+          "special_tokens_map.json": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049",
+          "tokenizer.json": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+          "tokenizer_config.json": "2966a59b9e9cf122279aec1249e22e5bc7ad8430c754e95031b13fd128d4e560",
+          "training_config.json": "91d404a5cf42e9aebaaad7e57b8e392bbd56392988e0a9ef6053864f29293624"
+        },
+        "cohort": {
+          "training_rows_sha256": "9c8a1fc0cce11888f4a66b2c120b227b14eab6408cef944d2a7d746a1a3505db",
+          "split_manifest_sha256": "f6a4cff1684bc2626a8901dbfda9f81e7d5d7e8753e5f48320cb1ada44c8cca4",
+          "label_definition_sha256": "a652d508ed0af054a2d2898ac7539fffefa8cd498c5ea6ae8ab24fd0b9ea9bf3",
+          "candidate_pool_sha256": "47052a8a02820804e3091f7b60aad25a06e8d0fe75eb1b974a23414b10ff4b20",
+          "backbone_revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+          "initial_optimizer_steps": 2007,
+          "initial_seed": 42,
+          "training_max_length": 512
+        }
+      }
+    },
+    "data_sha256": {
+      "train": "d9b0db47defd1d7162c1cf70059a6db806d743641d094c1e84b4c696bcbd56bf",
+      "dev": "aa9d973fcf886c7465fbf9e06701984d099cd74a5eabf508cc610845613edef8",
+      "feedback": "52a890baa95b404143837387708383dfbe3591bcecba66bdcc770676e111388c",
+      "gate": "baefa029ecf5946a248765cef2de7e311ed67981f962bb7dda3aba0d153090ba",
+      "forget": "750deca9315b31734778eb75ce2f0bea63f4f44a57a949c6960ad9b9aa7f807d",
+      "routerarena": "e60418d94ced38ba95115bad9a36247a699f14c20f67e49a39f15bc8fa40a308"
+    },
+    "r1_policy": {
+      "path": "/content/drive/MyDrive/LLM_Router/transfer-experiments/inputs/experiment-A/r1-policy.json",
+      "sha256": "c7cbbad1e5cade33dd08dc3524a5db67c4706393d6ac5a09b769123c02881e4b"
+    },
+    "runtime_contract": {
+      "path": "/content/drive/MyDrive/LLM_Router/transfer-experiments/inputs/experiment-A/runtime.json",
+      "sha256": "c2b98693b58b70ecdb065b8a0e6f0928e3b3e0ee5bfaa7727b4f3bbf1cac349c"
+    }
+  },
+  "data_dir": "/content/drive/MyDrive/LLM_Router/transfer-experiments/inputs/experiment-A/data",
+  "feedback_receipt": {
+    "kind": "benchmark_upward_proxy",
+    "feedback_sha256": "52a890baa95b404143837387708383dfbe3591bcecba66bdcc770676e111388c",
+    "log_sha256": "32237a8f327960684f014485a05f36f7faa389f1073b50103971d6142b2b2d67",
+    "logger_model_digest": "c4cec54a796ff2ba9c92c33e2ab01c46da7dbd39fb7c4b810500d13908124487",
+    "logging_max_length": 8192
+  },
+  "phase_sha256": {
+    "bridge": "8022c51717eef857ebf0442ced3ff1ef0f575faad72b15012573cea15d51063c",
+    "cycle-01": "4b140dfb7e9229083427446eb6cf9139f2d30629c485b2566099ee5c2caa8450",
+    "cycle-02": "09731922b9c70487c3e895e5e69fbc156ff51cd12bfdb5eff1a7cc9efe9f2aac",
+    "cycle-03": "f786065899a72a8a8675b458234fb1f384471c4889dbf2efa12304f711cfc9f6",
+    "cycle-04": "41fd6ff09899a26fef4c87274b8b45135a7cf22fc02c4f9936b5478773f29d28",
+    "cycle-05": "24fabc2fd8638fa94c1756f9d2059ff53dc2d90ba4d10d01c8c34684525ea124",
+    "cycle-06": "82eecd72d07607f747057d2043f1ce8fc414b71b06b1decba3370d11b9d0b63b"
+  },
+  "phase_train_rows": {
+    "bridge": 21406,
+    "cycle-01": 128,
+    "cycle-02": 160,
+    "cycle-03": 185,
+    "cycle-04": 192,
+    "cycle-05": 192,
+    "cycle-06": 192
+  },
+  "phase_label_counts": {
+    "bridge": {
+      "easy": 10608,
+      "medium": 8121,
+      "hard": 2677
+    },
+    "cycle-01": {
+      "medium": 48,
+      "hard": 48,
+      "easy": 32
+    },
+    "cycle-02": {
+      "medium": 71,
+      "hard": 57,
+      "easy": 32
+    },
+    "cycle-03": {
+      "medium": 83,
+      "hard": 70,
+      "easy": 32
+    },
+    "cycle-04": {
+      "medium": 86,
+      "hard": 74,
+      "easy": 32
+    },
+    "cycle-05": {
+      "medium": 83,
+      "hard": 77,
+      "easy": 32
+    },
+    "cycle-06": {
+      "medium": 87,
+      "hard": 73,
+      "easy": 32
+    }
+  },
+  "helper_sha256": "69cb2fb7bb923176ef9595c912aa3c18a34ebc4db24747ed210a88308b01a383",
+  "source_code_sha256": {
+    "__init__.py": "acb23a8fe9e0d341c36d5d3671d3af5527f9651c51d8a9cefe60f2fd1b0dda42",
+    "__main__.py": "08d48b3c29795606c46599c0d7cbb8a6eaf00cbe2e4d78f855252643885143b9",
+    "comparison/__init__.py": "dff88eed42c73db223e88cdece03f4a9233bfea324f204f91d73d38aae1314fa",
+    "comparison/evaluation.py": "c1e6ae282a068d5d553ecab65049cbf3749aea98c389e68a09e2f9fd6d41014e",
+    "comparison/tfidf_baseline.py": "ebc08debb7b67215fe60c2931789277f5af91182a8a60b110ce1a140529572cb",
+    "comparison/tfidf_cli.py": "714d32b66b4f1319ab6f8a1211992d4f55159fda143eb30dcc8439e7eb5657af",
+    "deployment/__init__.py": "e2bbee7652886ceeb79ab942a2fb3bf04f8541a10a72f4db2f6dc2ba560cf198",
+    "deployment/cloud_foundation.py": "893dc1d08be2119d97eb03d07a2f415f04c0b6bc09901c923caf04be5af7ce4f",
+    "deployment/deploy_gate.py": "6f14d440f714ed210f4d438078e580d70eb0fedf0fbb85b332f914000ab1a71d",
+    "deployment/deploy_gate_cli.py": "b423b75d22b5edf8b931ef28dc7e33039c72d091b96e7ac15d810caaaa203b7b",
+    "deployment/model_package.py": "7547e92c3425b6e0846ad7bf962614a50ab850317c117b0288025a012be0d417",
+    "deployment/model_package_cli.py": "e45bb2f9871f50ea5e04f4f65ad5c574bd5513cd08d312e2c9d00293a660705e",
+    "deployment/model_publish.py": "2329790fd9c966e9a7c2561fd1cbbb1e080dddf9feec29cee03978f7631d4d96",
+    "deployment/model_publish_cli.py": "b8d2e6ef23e1373f3d9668f4602389ab02be73e8b7cc188acba5db856737b456",
+    "deployment/promotion_evidence.py": "0d3c6c23bcb7991163378ab0704934c321bc986a3c6578fd64796ae1daf3f26c",
+    "evaluation/__init__.py": "6c7bcf092c2ea3ade22a4c2b44e216b09b21d36946244ed4119393578f8f179f",
+    "evaluation/continual_gate.py": "299352499306b420127f7279557b7ce4eef802c0de48c96963544ee84a06258c",
+    "evaluation/routerarena_cli.py": "f30684db938c1c87a5b090536a68ca09fbd530bd8529343078af9871f145f282",
+    "evaluation/routerarena_epoch_evaluation.py": "a7e3a8d23d16fbb72a1da4b9f61a4b5af1931a9366535126eadf1a4b69e6544d",
+    "evaluation/routerarena_evaluation_cli.py": "96bbd79533334dd397c0613353d43251c9039ee4980268ef3ff8b9c506da2098",
+    "evaluation/routerarena_preprocessing.py": "6f7e8da0df352c8053622020bab64de6e144229431ec43d662fda191d9029560",
+    "evaluation/routerarena_routing_evaluator.py": "4e15d7769d2f9b58763b76e1977fc9138dacd04c146dff3c604c160467e8e90a",
+    "evaluation/routerarena_visualization.py": "3502264ea0c1c2117628e49604826fc0e4a417973f93ddc98e8597a15973c9c4",
+    "generalization/__init__.py": "318c7c9b4bea43a1b071456b6c83d001554be8cd306b7308f7f38761d134b44c",
+    "generalization/__main__.py": "6d8b7d7846a845059d7a3107143f11131f63c5511d669b44085b15ec5e3d2279",
+    "generalization/cli.py": "727bd42c36103e7143bb859cf9005a689c95f89c30d40eb1d9325a2678cdfd54",
+    "generalization/data.py": "1d60456cfa666d45c7b790caa03629b7fd3fb024f2b7d1f64c783e5d0b68b0a6",
+    "generalization/eval_cli.py": "e39d47289a1b7259f90685028d4771faffee56b5de5fd6afaa164033a867d645",
+    "generalization/evaluation.py": "93d0ea3d45b1b2da815bfa46deaca9147edf87ca247a8457b2d15e53e0a5a684",
+    "generalization/train_cli.py": "87ff3638b304adacad5e2742c151ede957a3481c372752a4bee74e645e772121",
+    "generalization/training.py": "3e0aeed8bec6004533c524abf56d496343731de73603dc4dc38c0b4fdae767d8",
+    "objective_comparison/__init__.py": "d2037f5f9159f459537c2a2c9823de023b15c7c27baa6ddfc49ffcb25efde39a",
+    "objective_comparison/cli.py": "0d8c9ec5aaf3b8dcd05d48ff2a20094d37707b4bbc2e3ea980810f7716e39a60",
+    "objective_comparison/data.py": "c6d4788b92de8ab6e02b7e498328cd4848bfbc624aa82f2ec8d060fcadffcff8",
+    "objective_comparison/evaluation.py": "59f1de2108c848be58e6419d2f63e4c8ff92874e93f6f32edb6e3b36c460a1a0",
+    "objective_comparison/objectives.py": "0070e4ff004ea84fe7aa7ff8f4360337cea4032a25ef762bb00a2e2e48f79e45",
+    "objective_comparison/sealed_protocol.py": "65d426e2ab8bca5a3ffbc67def9d20539fb58e8a3b9dc51be3961ba9ec136f6a",
+    "objective_comparison/selection.py": "a011cfabca4fc34e194c1d23ddfa51e997d5223279047646c466532f752081e0",
+    "objective_comparison/shared_training.py": "434684b34a9f8238976ebef2fafade013b96cf3713ecf0238f44bdca502ce280",
+    "objective_comparison/training.py": "9f26a0b04804421683f4d67167c6b9fcaea34cc468a87e39a522299fa8f3e91d",
+    "routing_data/__init__.py": "b725400d3cd5c3f827a8e9d26a69a0c816e91fd2026c97166e3c1d1e7b44eaf8",
+    "routing_data/cli.py": "23bbdafd1db51e9d9f455fc615f7b52a88f61f7df20c731ec2d7e0f4ee649c17",
+    "routing_data/continual.py": "df3af659feaa975f21a177bd434ab88affb12403d18a1fd5257e11cfa1d3c37e",
+    "routing_data/preprocessing.py": "a14a0eb176fcc69895fa88c2bd16c80696d5422d9901bd8e5d2b514272f57037",
+    "routing_data/text.py": "e5548fc65cd2bb1a341912dd223336a65e74ece39fa8b348787dde923be4ff93",
+    "shared/__init__.py": "d199236c98856020916bffdca2cf1e9890ee5d147aad0c6d74c055c910ca4aaa",
+    "shared/dataset_io.py": "df147df47882d21eee34d26991ebc419e2378f83ef7074a2798c79ef5bd187f5",
+    "shared/object_store.py": "c78452fc196318b308661d62acc3329c31e835f7d09d65c9781fbc6c227b0130",
+    "shared/observability.py": "80abf6b05cf6da218dcbceff5368a537f9da404a663378eb26112e3ec2ee7831",
+    "shared/structured_text.py": "586437da40e3b5d77d15e474b4ec36e92681f66c40d777260c6cf16094a2b390",
+    "shared/text_normalization.py": "101448dee97a41a4bd7766d6cf7a67c6688fd546be7e6cafe0de84f632edfaa6",
+    "training/__init__.py": "b9e303dc87ae9bb973c5f94a22fd040a3e6701d95a080eae13b0d586a9d871e5",
+    "training/feedback_retraining_cli.py": "6c422a746a00227fcd3db0df60b438846453c1de3f6ae700050637c1b20bcb66",
+    "training/feedback_retraining_preprocessing.py": "5730d71a57c94a0f46fc333ecee52e4bc43d9bd74d9b52d0118a1c0685da5a39",
+    "training/frozen_outcome_projection.py": "df1d5309e7f5329cb290ac07fa63d9c7bbfaeae51a53979d298a94d930a43058",
+    "training/modernbert_checkpointing.py": "48d030fe98e060b6d1e8254a0e2915c0453a51149b538691fd10eaf0eddc28bc",
+    "training/modernbert_colab_training.py": "0a0a9fbfe5d0a9b334b2a024175af117f50f268defd69096054110493275ba9b",
+    "training/modernbert_colab_training_cli.py": "828bcb0794d725c0f5eb93dc8d4e49bf2f154d2410ecc164c020b895fcfed37a",
+    "training/modernbert_runtime.py": "d5e502a12e0d05bbaa1a68c75258d5fdc605bcf49e3b1a92ca4e55e15c3983b5",
+    "training/modernbert_training.py": "84d492e375d4722c1099e8195e02402bd932a3ca92c8789ad31c1c5a30c2f63a",
+    "training/modernbert_training_cli.py": "324497a165ff01e9d18e87f335ed746c6995f4fe10ddf0162425309e920eda5c",
+    "training/modernbert_validation_progress.py": "5bf0d153ac6a634cf143cf13eb72e1b88cb823b6753925103f10c484facb1d73",
+    "training/protected_retraining_base.py": "52c943a6bcebbf21f8a7fafd49f41a928fbb4c89ad442cdaa6484e7b5a0a3c4c",
+    "training/routerbench_cli.py": "96cdc8bf97b92cad90b9ebf3ffa3795800390eb2bd2306f8730a9226e08903c5",
+    "training/routerbench_labeling.py": "6c05318aff9f6de4aa477856ad273df325b428f069386aaaa58beff1d9635fa0",
+    "training/routerbench_preprocessing.py": "15d9561dd71934243a227b1a064102e88d9b3c66b9c83d6fee98552d2d5ab22c",
+    "training/routing_policy.py": "eeb8852f6aead323a3fa3ff5493ff6b792dc7053f60cb84d0c6d11cad4068b07"
+  },
+  "status": "prepared_not_trained"
+}

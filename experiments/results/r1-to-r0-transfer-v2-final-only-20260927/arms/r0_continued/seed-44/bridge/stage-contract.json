@@ -1,0 +1,28 @@
+{
+  "plan_sha256": "05fcfd4cef3ec83f0b7daee29df16a01b9ff30d48f84b119d337127c75e77185",
+  "initial_model_path": "/content/drive/MyDrive/LLM_Router/transfer-experiments/inputs/experiment-A/models/r0",
+  "training": {
+    "training_version": "r1-to-r0-transfer-v2-final-only-r0_continued-44-bridge",
+    "model_id": "answerdotai/ModernBERT-base",
+    "model_revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+    "train_split": "train",
+    "validation_split": "validation",
+    "max_length": 512,
+    "truncation": true,
+    "train_batch_size": 8,
+    "eval_batch_size": 1,
+    "epochs": 1,
+    "max_train_steps": 200,
+    "gradient_accumulation_steps": 4,
+    "gradient_checkpointing": true,
+    "learning_rate": 2e-05,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.1,
+    "seed": 44,
+    "device": "cuda",
+    "precision": "fp16",
+    "attention_implementation": "eager",
+    "train_sampling_strategy": "shuffle",
+    "gradient_clip_norm": 1.0
+  }
+}
