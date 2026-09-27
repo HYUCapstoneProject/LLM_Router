@@ -1311,11 +1311,13 @@ R0 교체 브랜치의 실제 입력·CLI·Spring/FastAPI 설정 계약은 [R0 r
 | 4. 실제 서버8192 시험 | 짧은/긴 입력의 p50/p95, 최대 메모리, 동시 요청, timeout·fallback을 측정한다. 기존 Spring 15초 timeout의 적합성을 결과로 판단한다. | 대상 VM 측정 보고서; Colab GPU의 forward 성공으로 대체하지 않음 |
 | 5. 전체 재학습·복구 시험 | 유효 피드백→학습→승격 시험→CURRENT→서버 실제 적재를 실행한다. 중복 제출·재시도·동시 요청·gate 탈락·적재 실패·rollback·Drive 복구도 확인한다. | 배치별 로그/지표/승격 증거와 서버 modelVersion 일치; 단순202 또는 Vertex 성공만으로 완료 처리하지 않음 |
 
+**2026-09-28 운영 인수 범위 결정.** 1·2단계는 완료했고, 3단계는 직접 승격 모드의 실제 배포까지 확인했다([5.14절](#r0-direct-promotion)). 사용자 결정에 따라 **4단계(실서버 8192 부하 시험)와 5단계(전체 재학습·복구 시험)는 수행하지 않는다.** 9/27 합성 피드백 시험에서 확인한 승격·거절·rollback 동작 외의 부하·장애 복구 특성은 검증하지 않은 상태로 남긴다.
+
 이후 연구를 완성하기 위한 실행은 다음과 같다. 운영 인수의 필수 조건과 분리하여 예산·일정을 정한다.
 
 | 연구 항목 | 남은 실행과 확인할 질문 |
 |---|---|
-| 재학습 F0/F1/F2 | 고정 모델 / 새 cycle 데이터만 학습 / replay·rehearsal 포함 학습을 같은 피드백·6회 제출 기회·학습량·validation48 조건에서 비교한다. 실제 개선과 기존 능력의 망각, 비용을 측정한다. R0/R1이라는 목적함수 비교와는 다른 축이다. |
+| 재학습 F0/F1/F2 | 고정 모델 / 새 cycle 데이터만 학습 / replay·rehearsal 포함 학습을 같은 피드백·6회 제출 기회·학습량·validation48 조건에서 비교한다. 실제 개선과 기존 능력의 망각, 비용을 측정한다. R0/R1이라는 목적함수 비교와는 다른 축이다. 실행 범위는 [재학습 효과 실험 계획서](RETRAINING_EFFECT_EXPERIMENT.md)에 고정했다(2026-09-28, 실행 전). |
 | 캐시 C0/C1/C2 | 캐시 없음 / exact / semantic을 고정 라우터 아래 비교한다. D1 반복 replay와 D2 사람 검증 동의어·hard negative trace를 준비하고 오답 재사용·품질·호출 비용·지연을 평가한다. C3 reranker는 선택 확장이다. |
 | 추가 외부 평가 | §4.9에서 조사한 LLMRouterBench, SPROUT의 이용 조건·실제 후보 교집합·중복·점수/비용 매핑을 확인한 뒤 독립 평가 데이터를 봉인한다. 후보 조사가 데이터 준비 완료를 뜻하지 않는다. |
 | 공정한 기준선·논문 비교 | source-only B의 실제 공통 세 후보에서 TF-IDF, BGE+kNN, ModernBERT 및 RouterDC를 같은 조건으로 비교한다. finalist 추가 seed, confidence 보정, group bootstrap을 마무리한다. |
@@ -1391,7 +1393,19 @@ R0 교체 브랜치의 실제 입력·CLI·Spring/FastAPI 설정 계약은 [R0 r
 <a id="r0-direct-promotion"></a>
 ### 5.14. R0 직접 승격 모드 — 2026-09-27 변경 결정
 
-사용자는 재학습 후 승격 전 품질 검증을 생략하는 파이프라인으로 운영 구성을 교체하도록 결정했다. 이는 하한을 낮추거나 후보를 검증 통과로 표시하는 변경이 아니라, 품질 평가를 하지 않는 별도 모드를 선택하는 변경이다. 이 절은 구현·배포 확인 후 상태를 갱신한다.
+사용자는 재학습 후 승격 전 품질 검증을 생략하는 파이프라인으로 운영 구성을 교체하도록 결정했다. 이는 하한을 낮추거나 후보를 검증 통과로 표시하는 변경이 아니라, 품질 평가를 하지 않는 별도 모드를 선택하는 변경이다.
+
+**배포 상태 (2026-09-28 확인).**
+
+| 확인 항목 | 결과 | 근거 |
+|---|---|---|
+| 코드 | ML PR #39(`b37e1e2`)와 serving의 baseline guard(`84d11ff`) 반영 | `ml/artifacts/r0-release-20260927/direct-promotion*`, `direct-baseline-guard/` |
+| 파이프라인 | `feedback-direct-retraining-pipeline.yaml` 게시(SHA `eef680e9…`) | `direct-promotion-serving/publication.json` |
+| 서빙 VM | `llm-router-serving` RUNNING. 이미지 `llm-router-serving@sha256:0ad73325…`(baseline guard), 환경 변수 `LLM_ROUTER_RETRAINING_PROMOTION_MODE=direct` | `gcloud compute instances describe` 읽기 전용 조회 |
+| 실제 동작 | 9/27 합성 피드백으로 v1.1 직접 승격이 두 번 성공했고, 두 번 모두 수동 rollback으로 1.0에 복귀 | `direct-e2e/rollback/` |
+| 현재 CURRENT | `router-modernbert-r0-a-20260927-v1`(logical 1.0). 14:23Z 수동 rollback 기록 | GCS `CURRENT.json` 읽기 전용 조회 |
+
+서버 내부의 `/health`·`/router/model/current` 응답과, rollback 뒤 retraining ledger 정합화(`direct-baseline-guard/deploy.sh` 6단계)가 실행됐는지는 이번에 조회하지 않았다. 이 두 항목은 운영 서버 접근 권한이 있는 사용자가 확인한다.
 
 | 항목 | 품질 검증 모드 | 직접 승격 모드 |
 |---|---|---|
