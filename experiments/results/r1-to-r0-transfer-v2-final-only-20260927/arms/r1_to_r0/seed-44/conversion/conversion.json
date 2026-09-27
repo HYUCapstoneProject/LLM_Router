@@ -1,0 +1,18 @@
+{
+  "identity": {
+    "parent_model_digest": "3256c804b250acbfddfe01177986407b3f111596a52400f826f157bc9343db4b",
+    "seed": 44,
+    "reset_modules": [
+      "head",
+      "classifier"
+    ],
+    "encoder_reused": true
+  },
+  "model_files": {
+    "config.json": "5121058c4e52381aed6124873076307d74e4234dd6719112e1239ebd41594610",
+    "model.safetensors": "8a8d30d1d52142d22bc95d36ce5b108b3d2ef78e7652c8b7173013ea88f6dee1",
+    "special_tokens_map.json": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049",
+    "tokenizer.json": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+    "tokenizer_config.json": "2966a59b9e9cf122279aec1249e22e5bc7ad8430c754e95031b13fd128d4e560"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "plan_sha256": "05fcfd4cef3ec83f0b7daee29df16a01b9ff30d48f84b119d337127c75e77185",
+  "primary_metric": "dev_source_macro_f1_8192",
+  "values": {
+    "r0_continued": [
+      0.39804357792645917,
+      0.4154166740591252,
+      0.41941973623986517
+    ],
+    "r1_to_r0": [
+      0.44131300717874133,
+      0.38796590874582215,
+      0.3859026706428439
+    ],
+    "r1_frozen": [
+      0.1997824915494989
+    ]
+  },
+  "selected_adaptive_arm": "r0_continued",
+  "delta_B_minus_A": -0.005899467219347365,
+  "final_model_digests": {
+    "r0_continued/42": "0119634d1339f8ce68e8c23a928c0e30e91a5788173d24268665268b6bc41ba2",
+    "r0_continued/43": "1819d4eeda3b2765a3800e1c412b3ccbfa2f603034e91d6daee43108a93cec41",
+    "r0_continued/44": "963cb5143b5d5a989f7b2f7d2d3766fd9e01d4a4591f9c33685c5cf1cf3918d6",
+    "r1_to_r0/42": "8787709fbfea51794baac76ca9e835a69d90f0a18db13c9c1407f3a673671f10",
+    "r1_to_r0/43": "38b8cb0bdb9c9769f8f887f15de80df95d82fa01e1e796db9861debd76b3ec2e",
+    "r1_to_r0/44": "ef4376590ca81cfab1554bf131fae63cf6459e968488c29c15567d418441f99d"
+  },
+  "production_approved": false
+}

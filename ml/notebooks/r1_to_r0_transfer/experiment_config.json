@@ -1,0 +1,38 @@
+{
+  "experiment_id": "r1-to-r0-transfer-v2-final-only",
+  "schema_version": "router-transfer-experiment-v1",
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "train_max_length": 512,
+  "evaluation_max_lengths": [
+    8192
+  ],
+  "bridge_steps": 200,
+  "cycle_steps": 100,
+  "cycles": 6,
+  "new_feedback_per_cycle": 32,
+  "history_per_label": 32,
+  "base_per_label": 32,
+  "validation_per_label": 16,
+  "train_batch_size": 8,
+  "gradient_accumulation_steps": 4,
+  "eval_batch_size": 1,
+  "learning_rate": 2e-05,
+  "weight_decay": 0.01,
+  "warmup_ratio": 0.1,
+  "gradient_clip_norm": 1.0,
+  "gradient_checkpointing": true,
+  "precision": "fp16",
+  "attention_implementation": "eager",
+  "checkpoint_every_steps": 25,
+  "keep_last_checkpoints": 2,
+  "stream_seed": 20260927,
+  "minimum_dev_improvement": 0.01,
+  "maximum_forgetting_drop": 0.01,
+  "arena_policy": "sigmoid_argmax_no_cost_diagnostic",
+  "automatic_promotion": false,
+  "evaluation_schedule": "final_only"
+}
