@@ -43,7 +43,7 @@ class KubeflowModernBertTrainingTest(unittest.TestCase):
             "NVIDIA_TESLA_T4",
         )
         self.assertEqual(worker_pool["machine_spec"]["accelerator_count"], 1.0)
-        self.assertEqual(worker_pool["container_spec"]["command"], ["modernbert-train"])
+        self.assertEqual(worker_pool["container_spec"]["command"][:2], ["python3", "-c"])
         self.assertIn("cuda", worker_pool["container_spec"]["args"])
         training_executor = pipeline_definition["deploymentSpec"]["executors"][
             "exec-modernbert-training-component"
@@ -66,6 +66,49 @@ class KubeflowModernBertTrainingTest(unittest.TestCase):
         self.assertIn("training_config_uri", pipeline_yaml)
         self.assertIn("training_service_account", pipeline_yaml)
         self.assertIn("training_base_output_directory", pipeline_yaml)
+
+    def test_vertex_worker_receives_real_path_for_bundle_and_direct_artifact(self) -> None:
+        """Execute the compiled worker command, not only the original component."""
+        import json
+        import os
+        import subprocess
+        import sys
+
+        import yaml
+
+        from ml.kubeflow.compile_training_workflows import compile_workflows
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            paths = compile_workflows(root / "ir")
+            probe = root / "modernbert-train"
+            probe.write_text(
+                f"#!{sys.executable}\nimport json, sys\nprint(json.dumps(sys.argv[1:]))\n"
+            )
+            probe.chmod(0o755)
+            for pipeline, component in (
+                ("initial_training_pipeline", "comp-modernbert-training-component"),
+                ("feedback_retraining_pipeline", "comp-modernbert-continual-training-component"),
+            ):
+                ir = yaml.safe_load(paths[pipeline].read_text())
+                worker = ir["components"][component]["inputDefinitions"]["parameters"][
+                    "worker_pool_specs"
+                ]["defaultValue"][0]["container_spec"]
+                self.assertNotIn("Concat", json.dumps(worker))
+                self.assertEqual(worker["args"][0], "{{$.inputs.artifacts['training_dataset'].path}}")
+                self.assertEqual(worker["args"][1], "{{$.inputs.parameters['training_path_suffix']}}")
+                for suffix in ("", "/training.parquet"):
+                    with self.subTest(pipeline=pipeline, suffix=suffix):
+                        base = "/gcs/test bucket/quote'and$(not-a-command)/artifact"
+                        resolved = [base, suffix, *worker["args"][2:]]
+                        result = subprocess.run(
+                            [sys.executable, *worker["command"][1:], *resolved],
+                            env={**os.environ, "PATH": str(root) + os.pathsep + os.environ["PATH"]},
+                            check=True, capture_output=True, text=True,
+                        )
+                        argv = json.loads(result.stdout)
+                        self.assertEqual(argv[:2], ["--training-path", base + suffix])
+                        self.assertEqual(argv[2:], resolved[2:])
 
 
 if __name__ == "__main__":

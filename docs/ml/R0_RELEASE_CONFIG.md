@@ -88,3 +88,9 @@ GCS에는 활성 objective의 모델 그룹 하나만 둔다. R0/R1의 예약된
 초기 qualification의 소표본 domain 예외는 `initial-small-domain-report-only-v1`로 명시한다. **D_dev domain 문항 수가 30 미만**이면 그 domain은 숫자 하한을 넣지 않고 `insufficient_support`, `quality_unverified=true`, 실제 문항 수를 기록한다. qualification 도구는 SHA가 고정된 D_dev parquet의 category→domain 매핑으로 문항 수를 다시 계산하여 예외 목록과 대조한다. 전체 macro-F1·hard recall·두 source와 충분한 표본의 domain 하한은 계속 필수다. D_gate에도 제외 domain 지표를 출력하며, 결과의 `quality_unverified_domains`와 `automatic_feedback_submission_authorized=false`를 유지한다. 이 예외는 초기 등록만 대상으로 하며 일반 재학습 회귀 gate를 완화하지 않는다.
 
 2026-09-27 D_dev에서 duplicate_group_id 단위 bootstrap 1,000회(seed 42)의 pointwise 양측 95% 구간 하단(2.5 percentile)을 초기 라벨 일관성 하한으로 선택했다. conversation은 8문항이고 하한이 0이므로 위 명시 정책의 보고 전용 대상이다. 0을 통과용 threshold로 쓰거나 임의 양수로 바꾸지 않았다. 동결은 D_gate 실행 전에 이루어졌으며, 서비스 대화 품질의 보증이나 독립 검증에서의 개선 증거로 해석하지 않는다. 전체 실제 파일과 SHA는 `ml/artifacts/r0-release-20260927/qualification/development-provenance.json`에 있다.
+
+### Vertex 학습 입력 경로 결합 (2026-09-27)
+
+첫 합성 E2E에서 준비·병합 단계는 성공했으나, 실제 Vertex CustomJob의 `--training-path`에 KFP `ConcatPlaceholder`가 경로 대신 JSON 문자열로 전달되는 문제가 발견됐다. 학습 CLI는 이 값을 파일 경로로 읽으므로 GPU가 시작되기 전에 해당 실행을 중단하고 입력 전달을 수정한다.
+
+초기·재학습 GPU 컴포넌트는 데이터 artifact 경로와 suffix를 별도 positional argument로 전달하고, worker의 짧은 Python entrypoint에서 문자열로 결합한 뒤 `os.execvp`로 기존 `modernbert-train`을 실행한다. 셸 해석이 없으며 이미지·학습 CLI·학습량·평가·승격 기준은 바뀌지 않는다. 컴파일된 CustomJob worker spec을 실제 subprocess로 실행하는 회귀검증으로 직접 Parquet와 directory `/training.parquet` 입력, 공백·따옴표·셸 문자가 포함된 경로의 전달을 확인한다. 새 IR 게시·서버 연결·실제 재실행 결과는 별도 증거로 남긴다.
