@@ -94,3 +94,7 @@ GCS에는 활성 objective의 모델 그룹 하나만 둔다. R0/R1의 예약된
 첫 합성 E2E에서 준비·병합 단계는 성공했으나, 실제 Vertex CustomJob의 `--training-path`에 KFP `ConcatPlaceholder`가 경로 대신 JSON 문자열로 전달되는 문제가 발견됐다. 학습 CLI는 이 값을 파일 경로로 읽으므로 GPU가 시작되기 전에 해당 실행을 중단하고 입력 전달을 수정한다.
 
 초기·재학습 GPU 컴포넌트는 데이터 artifact 경로와 suffix를 별도 positional argument로 전달하고, worker의 짧은 Python entrypoint에서 문자열로 결합한 뒤 `os.execvp`로 기존 `modernbert-train`을 실행한다. 셸 해석이 없으며 이미지·학습 CLI·학습량·평가·승격 기준은 바뀌지 않는다. 컴파일된 CustomJob worker spec을 실제 subprocess로 실행하는 회귀검증으로 직접 Parquet와 directory `/training.parquet` 입력, 공백·따옴표·셸 문자가 포함된 경로의 전달을 확인한다. 새 IR 게시·서버 연결·실제 재실행 결과는 별도 증거로 남긴다.
+
+### GCSFuse 패키지 복사 (2026-09-27)
+
+수정된 입력 경로로 GPU 학습(97 train / 48 validation, 3 epochs / 12 steps)과 동결 평가가 성공한 뒤, 패키지 생성이 GCSFuse의 `utime` 미지원으로 실패했다. `shutil.copy2`가 바이트 복사 이후 POSIX timestamp 복제를 시도한 것이 원인이다. 체크포인트·정책·평가 파일의 패키지 복사를 `copyfile`로 바꾸고 기존 SHA 검증을 유지한다. `os.utime`이 EPERM을 내는 조건에서도 v1/v2 패키지가 생성되고, 이후 가중치 변조는 여전히 검증에서 거절되는지 회귀검증한다. 이 수정은 모델 바이트·라벨·학습·평가·승격 기준을 변경하지 않는다.

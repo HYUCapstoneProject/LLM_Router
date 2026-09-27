@@ -119,6 +119,41 @@ class ModelPackagePolicyTest(unittest.TestCase):
         # The unchanged CURRENT pointer uses these service tier aliases.
         self.assertEqual(EXPECTED_ID2LABEL, {"0": "easy", "1": "medium", "2": "hard"})
 
+    def test_content_copy_works_when_destination_rejects_posix_metadata(self) -> None:
+        import errno
+        from unittest.mock import patch
+
+        for schema in ("model-package-v1", "model-package-v2"):
+            with self.subTest(schema=schema), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                checkpoint = root / "checkpoint"
+                policy_checkpoint(checkpoint, "ordinal")
+                policy = root / "policy.json"
+                _write_json(policy, fixture_policy_payload("ordinal"))
+                metadata = (
+                    policy_metadata(policy, "ordinal")
+                    if schema == "model-package-v2" else _metadata()
+                )
+                evaluation = root / "evaluation.json"
+                _write_json(evaluation, {"accuracy": 0.7})
+                package = root / "package"
+                with patch("os.utime", side_effect=PermissionError(errno.EPERM, "unsupported")):
+                    manifest = assemble_model_package(
+                        checkpoint, package, metadata,
+                        evaluation_metrics_path=evaluation,
+                        routing_policy_path=policy if schema == "model-package-v2" else None,
+                    )
+                for name in ("model.safetensors", "tokenizer.json", "training_config.json"):
+                    self.assertEqual((package / name).read_bytes(), (checkpoint / name).read_bytes())
+                    self.assertEqual(manifest["files"][name], sha256_file(checkpoint / name))
+                self.assertEqual(manifest["files"]["routerarena_metrics.json"], sha256_file(evaluation))
+                if schema == "model-package-v2":
+                    self.assertEqual(manifest["files"]["routing_policy.json"], sha256_file(policy))
+                validate_model_package(package)
+                (package / "model.safetensors").write_bytes(b"corrupted")
+                with self.assertRaises(ModelPackageError):
+                    validate_model_package(package)
+
     def test_v1_default_is_preserved_and_policy_cannot_silently_enter_it(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
