@@ -1,0 +1,12 @@
+{
+  "A": {
+    "source_macro_quality": 0.7891414591692014,
+    "expected": 0.7891414591692014,
+    "exact_replay_passed": true
+  },
+  "G1": {
+    "source_macro_quality": 0.6526216850750723,
+    "expected": 0.6526216850750723,
+    "exact_replay_passed": true
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "models/ordinal/_SUCCESS": {
+    "path": "/content/router-v1-durable-staging/full/final-model/_SUCCESS",
+    "sha256": "37a40f08d8548dba289b9b0bb35bcf63b359f6d37ee86044ebc6b6da080b9ec1",
+    "size_bytes": 9
+  },
+  "models/ordinal/artifact_manifest.json": {
+    "path": "/content/router-v1-durable-staging/full/final-model/artifact_manifest.json",
+    "sha256": "f121c475ca381d73b03b413aa4f8f3be177b6d83d9313790ed95592fc87c5aee",
+    "size_bytes": 1219
+  },
+  "models/ordinal/config.json": {
+    "path": "/content/router-v1-durable-staging/full/final-model/config.json",
+    "sha256": "ec78dcebe3890eaf422a55e3261f70a8579cdd4298cb51ec0fcc2949538646b5",
+    "size_bytes": 1492
+  },
+  "models/ordinal/metrics.json": {
+    "path": "/content/router-v1-durable-staging/full/final-model/metrics.json",
+    "sha256": "a3b6b0b2a1e876280faf42b1a1c4e39c303c947e77aeb05918a9755ee86c7fa0",
+    "size_bytes": 2908
+  },
+  "models/ordinal/model.safetensors": {
+    "path": "/content/router-v1-durable-staging/full/final-model/model.safetensors",
+    "sha256": "e1a40fec7d269d8f925b5391e4f5e75df5d0fedbb1e37b4eea96521e27b1a6a7",
+    "size_bytes": 598442860
+  },
+  "models/ordinal/special_tokens_map.json": {
+    "path": "/content/router-v1-durable-staging/full/final-model/special_tokens_map.json",
+    "sha256": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049",
+    "size_bytes": 694
+  },
+  "models/ordinal/tokenizer.json": {
+    "path": "/content/router-v1-durable-staging/full/final-model/tokenizer.json",
+    "sha256": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+    "size_bytes": 3583228
+  },
+  "models/ordinal/tokenizer_config.json": {
+    "path": "/content/router-v1-durable-staging/full/final-model/tokenizer_config.json",
+    "sha256": "626c86908d7c711f93b0feffd8657b782cc2727b391f9be190240e8cafb626d5",
+    "size_bytes": 21031
+  },
+  "models/ordinal/training_config.json": {
+    "path": "/content/router-v1-durable-staging/full/final-model/training_config.json",
+    "sha256": "ccbad2aeae5ee063593526c23cc573a41e4b693910a7ce81071a8036def999da",
+    "size_bytes": 669
+  },
+  "data/validation.parquet": {
+    "sha256": "aa9d973fcf886c7465fbf9e06701984d099cd74a5eabf508cc610845613edef8",
+    "path": "/Users/yoocheolmin/workspace/school/LLM_Router/ml/artifacts/routing-objective-continual-v1/dataset/validation.parquet"
+  },
+  "data/test_routerbench.parquet": {
+    "sha256": "0a3e0d5c417fe87e2473d2b56172b447a4efc989622fe3ed26fe9d13113abc18",
+    "path": "/Users/yoocheolmin/workspace/school/LLM_Router/ml/artifacts/frozen-evaluation-outcomes/continual-v1-20260924-28cbc342c510/test_routerbench.parquet"
+  },
+  "data/test_xroutebench.parquet": {
+    "sha256": "d6fde0899a5ed06950ecec4d958832e0de8a5e9f32c09f7ead37cd9c25e71cef",
+    "path": "/Users/yoocheolmin/workspace/school/LLM_Router/ml/artifacts/frozen-evaluation-outcomes/continual-v1-20260924-28cbc342c510/test_xroutebench.parquet"
+  },
+  "data/arena.parquet": {
+    "sha256": "d84be2fdad3ed9753d2cba93fdbe479025800b762d13b5b2c92565573e32925f",
+    "path": "/Users/yoocheolmin/workspace/school/LLM_Router/ml/artifacts/routerarena-diagnostics-v1-20260924/prepared/evaluation.parquet"
+  }
+}

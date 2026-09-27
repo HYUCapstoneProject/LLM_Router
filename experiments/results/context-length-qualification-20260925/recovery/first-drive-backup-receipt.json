@@ -1,0 +1,10 @@
+{
+  "source": "Colab preserve_remote.py stdout, PTY20972 exit0",
+  "file_count": 70,
+  "archive": "/content/context-length-qualification-recovered-20260925.tar.gz",
+  "drive_backup": "/content/drive/MyDrive/LLM_Router/context-length-qualification-20260925/context-length-qualification-recovered-20260925.tar.gz",
+  "size_bytes": 18220757,
+  "sha256": "a6eedc722b90b7ac4dbe5d5eabe77b0235fb0ee7e980fd91dcf896f3aa942bc3",
+  "cpu_probe_found": false,
+  "note": "The immutable Drive copy was verified by SHA256 readback before exit. A later replay may replace the ephemeral /content archive with a different gzip timestamp; use the original Drive object."
+}

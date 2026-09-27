@@ -1,0 +1,38 @@
+[
+  {
+    "file": "experiments/results/routing-generalization-v1-20260925/merged-runs/r1-natural/calibration-scores.parquet",
+    "sha256": "0f1a967d2a2710b88dd048cffbc02890e18a77d414a4d722f4ad98607497563f",
+    "manifest": "experiments/results/routing-generalization-v1-20260925/merged-runs/r1-natural/manifest.json",
+    "verified": true
+  },
+  {
+    "file": "experiments/results/routing-generalization-v1-20260925/merged-runs/r1-natural/selection-scores.parquet",
+    "sha256": "d7273a53bdbed7e27d0789c4aa29ef4e7fdf0ab0af5d5913412dd1bccb21d001",
+    "manifest": "experiments/results/routing-generalization-v1-20260925/merged-runs/r1-natural/manifest.json",
+    "verified": true
+  },
+  {
+    "file": "experiments/results/routing-generalization-v1-20260925/holdout-scores/r1-natural-scores.parquet",
+    "sha256": "83a815cbd295382d9a4b747e04a20baa298a88c955e104368ae172d642aacd2e",
+    "manifest": "experiments/results/routing-generalization-v1-20260925/holdout-scores/manifest.json",
+    "verified": true
+  },
+  {
+    "file": "experiments/results/routing-generalization-v1-20260925/arena-stress/results/r1-natural-predictions.parquet",
+    "sha256": "7e0c5b9035766592a352af1c8edfffc5dcd981737416687bd4201c9dbe52fd34",
+    "manifest": "experiments/results/routing-generalization-v1-20260925/arena-stress/results/manifest.json",
+    "verified": true
+  },
+  {
+    "file": "ml/artifacts/routerarena-diagnostics-v1-20260924/scores/pointwise-scores.parquet",
+    "sha256": "6fa687b92c9db2fb4e979116c3bbb639a2bfc1aaec4b92a6737d649ec942cfde",
+    "manifest": "ml/artifacts/routerarena-diagnostics-v1-20260924/scores/manifest.json",
+    "verified": true
+  },
+  {
+    "file": "ml/artifacts/routerarena-diagnostics-v1-20260924/scores/ordinal-scores.parquet",
+    "sha256": "a989e5846cbd860fe1877fae9df9a0da4e1afef54c49b4f6927188872e0b76a2",
+    "manifest": "ml/artifacts/routerarena-diagnostics-v1-20260924/scores/manifest.json",
+    "verified": true
+  }
+]

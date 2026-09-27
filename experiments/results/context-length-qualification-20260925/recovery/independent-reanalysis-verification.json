@@ -1,0 +1,101 @@
+{
+  "R0": {
+    "manifest_sha256": "45907074b46564785720e8d0852777df9be8692e93b3c8deb7ee8e9a56c041b1",
+    "datasets": {
+      "arena": {
+        "rows": 8791,
+        "short_rows": 8003,
+        "short_argmax_changes": 0,
+        "long_rows": 788,
+        "full_forward_counts_and_truncation_flags_verified": true
+      },
+      "validation": {
+        "rows": 3581,
+        "short_rows": 3571,
+        "short_argmax_changes": 0,
+        "long_rows": 10,
+        "full_forward_counts_and_truncation_flags_verified": true
+      },
+      "test_routerbench": {
+        "rows": 3473,
+        "short_rows": 3466,
+        "short_argmax_changes": 0,
+        "long_rows": 7,
+        "full_forward_counts_and_truncation_flags_verified": true
+      },
+      "test_xroutebench": {
+        "rows": 3729,
+        "short_rows": 3706,
+        "short_argmax_changes": 0,
+        "long_rows": 23,
+        "full_forward_counts_and_truncation_flags_verified": true
+      }
+    }
+  },
+  "A_R1": {
+    "manifest_sha256": "b969f4763c084a2953241cf29b0b906bdff498781f2be2361098c82a4241eae6",
+    "datasets": {
+      "arena": {
+        "rows": 8791,
+        "short_rows": 8003,
+        "short_argmax_changes": 0,
+        "long_rows": 788,
+        "full_forward_counts_and_truncation_flags_verified": true
+      },
+      "validation": {
+        "rows": 3581,
+        "short_rows": 3571,
+        "short_argmax_changes": 0,
+        "long_rows": 10,
+        "full_forward_counts_and_truncation_flags_verified": true
+      },
+      "test_routerbench": {
+        "rows": 3473,
+        "short_rows": 3466,
+        "short_argmax_changes": 0,
+        "long_rows": 7,
+        "full_forward_counts_and_truncation_flags_verified": true
+      },
+      "test_xroutebench": {
+        "rows": 3729,
+        "short_rows": 3706,
+        "short_argmax_changes": 0,
+        "long_rows": 23,
+        "full_forward_counts_and_truncation_flags_verified": true
+      }
+    }
+  },
+  "G1_R1": {
+    "manifest_sha256": "3381eb706110c652fe6abc5ee1acba789272b0059f4309d0eb8839bd6e6faa52",
+    "datasets": {
+      "arena": {
+        "rows": 8791,
+        "short_rows": 8003,
+        "short_argmax_changes": 0,
+        "long_rows": 788,
+        "full_forward_counts_and_truncation_flags_verified": true
+      },
+      "g1_calibration": {
+        "rows": 2275,
+        "short_rows": 2265,
+        "short_argmax_changes": 0,
+        "long_rows": 10,
+        "full_forward_counts_and_truncation_flags_verified": true
+      },
+      "g1_selection": {
+        "rows": 2314,
+        "short_rows": 2306,
+        "short_argmax_changes": 0,
+        "long_rows": 8,
+        "full_forward_counts_and_truncation_flags_verified": true
+      },
+      "g1_task_holdout": {
+        "rows": 1807,
+        "short_rows": 1807,
+        "short_argmax_changes": 0,
+        "long_rows": 0,
+        "full_forward_counts_and_truncation_flags_verified": true
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+__pycache__/
+recovery/r1-uncommitted/*/base/
+recovery/r1-uncommitted/*/reconstructed/
+recovery/remote/
+recovery/remote-results.tar.gz
+recovery/r1-uncommitted/
+recovery/worktree-audit.json
+recovery/script-recovery.json
+recovery/reconstruct_r1.py
+recovery/auth-scope-*.json

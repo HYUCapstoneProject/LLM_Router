@@ -1,0 +1,174 @@
+{
+  "arena": {
+    "full": {
+      "rows": 8379,
+      "changes": 38,
+      "accuracy512": 0.23570831841508533,
+      "accuracy8192": 0.23857262203126864,
+      "hard_to_easy512": 95,
+      "hard_to_easy8192": 92
+    },
+    "full/over512": {
+      "rows": 748,
+      "changes": 38,
+      "accuracy512": 0.5641711229946524,
+      "accuracy8192": 0.5962566844919787,
+      "hard_to_easy512": 3,
+      "hard_to_easy8192": 0
+    },
+    "robustness": {
+      "rows": 412,
+      "changes": 3,
+      "accuracy512": 0.24271844660194175,
+      "accuracy8192": 0.24029126213592233,
+      "hard_to_easy512": 4,
+      "hard_to_easy8192": 4
+    }
+  },
+  "g1_calibration": {
+    "all": {
+      "rows": 2275,
+      "changes": 1,
+      "512": {
+        "routerbench": {
+          "quality": 0.7849116781157999,
+          "relative_cost": 0.4584614207964981
+        },
+        "xroutebench": {
+          "quality": 0.7306676317773769,
+          "relative_cost": 0.39902075003948
+        }
+      },
+      "macro_quality512": 0.7577896549465883,
+      "macro_relative_cost512": 0.42874108541798905,
+      "8192": {
+        "routerbench": {
+          "quality": 0.7849116781157999,
+          "relative_cost": 0.4596091601708358
+        },
+        "xroutebench": {
+          "quality": 0.7306676317773769,
+          "relative_cost": 0.39902075003948
+        }
+      },
+      "macro_quality8192": 0.7577896549465883,
+      "macro_relative_cost8192": 0.42931495510515794
+    },
+    "over512": {
+      "rows": 10,
+      "changes": 1,
+      "512": {
+        "routerbench": {
+          "quality": 0.75,
+          "relative_cost": 0.27224716078868905
+        },
+        "xroutebench": {
+          "quality": 0.0,
+          "relative_cost": 0.6162888554648331
+        }
+      },
+      "macro_quality512": 0.375,
+      "macro_relative_cost512": 0.4442680081267611,
+      "8192": {
+        "routerbench": {
+          "quality": 0.75,
+          "relative_cost": 0.3721070187208451
+        },
+        "xroutebench": {
+          "quality": 0.0,
+          "relative_cost": 0.6162888554648331
+        }
+      },
+      "macro_quality8192": 0.375,
+      "macro_relative_cost8192": 0.4941979370928391
+    }
+  },
+  "g1_selection": {
+    "all": {
+      "rows": 2314,
+      "changes": 0,
+      "512": {
+        "routerbench": {
+          "quality": 0.7681553398058253,
+          "relative_cost": 0.4456393323459307
+        },
+        "xroutebench": {
+          "quality": 0.7354152689946305,
+          "relative_cost": 0.4079093401476186
+        }
+      },
+      "macro_quality512": 0.7517853044002278,
+      "macro_relative_cost512": 0.42677433624677463,
+      "8192": {
+        "routerbench": {
+          "quality": 0.7681553398058253,
+          "relative_cost": 0.4456393323459307
+        },
+        "xroutebench": {
+          "quality": 0.7354152689946305,
+          "relative_cost": 0.4079093401476186
+        }
+      },
+      "macro_quality8192": 0.7517853044002278,
+      "macro_relative_cost8192": 0.42677433624677463
+    },
+    "over512": {
+      "rows": 8,
+      "changes": 0,
+      "512": {
+        "routerbench": {
+          "quality": 0.6666666666666666,
+          "relative_cost": 0.06116347989873768
+        },
+        "xroutebench": {
+          "quality": 1.0,
+          "relative_cost": 0.6163315281375089
+        }
+      },
+      "macro_quality512": 0.8333333333333333,
+      "macro_relative_cost512": 0.3387475040181233,
+      "8192": {
+        "routerbench": {
+          "quality": 0.6666666666666666,
+          "relative_cost": 0.06116347989873768
+        },
+        "xroutebench": {
+          "quality": 1.0,
+          "relative_cost": 0.6163315281375089
+        }
+      },
+      "macro_quality8192": 0.8333333333333333,
+      "macro_relative_cost8192": 0.3387475040181233
+    }
+  },
+  "g1_task_holdout": {
+    "all": {
+      "rows": 1807,
+      "changes": 0,
+      "512": {
+        "routerbench": {
+          "quality": 0.8005115089514067,
+          "relative_cost": 0.1733558605046775
+        },
+        "xroutebench": {
+          "quality": 0.5047318611987381,
+          "relative_cost": 0.6522452585884585
+        }
+      },
+      "macro_quality512": 0.6526216850750723,
+      "macro_relative_cost512": 0.412800559546568,
+      "8192": {
+        "routerbench": {
+          "quality": 0.8005115089514067,
+          "relative_cost": 0.1733558605046775
+        },
+        "xroutebench": {
+          "quality": 0.5047318611987381,
+          "relative_cost": 0.6522452585884585
+        }
+      },
+      "macro_quality8192": 0.6526216850750723,
+      "macro_relative_cost8192": 0.412800559546568
+    }
+  }
+}
