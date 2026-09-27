@@ -1794,9 +1794,10 @@ research/<experiment-version>/  독립 dataset·prediction·snapshot·비용 led
 실험을 읽을 때는 **어떤 문제집(dataset)을 어떻게 나누고(split), 무엇을 정답(target)으로 가르쳤으며, 어떤 규칙(policy)으로 선택했는지**를 먼저 확인한다. Manifest는 그 조건과 사용한 파일을 다시 확인하기 위한 설명서다.
 
 
+<a id="r0-long-context-http-budget"></a>
 ### 2026-09-27 R0 장문 HTTP 대기 예산
 
-현재 CPU serving 검증에서 8,192토큰 단일 추론은 1 thread 기준 약 181.9초였고, 2 thread의 2,048토큰도 약 17.8초였다. 8,192토큰 HTTP 200 및 OOM 없음은 입력 길이를 처리한다는 증거이며, 기존 15초 응답 목표를 통과했다는 뜻은 아니다. 현재 VM에서 장문 한 건에 수분이 걸릴 수 있으며 동시 장문 처리 성능도 별도 검증 대상이다.
+현재 CPU serving 검증에서 8,192토큰 단일 추론은 1 thread 기준 약 181.9초였고, 2 thread의 2,048토큰도 약 17.8초였다. 2 thread의 8,192토큰 단일 측정은 171.124초, OOM 0이었다. 이 수치는 별도 warm 반복 측정이나 p95 결과가 아니다. 8,192토큰 HTTP 200 및 OOM 없음은 입력 길이를 처리한다는 증거이며, 기존 15초 응답 목표를 통과했다는 뜻은 아니다. 현재 VM에서 장문 한 건에 수분이 걸릴 수 있으며 동시 장문 처리 성능도 별도 검증 대상이다.
 
 `prod,r0`의 라우터 read timeout 기본값을 240초로 두고, 한 요청은 1회만 시도해 timeout 뒤 동일한 긴 추론이 중복 실행되는 것을 피한다. `ROUTER_READ_TIMEOUT`과 `ROUTER_MAX_ATTEMPTS`로 명시적으로 조정할 수 있다. 공통/R1 기본값과 공개 API, 8,192토큰 입력 계약, 재학습 제출 60초 timeout은 유지한다.
 
