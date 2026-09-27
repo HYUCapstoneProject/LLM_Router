@@ -10,6 +10,18 @@ DEFAULT_TRAINING_IMAGE = os.environ.get(
     ),
 )
 RUNTIME_CONTRACT_PATH = "/opt/llm-router/config/modernbert_runtime_cu124_v1.json"
+# Vertex CustomJob conversion leaves nested ConcatPlaceholder JSON unresolved.
+# Pass the two plain placeholders separately and concatenate in the worker,
+# without shell interpolation or changes to the training image/CLI.
+TRAINING_ENTRYPOINT = [
+    "python3",
+    "-c",
+    (
+        "import os, sys; os.execvp('modernbert-train', "
+        "['modernbert-train', '--training-path', sys.argv[1] + sys.argv[2], *sys.argv[3:]])"
+    ),
+]
+
 
 
 @dsl.container_component
@@ -30,12 +42,12 @@ def modernbert_training_component(
     """
     return dsl.ContainerSpec(
         image=DEFAULT_TRAINING_IMAGE,
-        command=["modernbert-train"],
+        command=TRAINING_ENTRYPOINT,
         args=[
+            training_dataset.path,
+            training_path_suffix,
             "--config",
             training_config.path,
-            "--training-path",
-            dsl.ConcatPlaceholder(items=[training_dataset.path, training_path_suffix]),
             "--runtime-contract",
             RUNTIME_CONTRACT_PATH,
             "--output-dir",
@@ -61,12 +73,12 @@ def modernbert_continual_training_component(
     """Warm-start from an approved anchor, or periodically rebase from pristine."""
     return dsl.ContainerSpec(
         image=DEFAULT_TRAINING_IMAGE,
-        command=["modernbert-train"],
+        command=TRAINING_ENTRYPOINT,
         args=[
+            training_dataset.path,
+            training_path_suffix,
             "--config",
             training_config.path,
-            "--training-path",
-            dsl.ConcatPlaceholder(items=[training_dataset.path, training_path_suffix]),
             "--runtime-contract",
             RUNTIME_CONTRACT_PATH,
             "--output-dir",

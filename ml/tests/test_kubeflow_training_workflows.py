@@ -181,7 +181,7 @@ class KubeflowTrainingWorkflowsTest(unittest.TestCase):
             "NVIDIA_TESLA_T4",
         )
         self.assertEqual(worker_pool["machine_spec"]["accelerator_count"], 1.0)
-        self.assertEqual(worker_pool["container_spec"]["command"], ["modernbert-train"])
+        self.assertEqual(worker_pool["container_spec"]["command"][:2], ["python3", "-c"])
         self.assertIn("cuda", worker_pool["container_spec"]["args"])
         self.assertIn("--initial-model-path", worker_pool["container_spec"]["args"])
         self.assertIn("--initialization-mode", worker_pool["container_spec"]["args"])
