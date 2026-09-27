@@ -499,14 +499,16 @@ def assemble_model_package(
         raise ModelPackageError(
             "checkpoint_config_sha256 does not match the source checkpoint"
         )
+    # GCSFuse supports content writes but not POSIX timestamps/copystat.
+    # Package integrity is bound to content hashes, not source file metadata.
     filenames = REQUIRED_PACKAGE_FILES | set(checkpoint_contract["model_weight_files"])
     for filename in sorted(filenames):
         source = checkpoint_dir / filename
         if not source.is_file():
             raise ModelPackageError(f"Checkpoint file not found: {filename}")
-        shutil.copy2(source, output_dir / filename)
+        shutil.copyfile(source, output_dir / filename)
     if schema == POLICY_SCHEMA_VERSION:
-        shutil.copy2(routing_policy_path, output_dir / "routing_policy.json")
+        shutil.copyfile(routing_policy_path, output_dir / "routing_policy.json")
         model_config = _load_json(output_dir / "config.json")
         if (
             metadata["objective"] == "ordinal"
@@ -533,7 +535,7 @@ def assemble_model_package(
             raise ModelPackageError(
                 "Evaluation metrics role does not match package metadata"
             )
-        shutil.copy2(evaluation_metrics_path, output_dir / evaluation_filename)
+        shutil.copyfile(evaluation_metrics_path, output_dir / evaluation_filename)
     candidate_metadata = {**metadata, "gate_status": "candidate"}
     if schema == POLICY_SCHEMA_VERSION:
         candidate_metadata["checkpoint_config_sha256"] = original_config_sha
