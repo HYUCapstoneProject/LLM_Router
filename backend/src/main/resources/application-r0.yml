@@ -5,6 +5,9 @@ llm:
   router:
     mode: ${ROUTER_MODE:fastapi}
     classify-contract: v1
+    # CPU serving can take minutes for 8192 tokens; avoid duplicate timed-out inference.
+    read-timeout: ${ROUTER_READ_TIMEOUT:PT240S}
+    max-attempts: ${ROUTER_MAX_ATTEMPTS:1}
   retraining:
     # Keep disabled until cloud activation and end-to-end retraining are verified.
     auto-submit: false
