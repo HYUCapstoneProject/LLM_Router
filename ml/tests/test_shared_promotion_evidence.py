@@ -59,7 +59,8 @@ def test_recorded_fixture_is_exact_output_of_shared_producer():
     stored.pop("updated_at")
     assert evidence == stored
     assert SUPPORTED_PROMOTION_CONTRACTS == {
-        ("ordinal", "model-package-v1", "deploy-gate-result-v1")
+        ("ordinal", "model-package-v1", "deploy-gate-result-v1"),
+        ("ordinal", "model-package-v1", "direct-promotion-result-v1"),
     }
 
 

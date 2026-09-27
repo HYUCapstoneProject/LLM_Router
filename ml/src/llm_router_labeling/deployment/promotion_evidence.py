@@ -16,6 +16,7 @@ PROMOTION_EVIDENCE_SCHEMA = "router-promotion-evidence-v1"
 SUPPORTED_PROMOTION_CONTRACTS = frozenset(
     {
         ("ordinal", "model-package-v1", "deploy-gate-result-v1"),
+        ("ordinal", "model-package-v1", "direct-promotion-result-v1"),
     }
 )
 
@@ -61,6 +62,64 @@ def promotion_contract(
     }
 
 
+def is_direct_promotion(result: Mapping[str, Any]) -> bool:
+    schema = result.get("source_schema_version", result.get("schema_version"))
+    return schema == "direct-promotion-result-v1"
+
+
+def validate_direct_promotion(
+    manifest: Mapping[str, Any], result: Mapping[str, Any]
+) -> None:
+    promotion_contract(manifest, result)
+    if (
+        not is_direct_promotion(result)
+        or result.get("promotion_mode") != "direct"
+        or result.get("quality_gate_skipped") is not True
+        or result.get("integrity_verified") is not True
+        or manifest.get("inference_max_length") != 8192
+        or not manifest.get("length_contract_version")
+        or "passed" in result
+        or result.get("candidate_metrics_sha256") is not None
+        or manifest.get("promotion_mode") != "direct"
+        or manifest.get("quality_gate_skipped") is not True
+        or manifest.get("evaluation_role") != "not_evaluated"
+        or manifest.get("evaluation_version") != "not-evaluated-direct-promotion-v1"
+        or any(
+            name in manifest.get("files", {})
+            for name in (
+                "gate_metrics.json",
+                "routerarena_metrics.json",
+                "development_metrics.json",
+            )
+        )
+    ):
+        raise PromotionEvidenceError("Invalid explicit direct-promotion contract")
+    for key in ("candidate_manifest_sha256", "baseline_manifest_sha256"):
+        if (
+            not isinstance(result.get(key), str)
+            or re.fullmatch(r"[0-9a-f]{64}", result[key]) is None
+        ):
+            raise PromotionEvidenceError("Direct promotion identity digest missing")
+    for key in (
+        "batch_id",
+        "candidate_model_version",
+        "baseline_model_version",
+        "pipeline_job_resource_name",
+        "model_publish_root_uri",
+    ):
+        if not isinstance(result.get(key), str) or not result[key].strip():
+            raise PromotionEvidenceError("Direct promotion identity missing")
+    if (
+        type(result.get("expected_current_generation")) is not int
+        or result["expected_current_generation"] <= 0
+    ):
+        raise PromotionEvidenceError(
+            "Direct promotion requires a frozen CURRENT generation"
+        )
+    if manifest.get("model_version") != result["candidate_model_version"]:
+        raise PromotionEvidenceError("Direct promotion candidate mismatch")
+
+
 def validate_gate_package_binding(
     manifest: Mapping[str, Any], gate: Mapping[str, Any]
 ) -> None:
@@ -74,6 +133,9 @@ def validate_gate_package_binding(
         raise PromotionEvidenceError(
             "Gate inference length contract differs from package"
         )
+    if is_direct_promotion(gate):
+        validate_direct_promotion(manifest, gate)
+        return
     metric_name = {
         "continual_gate": "gate_metrics.json",
         "routerarena": "routerarena_metrics.json",
@@ -98,6 +160,7 @@ def build_promotion_evidence(
     result: Mapping[str, Any],
     store: Any,
     gate_text: str,
+    promotion_mode: str = "quality_gate",
 ) -> dict[str, Any]:
     """Bind the gate and exact approved manifest to a stable CURRENT read."""
 
@@ -142,6 +205,11 @@ def build_promotion_evidence(
         isinstance(manifest, dict) and isinstance(gate, dict),
         "Promotion documents must be objects",
     )
+    direct = is_direct_promotion(gate)
+    require(
+        promotion_mode == ("direct" if direct else "quality_gate"),
+        "Promotion mode mismatch",
+    )
     contract = promotion_contract(manifest, gate)
     validate_gate_package_binding(manifest, gate)
     length_evidence = {}
@@ -157,15 +225,24 @@ def build_promotion_evidence(
             "inference_max_length": manifest["inference_max_length"],
         }
     require(
-        gate.get("passed") is True
+        (direct or gate.get("passed") is True)
         and gate.get("batch_id") == batch_id
         and gate.get("candidate_model_version") == model_version
         and gate.get("pipeline_job_resource_name") == pipeline_run_id,
         "Gate does not authorize this batch, candidate and pipeline",
     )
+    if direct:
+        require(
+            pointer.get("previous_pointer_generation")
+            == gate.get("expected_current_generation")
+            and pointer.get("previous_model_version")
+            == gate.get("baseline_model_version")
+            and gate.get("model_publish_root_uri") == root_uri.rstrip("/"),
+            "Direct baseline generation, version or registry mismatch",
+        )
     candidate_sha = gate.get("candidate_manifest_sha256")
     metrics_sha = gate.get("candidate_metrics_sha256")
-    for digest in (candidate_sha, metrics_sha):
+    for digest in (candidate_sha,) if direct else (candidate_sha, metrics_sha):
         require(
             isinstance(digest, str)
             and re.fullmatch(r"[0-9a-f]{64}", digest) is not None,
@@ -181,8 +258,11 @@ def build_promotion_evidence(
         "development_calibration": "development_metrics.json",
     }.get(manifest.get("evaluation_role", "routerarena"))
     require(
-        metric_name is not None
-        and manifest.get("files", {}).get(metric_name) == metrics_sha,
+        direct
+        or (
+            metric_name is not None
+            and manifest.get("files", {}).get(metric_name) == metrics_sha
+        ),
         "Approved manifest does not contain the gated evaluation",
     )
     require(
@@ -202,6 +282,17 @@ def build_promotion_evidence(
         "schema_version": PROMOTION_EVIDENCE_SCHEMA,
         **contract,
         **length_evidence,
+        **(
+            {
+                "promotion_mode": "direct",
+                "quality_gate_skipped": True,
+                "baseline_model_version": gate["baseline_model_version"],
+                "baseline_manifest_sha256": gate["baseline_manifest_sha256"],
+                "expected_current_generation": gate["expected_current_generation"],
+            }
+            if direct
+            else {}
+        ),
         "batch_id": batch_id,
         "candidate_model_version": model_version,
         "outcome": "promoted",

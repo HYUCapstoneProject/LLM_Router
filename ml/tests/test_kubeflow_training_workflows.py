@@ -49,6 +49,7 @@ class KubeflowTrainingWorkflowsTest(unittest.TestCase):
                 "model_auto_approve_component",
                 "initial_training_pipeline",
                 "feedback_retraining_pipeline",
+                "feedback_direct_retraining_pipeline",
                 "model_qualification_pipeline",
             },
         )

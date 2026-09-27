@@ -167,6 +167,7 @@ def publish_candidate(
     model_version: str,
     object_store: ObjectStore,
     gate_result: Mapping[str, Any] | None = None,
+    promotion_mode: str = "quality_gate",
 ) -> dict[str, Any]:
     """Upload a validated candidate package to ``<root>/<version>/candidate/``.
 
@@ -185,7 +186,32 @@ def publish_candidate(
             "Package model_version does not match the requested candidate version: "
             f"{validation['model_version']!r} != {model_version!r}"
         )
-    if gate_result is not None and not gate_result.get("passed"):
+    if promotion_mode == "direct":
+        from .promotion_evidence import (
+            is_direct_promotion,
+            validate_gate_package_binding,
+        )
+
+        try:
+            if not is_direct_promotion(gate_result or {}):
+                raise PromotionEvidenceError(
+                    "Direct publication requires direct authorization"
+                )
+            manifest = json.loads((package_dir / MANIFEST_FILENAME).read_text())
+            validate_gate_package_binding(manifest, gate_result or {})
+            if (gate_result or {}).get("candidate_manifest_sha256") != sha256_file(
+                package_dir / MANIFEST_FILENAME
+            ):
+                raise PromotionEvidenceError("Direct candidate checksum mismatch")
+        except PromotionEvidenceError as exc:
+            raise ModelPublishError(str(exc)) from exc
+    elif promotion_mode != "quality_gate":
+        raise ModelPublishError("Unsupported promotion mode")
+    if (
+        promotion_mode != "direct"
+        and gate_result is not None
+        and not gate_result.get("passed")
+    ):
         raise ModelPublishError(
             "Refusing to publish a candidate that failed the deploy gate"
         )
@@ -263,6 +289,7 @@ def approve_candidate(
     training_mode: str | None = None,
     retention_anchor_model_version: str | None = None,
     initial_qualification: Mapping[str, Any] | None = None,
+    direct_authorization: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Copy a candidate to ``approved/`` and move the ``CURRENT.json`` pointer.
 
@@ -285,11 +312,28 @@ def approve_candidate(
             or gate.get("candidate_model_version") != model_version
             or gate.get("model_publish_root_uri") != root_uri.rstrip("/")
             or "expected_current_generation" not in gate
-            or (generation is not None and (type(generation) is not int or generation <= 0))
+            or (
+                generation is not None
+                and (type(generation) is not int or generation <= 0)
+            )
             or generation != initial_generation
             or training_mode != "initial_training"
         ):
-            raise ModelPublishError("Initial qualification identity, mode or CURRENT generation mismatch")
+            raise ModelPublishError(
+                "Initial qualification identity, mode or CURRENT generation mismatch"
+            )
+    if direct_authorization is not None and (
+        direct_authorization.get("expected_current_generation") != initial_generation
+        or direct_authorization.get("model_publish_root_uri") != root_uri.rstrip("/")
+        or direct_authorization.get("pipeline_job_resource_name") != pipeline_run_id
+        or direct_authorization.get("baseline_model_version")
+        != (previous or {}).get("model_version")
+        or direct_authorization.get("baseline_manifest_sha256")
+        != (previous or {}).get("manifest_sha256")
+    ):
+        raise ModelPublishError(
+            "Direct authorization baseline, root, job or generation changed"
+        )
     previous_version = previous.get("model_version") if previous else None
     if (
         expected_baseline_model_version is not None
@@ -333,7 +377,22 @@ def approve_candidate(
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     try:
-        promotion_contract(manifest, {"schema_version": "deploy-gate-result-v1"})
+        if manifest.get("promotion_mode") == "direct":
+            from .promotion_evidence import validate_gate_package_binding
+
+            if direct_authorization is None:
+                raise PromotionEvidenceError(
+                    "Direct package requires explicit authorization"
+                )
+            validate_gate_package_binding(manifest, direct_authorization)
+            if direct_authorization.get("candidate_manifest_sha256") != sha256_file(
+                manifest_path
+            ):
+                raise PromotionEvidenceError("Direct candidate checksum mismatch")
+        elif direct_authorization is not None:
+            raise PromotionEvidenceError("Direct authorization requires direct package")
+        else:
+            promotion_contract(manifest, {"schema_version": "deploy-gate-result-v1"})
     except PromotionEvidenceError as exc:
         raise ModelPublishError(str(exc)) from exc
     if manifest.get("model_version") != model_version:
@@ -349,8 +408,13 @@ def approve_candidate(
             validate_gate_package_binding(manifest, initial_qualification)
         except PromotionEvidenceError as exc:
             raise ModelPublishError(str(exc)) from exc
-        if initial_qualification.get("candidate_manifest_sha256") != candidate_manifest_sha256:
-            raise ModelPublishError("Initial qualification candidate manifest checksum mismatch")
+        if (
+            initial_qualification.get("candidate_manifest_sha256")
+            != candidate_manifest_sha256
+        ):
+            raise ModelPublishError(
+                "Initial qualification candidate manifest checksum mismatch"
+            )
     if previous and not allow_pointer_rollback:
         _reject_pointer_rollback(previous, manifest)
     approved_at = _reserve_approval_identity(
