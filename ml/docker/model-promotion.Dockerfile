@@ -22,6 +22,7 @@ RUN mkdir -p \
         /opt/llm-router/ml/src/llm_router_labeling/shared
 COPY ml/src/llm_router_labeling/__init__.py /opt/llm-router/ml/src/llm_router_labeling/__init__.py
 COPY ml/src/llm_router_labeling/deployment/__init__.py /opt/llm-router/ml/src/llm_router_labeling/deployment/__init__.py
+COPY ml/src/llm_router_labeling/deployment/direct_promotion.py /opt/llm-router/ml/src/llm_router_labeling/deployment/direct_promotion.py
 COPY ml/src/llm_router_labeling/deployment/model_package.py /opt/llm-router/ml/src/llm_router_labeling/deployment/model_package.py
 COPY ml/src/llm_router_labeling/deployment/model_package_cli.py /opt/llm-router/ml/src/llm_router_labeling/deployment/model_package_cli.py
 COPY ml/src/llm_router_labeling/deployment/deploy_gate.py /opt/llm-router/ml/src/llm_router_labeling/deployment/deploy_gate.py

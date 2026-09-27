@@ -39,6 +39,8 @@ REQUIRED_PACKAGE_FILES = {
     "training_config.json",
 }
 OPTIONAL_METADATA_FIELDS = {
+    "promotion_mode",
+    "quality_gate_skipped",
     "evaluation_role",
     "split_version",
     "dataset_manifest_sha256",

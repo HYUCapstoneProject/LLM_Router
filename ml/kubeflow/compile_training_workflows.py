@@ -25,6 +25,7 @@ from ml.kubeflow.components.vertex_training import (
 )
 from ml.kubeflow.pipelines.model_qualification import model_qualification_pipeline
 from ml.kubeflow.pipelines.modernbert_retraining import (
+    modernbert_direct_retraining_pipeline,
     modernbert_retraining_pipeline,
 )
 from ml.kubeflow.pipelines.modernbert_training import modernbert_training_pipeline
@@ -92,6 +93,10 @@ def compile_workflows(output_dir: Path) -> dict[str, Path]:
         "feedback_retraining_pipeline": (
             modernbert_retraining_pipeline,
             output_dir / "feedback-retraining-pipeline.yaml",
+        ),
+        "feedback_direct_retraining_pipeline": (
+            modernbert_direct_retraining_pipeline,
+            output_dir / "feedback-direct-retraining-pipeline.yaml",
         ),
         "model_qualification_pipeline": (
             model_qualification_pipeline,
