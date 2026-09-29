@@ -37,7 +37,9 @@
 | F1 Cycle-only | 현재 cycle의 누적 피드백 | base 학습 행과 과거 cycle replay를 제거 |
 | F2 Replay+rehearsal | 현재 cycle 피드백 + 과거 피드백 replay(라벨별 최대 32) + base train rehearsal(라벨별 32) | 운영 merge와 같은 구성 |
 
-F1/F2 모두 D_dev에서 고정한 validation 48행(라벨별 16)을 학습 내부 검증에만 사용한다. F1/F2 차이는 history replay와 base rehearsal의 **결합 효과**이며 각각의 개별 효과를 주장하지 않는다.
+F1/F2 모두 D_dev에서 고정한 validation 48행(라벨별 16)을 학습 내부 검증에만 사용한다.
+
+피드백을 전부 쓰므로 cycle 누적 피드백은 약 250(첫 window)~750행(cycle 셋째 window)이다. F2의 복습 행은 운영 상한대로 최대 160행(base 96 + history 64)이라 F2 학습 데이터에서 새 피드백 비중은 약 70~90%가 된다. 운영에서도 같은 비중이 생기므로 복습 상한은 바꾸지 않고, 이 조건에서 F2의 보호 효과를 측정한다. F1/F2 차이는 history replay와 base rehearsal의 **결합 효과**이며 각각의 개별 효과를 주장하지 않는다.
 
 ## 4. 피드백 생성: 고정 로거 시뮬레이터
 
@@ -45,7 +47,9 @@ F1/F2 모두 D_dev에서 고정한 validation 48행(라벨별 16)을 학습 내�
 2. 로거는 anchor 1.0을 8192 추론으로 한 번만 실행한다. 예측 단계를 초기 단계로 삼는다.
 3. 초기 단계의 `success_*`가 실패면 다음 단계로 올리고, 처음 성공한 단계에서 멈춘다. 모든 시도 비용을 합산한다. 끝까지 실패한 요청도 분모에 남긴다.
 4. **상향 후 성공한 요청만** 피드백 event가 된다. `finalLabel`은 성공한 단계이며 `label_origin=observed_escalation_action`(시뮬레이션)으로 기록한다. `userSatisfied=true`는 benchmark 성공의 대리 신호다.
-5. 각 window 끝에서 도착 순서대로 유효 피드백을 **최대 32행** 제출한다. 32행 미만인 window가 있으면 학습 전에 설계를 수정하고 새 version으로 등록한다. 결과를 본 뒤 조정하지 않는다.
+5. 각 window 끝에서 그 window에서 발생한 **유효 피드백 전부**를 제출한다(상한 없음, 2026-09-28 결정). README 5.8절의 연구 설정값 32행 상한은 발생한 피드백 대부분을 버리므로 사용하지 않는다. 유효 피드백이 32행 미만인 window가 있으면 학습 전에 설계를 수정하고 새 version으로 등록한다. 결과를 본 뒤 조정하지 않는다.
+
+**예상 규모.** anchor 1.0의 D_dev 예측(3,581행)에 같은 규칙을 적용하면 첫 시도 해결 59.7%, 상향 후 해결 27.8%, 끝까지 실패 12.5%였다. 이를 stream에 적용하면 **window당 약 250건, 전체 약 1,490건**의 피드백이 예상된다. 피드백 정답은 medium 약 58%·hard 약 42%이며 easy는 0건이다. 원천은 RouterBench가 약 94%로 xRouteBench 피드백은 적다. 실제 수는 00 준비 단계의 stream 로거 추론으로 확정한다.
 
 F1과 F2는 **같은 피드백 batch**를 받는다(off-policy 고정 로거). 각 arm이 자기 피드백을 만드는 on-policy 실험은 범위 밖이다.
 
@@ -106,7 +110,7 @@ weight만 가져오고 optimizer·scheduler는 매번 새로 만든다. 1.2는 1
 
 | 노트북 | 역할 |
 |---|---|
-| `00_prepare.ipynb` | 입력·pin 검증, anchor digest 확인, 로거 추론과 시뮬레이션, window별 피드백 32행 확보 검사, plan 봉인 |
+| `00_prepare.ipynb` | 입력·pin 검증, anchor digest 확인, 로거 추론과 시뮬레이션, window별 피드백 수 기록과 최소 32행 검사, plan 봉인 |
 | `01_f1_cycle_only.ipynb` | F1 × seed 3의 6 window 학습과 prequential 예측 |
 | `02_f2_replay.ipynb` | F2 × seed 3의 6 window 학습과 prequential 예측 |
 | `03_compare.ipynb` | F0 포함 최종 평가(retention·gate·RouterArena), 판정, 보고서·그림, `results-for-review.zip` |
