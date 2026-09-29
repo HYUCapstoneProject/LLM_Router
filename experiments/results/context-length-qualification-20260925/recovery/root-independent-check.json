@@ -1,0 +1,161 @@
+{
+  "g1_original_independent_counts": {
+    "n": 8379,
+    "correct512": 1975,
+    "correct8192": 1999,
+    "gained": 31,
+    "lost": 7,
+    "short_changes": 0
+  },
+  "r0_xroutebench_candidate_outcomes": {
+    "rows": 3729,
+    "action_changed_count": 1,
+    "action_changed_rate": 0.0002681684097613301,
+    "lengths": {
+      "512": {
+        "difficulty_slot_accuracy": 0.6613032984714401,
+        "difficulty_slot_macro_f1": 0.54779549404064,
+        "severe_underroute_hard_to_low_count": 237,
+        "severe_underroute_hard_to_low_rate": 0.06355591311343524,
+        "hard_label_rows": 744,
+        "hard_recall": 0.3696236559139785,
+        "hard_to_low_conditional_rate": 0.3185483870967742,
+        "confusion_matrix": [
+          [
+            1910,
+            191,
+            55
+          ],
+          [
+            466,
+            281,
+            82
+          ],
+          [
+            237,
+            232,
+            275
+          ]
+        ],
+        "actions": {
+          "low": 2613,
+          "medium": 704,
+          "high": 412
+        },
+        "per_source": {
+          "xroutebench": {
+            "rows": 3729,
+            "mean_quality": 0.7244062656791813,
+            "mean_actual_cost": 8.435612764816305e-05,
+            "relative_cost": 0.15764458808101153,
+            "mean_observed_success_target": 0.722177527487262,
+            "actual_cost_semantics": "recorded source cost units, not current service prices",
+            "default_budget_exceeded": false
+          }
+        },
+        "source_macro_quality": 0.7244062656791813,
+        "source_macro_observed_success_target": 0.722177527487262,
+        "row_weighted_quality": 0.7244062656791813,
+        "quality_semantics": "historical per-source candidate quality; source contracts may differ",
+        "success_semantics": "frozen binary success targets of these candidate pools; not service-model success",
+        "aggregate_cost_semantics": "source-macro relative cost only; absolute costs are never pooled",
+        "source_macro_relative_cost": 0.15764458808101153
+      },
+      "8192": {
+        "difficulty_slot_accuracy": 0.6613032984714401,
+        "difficulty_slot_macro_f1": 0.5478192840689263,
+        "severe_underroute_hard_to_low_count": 238,
+        "severe_underroute_hard_to_low_rate": 0.06382408152319657,
+        "hard_label_rows": 744,
+        "hard_recall": 0.3696236559139785,
+        "hard_to_low_conditional_rate": 0.31989247311827956,
+        "confusion_matrix": [
+          [
+            1910,
+            191,
+            55
+          ],
+          [
+            466,
+            281,
+            82
+          ],
+          [
+            238,
+            231,
+            275
+          ]
+        ],
+        "actions": {
+          "low": 2614,
+          "medium": 703,
+          "high": 412
+        },
+        "per_source": {
+          "xroutebench": {
+            "rows": 3729,
+            "mean_quality": 0.7244062656791813,
+            "mean_actual_cost": 8.434049342987395e-05,
+            "relative_cost": 0.15760931158986421,
+            "mean_observed_success_target": 0.722177527487262,
+            "actual_cost_semantics": "recorded source cost units, not current service prices",
+            "default_budget_exceeded": false
+          }
+        },
+        "source_macro_quality": 0.7244062656791813,
+        "source_macro_observed_success_target": 0.722177527487262,
+        "row_weighted_quality": 0.7244062656791813,
+        "quality_semantics": "historical per-source candidate quality; source contracts may differ",
+        "success_semantics": "frozen binary success targets of these candidate pools; not service-model success",
+        "aggregate_cost_semantics": "source-macro relative cost only; absolute costs are never pooled",
+        "source_macro_relative_cost": 0.15760931158986421
+      }
+    },
+    "uncertainty": {
+      "estimand": "source_macro_quality_delta",
+      "paired_delta_95_ci": [
+        0.0,
+        0.0
+      ],
+      "paired_source_macro_delta_95_ci": [
+        0.0,
+        0.0
+      ],
+      "iterations": 10000,
+      "seed": 42,
+      "unit": "duplicate_group_id",
+      "strata": "source_dataset",
+      "groups_per_source": {
+        "xroutebench": 3729
+      },
+      "warning": "sampling-only uncertainty; not a training-seed CI or new independent test",
+      "arena_full_and_perturbed_rows_clustered_together": false
+    },
+    "primary_quality_delta": 0.0,
+    "observed_success_target_delta": 0.0,
+    "observed_success_target_uncertainty": {
+      "estimand": "source_macro_observed_success_target_delta",
+      "paired_delta_95_ci": [
+        0.0,
+        0.0
+      ],
+      "paired_source_macro_delta_95_ci": [
+        0.0,
+        0.0
+      ],
+      "iterations": 10000,
+      "seed": 42,
+      "unit": "duplicate_group_id",
+      "strata": "source_dataset",
+      "groups_per_source": {
+        "xroutebench": 3729
+      },
+      "warning": "sampling-only uncertainty; not a training-seed CI or new independent test",
+      "arena_full_and_perturbed_rows_clustered_together": false
+    },
+    "small_or_noisy_slice": false,
+    "predeclared_automatic_quality_pass_blockers": [
+      "increased severe difficulty-slot under-routing"
+    ]
+  }
+}

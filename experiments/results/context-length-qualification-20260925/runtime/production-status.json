@@ -1,0 +1,10 @@
+{
+  "production_runtime_qualified": false,
+  "checked_at": "2026-09-25T12:06Z",
+  "target": "llm-router-serving",
+  "operation": "read-only free -m over gcloud compute ssh",
+  "result": "authentication_refresh_failed_requires_interactive_gcloud_auth_login",
+  "server_command_executed": false,
+  "production_load_test_executed": false,
+  "configuration_changed": false
+}

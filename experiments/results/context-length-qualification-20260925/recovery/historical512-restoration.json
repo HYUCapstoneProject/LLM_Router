@@ -1,0 +1,26 @@
+[
+  {
+    "archive": "comparison-results.tar",
+    "archive_sha256": "c3b844dbe003a4d209e7d304ca72ab3d38f7e780a85dd17d0de2d79f3aac67b1",
+    "member": "pointwise/validation-scores.parquet",
+    "path": "experiments/results/context-length-qualification-20260925/recovery/historical512/A/validation-scores.parquet",
+    "sha256": "0edfe7f64ba8f96bfb6d4022406bf4d7b714b155e819d69c7fa006f32af1635b",
+    "size_bytes": 158896
+  },
+  {
+    "archive": "sealed-tests/sealed-evaluation.tar",
+    "archive_sha256": "ad4b52f7ae3dcb6931475b5e780c71f30d16d697a1af4f7f0b184477f8eaaf8f",
+    "member": "inference/pointwise/test_routerbench-scores.parquet",
+    "path": "experiments/results/context-length-qualification-20260925/recovery/historical512/A/test_routerbench-scores.parquet",
+    "sha256": "2b0ed365810eae187823d8ed6c96f74aea383f6c089f5bd8e3a6b94827693719",
+    "size_bytes": 138317
+  },
+  {
+    "archive": "sealed-tests/sealed-evaluation.tar",
+    "archive_sha256": "ad4b52f7ae3dcb6931475b5e780c71f30d16d697a1af4f7f0b184477f8eaaf8f",
+    "member": "inference/pointwise/test_xroutebench-scores.parquet",
+    "path": "experiments/results/context-length-qualification-20260925/recovery/historical512/A/test_xroutebench-scores.parquet",
+    "sha256": "c9e292a3cb4d266bf4da808be679ff72092196cdeacd040511833ffd4751dabc",
+    "size_bytes": 202125
+  }
+]
