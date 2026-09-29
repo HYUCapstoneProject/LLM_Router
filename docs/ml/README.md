@@ -1365,7 +1365,7 @@ R0 교체 브랜치의 실제 입력·CLI·Spring/FastAPI 설정 계약은 [R0 r
 | 연구 항목 | 남은 실행과 확인할 질문 |
 |---|---|
 | 재학습 F0/F1/F2 | 고정 모델 / 새 cycle 데이터만 학습 / replay·rehearsal 포함 학습을 같은 피드백·6회 제출 기회·학습량·validation48 조건에서 비교한다. 실제 개선과 기존 능력의 망각, 비용을 측정한다. R0/R1이라는 목적함수 비교와는 다른 축이다. 실행 범위는 [재학습 효과 실험 계획서](RETRAINING_EFFECT_EXPERIMENT.md)에 고정했다(2026-09-28, 실행 전). |
-| 캐시 C0/C1/C2 | 캐시 없음 / exact / semantic을 고정 라우터 아래 비교한다. D1 반복 replay와 D2 사람 검증 동의어·hard negative trace를 준비하고 오답 재사용·품질·호출 비용·지연을 평가한다. C3 reranker는 선택 확장이다. |
+| 캐시 C0/C1/C2 | 캐시 없음 / exact / semantic을 고정 라우터 아래 비교한다. D1 반복 replay와 D2 사람 검증 동의어·hard negative trace를 준비하고 오답 재사용·품질·호출 비용·지연을 평가한다. C3 reranker는 선택 확장이다. 실행 범위는 [캐시 실험 계획서](CACHE_EXPERIMENT.md)에 고정했다(2026-09-30, 실행 전). 현재 운영 구성이 C3와 같아 C3를 기본 포함으로 제안한다. |
 | 추가 외부 평가 | §4.9에서 조사한 LLMRouterBench, SPROUT의 이용 조건·실제 후보 교집합·중복·점수/비용 매핑을 확인한 뒤 독립 평가 데이터를 봉인한다. 후보 조사가 데이터 준비 완료를 뜻하지 않는다. |
 | 공정한 기준선·논문 비교 | source-only B의 실제 공통 세 후보에서 TF-IDF, BGE+kNN, ModernBERT 및 RouterDC를 같은 조건으로 비교한다. finalist 추가 seed, confidence 보정, group bootstrap을 마무리한다. |
 | 인지 수준·최종 보고서 | blind 주석·통제 문항쌍과 사람 검증을 수행하고, 난이도 label 일치·후보 선택 품질·인지 정렬을 분리해 재현 가능한 보고서와 그림을 완성한다. |
@@ -1475,6 +1475,8 @@ R0 교체 브랜치의 실제 입력·CLI·Spring/FastAPI 설정 계약은 [R0 r
 
 <a id="cache"></a>
 ## 6. 캐시 실험
+
+실행 범위·데이터·지연 측정 방법은 [캐시 실험 계획서](CACHE_EXPERIMENT.md)에 고정한다. 이 장은 전체 사양으로 유지한다.
 
 <a id="cache-1"></a>
 ### 6.1. 고정할 시스템과 비교군
