@@ -1,6 +1,6 @@
 # R0 재학습 효과 실험 (F0/F1/F2) 계획서
 
-작성일: 2026-09-28. 이 문서는 **실행 전 사전 계획**이며 결과 보고서나 운영 변경 승인이 아니다. 전체 연구·운영 계약은 [ML 단일 문서](README.md)의 [5.6~5.9절](README.md#retraining-6)을 따르며, 이 문서는 그 사양을 현재 운영 조건에 맞춰 실행 가능한 범위로 고정한다. 노트북·실행 코드는 아직 만들지 않았다.
+작성일: 2026-09-28. 이 문서는 **실행 전 사전 계획**이며 결과 보고서나 운영 변경 승인이 아니다. 전체 연구·운영 계약은 [ML 단일 문서](README.md)의 [5.6~5.9절](README.md#retraining-6)을 따르며, 이 문서는 그 사양을 현재 운영 조건에 맞춰 실행 가능한 범위로 고정한다. 실행 코드는 [`ml/notebooks/retraining_effect/`](../../ml/notebooks/retraining_effect/README.md)에 있다(2026-09-29).
 
 ## 1. 목적과 질문
 
@@ -129,10 +129,10 @@ weight만 가져오고 optimizer·scheduler는 매번 새로 만든다. 1.2는 1
 
 ## 11. 실행 전·완료 체크리스트
 
-- [ ] anchor 1.0 digest와 전이 실험 R0 pin 일치 확인
+- [x] anchor 1.0 digest와 전이 실험 R0 pin 일치 확인 — 운영 1.0 approved `model.safetensors`와 pin이 모두 `e1a40fec…`, 원본 archive `d15da837…` (2026-09-29)
 - [ ] stream·dev·gate·retention의 행 수·SHA와 역할 간 duplicate group 누수 0 재확인
-- [ ] 시뮬레이터 단위 테스트: 상향 경로, 끝까지 실패, high 시작, 비용 합산
-- [ ] 여섯 window 모두 유효 피드백 32행 이상 확인 후 plan 봉인
+- [x] 시뮬레이터 단위 테스트: 상향 경로, 끝까지 실패, high 시작, 비용 합산 — `ml/tests/test_retraining_effect_experiment.py`
+- [ ] 여섯 window 모두 유효 피드백 32행 이상 확인 후 plan 봉인 — 로컬 CPU 미리보기(봉인 아님)에서 249/253/238/255/237/260건, 전체 1,492건(medium 886·hard 606, RouterBench 1,409·xRouteBench 83). 공식 값은 Colab 00의 GPU 로거로 확정
 - [ ] F1/F2 window별 실제 완료 step 일치 기록
 - [ ] F0/F1/F2 prequential·최종 예측 SHA와 receipt 일치
 - [ ] 결과 보고서를 `experiments/results/retraining-effect-v1-<실행일>/`에 반입하고 README 5.12에 요약
