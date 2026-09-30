@@ -4,7 +4,7 @@ Never submits cloud jobs, never changes CURRENT and never publishes a model.
 The contract is docs/ml/RETRAINING_EFFECT_EXPERIMENT.md: a fixed logger (the
 operational 1.0 anchor) replays recorded benchmark outcomes to create upward
 escalation feedback; F1 learns only the current cycle's feedback, F2 adds the
-operational history replay and base rehearsal, F4 adds to F2 confirmed-easy
+operational history replay and base rehearsal, F3 adds to F2 confirmed-easy
 rows (logger routed easy and the low tier solved it first try) drawn without
 reuse so the three labels are as even as possible. Heavy ML imports happen
 only for training/inference.
@@ -26,7 +26,7 @@ import pandas as pd
 
 LABELS = ("easy", "medium", "hard")
 TIERS = ("low", "medium", "high")
-ARMS = ("f1_cycle_only", "f2_replay", "f4_balanced_easy")
+ARMS = ("f1_cycle_only", "f2_replay", "f3_balanced_easy")
 DEFAULT_ARMS = ["f1_cycle_only", "f2_replay"]
 FROZEN = "f0_frozen"
 INPUT_ROLES = ("train", "dev", "gate", "feedback", "forget", "routerarena")
@@ -151,8 +151,8 @@ def load_inputs(config_path, pins_path, data_dir):
         raise ValueError(f"Unknown or duplicated arms: {arms}")
     if "f1_cycle_only" in arms and "f2_replay" not in arms:
         raise ValueError("F1 matches F2's optimizer steps; prepare them together")
-    if "f4_balanced_easy" in arms and not isinstance(config.get("easy_supplement_seed"), int):
-        raise ValueError("F4 needs an integer easy_supplement_seed")
+    if "f3_balanced_easy" in arms and not isinstance(config.get("easy_supplement_seed"), int):
+        raise ValueError("F3 needs an integer easy_supplement_seed")
     if config.get("feedback_per_window_cap") is not None:
         raise ValueError("2026-09-28 decision: every valid feedback event is used; no per-window cap")
     pins = json.loads(json.dumps(pins))
@@ -348,7 +348,7 @@ def make_updates(config, frames, log):
         history = per_label(events[events.window.le(cycle_start)], config["history_per_label"], seed)
         replay = pd.concat([current, history, base], ignore_index=True)
         rows = {"f1_cycle_only": current, "f2_replay": replay}
-        if "f4_balanced_easy" in arms:
+        if "f3_balanced_easy" in arms:
             counts = replay.difficulty_label.value_counts().reindex(LABELS, fill_value=0)
             target = (int(counts["medium"]) + int(counts["hard"]) + 1) // 2
             need = max(0, target - int(counts["easy"]))
@@ -357,7 +357,7 @@ def make_updates(config, frames, log):
             used_easy.update(added.sample_id)
             supplement[name] = {"target_easy": target, "base_easy": int(counts["easy"]), "added_easy": int(len(added)),
                                 "pool_available": int(len(pool)), "shortfall": int(need - len(added))}
-            rows["f4_balanced_easy"] = pd.concat([replay, added], ignore_index=True)
+            rows["f3_balanced_easy"] = pd.concat([replay, added], ignore_index=True)
         for arm in arms:
             train = rows[arm].assign(split="train", sample_weight=1.0)
             updates[arm][name] = pd.concat([train[TRAINER_COLUMNS], validation[TRAINER_COLUMNS]], ignore_index=True)
@@ -365,9 +365,9 @@ def make_updates(config, frames, log):
 
 
 def training_budget(config, updates):
-    """F2/F4 use the operational 3 epochs of their own rows; F1 repeats epochs to match F2's steps."""
+    """F2/F3 use the operational 3 epochs of their own rows; F1 repeats epochs to match F2's steps."""
     budget = {arm: {} for arm in updates}
-    for arm in ("f2_replay", "f4_balanced_easy"):
+    for arm in ("f2_replay", "f3_balanced_easy"):
         for name, data in updates.get(arm, {}).items():
             rows = int(data.split.eq("train").sum())
             budget[arm][name] = {"train_rows": rows, "epochs": config["f2_epochs"],
@@ -732,7 +732,7 @@ def compare(args):
         pooled[f"{arm}_quality"] = values.initial_quality.to_numpy()
         pooled[f"{arm}_cost"] = values.simulated_cost.to_numpy()
         pooled[f"{arm}_depth"] = values.call_depth.to_numpy()
-    pairs = [(FROZEN, arm) for arm in arms] + [("f1_cycle_only", "f2_replay"), ("f2_replay", "f4_balanced_easy")]
+    pairs = [(FROZEN, arm) for arm in arms] + [("f1_cycle_only", "f2_replay"), ("f2_replay", "f3_balanced_easy")]
     for left, right in pairs:
         if left not in per_row or right not in per_row:
             continue
@@ -793,12 +793,12 @@ def compare(args):
     if len(f2_f1):
         low, high = f2_f1.conditional_ci95_low.iloc[0], f2_f1.conditional_ci95_high.iloc[0]
         judgments["f2_vs_f1_quality"] = "no_difference_confirmed" if low <= 0 <= high else ("f2_higher" if low > 0 else "f1_higher")
-    f4_f2 = contrasts[(contrasts.contrast == "f4_balanced_easy_minus_f2_replay")] if len(contrasts) else contrasts
+    f3_f2 = contrasts[(contrasts.contrast == "f3_balanced_easy_minus_f2_replay")] if len(contrasts) else contrasts
     for metric in ("quality", "cost"):
-        row = f4_f2[f4_f2.metric == metric] if len(f4_f2) else f4_f2
+        row = f3_f2[f3_f2.metric == metric] if len(f3_f2) else f3_f2
         if len(row):
             low, high = row.conditional_ci95_low.iloc[0], row.conditional_ci95_high.iloc[0]
-            judgments[f"f4_vs_f2_{metric}"] = "no_difference_confirmed" if low <= 0 <= high else ("f4_higher" if low > 0 else "f2_higher")
+            judgments[f"f3_vs_f2_{metric}"] = "no_difference_confirmed" if low <= 0 <= high else ("f3_higher" if low > 0 else "f2_higher")
     status = {"complete": not missing, "missing": missing, "judgments": judgments,
               "production_approved": False, "plan_sha256": plan_sha}
     (out / "status.json").write_text(json.dumps(status, indent=2) + "\n")

@@ -103,13 +103,13 @@ class RetrainingEffectContracts(unittest.TestCase):
             for name in updates[arm]:
                 pd.testing.assert_frame_equal(updates[arm][name], again[arm][name])
 
-    def test_f4_preparation_is_order_independent(self):
-        config = self.f4_setup()
+    def test_f3_preparation_is_order_independent(self):
+        config = self.f3_setup()
         updates, _, _, _ = experiment.make_updates(config, self.frames, self.log)
         shuffled = {k: v.sample(frac=1, random_state=3).reset_index(drop=True) for k, v in self.frames.items()}
         again, _, _, _ = experiment.make_updates(config, shuffled, self.log.sample(frac=1, random_state=4))
-        for name in updates["f4_balanced_easy"]:
-            pd.testing.assert_frame_equal(updates["f4_balanced_easy"][name], again["f4_balanced_easy"][name])
+        for name in updates["f3_balanced_easy"]:
+            pd.testing.assert_frame_equal(updates["f3_balanced_easy"][name], again["f3_balanced_easy"][name])
 
     def test_short_window_fails_before_fitting(self):
         self.frames["feedback"]["success_low"] = 1.0
@@ -234,22 +234,22 @@ class RetrainingEffectContracts(unittest.TestCase):
         self.assertAlmostEqual(result["predicted_easy_share"], 0.)
         self.assertAlmostEqual(result["over_route_rate"], 2 / 6)
 
-    def f4_setup(self):
-        config = experiment.read(HELPER.parent / "experiment_config_f4.json")
+    def f3_setup(self):
+        config = experiment.read(HELPER.parent / "experiment_config_f3.json")
         # Half of the requests are solved by the low tier first try (confirmed easy).
         self.frames["feedback"]["success_low"] = [1.0 if i % 2 else 0.0 for i in range(600)]
         return config
 
-    def test_f4_balances_labels_with_fresh_arrived_easy_rows(self):
-        config = self.f4_setup()
+    def test_f3_balances_labels_with_fresh_arrived_easy_rows(self):
+        config = self.f3_setup()
         updates, stream, events, supplement = experiment.make_updates(config, self.frames, self.log)
-        self.assertEqual(list(updates), ["f4_balanced_easy"])
+        self.assertEqual(list(updates), ["f3_balanced_easy"])
         window_of = dict(zip(stream.sample_id, stream.window))
         confirmed = set(stream[stream.outcome.eq("first_try") & stream.initial_tier.eq(0)].sample_id)
         used = set()
         for update in range(1, 7):
             name = f"update-{update:02d}"
-            data = updates["f4_balanced_easy"][name]
+            data = updates["f3_balanced_easy"][name]
             train = data[data.split.eq("train")]
             added = train[train.label_origin.eq(experiment.CONFIRMED_EASY_ORIGIN)]
             self.assertTrue(set(added.sample_id) <= confirmed)
@@ -267,19 +267,19 @@ class RetrainingEffectContracts(unittest.TestCase):
             self.assertEqual(info["target_easy"], (int(counts["medium"]) + int(counts["hard"]) + 1) // 2)
             feedback_rows = train[train.label_origin.eq(experiment.FEEDBACK_ORIGIN)]
             self.assertTrue(set(feedback_rows.sample_id) <= set(events.sample_id))
-        budget = experiment.training_budget(config, updates)["f4_balanced_easy"]
-        for name, data in updates["f4_balanced_easy"].items():
+        budget = experiment.training_budget(config, updates)["f3_balanced_easy"]
+        for name, data in updates["f3_balanced_easy"].items():
             rows = int(data.split.eq("train").sum())
             self.assertEqual(budget[name], {"train_rows": rows, "epochs": 3,
                                             "max_train_steps": experiment.steps_per_epoch(rows, config) * 3})
 
-    def test_f4_records_shortfall_instead_of_reusing_easy_rows(self):
-        config = self.f4_setup()
+    def test_f3_records_shortfall_instead_of_reusing_easy_rows(self):
+        config = self.f3_setup()
         self.frames["feedback"]["success_low"] = [1.0 if i % 25 == 1 else 0.0 for i in range(600)]
         updates, _, _, supplement = experiment.make_updates(config, self.frames, self.log)
         self.assertGreater(sum(x["shortfall"] for x in supplement.values()), 0)
         seen = []
-        for data in updates["f4_balanced_easy"].values():
+        for data in updates["f3_balanced_easy"].values():
             seen += data[data.label_origin.eq(experiment.CONFIRMED_EASY_ORIGIN)].sample_id.tolist()
         self.assertEqual(len(seen), len(set(seen)))
 

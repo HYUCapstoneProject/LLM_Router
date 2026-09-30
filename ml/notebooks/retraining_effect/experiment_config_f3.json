@@ -1,8 +1,8 @@
 {
-  "experiment_id": "retraining-effect-v2-f4",
+  "experiment_id": "retraining-effect-v2-f3",
   "schema_version": "router-retraining-effect-v1",
   "arms": [
-    "f4_balanced_easy"
+    "f3_balanced_easy"
   ],
   "easy_supplement_seed": 20260930,
   "seeds": [
