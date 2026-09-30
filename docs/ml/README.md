@@ -1065,6 +1065,8 @@ run별 `predictions.parquet`, `metrics.json`, `model_info.json`, dataset/validat
 | **R2-Bench / R2-Router** | 문항×모델×출력 예산의 응답·token count·judge score. 비용 예산 제어 후속 연구에 적합. [논문](https://arxiv.org/abs/2602.02823), [코드](https://github.com/jqxue1999/R2-Router), [HF 카드](https://huggingface.co/datasets/JiaqiXue/R2-Bench/blob/main/README.md) | 공식 GitHub 15 모델 vs HF 카드 10 모델, 마지막 예산 `default` vs `8000`이 달라 실제 파일 확인 선행. SPROUT과 문항 중복 위험. HF MIT, 원천 조건 별도. **우리 pairwise R2와 다른 연구**이며 독립 평가 우선순위는 낮다. |
 | **KMMLU-Pro** | 한국 전문자격 14종의 한국어 2,822문항. 한국어 지식 평가 보완. [논문](https://arxiv.org/abs/2507.08924), [공식 카드](https://huggingface.co/datasets/LGAI-EXAONE/KMMLU-Pro/blob/main/README.md) | 질문·정답은 있으나 원하는 후보별 outcome/cost 행렬은 미확인. `score`는 시험 배점이다. 서비스 모델 호출·usage 수집이 필요. CC-BY-NC-ND-4.0, gated 비상업 이용·평가 전용 조건 확인 전제로 고려한다. |
 
+**2026-10-01 선정·준비 완료.** 선정 기준과 제외 규칙을 적용해 **LLMRouterBench를 주 세트**(2025년 flagship 13개 모델, 실제 비용 포함, 9,713문항), **SPROUT을 보조 세트**(비용 없음, 품질·라벨만, 20,545문항)로 준비했다. MMLU-Pro 1,728문항은 RouterBench MMLU와 같은 질문이라 제외했다. calibration 30%/test 70%로 봉인했으며 모델 평가는 아직 하지 않았다. 상세 기준·제외 건수·사용 규칙은 [외부 평가 데이터 준비 기록](EXTERNAL_EVALUATION_DATA.md)에 있다.
+
 LLMRouterBench에서 확인한 HF revision은 `0e5af1b84bf73437a01a1849c0f1d2468baa93fc`, SPROUT은 `d54e3cda2189ca1ed13a877a44ed34736c4b6920`이다. 최신 GitHub 설명의 모든 태스크가 이 과거 archive에도 있다고 가정하지 않는다. SPROUT의 code license를 dataset 이용·재배포 허가로 대신하지 않는다.
 
 도입 순서는 사용 조건 확인 → frozen archive inventory → 기존 train/dev/test와 ID·정규화 텍스트·근접 중복 비교 → 실제 모델 ID·실행 설정·점수 의미·비용 근거의 교집합 확정 → calibration과 external test 봉인이다. 같은 family의 새 문항과 완전히 새로운 family를 분리해 보고한다. 기록된 후보의 결과만 재사용하면 LLM 재호출은 피할 수 있지만 현재 RB/xRB 또는 서비스 Claude 세 후보 전체와 같은 pool인지는 아직 확인되지 않았다. **새 모델 세 개를 가격순 low/medium/high에 넣어 기존 R1/R2의 외부 성능이라고 보고하지 않는다.** 새 pool 학습·보정은 별도 전이 실험이다.
