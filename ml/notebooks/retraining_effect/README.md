@@ -8,10 +8,13 @@
 | F1 | [01_f1_cycle_only.ipynb](01_f1_cycle_only.ipynb) | 현재 cycle 피드백만 학습 × seed 3, window별 prequential 예측 |
 | F2 | [02_f2_replay.ipynb](02_f2_replay.ipynb) | 피드백 + history replay + base rehearsal × seed 3, window별 prequential 예측 |
 | 3 | [03_compare_results.ipynb](03_compare_results.ipynb) | 최종 모델 잠금 → gate·retention·RouterArena 평가 → 보고서 |
+| F4-0 | [00_prepare_f4.ipynb](00_prepare_f4.ipynb) | 첫 실험의 로거로 F4 계획 봉인(GPU 추론 없음) |
+| F4-1 | [01_f4_balanced_easy.ipynb](01_f4_balanced_easy.ipynb) | F2 + 확인된 easy 보충 × seed 3, window별 prequential 예측 |
+| F4-2 | [02_compare_f4.ipynb](02_compare_f4.ipynb) | F4 최종 평가 후 run001의 F1/F2와 한 보고서로 비교 |
 
 ## 실행 흐름
 
-1. [`build_bundle.py`](build_bundle.py)로 만든 `retraining-effect` kit를 개인 Drive의 `MyDrive/LLM_Router/`에 올린다.
+1. [`build_bundle.py`](build_bundle.py)로 만든 `retraining-effect` kit(F4는 `--variant f4`로 만든 `retraining-effect-f4` kit)를 개인 Drive의 `MyDrive/LLM_Router/`에 올린다.
 2. 00 → (01, 02를 별도 세션에서) → 03 순서로 전체 실행한다.
 3. 03이 내려받는 `results-for-review.zip`을 검토에 사용한다.
 
@@ -23,6 +26,7 @@
 - **버전 규칙:** update 1~3은 anchor에서, 4~6은 해당 arm의 update-03(2.0)에서 가중치만 가져온다. cycle 데이터는 cycle 안에서 누적한다.
 - **학습량:** F2는 3 epoch, F1은 같은 update의 F2와 실제 optimizer step이 같도록 epoch를 늘린다. 완료 step이 다르면 실패로 처리한다.
 - **평가 보호:** window j+1은 update j 모델이 학습 전에 예측한다. gate·retention·RouterArena는 모든 학습과 window 평가가 끝나고 `final-lock.json`이 생긴 뒤에만 평가한다.
+- **F4 easy 보충:** 도착한 window에서 로거가 easy로 보내 첫 시도에 해결된 질문을, medium·hard 평균 수가 되도록 F2 구성에 더한다. 한 번 쓴 easy는 다시 뽑지 않는다. 계획서 12절 참조.
 - **판정:** window 2~6의 초기 선택 품질 차이(0.01 초과)와 비용·호출 깊이 차이를 질문 그룹 bootstrap으로 보고하고, retention source-macro-F1 하락 0.01 이내를 망각 기준으로 쓴다.
 
 테스트는 [`ml/tests/test_retraining_effect_experiment.py`](../../tests/test_retraining_effect_experiment.py)에 있으며 합성 데이터만 사용한다.

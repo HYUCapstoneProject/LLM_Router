@@ -136,3 +136,21 @@ weight만 가져오고 optimizer·scheduler는 매번 새로 만든다. 1.2는 1
 - [ ] F1/F2 window별 실제 완료 step 일치 기록
 - [ ] F0/F1/F2 prequential·최종 예측 SHA와 receipt 일치
 - [ ] 결과 보고서를 `experiments/results/retraining-effect-v1-<실행일>/`에 반입하고 README 5.12에 요약
+
+## 12. 추가 비교군 F4: easy 보충 (2026-09-30 추가)
+
+**배경.** run001(`retraining-effect-v1-run001`)에서 F1·F2 모두 첫 재학습부터 easy 예측이 60%→0%가 되었다. 초기 선택 품질은 F0보다 약 0.18 높았지만, 질문당 비용이 약 77% 늘고 최종 해결률이 87.0%→83.0%로 낮아졌다. retention source-macro-F1도 약 0.27 떨어졌다. 상향 피드백에는 구조적으로 easy 정답이 없고, F2의 base rehearsal(easy 32행)은 학습 데이터의 10~30%에 불과해 이 쏠림을 막지 못했다.
+
+**F4 구성.** 사용자 결정에 따라 F2 구성에 easy 행을 보충해 세 단계의 학습 비율을 최대한 균일하게 만든다.
+
+| 항목 | 규칙 |
+|---|---|
+| easy 출처 | 이미 도착한 window(현재 update 이하)에서 로거가 easy로 보냈고 low 후보가 첫 시도에 해결한 질문. 서비스에서 “Haiku로 보냈고 상향 없이 끝난 요청”에 해당한다. 라벨 출처는 `simulated_confirmed_first_try_easy` |
+| 보충량 | F2 학습 행의 medium·hard 수의 평균(올림)이 되도록 easy를 채운다. 이미 있는 base easy 32행을 포함해 계산한다 |
+| 중복 방지 | 한 번 학습에 쓴 easy 질문은 이후 update에서 다시 뽑지 않는다. 남은 후보 중 `easy_supplement_seed`로 무작위 선택하며, 후보가 모자라면 재사용하지 않고 부족분을 기록한다 |
+| 학습 | 운영과 같은 버전 규칙, 자기 학습 행 기준 3 epoch. F2보다 학습 행이 많으므로 optimizer step도 많다(F2와 step을 맞추지 않음) |
+| 비교 | 같은 로거·stream을 쓰는 새 run(`retraining-effect-v2-f4-run001`)에서 F4만 학습하고, run001의 F1/F2를 해시와 행 내용 검증 후 불러와 한 보고서로 비교한다 |
+
+로컬 CPU 미리보기(봉인 아님)에서는 update별 easy 보충이 125/251/370/160/278/408행으로 부족분이 없었다. 서로 다른 easy 질문 1,592건이 쓰였고, 학습 비율은 easy·medium·hard 약 33/38/28%였다. seed당 학습량은 510 step이다(F2는 360).
+
+**판정.** 8절 기준을 그대로 쓰고, F4−F2의 품질·비용 차이를 추가로 보고한다. F4가 easy 비율과 비용을 F0에 가깝게 유지하면서 품질·해결률을 개선하는지, retention 하락이 0.01 이내인지를 본다. F4와 F2는 데이터 구성과 학습량이 함께 다르므로, 차이를 easy 보충만의 효과라고 주장하지 않는다.

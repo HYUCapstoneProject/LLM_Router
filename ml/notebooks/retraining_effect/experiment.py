@@ -4,8 +4,10 @@ Never submits cloud jobs, never changes CURRENT and never publishes a model.
 The contract is docs/ml/RETRAINING_EFFECT_EXPERIMENT.md: a fixed logger (the
 operational 1.0 anchor) replays recorded benchmark outcomes to create upward
 escalation feedback; F1 learns only the current cycle's feedback, F2 adds the
-operational history replay and base rehearsal. Heavy ML imports happen only
-for training/inference.
+operational history replay and base rehearsal, F4 adds to F2 confirmed-easy
+rows (logger routed easy and the low tier solved it first try) drawn without
+reuse so the three labels are as even as possible. Heavy ML imports happen
+only for training/inference.
 """
 from __future__ import annotations
 
@@ -24,7 +26,8 @@ import pandas as pd
 
 LABELS = ("easy", "medium", "hard")
 TIERS = ("low", "medium", "high")
-ARMS = ("f1_cycle_only", "f2_replay")
+ARMS = ("f1_cycle_only", "f2_replay", "f4_balanced_easy")
+DEFAULT_ARMS = ["f1_cycle_only", "f2_replay"]
 FROZEN = "f0_frozen"
 INPUT_ROLES = ("train", "dev", "gate", "feedback", "forget", "routerarena")
 FINAL_ROLES = ("gate", "forget", "routerarena")
@@ -33,6 +36,7 @@ OUTCOME_COLUMNS = tuple(f"{kind}_{tier}" for kind in ("success", "quality", "act
 TRAINER_COLUMNS = ["sample_id", "duplicate_group_id", "model_input_text", "difficulty_label",
                    "sample_weight", "split", "label_origin"]
 FEEDBACK_ORIGIN = "simulated_observed_escalation"
+CONFIRMED_EASY_ORIGIN = "simulated_confirmed_first_try_easy"
 HERE = Path(__file__).resolve().parent
 SOURCE_ROOT = HERE.parents[1] / "src" / "llm_router_labeling"
 
@@ -87,6 +91,10 @@ def per_label(frame, n, seed):
                       for label in LABELS], ignore_index=True)
 
 
+def run_arms(config):
+    return list(config.get("arms", DEFAULT_ARMS))
+
+
 def steps_per_epoch(rows, config):
     return math.ceil(math.ceil(rows / config["train_batch_size"]) / config["gradient_accumulation_steps"])
 
@@ -138,6 +146,13 @@ def load_inputs(config_path, pins_path, data_dir):
                  "gradient_accumulation_steps", "checkpoint_every_steps", "keep_last_checkpoints"):
         if not isinstance(config[name], int) or config[name] <= 0:
             raise ValueError(f"Positive integer required: {name}")
+    arms = run_arms(config)
+    if not arms or set(arms) - set(ARMS) or len(set(arms)) != len(arms):
+        raise ValueError(f"Unknown or duplicated arms: {arms}")
+    if "f1_cycle_only" in arms and "f2_replay" not in arms:
+        raise ValueError("F1 matches F2's optimizer steps; prepare them together")
+    if "f4_balanced_easy" in arms and not isinstance(config.get("easy_supplement_seed"), int):
+        raise ValueError("F4 needs an integer easy_supplement_seed")
     if config.get("feedback_per_window_cap") is not None:
         raise ValueError("2026-09-28 decision: every valid feedback event is used; no per-window cap")
     pins = json.loads(json.dumps(pins))
@@ -317,30 +332,50 @@ def make_updates(config, frames, log):
     validation = per_label(frames["dev"], config["validation_per_label"], seed).assign(
         split="validation", sample_weight=1.0, label_origin="benchmark_difficulty")
     base = per_label(frames["train"], config["base_per_label"], seed).assign(label_origin="benchmark_difficulty")
-    updates = {arm: {} for arm in ARMS}
+    arms = run_arms(config)
+    updates = {arm: {} for arm in arms}
+    # Arrived requests the logger sent to the low tier and that were solved first try.
+    confirmed = stream[stream.outcome.eq("first_try") & stream.initial_tier.eq(0)].copy()
+    confirmed["benchmark_difficulty_label"] = confirmed.difficulty_label
+    confirmed["difficulty_label"] = "easy"
+    confirmed["label_origin"] = CONFIRMED_EASY_ORIGIN
+    used_easy, supplement = set(), {}
     per = config["updates_per_major"]
     for update in range(1, config["windows"] + 1):
+        name = f"update-{update:02d}"
         cycle_start = ((update - 1) // per) * per
         current = events[events.window.between(cycle_start + 1, update)]
         history = per_label(events[events.window.le(cycle_start)], config["history_per_label"], seed)
-        rows = {"f1_cycle_only": current, "f2_replay": pd.concat([current, history, base], ignore_index=True)}
-        for arm, train in rows.items():
-            train = train.assign(split="train", sample_weight=1.0)
-            updates[arm][f"update-{update:02d}"] = pd.concat(
-                [train[TRAINER_COLUMNS], validation[TRAINER_COLUMNS]], ignore_index=True)
-    return updates, stream, events
+        replay = pd.concat([current, history, base], ignore_index=True)
+        rows = {"f1_cycle_only": current, "f2_replay": replay}
+        if "f4_balanced_easy" in arms:
+            counts = replay.difficulty_label.value_counts().reindex(LABELS, fill_value=0)
+            target = (int(counts["medium"]) + int(counts["hard"]) + 1) // 2
+            need = max(0, target - int(counts["easy"]))
+            pool = confirmed[confirmed.window.le(update) & ~confirmed.sample_id.isin(used_easy)]
+            added = stable_sample(pool, need, config["easy_supplement_seed"] + update)
+            used_easy.update(added.sample_id)
+            supplement[name] = {"target_easy": target, "base_easy": int(counts["easy"]), "added_easy": int(len(added)),
+                                "pool_available": int(len(pool)), "shortfall": int(need - len(added))}
+            rows["f4_balanced_easy"] = pd.concat([replay, added], ignore_index=True)
+        for arm in arms:
+            train = rows[arm].assign(split="train", sample_weight=1.0)
+            updates[arm][name] = pd.concat([train[TRAINER_COLUMNS], validation[TRAINER_COLUMNS]], ignore_index=True)
+    return updates, stream, events, supplement
 
 
 def training_budget(config, updates):
-    """F2 uses the operational 3 epochs; F1 repeats epochs to match F2's optimizer steps."""
-    budget = {arm: {} for arm in ARMS}
-    for name, f2 in updates["f2_replay"].items():
-        f2_rows = int(f2.split.eq("train").sum())
-        steps = steps_per_epoch(f2_rows, config) * config["f2_epochs"]
-        budget["f2_replay"][name] = {"train_rows": f2_rows, "epochs": config["f2_epochs"], "max_train_steps": steps}
-        f1_rows = int(updates["f1_cycle_only"][name].split.eq("train").sum())
-        budget["f1_cycle_only"][name] = {"train_rows": f1_rows,
-                                         "epochs": math.ceil(steps / steps_per_epoch(f1_rows, config)),
+    """F2/F4 use the operational 3 epochs of their own rows; F1 repeats epochs to match F2's steps."""
+    budget = {arm: {} for arm in updates}
+    for arm in ("f2_replay", "f4_balanced_easy"):
+        for name, data in updates.get(arm, {}).items():
+            rows = int(data.split.eq("train").sum())
+            budget[arm][name] = {"train_rows": rows, "epochs": config["f2_epochs"],
+                                 "max_train_steps": steps_per_epoch(rows, config) * config["f2_epochs"]}
+    for name, data in updates.get("f1_cycle_only", {}).items():
+        steps = budget["f2_replay"][name]["max_train_steps"]
+        rows = int(data.split.eq("train").sum())
+        budget["f1_cycle_only"][name] = {"train_rows": rows, "epochs": math.ceil(steps / steps_per_epoch(rows, config)),
                                          "max_train_steps": steps}
     return budget
 
@@ -351,7 +386,7 @@ def prepare(args):
     receipt = read(log_path.with_suffix(".json"))
     if receipt != logger_receipt(pins, log_path):
         raise ValueError("Logger provenance mismatch")
-    updates, stream, events = make_updates(config, frames, pd.read_parquet(log_path))
+    updates, stream, events, supplement = make_updates(config, frames, pd.read_parquet(log_path))
     root = Path(args.output_dir).resolve()
     if root.exists():
         raise ValueError("Prepare needs a NEW directory; other notebooks reuse that sealed plan")
@@ -371,6 +406,7 @@ def prepare(args):
             "logger_receipt": receipt, "data_sha256": hashes,
             "anchor_archive": read(archives)["r0"] if archives.exists() else None,
             "training_budget": training_budget(config, updates),
+            "easy_supplement": supplement,
             "feedback_per_window": {str(k): int(v) for k, v in events.window.value_counts().sort_index().items()},
             "feedback_label_counts": {k: int(v) for k, v in events.difficulty_label.value_counts().items()},
             "feedback_source_counts": {k: int(v) for k, v in events.source_dataset.value_counts().items()},
@@ -382,6 +418,7 @@ def prepare(args):
     exact_json(root / "plan.sha256.json", {"sha256": sha(root / "plan.json")})
     print(json.dumps({"run_dir": str(root), "feedback_per_window": plan["feedback_per_window"],
                       "feedback_label_counts": plan["feedback_label_counts"],
+                      "easy_supplement": plan["easy_supplement"],
                       "training_budget": plan["training_budget"]}, indent=2))
 
 
@@ -421,8 +458,8 @@ def train(args):
     root = Path(args.run_dir)
     plan = load_plan(root)
     cfg, pins = plan["config"], plan["pins"]
-    if args.arm not in ARMS or args.seed not in cfg["seeds"]:
-        raise ValueError("Only F1/F2 with declared adaptation seeds can train")
+    if args.arm not in run_arms(cfg) or args.seed not in cfg["seeds"]:
+        raise ValueError("Only this run's arms with declared adaptation seeds can train")
     if (root / "final-lock.json").exists():
         raise ValueError("Experiment locked; no further fitting")
     source = pins["models"]["r0"]
@@ -524,7 +561,7 @@ def score_windows(args):
     root = Path(args.run_dir)
     plan = load_plan(root)
     cfg, pins = plan["config"], plan["pins"]
-    if args.arm not in ARMS or args.seed not in cfg["seeds"]:
+    if args.arm not in run_arms(cfg) or args.seed not in cfg["seeds"]:
         raise ValueError("Unsupported arm/seed")
     path = Path(plan["data_dir"]) / "feedback.parquet"
     file_pin(path, pins["data_sha256"]["feedback"])
@@ -552,7 +589,7 @@ def final_lock(args):
     cfg = plan["config"]
     digests, missing = {}, []
     last = f"update-{cfg['windows']:02d}"
-    for arm in ARMS:
+    for arm in run_arms(cfg):
         for seed in cfg["seeds"]:
             digests[f"{arm}/{seed}"] = digest(verify_finished(root / "arms" / arm / f"seed-{seed}" / last)["model_files"])
             for window in range(2, cfg["windows"] + 1):
@@ -580,7 +617,7 @@ def score_final(args):
             raise ValueError("F0 is the untouched anchor, measured once as seed 0")
         verify_source(pins["models"]["r0"])
         model = Path(pins["models"]["r0"]["path"])
-    elif args.arm in ARMS and args.seed in cfg["seeds"]:
+    elif args.arm in run_arms(cfg) and args.seed in cfg["seeds"]:
         model = root / "arms" / args.arm / f"seed-{args.seed}" / f"update-{cfg['windows']:02d}" / "model"
         if digest(model_inventory(model)) != lock["final_model_digests"][f"{args.arm}/{args.seed}"]:
             raise ValueError("Final checkpoint changed after the lock")
@@ -616,6 +653,27 @@ def paired_bootstrap(frame, left, right, draws, seed):
     return float(diff.mean()), float(np.quantile(samples, .025)), float(np.quantile(samples, .975))
 
 
+def reference_sources(plan, reference_run, current_stream=None):
+    """Reuse a finished run's arms only when its sealed stream and logger are identical."""
+    if not reference_run:
+        return {}
+    ref = Path(reference_run)
+    file_pin(ref / "plan.json", read(ref / "plan.sha256.json")["sha256"])
+    ref_plan = read(ref / "plan.json")
+    same = {key: ref_plan["config"][key] == plan["config"][key]
+            for key in ("seeds", "windows", "stream_seed", "evaluation_max_length")}
+    if ref_plan["logger_receipt"] != plan["logger_receipt"] or not all(same.values()):
+        raise ValueError("Reference run used a different stream, logger or seeds")
+    file_pin(ref / "shared-data" / "stream-windows.parquet", ref_plan["data_sha256"]["stream-windows"])
+    if current_stream is not None:
+        # Parquet bytes may differ across writers; the sealed rows themselves must match.
+        keys = ["sample_id", "window", "initial_label", "outcome", "resolved_tier"]
+        theirs = pd.read_parquet(ref / "shared-data" / "stream-windows.parquet", columns=keys)
+        if not theirs.reset_index(drop=True).equals(current_stream[keys].reset_index(drop=True)):
+            raise ValueError("Reference run used a different stream, logger or seeds")
+    return {arm: (ref, sha(ref / "plan.json")) for arm in run_arms(ref_plan["config"])}
+
+
 def compare(args):
     import matplotlib
     matplotlib.use("Agg")
@@ -628,6 +686,9 @@ def compare(args):
     out.mkdir(exist_ok=True)
     stream = pd.read_parquet(root / "shared-data" / "stream-windows.parquet")
     windows = range(1, cfg["windows"] + 1)
+    sources = reference_sources(plan, getattr(args, "reference_run", None), stream)
+    sources.update({arm: (root, plan_sha) for arm in run_arms(cfg)})
+    arms = [arm for arm in ARMS if arm in sources]
     rows, missing = [], []
     per_row = {}
     logger_pred = stream.initial_label.map(LABELS.index).to_numpy()
@@ -638,17 +699,18 @@ def compare(args):
     base = stream[stream.window.ge(2)].sort_values("sample_id").reset_index(drop=True)
     sim0 = simulate(base, base.initial_label.map(LABELS.index).to_numpy())
     per_row[FROZEN] = sim0
-    for arm in ARMS:
+    for arm in arms:
+        arm_root, arm_plan = sources[arm]
         seed_rows = []
         for seed in cfg["seeds"]:
             parts = []
             for window in range(2, cfg["windows"] + 1):
-                directory = root / "scores" / arm / f"seed-{seed}" / f"window-{window:02d}"
+                directory = arm_root / "scores" / arm / f"seed-{seed}" / f"window-{window:02d}"
                 if not (directory / "receipt.json").exists():
                     missing.append(f"{arm}/{seed}/window-{window:02d}")
                     continue
                 receipt = read(directory / "receipt.json")
-                if receipt["plan_sha256"] != plan_sha:
+                if receipt["plan_sha256"] != arm_plan:
                     raise ValueError("Cannot combine results from different plans")
                 file_pin(directory / "predictions.parquet", receipt["predictions_sha256"])
                 frame = pd.read_parquet(directory / "predictions.parquet")
@@ -670,7 +732,8 @@ def compare(args):
         pooled[f"{arm}_quality"] = values.initial_quality.to_numpy()
         pooled[f"{arm}_cost"] = values.simulated_cost.to_numpy()
         pooled[f"{arm}_depth"] = values.call_depth.to_numpy()
-    for left, right in [(FROZEN, "f1_cycle_only"), (FROZEN, "f2_replay"), ("f1_cycle_only", "f2_replay")]:
+    pairs = [(FROZEN, arm) for arm in arms] + [("f1_cycle_only", "f2_replay"), ("f2_replay", "f4_balanced_easy")]
+    for left, right in pairs:
         if left not in per_row or right not in per_row:
             continue
         for metric in ("quality", "cost", "depth"):
@@ -682,15 +745,16 @@ def compare(args):
     contrasts.to_csv(out / "paired-comparisons.csv", index=False)
     final_rows = []
     predictions = {}
-    for arm, seeds in [(FROZEN, [0])] + [(a, cfg["seeds"]) for a in ARMS]:
+    for arm, seeds in [(FROZEN, [0])] + [(a, cfg["seeds"]) for a in arms]:
+        arm_root, arm_plan = (root, plan_sha) if arm == FROZEN else sources[arm]
         for seed in seeds:
             for role in FINAL_ROLES:
-                directory = root / "scores" / arm / f"seed-{seed}" / "final" / role
+                directory = arm_root / "scores" / arm / f"seed-{seed}" / "final" / role
                 if not (directory / "receipt.json").exists():
                     missing.append(f"{arm}/{seed}/final/{role}")
                     continue
                 receipt = read(directory / "receipt.json")
-                if receipt["plan_sha256"] != plan_sha:
+                if receipt["plan_sha256"] != arm_plan:
                     raise ValueError("Cannot combine results from different plans")
                 file_pin(directory / "predictions.parquet", receipt["predictions_sha256"])
                 frame = pd.read_parquet(directory / "predictions.parquet")
@@ -703,7 +767,7 @@ def compare(args):
     baseline_key = (FROZEN, 0, "forget")
     if baseline_key in predictions:
         baseline = label_metrics(predictions[baseline_key], predictions[baseline_key].prediction.map(LABELS.index))["source_macro_f1"]
-        for arm in ARMS:
+        for arm in arms:
             for seed in cfg["seeds"]:
                 if (arm, seed, "forget") in predictions:
                     frame = predictions[(arm, seed, "forget")]
@@ -715,7 +779,7 @@ def compare(args):
     retention = pd.DataFrame(retention)
     retention.to_csv(out / "retention-check.csv", index=False)
     judgments = {}
-    for arm in ARMS:
+    for arm in arms:
         q = contrasts[(contrasts.contrast == f"{arm}_minus_{FROZEN}") & (contrasts.metric == "quality")] if len(contrasts) else contrasts
         c = contrasts[(contrasts.contrast == f"{arm}_minus_{FROZEN}") & (contrasts.metric == "cost")] if len(contrasts) else contrasts
         r = retention[retention.arm == arm] if len(retention) else retention
@@ -729,6 +793,12 @@ def compare(args):
     if len(f2_f1):
         low, high = f2_f1.conditional_ci95_low.iloc[0], f2_f1.conditional_ci95_high.iloc[0]
         judgments["f2_vs_f1_quality"] = "no_difference_confirmed" if low <= 0 <= high else ("f2_higher" if low > 0 else "f1_higher")
+    f4_f2 = contrasts[(contrasts.contrast == "f4_balanced_easy_minus_f2_replay")] if len(contrasts) else contrasts
+    for metric in ("quality", "cost"):
+        row = f4_f2[f4_f2.metric == metric] if len(f4_f2) else f4_f2
+        if len(row):
+            low, high = row.conditional_ci95_low.iloc[0], row.conditional_ci95_high.iloc[0]
+            judgments[f"f4_vs_f2_{metric}"] = "no_difference_confirmed" if low <= 0 <= high else ("f4_higher" if low > 0 else "f2_higher")
     status = {"complete": not missing, "missing": missing, "judgments": judgments,
               "production_approved": False, "plan_sha256": plan_sha}
     (out / "status.json").write_text(json.dumps(status, indent=2) + "\n")
@@ -759,7 +829,7 @@ def compare(args):
         fig.savefig(out / f"confusion-{arm}-{seed}-forget.png", dpi=140)
         plt.close(fig)
     summary = prequential[prequential.window.ge(2)].groupby("arm")[
-        ["initial_quality", "first_try_rate", "resolved_rate", "mean_call_depth", "mean_cost", "source_macro_f1"]].mean()
+        ["predicted_easy_share", "initial_quality", "first_try_rate", "resolved_rate", "mean_call_depth", "mean_cost", "source_macro_f1"]].mean()
     (out / "REPORT.md").write_text("# R0 재학습 효과 실험 결과\n\n"
         "생성된 실제 예측만 집계했다. 누락 항목은 완료로 해석하지 않으며 status.json에 표시한다. "
         "F0는 운영 1.0(anchor)이자 고정 로거이고, F1/F2는 seed 42/43/44의 adaptation 반복이다.\n\n"
@@ -798,8 +868,10 @@ def main():
     p.add_argument("--arm", choices=(FROZEN, *ARMS), required=True)
     p.add_argument("--seed", type=int, required=True)
     p.add_argument("--role", choices=FINAL_ROLES, required=True)
-    for name in ("final-lock", "compare"):
-        subs.add_parser(name).add_argument("--run-dir", required=True)
+    subs.add_parser("final-lock").add_argument("--run-dir", required=True)
+    p = subs.add_parser("compare")
+    p.add_argument("--run-dir", required=True)
+    p.add_argument("--reference-run", help="finished run whose F1/F2 used the same sealed stream and logger")
     args = parser.parse_args()
     {"prepare": prepare, "build-logger-log": build_logger_log, "train": train,
      "score-windows": score_windows, "final-lock": final_lock, "score-final": score_final,
