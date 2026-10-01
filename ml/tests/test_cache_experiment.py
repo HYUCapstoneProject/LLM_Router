@@ -326,6 +326,16 @@ class D2Test(unittest.TestCase):
         with self.assertRaises(ValueError):
             ce.merge_annotations(a, a)
 
+    def test_quality_flags_reach_variants(self):
+        originals = pd.DataFrame({"group_id": ["g1", "g2"], "sample_id": ["s1", "s2"], "d2_split": ["test"] * 2,
+                                  "stratum": ["rb_mcq"] * 2, "negative_type": ["negation"] * 2})
+        sheet = pd.DataFrame({"group_id": ["g1", "g2"], "paraphrase_text": ["a", "b"], "hard_negative_text": ["c", "d"],
+                              "author": ["x", "x"], "author_notes": ["함정 목표 정답: B / low-quality trap", ""]})
+        variants = ce.variants_from(sheet, originals)
+        self.assertEqual(variants.set_index("item_id").quality_flags.to_dict(),
+                         {"g1-p": "low-quality trap", "g1-n": "low-quality trap", "g2-p": "", "g2-n": ""})
+        self.assertEqual(ce.quality_flags("source anomaly: x"), ["source anomaly"])
+
     def test_kappa(self):
         self.assertAlmostEqual(ce.cohen_kappa(["Y", "N", "Y", "N"], ["Y", "N", "Y", "N"]), 1.0)
         self.assertLess(ce.cohen_kappa(["Y", "N", "Y", "N"], ["N", "Y", "N", "Y"]), 0)

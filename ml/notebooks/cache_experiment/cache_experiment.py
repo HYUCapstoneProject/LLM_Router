@@ -951,17 +951,28 @@ def validate_authoring(sheet, originals, token_count=None, limit=512):
     return pd.DataFrame(problems, columns=["group_id", "field", "problem"])
 
 
+QUALITY_FLAGS = ("low-quality trap", "source anomaly")
+
+
+def quality_flags(notes):
+    """Author-note tags that mark a group for the sensitivity analysis."""
+    text = str(notes or "")
+    return [flag for flag in QUALITY_FLAGS if flag in text]
+
+
 def variants_from(sheet, originals):
     rows = []
     base = originals.set_index("group_id")
-    for r in sheet.itertuples():
+    notes = sheet.author_notes if "author_notes" in sheet else pd.Series("", index=sheet.index)
+    for r, note in zip(sheet.itertuples(), notes):
         for role, text in (("paraphrase", r.paraphrase_text), ("hard_negative", r.hard_negative_text)):
             o = base.loc[r.group_id]
             rows.append({"item_id": f"{r.group_id}-{'p' if role == 'paraphrase' else 'n'}", "group_id": r.group_id,
                          "d2_split": o.d2_split, "stratum": o.stratum, "role": role,
                          "negative_type": o.negative_type if role == "hard_negative" else None,
                          "original_sample_id": o.sample_id, "variant_text": text,
-                         "key_hash": question_hash(text), "author": r.author})
+                         "key_hash": question_hash(text), "author": r.author,
+                         "quality_flags": ",".join(quality_flags(note))})
     return pd.DataFrame(rows)
 
 

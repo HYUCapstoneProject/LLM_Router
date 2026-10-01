@@ -462,7 +462,10 @@ def d2_test(run, embedder, reranker):
     for name, spec in specs.items():
         o = ce.evaluate_spec(spec, items, labels, order, sims, scores, relation, status, cache_frame).assign(policy=name)
         outcomes.append(o)
+        flagged = set(items.group_id[items.get("quality_flags", pd.Series("", index=items.index)).fillna("").ne("")])
         metrics[name] = {"spec": spec, "overall": ce.d2_metrics(o),
+                         "excluding_flagged_groups": {"groups_excluded": sorted(flagged),
+                                                      **ce.d2_metrics(o[~o.group_id.isin(flagged)])},
                          "by_stratum": {k: ce.d2_metrics(g) for k, g in o.groupby("stratum")},
                          "by_negative_type": {k: ce.d2_metrics(g) for k, g in o[o.role.eq("hard_negative")].groupby("negative_type")}}
     exact_hits = int(sum(ce.question_hash(t) in set(cache_frame.key_hash) for t in items.variant_text))
