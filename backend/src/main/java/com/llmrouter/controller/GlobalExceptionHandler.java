@@ -6,7 +6,6 @@ import com.anthropic.errors.BadRequestException;
 import com.anthropic.errors.InternalServerException;
 import com.anthropic.errors.RateLimitException;
 import com.anthropic.errors.UnauthorizedException;
-import com.llmrouter.client.MessageTooLongException;
 import com.llmrouter.config.RequestIdFilter;
 import com.llmrouter.dto.ErrorResponse;
 import com.llmrouter.exception.EscalationConflictException;
@@ -42,17 +41,6 @@ public class GlobalExceptionHandler {
 
         log.warn("요청 검증 실패 - {}", detail);
         return build(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", detail);
-    }
-
-    /**
-     * 질문이 512 토큰을 넘는다. 캐시 임베딩 모델(BGE)의 입력 한도라
-     * 자르지 않고 거절해야 캐시와 라우터가 같은 질문 전체를 본다.
-     */
-    @ExceptionHandler(MessageTooLongException.class)
-    public ResponseEntity<ErrorResponse> handleMessageTooLong(MessageTooLongException e) {
-        log.warn("입력 토큰 한도 초과 - {}", e.getMessage());
-        return build(HttpStatus.BAD_REQUEST, "MESSAGE_TOO_LONG",
-                "질문이 너무 깁니다. 512 토큰 이하로 줄여서 다시 보내주세요.");
     }
 
     /** /api/escalate 가 참조한 원본 요청이 request_log 에 없다 */
