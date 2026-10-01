@@ -38,6 +38,7 @@
 | LLMRouterBench | bbh, math500, mbpp, humaneval, medqa 등 13개 | 7~8B 소형 모델 결과만 있고 flagship 풀·비용 비교가 불가(C2·C6) |
 | SPROUT | MMLU-Pro, MATH | 우리 개발 데이터(xRouteBench mmlu_pro·math)와 같은 계열이고, MMLU-Pro는 비용이 있는 주 세트 사본을 우선 |
 | SPROUT | RAGBench 12종 | 검색 문서가 붙은 긴 입력. 프로젝트 데이터 계약이 RAG를 제외함 |
+| SPROUT | MuSR 3종 (748) | 여러 문단의 이야기 지문을 주고 묻는 문서 기반 질문(RAG형 입력) |
 
 ### 3.2. 문항 단위 제외 (실제 건수)
 
@@ -50,6 +51,8 @@
 | LLMRouterBench hle·arenahard | 같은 index인데 모델마다 질문이 다름 | 2 |
 | SPROUT gpqa_extended | 주 세트 GPQA와 같은 문항 (주 세트 사본 유지) | 198 |
 | SPROUT openhermes | 우리 데이터와 중복 | 1 |
+| SPROUT openhermes·gpqa_extended | **RAG형**: `BEGININPUT/BEGINCONTEXT` 문서 블록, 앞머리 `Context:` 지문, "다음 지문을 읽고 답하라" | 338 |
+| LLMRouterBench arenahard·hle, SPROUT gpqa_extended | ModernBERT 토큰 8,192 초과 | 4 |
 
 MMLU-Pro 중복이 많은 이유는 MMLU-Pro가 **원래 MMLU 문항에 선택지를 10개로 늘려 만든 데이터**이기 때문이다. RouterBench의 MMLU와 질문 본문이 같다. 샘플을 직접 대조해 같은 질문임을 확인했다.
 
@@ -60,41 +63,57 @@ MMLU-Pro 중복이 많은 이유는 MMLU-Pro가 **원래 MMLU 문항에 선택�
 - **결측:** 비용 0·출력 토큰 0인 기록(호출 실패), SPROUT의 빈 응답은 **오답이 아니라 결측**이다. 유효 결과가 12개 미만이면 제외한다.
 - **난이도 라벨:** 우리와 같은 규칙 `overall-solve-rate-grid-v1:h0.27-e0.64`를 외부 모델 풀에 적용한다. 풀이 다르므로 "같은 정의, 다른 풀"의 라벨이다.
 - **중복 검사:** 프로젝트의 중복 규칙(정확 일치 + token 3-gram SimHash Jaccard ≥ 0.90)에 더해, **선택지 앞 질문 본문(10단어 이상)이 같은 경우**도 중복으로 본다. 선택지를 섞거나 형식을 바꾼 같은 문항을 잡기 위한 규칙이다.
+- **RAG형 제외:** 문서를 붙여 주고 그 문서로 답하게 하는 형식은 뺀다. 질문 안에 인용문이 있어도 그 인용문 자체가 묻는 대상이면(예: 문장 읽기 실험 문제) 남긴다.
+- **토큰 한계:** 라우터(ModernBERT) 토큰이 8,192를 넘으면 제외한다. 캐시 임베딩(BGE) 토큰 512 초과는 제외하지 않고 `within_cache_embed_limit=false`로 표시한다. 판단 근거는 5절에 있다.
 - **분할:** 중복 그룹·같은 질문 본문·같은 긴 지문(1,000자 이상에서 앞 300자 동일)을 한 단위로 묶어 **calibration 30% / test 70%**로 고정한다. 한 지문의 여러 질문이 양쪽에 나뉘지 않는다.
 
 ## 4. 준비 결과
 
-| 세트 | slice | 계열 | 문항 |
-|---|---|---|---:|
-| **LLMRouterBench** | 주 평가 (새 계열) | SimpleQA 4,326 · HLE 2,031 · LiveCodeBench 1,002 · GPQA 198 · LiveMathBench 118 | **7,675** |
-| | 같은 계열 (참고) | MMLU-Pro 1,256 · AIME 40 | 1,296 |
-| | 판정 선호 진단 | ArenaHard 742 | 742 |
-| **SPROUT** | 일반 대화 | OpenHermes 19,454 | 19,454 |
-| | 새 계열 | MuSR 748 · GPQA extended 343 | 1,091 |
+| 세트 | slice | 계열 | 문항 | 두 한계 모두 이내 |
+|---|---|---|---:|---:|
+| **LLMRouterBench** | 주 평가 (새 계열) | SimpleQA 4,326 · HLE 2,030 · LiveCodeBench 1,002 · GPQA 198 · LiveMathBench 118 | **7,674** | 7,055 |
+| | 같은 계열 (참고) | MMLU-Pro 1,256 · AIME 40 | 1,296 | 1,266 |
+| | 판정 선호 진단 | ArenaHard 740 | 740 | 625 |
+| **SPROUT** | 일반 대화 | OpenHermes 19,117 | 19,117 | 19,117 |
+| | 새 계열 | GPQA extended 341 | 341 | 330 |
+| | | 합계 | **29,168** | **28,393** |
 
-LLMRouterBench 9,713문항, SPROUT 20,545문항이다. 난이도 라벨 분포(calibration + test):
+"두 한계 모두 이내"는 ModernBERT 8,192 토큰과 캐시 BGE 512 토큰을 모두 지키는 문항 수다. 캐시 한계를 넘는 775문항은 LiveCodeBench 396, HLE 216, ArenaHard 115 등 **길고 어려운 문항**에 몰려 있다. 난이도 라벨 분포(calibration + test):
 
 | slice | easy | medium | hard |
 |---|---:|---:|---:|
-| LLMRouterBench 주 평가 | 1,659 | 1,920 | 4,096 |
+| LLMRouterBench 주 평가 | 1,659 | 1,920 | 4,095 |
 | LLMRouterBench 같은 계열 | 1,104 | 97 | 95 |
-| LLMRouterBench 판정 진단 | 305 | 306 | 131 |
-| SPROUT 일반 대화 | 16,345 | 2,293 | 816 |
-| SPROUT 새 계열 | 374 | 417 | 300 |
+| LLMRouterBench 판정 진단 | 304 | 305 | 131 |
+| SPROUT 일반 대화 | 16,029 | 2,278 | 810 |
+| SPROUT 새 계열 | 68 | 152 | 121 |
 
 - 주 평가 세트는 HLE 때문에 **hard가 많다**(53%). SPROUT 일반 대화는 2024년 모델도 대부분 풀어서 **easy가 84%**다. 두 세트의 성격이 반대라 함께 보면 라우터가 양쪽에서 어떻게 움직이는지 확인할 수 있다.
-- ModernBERT tokenizer 기준 입력 길이 중앙값 37 token, 최대 13,577 token이다. 8,192 token을 넘는 4문항은 추론 때 기존 규칙대로 잘린다.
+- 입력 길이 중앙값은 ModernBERT 35 token, BGE 37 token이다. 남은 문항의 최대는 ModernBERT 7,488 token이다.
 - LLMRouterBench 풀의 문항당 평균 기록 비용은 $0.00057(deepseek-v3-0324)부터 $0.0587(gemini-2.5-pro)까지 약 100배 차이다. 세 단계 후보는 **calibration 세트로만** 정하고 test에서 바꾸지 않는다.
 
-## 5. 사용 규칙
+## 5. 토큰 한계: 어느 쪽에 맞추나
+
+| 단계 | 모델 | 한계 | 넘으면 |
+|---|---|---:|---|
+| 라우터 | ModernBERT (운영 1.0) | 8,192 | 뒤쪽을 잘라 분류 |
+| 캐시 임베딩 | `BAAI/bge-large-en-v1.5` | 512 | 뒤쪽을 잘라 임베딩 |
+| 캐시 reranker | cross-encoder (운영 비활성) | 512 (질문+후보 쌍) | 뒤쪽을 잘라 비교 |
+
+**외부 라우터 평가는 라우터 한계(8,192)에 맞춘다.** 평가 대상이 라우터이고, 캐시는 긴 질문에서 실패하지 않고 앞 512 토큰만 보고 동작한다. 512로 자르면 길고 어려운 문항(LiveCodeBench의 40%, HLE의 11%)이 빠져서 세트가 쉬운 쪽으로 치우친다. 그러면 라우터가 가장 중요하게 판단해야 하는 문항을 평가하지 못한다.
+
+**캐시 실험과 "서비스 전체 경로" 보고에는 512 이내 표시를 쓴다.** 앞 512 토큰이 같고 뒤가 다른 두 긴 질문은 같은 임베딩이 되어 다른 질문의 답을 재사용할 위험이 있다. 그래서 캐시 실험은 `within_cache_embed_limit=true`인 문항(28,393)만 쓰거나, 초과 문항을 따로 집계해야 한다. 이 위험은 캐시 설계의 한계이며 외부 데이터 선정으로 해결할 문제가 아니다.
+
+## 6. 사용 규칙
 
 1. test 세트는 평가 방식·후보 세 개·판정 기준을 calibration에서 모두 고정한 뒤 **한 번만** 평가한다.
 2. 새 풀의 세 모델을 low/medium/high에 넣은 결과를 **기존 RB/xRB 결과의 외부 성능**이라고 보고하지 않는다. "다른 모델 풀로의 전이" 평가다.
 3. 주 평가(새 계열)와 같은 계열·판정 진단·SPROUT 결과를 합산하지 않고 따로 보고한다.
 4. SPROUT은 비용 지표 없이 품질·라벨 정렬만 보고한다.
-5. 공개 모델 결과이므로 Claude 서비스의 실제 성공률로 해석하지 않는다.
+5. 라우터 평가는 전체(8,192 이내)로 하고, 캐시와 함께 보는 서비스 경로 결과는 `within_cache_embed_limit=true` 부분집합으로 따로 보고한다.
+6. 공개 모델 결과이므로 Claude 서비스의 실제 성공률로 해석하지 않는다.
 
-## 6. 재현
+## 7. 재현
 
 원본 파일은 `ml/artifacts/external-eval-raw/`(Git 제외)에 고정 revision으로 내려받아 SHA를 확인했다. 준비 코드는 [`external_data.py`](../../ml/src/llm_router_labeling/evaluation/external_data.py), 설정은 [`external_evaluation_v1.json`](../../ml/config/external_evaluation_v1.json)이다.
 

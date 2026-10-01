@@ -76,6 +76,19 @@ class OverlapContracts(unittest.TestCase):
         self.assertEqual(split.iloc[0], split.iloc[1])
 
 
+class ContextGroundedContracts(unittest.TestCase):
+    def test_provided_documents_are_marked_but_quoted_objects_are_kept(self):
+        pattern = json.loads((Path(__file__).resolve().parents[1] / "config/external_evaluation_v1.json").read_text())[
+            "context_grounded_exclusion"]["pattern"]
+        frame = pd.DataFrame({"exclusion_reason": [None] * 5, "model_input_text": [
+            "BEGININPUT\nBEGINCONTEXT\ndate: 2021\nENDCONTEXT\nAlice: hi\nENDINPUT\nBEGININSTRUCTION\nSummarize.",
+            "Context: In a small town a crime happened.\n\nQuestion: Who did it?",
+            "Read the following passage on Wnt signaling to answer the subsequent question.\n\nThe ligand binds...",
+            "Suppose participants read the following passage: \"The ships will outmaneuver\". Which word is slowest?",
+            "Who received the IEEE award in 2010?"]})
+        self.assertEqual(x.mark_context_grounded(frame, pattern).tolist(), [True, True, True, False, False])
+
+
 class OutcomeContracts(unittest.TestCase):
     def test_failed_calls_are_missing_and_labels_follow_project_rule(self):
         pool = ["m-a", "m-b", "m-c"]

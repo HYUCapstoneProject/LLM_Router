@@ -21,7 +21,7 @@ def main():
     parser.add_argument("--repo-root", type=Path, required=True)
     parser.add_argument("--llmrouterbench-root", type=Path, required=True)
     parser.add_argument("--sprout-dir", type=Path, required=True)
-    parser.add_argument("--tokenizer", type=Path)
+    parser.add_argument("--tokenizer", type=Path, required=True, help="Router (ModernBERT) tokenizer directory")
     parser.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args()
     summary = prepare(args.config, args.repo_root, args.llmrouterbench_root, args.sprout_dir, args.output_dir, args.tokenizer)

@@ -273,18 +273,23 @@ def assign_split(frame: pd.DataFrame, fraction: float, seed: int) -> pd.Series:
     return frame.split_group_id.astype(str).map(lambda g: "calibration" if stable(g) < fraction else "test")
 
 
-def token_counts(texts: pd.Series, tokenizer_dir: Path | None) -> pd.Series:
-    if tokenizer_dir is None:
-        return pd.Series(np.nan, index=texts.index)
+def mark_context_grounded(frame: pd.DataFrame, pattern: str) -> pd.Series:
+    """RAG / provided-document QA (e.g. BEGININPUT blocks, leading Context: passages)."""
+    live = frame.exclusion_reason.isna()
+    hit = live & frame.model_input_text.fillna("").str.contains(re.compile(pattern), regex=True)
+    return hit
+
+
+def token_counts(texts: pd.Series, tokenizer: str | Path, revision: str | None = None) -> pd.Series:
     from transformers import AutoTokenizer
 
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer_dir, local_files_only=True)
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer, revision=revision, local_files_only=True)
     ids = tokenizer(texts.fillna("").tolist(), add_special_tokens=True, truncation=False)["input_ids"]
     return pd.Series([len(x) for x in ids], index=texts.index)
 
 
 def prepare(config_path: Path, repo_root: Path, lrb_root: Path, sprout_dir: Path, output_dir: Path,
-            tokenizer_dir: Path | None = None) -> dict[str, Any]:
+            tokenizer_dir: Path) -> dict[str, Any]:
     config = json.loads(Path(config_path).read_text())
     if output_dir.exists():
         raise ExternalDataError("Use a new output directory; prepared sets are frozen")
@@ -301,12 +306,22 @@ def prepare(config_path: Path, repo_root: Path, lrb_root: Path, sprout_dir: Path
     lrb = add_labels(load_llmrouterbench(lrb_root, lrb_cfg), lrb_pool, config["labels"], int(lrb_cfg["minimum_valid_models"]))
     sprout = add_labels(load_sprout(sprout_dir, sprout_cfg), sprout_pool, config["labels"], int(sprout_cfg["minimum_valid_models"]))
     external = pd.concat([lrb, sprout], ignore_index=True)
+    grounded = mark_context_grounded(external, config["context_grounded_exclusion"]["pattern"])
+    external.loc[grounded, "exclusion_reason"] = "context_grounded_rag"
+    limits = config["token_limits"]
+    live = external.exclusion_reason.isna()
+    external["input_tokens"] = np.nan
+    external.loc[live, "input_tokens"] = token_counts(external.loc[live, "model_input_text"], tokenizer_dir)
+    external.loc[live & external.input_tokens.gt(int(limits["router_max_tokens"])), "exclusion_reason"] = "exceeds_router_max_tokens"
     external, overlap_report = mark_overlaps(external, reference, config["deduplication"])
     kept = external.exclusion_reason.isna()
+    external["cache_embed_tokens"] = np.nan
+    external.loc[kept, "cache_embed_tokens"] = token_counts(external.loc[kept, "model_input_text"],
+                                                           limits["cache_embed_model"], limits["cache_embed_revision"])
+    external["within_cache_embed_limit"] = None
+    external.loc[kept, "within_cache_embed_limit"] = external.loc[kept, "cache_embed_tokens"].le(int(limits["cache_embed_max_tokens"]))
     external["eval_split"] = None
     external.loc[kept, "eval_split"] = assign_split(external[kept], float(config["split"]["calibration_fraction"]), int(config["split"]["seed"]))
-    external["input_tokens"] = np.nan
-    external.loc[kept, "input_tokens"] = token_counts(external.loc[kept, "model_input_text"], tokenizer_dir)
     output_dir.mkdir(parents=True)
     outputs = {}
     for benchmark, pool in (("llmrouterbench", lrb_pool), ("sprout", sprout_pool)):
@@ -352,10 +367,12 @@ def summarize(external: pd.DataFrame, config: Mapping[str, Any], reference_files
         "prepared_by_slice_split_label": table(kept, ["benchmark", "slice", "eval_split", "difficulty_label"]),
         "prepared_by_family": table(kept, ["benchmark", "slice", "source_family"]),
         "overlap": overlap_report,
-        "input_tokens": {"tokenizer": str(tokenizer_dir) if tokenizer_dir else None,
-                         "rows_over_8192": int(kept.input_tokens.gt(8192).sum()) if kept.input_tokens.notna().any() else None,
-                         "median": float(kept.input_tokens.median()) if kept.input_tokens.notna().any() else None,
-                         "max": float(kept.input_tokens.max()) if kept.input_tokens.notna().any() else None},
+        "token_limits": {"router_tokenizer": str(tokenizer_dir), **config["token_limits"],
+                         "router_tokens_median": float(kept.input_tokens.median()), "router_tokens_max": float(kept.input_tokens.max()),
+                         "cache_tokens_median": float(kept.cache_embed_tokens.median()),
+                         "rows_within_both_limits": int(kept.within_cache_embed_limit.astype(bool).sum())},
+        "prepared_by_slice_split_cache_limit": table(kept.assign(within_cache_embed_limit=kept.within_cache_embed_limit.astype(bool)),
+                                                     ["benchmark", "slice", "eval_split", "within_cache_embed_limit"]),
         "mean_recorded_cost_usd_llmrouterbench": costs,
         "mean_success_by_model": success,
         "evaluation_only": True,

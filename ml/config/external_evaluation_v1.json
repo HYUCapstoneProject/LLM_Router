@@ -38,29 +38,103 @@
     "license_status": "No LICENSE file in the dataset card or code repository (README shows an MIT badge only). Local research evaluation; raw text and responses are not redistributed in Git.",
     "minimum_valid_models": 12,
     "pool_prices_usd_per_million_tokens": {
-      "claude-sonnet-4": [3.0, 15.0],
-      "gemini-2.5-flash": [0.3, 2.5],
-      "gemini-2.5-pro": [1.25, 10.0],
-      "gpt-5-chat": [1.25, 10.0],
-      "gpt-5": [1.25, 10.0],
-      "qwen3-235b-a22b-2507": [0.09, 0.6],
-      "qwen3-235b-a22b-thinking-2507": [0.3, 2.9],
-      "deepseek-v3-0324": [0.25, 0.88],
-      "deepseek-v3.1-terminus": [0.27, 1.0],
-      "deepseek-r1-0528": [0.5, 2.15],
-      "glm-4.6": [0.6, 2.2],
-      "kimi-k2-0905": [0.5, 2.0],
-      "intern-s1": [0.18, 0.54]
+      "claude-sonnet-4": [
+        3.0,
+        15.0
+      ],
+      "gemini-2.5-flash": [
+        0.3,
+        2.5
+      ],
+      "gemini-2.5-pro": [
+        1.25,
+        10.0
+      ],
+      "gpt-5-chat": [
+        1.25,
+        10.0
+      ],
+      "gpt-5": [
+        1.25,
+        10.0
+      ],
+      "qwen3-235b-a22b-2507": [
+        0.09,
+        0.6
+      ],
+      "qwen3-235b-a22b-thinking-2507": [
+        0.3,
+        2.9
+      ],
+      "deepseek-v3-0324": [
+        0.25,
+        0.88
+      ],
+      "deepseek-v3.1-terminus": [
+        0.27,
+        1.0
+      ],
+      "deepseek-r1-0528": [
+        0.5,
+        2.15
+      ],
+      "glm-4.6": [
+        0.6,
+        2.2
+      ],
+      "kimi-k2-0905": [
+        0.5,
+        2.0
+      ],
+      "intern-s1": [
+        0.18,
+        0.54
+      ]
     },
     "datasets": {
-      "gpqa": {"split": "test", "slice": "main_new_family", "wrapper": "multiple_choice_head"},
-      "hle": {"split": "test", "slice": "main_new_family", "wrapper": "hle_head"},
-      "livecodebench": {"split": "test", "slice": "main_new_family", "wrapper": "livecodebench"},
-      "livemathbench": {"split": "test", "slice": "main_new_family", "wrapper": "boxed_math"},
-      "simpleqa": {"split": "test", "slice": "main_new_family", "wrapper": "none"},
-      "aime": {"split": "hybrid", "slice": "same_family", "wrapper": "boxed_math", "family_note": "xRouteBench aime_2020_2024 is in the development data"},
-      "mmlupro": {"split": "test_3000", "slice": "same_family", "wrapper": "mmlupro", "family_note": "xRouteBench mmlu_pro is in the development data"},
-      "arenahard": {"split": "", "slice": "judge_preference_diagnostic", "wrapper": "none", "family_note": "Score is a pairwise judge preference against a baseline answer (0/0.5/1), not correctness; success means a clear win (1.0)"}
+      "gpqa": {
+        "split": "test",
+        "slice": "main_new_family",
+        "wrapper": "multiple_choice_head"
+      },
+      "hle": {
+        "split": "test",
+        "slice": "main_new_family",
+        "wrapper": "hle_head"
+      },
+      "livecodebench": {
+        "split": "test",
+        "slice": "main_new_family",
+        "wrapper": "livecodebench"
+      },
+      "livemathbench": {
+        "split": "test",
+        "slice": "main_new_family",
+        "wrapper": "boxed_math"
+      },
+      "simpleqa": {
+        "split": "test",
+        "slice": "main_new_family",
+        "wrapper": "none"
+      },
+      "aime": {
+        "split": "hybrid",
+        "slice": "same_family",
+        "wrapper": "boxed_math",
+        "family_note": "xRouteBench aime_2020_2024 is in the development data"
+      },
+      "mmlupro": {
+        "split": "test_3000",
+        "slice": "same_family",
+        "wrapper": "mmlupro",
+        "family_note": "xRouteBench mmlu_pro is in the development data"
+      },
+      "arenahard": {
+        "split": "",
+        "slice": "judge_preference_diagnostic",
+        "wrapper": "none",
+        "family_note": "Score is a pairwise judge preference against a baseline answer (0/0.5/1), not correctness; success means a clear win (1.0)"
+      }
     },
     "excluded_datasets": {
       "swe-bench/verified": "Agentic repository patch task; not a single-turn text query; one pool model missing",
@@ -88,23 +162,45 @@
     "success_threshold": 0.7,
     "minimum_valid_models": 12,
     "pool": [
-      "aws-claude-3-5-sonnet-v1", "aws-titan-text-premier-v1", "openai-gpt-4o", "openai-gpt-4o-mini",
-      "wxai-granite-3-2b-instruct-8k-max-tokens", "wxai-granite-3-8b-instruct-8k-max-tokens",
-      "wxai-llama-3-1-70b-instruct", "wxai-llama-3-1-8b-instruct", "wxai-llama-3-2-1b-instruct",
-      "wxai-llama-3-2-3b-instruct", "wxai-llama-3-3-70b-instruct", "wxai-llama-3-405b-instruct",
+      "aws-claude-3-5-sonnet-v1",
+      "aws-titan-text-premier-v1",
+      "openai-gpt-4o",
+      "openai-gpt-4o-mini",
+      "wxai-granite-3-2b-instruct-8k-max-tokens",
+      "wxai-granite-3-8b-instruct-8k-max-tokens",
+      "wxai-llama-3-1-70b-instruct",
+      "wxai-llama-3-1-8b-instruct",
+      "wxai-llama-3-2-1b-instruct",
+      "wxai-llama-3-2-3b-instruct",
+      "wxai-llama-3-3-70b-instruct",
+      "wxai-llama-3-405b-instruct",
       "wxai-mixtral-8x7b-instruct-v01"
     ],
     "datasets": {
-      "openhermes/teknium": {"slice": "secondary_general_chat"},
-      "Idavidrein/gpqa/gpqa_extended": {"slice": "secondary_new_family"},
-      "TAUR-Lab/MuSR": {"slice": "secondary_new_family"},
-      "TAUR-Lab/MuSR/object_placements": {"slice": "secondary_new_family"},
-      "TAUR-Lab/MuSR/team_allocation": {"slice": "secondary_new_family"}
+      "openhermes/teknium": {
+        "slice": "secondary_general_chat"
+      },
+      "Idavidrein/gpqa/gpqa_extended": {
+        "slice": "secondary_new_family"
+      }
     },
     "excluded_datasets": {
       "TIGER-Lab/MMLU-Pro": "Same family as xRouteBench mmlu_pro and LLMRouterBench mmlupro (primary set keeps the cost-bearing copy)",
       "lighteval/MATH/*": "Same family as xRouteBench math in the development data",
-      "rungalileo/ragbench/*": "Retrieval-augmented long contexts; RAG is excluded by the project data contract"
+      "rungalileo/ragbench/*": "Retrieval-augmented long contexts; RAG is excluded by the project data contract",
+      "TAUR-Lab/MuSR/*": "Story-grounded questions over a provided multi-paragraph narrative (document-grounded, RAG-like input)"
     }
+  },
+  "token_limits": {
+    "router_max_tokens": 8192,
+    "router_note": "ModernBERT router (serving router_max_length=8192). Rows above it are excluded because the router would not see the whole question.",
+    "cache_embed_model": "BAAI/bge-large-en-v1.5",
+    "cache_embed_revision": "d4aa6901d3a41ba39fb536a557fa166f842b0e09",
+    "cache_embed_max_tokens": 512,
+    "cache_note": "Serving cache embedder (embed_max_length=512) truncates, it does not fail. Rows above it are kept and flagged within_cache_embed_limit=false for the cache experiment and the full-service-path slice."
+  },
+  "context_grounded_exclusion": {
+    "pattern": "BEGININPUT|BEGINCONTEXT|(?i:^\\s*(?:context|passage|document|article|background|story)\\s*:)|(?i:read the following (?:passage|article|text|excerpt|document)[^\\n]{0,120}?to answer)",
+    "reason": "RAG / provided-document question answering is excluded by the project data contract; a quoted passage that is itself the object of the question is kept"
   }
 }
