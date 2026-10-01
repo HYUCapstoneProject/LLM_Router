@@ -1,8 +1,8 @@
 // FastAPI 캐시 임베딩(bge-large-en-v1.5)과 같은 규칙으로 토큰 수만 센다.
 //
 // 서비스 입력 상한은 이 토크나이저 기준 512 토큰이다(FastAPI embed_max_length).
-// 넘으면 서버가 400 MESSAGE_TOO_LONG 으로 거절하므로, 보내기 전에 화면에서 알려준다.
-// 최종 판정은 서버가 한다. 여기 숫자는 안내용이다.
+// 넘는 질문은 캐시 임베딩에서 앞 512 토큰만 반영되므로 보내기 전에 화면에서 막는다.
+// 서버 쪽 거절은 아직 없다(LLM_Router#50 되돌림). 지금은 이 화면 검사가 유일한 제한이다.
 //
 // 임베딩 모델(가중치)은 필요 없다. 토크나이저는 정규화 규칙과 사전만으로 동작해서
 // 같은 사전과 같은 규칙이면 서버(HF tokenizers BertNormalizer + BertPreTokenizer +
@@ -107,7 +107,7 @@ function countSegment(segment: string, vocab: Set<string>): number {
   return count
 }
 
-/** [CLS]·[SEP] 를 포함한 토큰 수. 서버가 상한과 비교하는 값과 같다. */
+/** [CLS]·[SEP] 를 포함한 토큰 수. 서버 임베딩이 512 와 비교해 자르는 기준과 같다. */
 export function countTokens(text: string, vocab: Set<string>): number {
   // 특수 토큰 문자열은 정규화 전에 그대로 한 토큰으로 떼어낸다(HF added_tokens 동작).
   let count = 2
