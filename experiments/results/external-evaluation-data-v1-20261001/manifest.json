@@ -1,0 +1,785 @@
+{
+  "version": "external-evaluation-v1",
+  "config_sha256": "70c1fbe8ae1da6c3688f186d2190d098ed3449cc2fa3d429046d375d9674302c",
+  "sources": {
+    "llmrouterbench": {
+      "repository": "NPULH/LLMRouterBench",
+      "revision": "0e5af1b84bf73437a01a1849c0f1d2468baa93fc",
+      "archive_sha256": "b79f8cde1a6f029c2efa663a3a3b6f7748defb22341fe59f328cebef6648c8f1",
+      "license_status": "No LICENSE file in the dataset card or code repository (README shows an MIT badge only). Local research evaluation; raw text and responses are not redistributed in Git."
+    },
+    "sprout": {
+      "repository": "CARROT-LLM-Routing/SPROUT",
+      "revision": "d54e3cda2189ca1ed13a877a44ed34736c4b6920",
+      "files": {
+        "train-00000-of-00003.parquet": "869336223180644e4c8395af51c8fee51ffdfcf619fce96392f6e0179a6fa3ff",
+        "train-00001-of-00003.parquet": "c9d3e62145d1951032edad5be5701425a4109c271a9ffba4f45bd3d8fd4932ae",
+        "train-00002-of-00003.parquet": "f3b0f101a1fe0381d2c3637f28a4a2ecc15830af60b46924590fcbc59fccff5e",
+        "validation-00000-of-00001.parquet": "c0d710427c0c902f8283c02fc1cf9f10416f51cb183c99ea92e3f633f8db9862",
+        "test-00000-of-00001.parquet": "d40ac32d71b5716cd8b7f5c33c05612c3b111a3a1ed855a6e9504ad0bd54948f"
+      },
+      "license_status": "No license in the dataset card or the CARROT code repository. Local research evaluation; raw text and responses are not redistributed in Git.",
+      "cost_status": "Token counts only; no recorded dollar cost. Quality and label alignment only, no cost metrics."
+    }
+  },
+  "reference_files_sha256": {
+    "ml/artifacts/routing-objective-continual-v1/dataset/train.parquet": "d9b0db47defd1d7162c1cf70059a6db806d743641d094c1e84b4c696bcbd56bf",
+    "ml/artifacts/routing-objective-continual-v1/dataset/validation.parquet": "aa9d973fcf886c7465fbf9e06701984d099cd74a5eabf508cc610845613edef8",
+    "ml/artifacts/frozen-evaluation-outcomes/continual-v1-20260924-28cbc342c510/gate.parquet": "baefa029ecf5946a248765cef2de7e311ed67981f962bb7dda3aba0d153090ba",
+    "ml/artifacts/frozen-evaluation-outcomes/continual-v1-20260924-28cbc342c510/stream.parquet": "52a890baa95b404143837387708383dfbe3591bcecba66bdcc770676e111388c",
+    "ml/artifacts/frozen-evaluation-outcomes/continual-v1-20260924-28cbc342c510/retention_test.parquet": "750deca9315b31734778eb75ce2f0bea63f4f44a57a949c6960ad9b9aa7f807d",
+    "ml/artifacts/frozen-evaluation-outcomes/continual-v1-20260924-28cbc342c510/test_routerbench.parquet": "0a3e0d5c417fe87e2473d2b56172b447a4efc989622fe3ed26fe9d13113abc18",
+    "ml/artifacts/frozen-evaluation-outcomes/continual-v1-20260924-28cbc342c510/test_xroutebench.parquet": "d6fde0899a5ed06950ecec4d958832e0de8a5e9f32c09f7ead37cd9c25e71cef",
+    "ml/artifacts/routerarena-diagnostics-v1-20260924/prepared/evaluation.parquet": "d84be2fdad3ed9753d2cba93fdbe479025800b762d13b5b2c92565573e32925f"
+  },
+  "outputs": {
+    "llmrouterbench": {
+      "file": "llmrouterbench.parquet",
+      "sha256": "3c55d579dc1bff84f2d1efc76018a25ffd5376804bd198bd5b1e07ed825565d9",
+      "rows": 9710
+    },
+    "sprout": {
+      "file": "sprout.parquet",
+      "sha256": "2f80461e07c5199cdb740436466f6ca7e08d956c46bb5485725dba6c45bb3f5c",
+      "rows": 19458
+    }
+  },
+  "rows_before_exclusion": [
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "aime",
+      "rows": 60
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "arenahard",
+      "rows": 750
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "gpqa",
+      "rows": 198
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "hle",
+      "rows": 2158
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "livecodebench",
+      "rows": 1055
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "livemathbench",
+      "rows": 121
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "mmlupro",
+      "rows": 3000
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "simpleqa",
+      "rows": 4326
+    },
+    {
+      "benchmark": "sprout",
+      "source_family": "Idavidrein/gpqa/gpqa_extended",
+      "rows": 541
+    },
+    {
+      "benchmark": "sprout",
+      "source_family": "openhermes/teknium",
+      "rows": 19455
+    }
+  ],
+  "exclusions": [
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "aime",
+      "exclusion_reason": "overlaps_project_data",
+      "rows": 18
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "aime",
+      "exclusion_reason": "too_few_valid_models",
+      "rows": 2
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "arenahard",
+      "exclusion_reason": "exceeds_router_max_tokens",
+      "rows": 2
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "arenahard",
+      "exclusion_reason": "inconsistent_prompt_across_models",
+      "rows": 1
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "arenahard",
+      "exclusion_reason": "overlaps_project_data",
+      "rows": 1
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "arenahard",
+      "exclusion_reason": "too_few_valid_models",
+      "rows": 6
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "hle",
+      "exclusion_reason": "exceeds_router_max_tokens",
+      "rows": 1
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "hle",
+      "exclusion_reason": "inconsistent_prompt_across_models",
+      "rows": 1
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "hle",
+      "exclusion_reason": "too_few_valid_models",
+      "rows": 126
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "livecodebench",
+      "exclusion_reason": "too_few_valid_models",
+      "rows": 53
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "livemathbench",
+      "exclusion_reason": "too_few_valid_models",
+      "rows": 3
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "mmlupro",
+      "exclusion_reason": "overlaps_project_data",
+      "rows": 1728
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "source_family": "mmlupro",
+      "exclusion_reason": "too_few_valid_models",
+      "rows": 16
+    },
+    {
+      "benchmark": "sprout",
+      "source_family": "Idavidrein/gpqa/gpqa_extended",
+      "exclusion_reason": "context_grounded_rag",
+      "rows": 1
+    },
+    {
+      "benchmark": "sprout",
+      "source_family": "Idavidrein/gpqa/gpqa_extended",
+      "exclusion_reason": "duplicate_of_primary_external",
+      "rows": 198
+    },
+    {
+      "benchmark": "sprout",
+      "source_family": "Idavidrein/gpqa/gpqa_extended",
+      "exclusion_reason": "exceeds_router_max_tokens",
+      "rows": 1
+    },
+    {
+      "benchmark": "sprout",
+      "source_family": "openhermes/teknium",
+      "exclusion_reason": "context_grounded_rag",
+      "rows": 337
+    },
+    {
+      "benchmark": "sprout",
+      "source_family": "openhermes/teknium",
+      "exclusion_reason": "overlaps_project_data",
+      "rows": 1
+    }
+  ],
+  "prepared_by_slice_split_label": [
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "judge_preference_diagnostic",
+      "eval_split": "calibration",
+      "difficulty_label": "easy",
+      "rows": 99
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "judge_preference_diagnostic",
+      "eval_split": "calibration",
+      "difficulty_label": "hard",
+      "rows": 50
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "judge_preference_diagnostic",
+      "eval_split": "calibration",
+      "difficulty_label": "medium",
+      "rows": 89
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "judge_preference_diagnostic",
+      "eval_split": "test",
+      "difficulty_label": "easy",
+      "rows": 205
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "judge_preference_diagnostic",
+      "eval_split": "test",
+      "difficulty_label": "hard",
+      "rows": 81
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "judge_preference_diagnostic",
+      "eval_split": "test",
+      "difficulty_label": "medium",
+      "rows": 216
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "main_new_family",
+      "eval_split": "calibration",
+      "difficulty_label": "easy",
+      "rows": 516
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "main_new_family",
+      "eval_split": "calibration",
+      "difficulty_label": "hard",
+      "rows": 1273
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "main_new_family",
+      "eval_split": "calibration",
+      "difficulty_label": "medium",
+      "rows": 590
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "main_new_family",
+      "eval_split": "test",
+      "difficulty_label": "easy",
+      "rows": 1143
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "main_new_family",
+      "eval_split": "test",
+      "difficulty_label": "hard",
+      "rows": 2822
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "main_new_family",
+      "eval_split": "test",
+      "difficulty_label": "medium",
+      "rows": 1330
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "same_family",
+      "eval_split": "calibration",
+      "difficulty_label": "easy",
+      "rows": 332
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "same_family",
+      "eval_split": "calibration",
+      "difficulty_label": "hard",
+      "rows": 31
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "same_family",
+      "eval_split": "calibration",
+      "difficulty_label": "medium",
+      "rows": 29
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "same_family",
+      "eval_split": "test",
+      "difficulty_label": "easy",
+      "rows": 772
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "same_family",
+      "eval_split": "test",
+      "difficulty_label": "hard",
+      "rows": 64
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "same_family",
+      "eval_split": "test",
+      "difficulty_label": "medium",
+      "rows": 68
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_general_chat",
+      "eval_split": "calibration",
+      "difficulty_label": "easy",
+      "rows": 4886
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_general_chat",
+      "eval_split": "calibration",
+      "difficulty_label": "hard",
+      "rows": 216
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_general_chat",
+      "eval_split": "calibration",
+      "difficulty_label": "medium",
+      "rows": 685
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_general_chat",
+      "eval_split": "test",
+      "difficulty_label": "easy",
+      "rows": 11143
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_general_chat",
+      "eval_split": "test",
+      "difficulty_label": "hard",
+      "rows": 594
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_general_chat",
+      "eval_split": "test",
+      "difficulty_label": "medium",
+      "rows": 1593
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_new_family",
+      "eval_split": "calibration",
+      "difficulty_label": "easy",
+      "rows": 18
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_new_family",
+      "eval_split": "calibration",
+      "difficulty_label": "hard",
+      "rows": 30
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_new_family",
+      "eval_split": "calibration",
+      "difficulty_label": "medium",
+      "rows": 44
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_new_family",
+      "eval_split": "test",
+      "difficulty_label": "easy",
+      "rows": 50
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_new_family",
+      "eval_split": "test",
+      "difficulty_label": "hard",
+      "rows": 91
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_new_family",
+      "eval_split": "test",
+      "difficulty_label": "medium",
+      "rows": 108
+    }
+  ],
+  "prepared_by_family": [
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "judge_preference_diagnostic",
+      "source_family": "arenahard",
+      "rows": 740
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "main_new_family",
+      "source_family": "gpqa",
+      "rows": 198
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "main_new_family",
+      "source_family": "hle",
+      "rows": 2030
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "main_new_family",
+      "source_family": "livecodebench",
+      "rows": 1002
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "main_new_family",
+      "source_family": "livemathbench",
+      "rows": 118
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "main_new_family",
+      "source_family": "simpleqa",
+      "rows": 4326
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "same_family",
+      "source_family": "aime",
+      "rows": 40
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "same_family",
+      "source_family": "mmlupro",
+      "rows": 1256
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_general_chat",
+      "source_family": "openhermes/teknium",
+      "rows": 19117
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_new_family",
+      "source_family": "Idavidrein/gpqa/gpqa_extended",
+      "rows": 341
+    }
+  ],
+  "overlap": {
+    "duplicate_detection": {
+      "duplicate_group_count": 82545,
+      "duplicate_row_count": 295,
+      "near_duplicate_pair_count": 188,
+      "near_duplicate_candidate_pair_count": 92640,
+      "near_duplicate_skipped_large_bucket_count": 0
+    },
+    "overlap_rows_by_family_exact_or_near": [
+      {
+        "benchmark": "llmrouterbench",
+        "source_family": "aime",
+        "rows": 16
+      },
+      {
+        "benchmark": "llmrouterbench",
+        "source_family": "arenahard",
+        "rows": 1
+      }
+    ],
+    "overlap_rows_by_family_same_stem": [
+      {
+        "benchmark": "llmrouterbench",
+        "source_family": "aime",
+        "rows": 2
+      },
+      {
+        "benchmark": "llmrouterbench",
+        "source_family": "mmlupro",
+        "rows": 1728
+      },
+      {
+        "benchmark": "sprout",
+        "source_family": "openhermes/teknium",
+        "rows": 1
+      }
+    ],
+    "secondary_duplicate_rows": 198
+  },
+  "token_limits": {
+    "router_tokenizer": "ml/artifacts/r0-release-20260927/approved",
+    "router_max_tokens": 8192,
+    "router_note": "ModernBERT router (serving router_max_length=8192). Rows above it are excluded because the router would not see the whole question.",
+    "cache_embed_model": "BAAI/bge-large-en-v1.5",
+    "cache_embed_revision": "d4aa6901d3a41ba39fb536a557fa166f842b0e09",
+    "cache_embed_max_tokens": 512,
+    "cache_note": "Serving cache embedder (embed_max_length=512) truncates, it does not fail. Rows above it are kept and flagged within_cache_embed_limit=false for the cache experiment and the full-service-path slice.",
+    "router_tokens_median": 35.0,
+    "router_tokens_max": 7488.0,
+    "cache_tokens_median": 37.0,
+    "rows_within_both_limits": 28393
+  },
+  "prepared_by_slice_split_cache_limit": [
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "judge_preference_diagnostic",
+      "eval_split": "calibration",
+      "within_cache_embed_limit": false,
+      "rows": 39
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "judge_preference_diagnostic",
+      "eval_split": "calibration",
+      "within_cache_embed_limit": true,
+      "rows": 199
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "judge_preference_diagnostic",
+      "eval_split": "test",
+      "within_cache_embed_limit": false,
+      "rows": 76
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "judge_preference_diagnostic",
+      "eval_split": "test",
+      "within_cache_embed_limit": true,
+      "rows": 426
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "main_new_family",
+      "eval_split": "calibration",
+      "within_cache_embed_limit": false,
+      "rows": 195
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "main_new_family",
+      "eval_split": "calibration",
+      "within_cache_embed_limit": true,
+      "rows": 2184
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "main_new_family",
+      "eval_split": "test",
+      "within_cache_embed_limit": false,
+      "rows": 424
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "main_new_family",
+      "eval_split": "test",
+      "within_cache_embed_limit": true,
+      "rows": 4871
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "same_family",
+      "eval_split": "calibration",
+      "within_cache_embed_limit": false,
+      "rows": 14
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "same_family",
+      "eval_split": "calibration",
+      "within_cache_embed_limit": true,
+      "rows": 378
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "same_family",
+      "eval_split": "test",
+      "within_cache_embed_limit": false,
+      "rows": 16
+    },
+    {
+      "benchmark": "llmrouterbench",
+      "slice": "same_family",
+      "eval_split": "test",
+      "within_cache_embed_limit": true,
+      "rows": 888
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_general_chat",
+      "eval_split": "calibration",
+      "within_cache_embed_limit": true,
+      "rows": 5787
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_general_chat",
+      "eval_split": "test",
+      "within_cache_embed_limit": true,
+      "rows": 13330
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_new_family",
+      "eval_split": "calibration",
+      "within_cache_embed_limit": false,
+      "rows": 2
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_new_family",
+      "eval_split": "calibration",
+      "within_cache_embed_limit": true,
+      "rows": 90
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_new_family",
+      "eval_split": "test",
+      "within_cache_embed_limit": false,
+      "rows": 9
+    },
+    {
+      "benchmark": "sprout",
+      "slice": "secondary_new_family",
+      "eval_split": "test",
+      "within_cache_embed_limit": true,
+      "rows": 240
+    }
+  ],
+  "mean_recorded_cost_usd_llmrouterbench": {
+    "claude_sonnet_4": 0.0076040017507724,
+    "gemini_2_5_flash": 0.008651208250825082,
+    "gemini_2_5_pro": 0.05869255715473345,
+    "gpt_5_chat": 0.004035288047116375,
+    "gpt_5": 0.02860066563403552,
+    "qwen3_235b_a22b_2507": 0.0008074607408940399,
+    "qwen3_235b_a22b_thinking_2507": 0.007664550181880187,
+    "deepseek_v3_0324": 0.0005727463357363543,
+    "deepseek_v3_1_terminus": 0.0008443429663199094,
+    "deepseek_r1_0528": 0.01307909149330587,
+    "glm_4_6": 0.015167319428099514,
+    "kimi_k2_0905": 0.0011406334751261718,
+    "intern_s1": 0.00275014140061792
+  },
+  "mean_success_by_model": {
+    "claude_sonnet_4": {
+      "benchmark": "llmrouterbench",
+      "mean": 0.3067971163748713
+    },
+    "gemini_2_5_flash": {
+      "benchmark": "llmrouterbench",
+      "mean": 0.3803630363036304
+    },
+    "gemini_2_5_pro": {
+      "benchmark": "llmrouterbench",
+      "mean": 0.5700924867504936
+    },
+    "gpt_5_chat": {
+      "benchmark": "llmrouterbench",
+      "mean": 0.4353244078269825
+    },
+    "gpt_5": {
+      "benchmark": "llmrouterbench",
+      "mean": 0.5548327137546468
+    },
+    "qwen3_235b_a22b_2507": {
+      "benchmark": "llmrouterbench",
+      "mean": 0.5159354304635762
+    },
+    "qwen3_235b_a22b_thinking_2507": {
+      "benchmark": "llmrouterbench",
+      "mean": 0.550414914175287
+    },
+    "deepseek_v3_0324": {
+      "benchmark": "llmrouterbench",
+      "mean": 0.3650875386199794
+    },
+    "deepseek_v3_1_terminus": {
+      "benchmark": "llmrouterbench",
+      "mean": 0.38325265217839116
+    },
+    "deepseek_r1_0528": {
+      "benchmark": "llmrouterbench",
+      "mean": 0.4262615859938208
+    },
+    "glm_4_6": {
+      "benchmark": "llmrouterbench",
+      "mean": 0.39516878290492413
+    },
+    "kimi_k2_0905": {
+      "benchmark": "llmrouterbench",
+      "mean": 0.3966422906581522
+    },
+    "intern_s1": {
+      "benchmark": "llmrouterbench",
+      "mean": 0.31307929969104015
+    },
+    "aws_claude_3_5_sonnet_v1": {
+      "benchmark": "sprout",
+      "mean": 0.9230650632130744
+    },
+    "aws_titan_text_premier_v1": {
+      "benchmark": "sprout",
+      "mean": 0.8448563098708871
+    },
+    "openai_gpt_4o": {
+      "benchmark": "sprout",
+      "mean": 0.9297975125912221
+    },
+    "openai_gpt_4o_mini": {
+      "benchmark": "sprout",
+      "mean": 0.916846541268373
+    },
+    "wxai_granite_3_2b_instruct_8k_max_tokens": {
+      "benchmark": "sprout",
+      "mean": 0.7773666358310206
+    },
+    "wxai_granite_3_8b_instruct_8k_max_tokens": {
+      "benchmark": "sprout",
+      "mean": 0.8463356973995272
+    },
+    "wxai_llama_3_1_70b_instruct": {
+      "benchmark": "sprout",
+      "mean": 0.9063110288827217
+    },
+    "wxai_llama_3_1_8b_instruct": {
+      "benchmark": "sprout",
+      "mean": 0.8361599342172885
+    },
+    "wxai_llama_3_2_1b_instruct": {
+      "benchmark": "sprout",
+      "mean": 0.6183060951793606
+    },
+    "wxai_llama_3_2_3b_instruct": {
+      "benchmark": "sprout",
+      "mean": 0.7806043786617329
+    },
+    "wxai_llama_3_3_70b_instruct": {
+      "benchmark": "sprout",
+      "mean": 0.8913557405694316
+    },
+    "wxai_llama_3_405b_instruct": {
+      "benchmark": "sprout",
+      "mean": 0.8332819405899887
+    },
+    "wxai_mixtral_8x7b_instruct_v01": {
+      "benchmark": "sprout",
+      "mean": 0.8642203720834618
+    }
+  },
+  "evaluation_only": true
+}
