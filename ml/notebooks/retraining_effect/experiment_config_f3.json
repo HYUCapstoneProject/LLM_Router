@@ -1,0 +1,42 @@
+{
+  "experiment_id": "retraining-effect-v2-f3",
+  "schema_version": "router-retraining-effect-v1",
+  "arms": [
+    "f3_balanced_easy"
+  ],
+  "easy_supplement_seed": 20260930,
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "windows": 6,
+  "updates_per_major": 3,
+  "promotion_mode": "direct_research_only",
+  "feedback_per_window_cap": null,
+  "minimum_feedback_per_window": 32,
+  "history_per_label": 32,
+  "base_per_label": 32,
+  "validation_per_label": 16,
+  "rehearsal_seed": 20260912,
+  "stream_seed": 20260929,
+  "f2_epochs": 3,
+  "train_max_length": 512,
+  "evaluation_max_length": 8192,
+  "train_batch_size": 8,
+  "gradient_accumulation_steps": 4,
+  "eval_batch_size": 1,
+  "learning_rate": 2e-05,
+  "weight_decay": 0.01,
+  "warmup_ratio": 0.1,
+  "gradient_clip_norm": 1.0,
+  "gradient_checkpointing": true,
+  "precision": "fp16",
+  "attention_implementation": "eager",
+  "checkpoint_every_steps": 25,
+  "keep_last_checkpoints": 2,
+  "minimum_improvement": 0.01,
+  "maximum_forgetting_drop": 0.01,
+  "bootstrap_draws": 1000,
+  "bootstrap_seed": 20260929
+}
