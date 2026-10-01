@@ -1,6 +1,6 @@
 # 성능 평가 색인
 
-> **2026-10-01 데이터 오류 경고:** RouterBench·xRouteBench의 기록 점수에서 체계적인 채점 오류를 발견했다(RouterBench GSM8K 등급 점수, MMLU 정답 키 오류, xRouteBench 형식 오답 처리, SQuAD F1 기준). 아래 2026-09 실험은 모두 오류가 포함된 v1 데이터 기준이며 재검증 전까지 잠정 결과다. → [점검 보고서와 검증 데이터셋 v2](benchmark-outcome-audit-20261001/REPORT.md)
+> **2026-10-01 데이터 오류 경고:** RouterBench·xRouteBench의 기록 점수에서 체계적인 채점 오류를 발견했다(RouterBench GSM8K 등급 점수, MMLU 정답 키 오류, xRouteBench 형식 오답 처리, SQuAD F1 기준). 아래 2026-09 실험은 모두 오류가 포함된 v1 데이터 기준이다. 현재 기준은 v1을 유지하며, v2는 교체용으로 보관한다(재실험 여부 보류). → [점검 보고서와 검증 데이터셋 v2](benchmark-outcome-audit-20261001/REPORT.md)
 
 2026-09-25 추가: [R1/R3 natural·balanced 최종 평가](routing-generalization-v1-20260925/report.md), [R0~R3 통합 판단](routing-method-review-20260925/REVIEW.md), [Git·원본 보관 범위](ARTIFACT_STORAGE.md).
 
