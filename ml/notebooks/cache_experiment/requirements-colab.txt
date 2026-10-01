@@ -1,0 +1,8 @@
+# Same pins as requirements.txt (serving image). Install torch separately:
+#   pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu124
+transformers==4.48.3
+numpy==2.1.2
+pandas==2.3.3
+pyarrow==21.0.0
+scipy==1.14.1
+matplotlib==3.10.1
