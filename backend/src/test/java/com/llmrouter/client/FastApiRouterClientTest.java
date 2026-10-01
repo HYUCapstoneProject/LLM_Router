@@ -314,6 +314,34 @@ class FastApiRouterClientTest {
     }
 
     @Test
+    void tokenLimitRejectionIsNotARouterOutage() {
+        server.expect(once(), requestTo("http://router.internal:8000/router/embed"))
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body("{\"error\":\"message has 513 tokens; the limit is 512\","
+                                + "\"code\":\"MESSAGE_TOO_LONG\",\"requestId\":\"r\"}"));
+
+        assertThatThrownBy(() -> client.embed("q"))
+                .isInstanceOf(MessageTooLongException.class)
+                .isNotInstanceOf(RouterClientException.class);
+        server.verify();
+    }
+
+    @Test
+    void otherBadRequestStaysARouterClientException() {
+        server.expect(once(), requestTo("http://router.internal:8000/router/classify"))
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body("{\"error\":\"x\",\"code\":\"INVALID_MESSAGE\",\"requestId\":\"r\"}"));
+
+        assertThatThrownBy(() -> client.classify("q"))
+                .isInstanceOf(RouterClientException.class)
+                .extracting(error -> ((RouterClientException) error).statusCode())
+                .isEqualTo(400);
+        server.verify();
+    }
+
+    @Test
     void doesNotRetryAuthenticationFailure() {
         server.expect(once(), requestTo("http://router.internal:8000/router/classify"))
                 .andRespond(withStatus(HttpStatus.UNAUTHORIZED));
