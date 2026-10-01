@@ -321,6 +321,10 @@ public class FastApiRouterClient implements RouterClient {
                 return call.get();
             } catch (RestClientResponseException error) {
                 int status = error.getStatusCode().value();
+                if (status == 400 && error.getResponseBodyAsString().contains("\"MESSAGE_TOO_LONG\"")) {
+                    throw new MessageTooLongException(
+                            "FastAPI " + operation + " 입력 토큰 한도 초과", error);
+                }
                 if (attempt < maxAttempts && (status == 500 || status == 503)) {
                     log.warn("FastAPI {} 실패(status={}), 재시도 {}/{}", operation, status,
                             attempt + 1, maxAttempts);

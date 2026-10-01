@@ -3,6 +3,7 @@ package com.llmrouter.service;
 import com.llmrouter.client.RouterClient;
 import com.llmrouter.client.RouterClassification;
 import com.llmrouter.client.RouterClientException;
+import com.llmrouter.client.MessageTooLongException;
 import com.llmrouter.client.RouterEmbedding;
 import com.llmrouter.dto.CachedResponse;
 import com.llmrouter.dto.ChatRequest;
@@ -103,6 +104,28 @@ class ChatServiceTest {
                         && entry.embedModelVersion() == null
                         && entry.similarity().equals(1.0)
                         && entry.cacheEntryId().equals(3L)));
+    }
+
+    /** 512 토큰 초과는 장애 폴백이 아니라 거절이다. 분류도 Claude 호출도 하지 않는다. */
+    @Test
+    void tooLongMessageIsRejectedInsteadOfFallingBack() {
+        when(routerClient.embed("long")).thenThrow(new MessageTooLongException("too long", null));
+
+        assertThatThrownBy(() -> service.chat(request("long")))
+                .isInstanceOf(MessageTooLongException.class);
+        verifyNoInteractions(routerService, llmService);
+        verify(cacheService, never()).put(anyString(), any(), any(), anyString());
+    }
+
+    /** 캐시를 끈 구성(Router Only)에서도 classify 가 같은 한도로 거절한다. */
+    @Test
+    void tooLongMessageIsRejectedByClassifyWhenCacheIsDisabled() {
+        ReflectionTestUtils.setField(service, "cacheEnabled", false);
+        when(routerService.classify("long")).thenThrow(new MessageTooLongException("too long", null));
+
+        assertThatThrownBy(() -> service.chat(request("long")))
+                .isInstanceOf(MessageTooLongException.class);
+        verifyNoInteractions(llmService);
     }
 
     @Test
