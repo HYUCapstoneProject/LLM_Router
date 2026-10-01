@@ -1,0 +1,219 @@
+{
+  "artifacts": {
+    "contamination-report.json": {
+      "sha256": "f5603526cd4eb6c50d90c7eda6f136b73d9f5c94aec3c6858eacc959fe792d4d",
+      "size_bytes": 1973
+    },
+    "coverage/coverage-report.parquet": {
+      "sha256": "85045a3349f631121db4ad1809ac63be9ef5af689755a7fa1d0be02b0d75d2b4",
+      "size_bytes": 16193
+    },
+    "coverage/resolution.json": {
+      "sha256": "bc85600e35b15487a2e8f1fd9baf628eb4b2fcab6611223acc8cca59a8e78c8f",
+      "size_bytes": 183
+    },
+    "experiment-config.json": {
+      "sha256": "b08087084f1b70eb16921ef70e0798e65fdb58b26e2b8465b076371f12f6586c",
+      "size_bytes": 9940
+    },
+    "input-audit.json": {
+      "sha256": "1030e92b6cf1ef5d2688868d65147f71a4182302fc375d11934951cbc5fe2bd9",
+      "size_bytes": 365
+    },
+    "metadata.parquet": {
+      "sha256": "3d66ce6d8f1bcac52b60da57c531aa68a2c34ea51ce7296103d4e35909e50f58",
+      "size_bytes": 30079159
+    },
+    "sealed/gate.parquet": {
+      "sha256": "bc00fb8d212f2925416a15de5599f5ee72018e92cd7cd4845558a26e9efd7064",
+      "size_bytes": 2643544
+    },
+    "sealed/retention_test.parquet": {
+      "sha256": "1b6826993cbdaa0835a7c966eddb06b03f11fcdb2812008eecbb1c94c91302c2",
+      "size_bytes": 1365078
+    },
+    "sealed/stream.parquet": {
+      "sha256": "0682f4a70afdc1938864e1afa488a92454e795c37ed65bb868c8cc27a7208e76",
+      "size_bytes": 3949277
+    },
+    "test/routerbench.parquet": {
+      "sha256": "5ea350b99aa3522205df944486a03b9e793d474ee646dfe86ba03b70e00281ba",
+      "size_bytes": 2480704
+    },
+    "test/xroutebench.parquet": {
+      "sha256": "516f293ef59faf1031b07ba08e3d3e7c22bdac4289cd3ec8e918901c2d93c219",
+      "size_bytes": 2194567
+    },
+    "threshold/candidates.parquet": {
+      "sha256": "8ec4658f11ed811730ab266cbf8258ed09ce3db9f04344825a020bcee1fe0938",
+      "size_bytes": 15411
+    },
+    "threshold/oof-predictions.parquet": {
+      "sha256": "a52b121b31aec7332ca11c6074d92ee76517502b35860842a8bd78fc1c27fb48",
+      "size_bytes": 1308790
+    },
+    "threshold/selected-t1-t2.json": {
+      "sha256": "82e3c5054c1c5aa24175daa5d713f315a77ea5c2a4085c1ecd062efb13da0bfb",
+      "size_bytes": 428
+    },
+    "threshold/t2-all-splits.parquet": {
+      "sha256": "cf44bb516926e5830532276e002e8a8fc804b3d6e460bdb2c29971b4b92faa17",
+      "size_bytes": 30079083
+    },
+    "train/training-t2.parquet": {
+      "sha256": "1abd7e0177acf4e87e5aaff2c7e2aef6340d7bd069d55f6b0c3ba2dde60f0b7c",
+      "size_bytes": 15427908
+    },
+    "train/training.parquet": {
+      "sha256": "657b09b203d314f343ea2535c0d41ddafbdac12d708077aad15af5ca059cfdbd",
+      "size_bytes": 15427935
+    },
+    "training.parquet": {
+      "sha256": "1db9826bcb3a1f9f16a76f2f5f0d749bbefbab133468c0bb77eebab2595d6a70",
+      "size_bytes": 17944669
+    },
+    "validation/validation-t2.parquet": {
+      "sha256": "9fc8a1c5fd06657d53df1d1c4afbf9638bc68c47f2b0deee4b6ebde6b9b32143",
+      "size_bytes": 2614749
+    },
+    "validation/validation.parquet": {
+      "sha256": "4ad2e6af24f07de17a75e84623db8549cc2a20bd0d7a21ccd462887a9ac2751e",
+      "size_bytes": 2614753
+    }
+  },
+  "continual_split": {
+    "fractions": {
+      "gate": 0.1,
+      "retention_test": 0.05,
+      "stream": 0.15,
+      "train": 0.6,
+      "validation": 0.1
+    },
+    "roles": {
+      "gate": "D_gate",
+      "retention_test": "D_retention_test",
+      "stream": "D_stream",
+      "train": "D_initial_train",
+      "validation": "D_dev"
+    },
+    "test_policy": "preserve_routerbench_fixed_and_xroute_official_test"
+  },
+  "coverage_resolution_status": "complete",
+  "created_at_unix": 1790855599,
+  "dataset_version": "routerbench-xroutebench-continual-v2-verified",
+  "deduplication": {
+    "cross_source_duplicate_group_count": 0,
+    "dropped_by_source_split": {
+      "routerbench|test": 2,
+      "routerbench|train": 6,
+      "routerbench|validation": 2,
+      "xroutebench|train": 4,
+      "xroutebench|validation": 1
+    },
+    "dropped_rows": 15,
+    "input_rows": 42661,
+    "output_rows": 42646
+  },
+  "duplicate_metrics": {
+    "duplicate_group_count": 42677,
+    "duplicate_row_count": 15,
+    "near_duplicate_candidate_pair_count": 25326,
+    "near_duplicate_pair_count": 6,
+    "near_duplicate_skipped_large_bucket_count": 0
+  },
+  "effective_sample_weight": 1.0,
+  "experiment_version": "modernbert-initial-v2-verified",
+  "input_contract": "structure-preserving-v2",
+  "label_rule_version": "overall-solve-rate-grid-v1",
+  "outcome_audit": {
+    "audit_dir": "ml/artifacts/benchmark-outcome-audit-v1",
+    "manifest_sha256": "c5a2a47e3a15a7507b1acc5d2bb960eab72c48fee9e0035a01f28dd339d665b1",
+    "routerbench_cells_corrected": 83047,
+    "routerbench_items_excluded": 290,
+    "xroutebench_cells_corrected": 13733
+  },
+  "preprocessing_version": "integrated-routing-preprocess-v2-structure",
+  "row_counts": {
+    "external_test": 3729,
+    "gate": 3557,
+    "retention_test": 1785,
+    "stream": 5328,
+    "test": 3445,
+    "train": 21245,
+    "validation": 3557
+  },
+  "schema_version": "routing-comparison-dataset-v1",
+  "selected_thresholds": {
+    "routerarena_used_for_selection": false,
+    "selection_data": "train_only_group_oof",
+    "t1": {
+      "candidate_id": "h0.36-e0.73",
+      "easy_threshold": 0.73,
+      "hard_threshold": 0.36,
+      "j_threshold": 0.5653125958168004
+    },
+    "t2": {
+      "candidate_id": "h0.36-e0.64",
+      "easy_threshold": 0.64,
+      "hard_threshold": 0.36,
+      "j_threshold": 0.5248294803253849,
+      "t1_label_disagreement": 0.11423864438691457
+    }
+  },
+  "source_artifacts": {
+    "ml/artifacts/routerbench-labeled/withmartian-routerbench-2024-03-27__routerbench-capability-tier-v1__overall-solve-rate-v3-probe-selected/labeled.parquet": {
+      "sha256": "33fb6a8fd198d79b8adb86e644dfae0d7569c4b36df7b104f023f5ba8be50748",
+      "size_bytes": 28263921
+    },
+    "ml/artifacts/routerbench-labeled/withmartian-routerbench-2024-03-27__routerbench-capability-tier-v1__overall-solve-rate-v3-probe-selected/model_tiers.json": {
+      "sha256": "a88ce8a77e6ea14901601809a9cf2bc936d13addacd476185089fdb7a2d2e11e",
+      "size_bytes": 2120
+    },
+    "ml/artifacts/routerbench-training/withmartian-routerbench-2024-03-27__overall-solve-rate-v3-probe-selected__routerbench-training-preprocess-v3-natural/metadata.parquet": {
+      "sha256": "1777423a3864844eb08f3e0862abceb80fcf560ab1e9927c3a7a5ce02c725410",
+      "size_bytes": 20032275
+    },
+    "ml/data/raw/routerbench_0shot.pkl": {
+      "sha256": "ba4f77f19517610a707c374e99322d7750c30fc4ae7ff5527888595a1e65d36d",
+      "size_bytes": 99567659
+    },
+    "ml/data/raw/routerbench_5shot.pkl": {
+      "sha256": "fbd7d3d16fba2759a18fa0ad44409d3e0e92ba80d03d90827eed1a6d084c9ffe",
+      "size_bytes": 171091324
+    },
+    "ml/data/raw/xroutebench/ea4b6e1b29d9a734f55f0a637baf326bad6aa681/llm_candidates.parquet": {
+      "sha256": "ba72146533ae68641e382759c90ff5bc53eb903956d4e748b7f3c0111907541f",
+      "size_bytes": 8450
+    },
+    "ml/data/raw/xroutebench/ea4b6e1b29d9a734f55f0a637baf326bad6aa681/llmrouter_generic-test.parquet": {
+      "sha256": "cc7f33f03298c734c1f4b3c380d8d9b84dc8723eb0d08f850de033d2645778f4",
+      "size_bytes": 10484956
+    },
+    "ml/data/raw/xroutebench/ea4b6e1b29d9a734f55f0a637baf326bad6aa681/llmrouter_generic-train.parquet": {
+      "sha256": "6ae53d6b619396271e345a242bd32c253fc9796a45a75d3c122ad74843f8a7ef",
+      "size_bytes": 10917678
+    }
+  },
+  "source_row_counts": {
+    "routerbench": 34433,
+    "xroutebench": 8213
+  },
+  "split_version": "continual-60-10-10-15-5-v1-seed-42",
+  "threshold_selection_partition": "D_initial_train",
+  "xroutebench": {
+    "test": {
+      "eligible_query_rows": 3729,
+      "excluded_too_few_valid_models": 0,
+      "queries_with_unknown_metric": 0,
+      "query_rows": 3729,
+      "raw_run_rows": 67122
+    },
+    "train": {
+      "eligible_query_rows": 4489,
+      "excluded_too_few_valid_models": 0,
+      "queries_with_unknown_metric": 0,
+      "query_rows": 4489,
+      "raw_run_rows": 80802
+    }
+  }
+}

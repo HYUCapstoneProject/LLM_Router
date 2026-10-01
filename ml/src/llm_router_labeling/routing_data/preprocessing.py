@@ -28,6 +28,7 @@ from ..training.routerbench_preprocessing import (
 )
 from .text import clean_text, clean_xroute_text, structured_duplicate_key, compatible_near_duplicate
 from .continual import assign_continual_splits
+from .outcome_audit import apply_routerbench_audit, apply_xroute_audit, load_outcome_audit
 
 
 LABELS = ("easy", "medium", "hard")
@@ -137,7 +138,11 @@ def _routerbench_accepted(labeled: pd.DataFrame, models: Sequence[str]) -> pd.Da
     return result
 
 
-def _load_routerbench(config: Mapping[str, Any], root: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
+def _load_routerbench(
+    config: Mapping[str, Any],
+    root: Path,
+    outcome_audit: Mapping[str, pd.DataFrame] | None = None,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     rb = config["routerbench"]
     labeled_path = root / str(rb["labeled_path"])
     metadata_path = root / str(rb["metadata_path"])
@@ -153,6 +158,9 @@ def _load_routerbench(config: Mapping[str, Any], root: Path) -> tuple[pd.DataFra
     if missing:
         raise RoutingDataError(f"RouterBench labeled data is missing models: {missing}")
     accepted = _routerbench_accepted(labeled, models)
+    excluded: set[str] = set()
+    if outcome_audit is not None:
+        accepted, excluded = apply_routerbench_audit(accepted, labeled, outcome_audit)
     accepted.index = labeled["sample_id"].astype(str)
 
     meta_columns = [
@@ -177,6 +185,8 @@ def _load_routerbench(config: Mapping[str, Any], root: Path) -> tuple[pd.DataFra
         validate="one_to_one",
     )
     merged = merged.loc[merged["included_in_training"].astype(bool)].copy()
+    # Items whose answer key is broken (MMLU-Redux) or unverifiable are dropped.
+    merged = merged.loc[~merged["sample_id"].astype(str).isin(excluded)].copy()
     if config.get("input_contract") == "structure-preserving-v2":
         # Rebuild from raw queries, not the legacy collapsed input artifact.
         merged["model_input_text"] = merged["query_text"].map(clean_text)
@@ -207,6 +217,7 @@ def _validate_xroute_rows(
     exact_metrics: set[str],
     continuous_metrics: set[str],
     structured: bool = False,
+    outcome_audit: Mapping[str, pd.DataFrame] | None = None,
 ) -> pd.DataFrame:
     required = {
         "task_name",
@@ -258,6 +269,8 @@ def _validate_xroute_rows(
     )
     output.loc[exact, "accepted"] = output.loc[exact, "performance"].eq(1.0)
     output.loc[continuous, "accepted"] = output.loc[continuous, "performance"].ge(0.70)
+    if outcome_audit is not None:
+        output = apply_xroute_audit(output, outcome_audit)
     return output
 
 
@@ -807,6 +820,7 @@ def build_comparison_dataset(
 
     exact_metrics = set(str(value) for value in xconfig["exact_metrics"])
     continuous_metrics = set(str(value) for value in xconfig["continuous_metrics"])
+    outcome_audit = load_outcome_audit(config, project_root)
     xroute_frames: list[pd.DataFrame] = []
     xroute_accepted: list[pd.DataFrame] = []
     xroute_metrics: dict[str, Any] = {}
@@ -818,6 +832,7 @@ def build_comparison_dataset(
             exact_metrics=exact_metrics,
             continuous_metrics=continuous_metrics,
             structured=structured,
+            outcome_audit=outcome_audit,
         )
         pivoted, accepted, metrics = _pivot_xroute(
             raw,
@@ -832,7 +847,7 @@ def build_comparison_dataset(
     xroute = pd.concat(xroute_frames, ignore_index=True)
     xroute_accept = pd.concat(xroute_accepted, axis=0)
 
-    routerbench, routerbench_accept = _load_routerbench(config, project_root)
+    routerbench, routerbench_accept = _load_routerbench(config, project_root, outcome_audit)
     combined = pd.concat([routerbench, xroute], ignore_index=True, sort=False)
     if combined["model_input_text"].str.strip().eq("").any():
         raise RoutingDataError("Input cleaning produced empty text")
@@ -1071,6 +1086,13 @@ def build_comparison_dataset(
             "effective_sample_weight": config.get("effective_sample_weight", "source_metadata"),
             "threshold_selection_partition": "D_initial_train" if config.get("continual_split") else "train",
             "continual_split": config.get("continual_split"),
+            "outcome_audit": None if outcome_audit is None else {
+                "audit_dir": str(config["outcome_audit"]["audit_dir"]),
+                "manifest_sha256": _sha256(project_root / str(config["outcome_audit"]["audit_dir"]) / "manifest.json"),
+                "routerbench_cells_corrected": int(len(outcome_audit["routerbench_corrections"])),
+                "routerbench_items_excluded": int(len(outcome_audit["routerbench_exclusions"])),
+                "xroutebench_cells_corrected": int(len(outcome_audit["xroute_corrections"])),
+            },
             "source_artifacts": {
                 str(path.relative_to(project_root)) if path.is_relative_to(project_root) else str(path): {"sha256": _sha256(path), "size_bytes": path.stat().st_size}
                 for path in [*(project_root / str(config["routerbench"][key]) for key in ("labeled_path", "metadata_path", "model_tiers_path")), *(project_root / str(source["local_path"]) for source in config["routerbench"].get("raw_sources", {}).values()), *source_paths.values()]
