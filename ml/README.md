@@ -41,7 +41,7 @@ python3.12 -m venv .venv
 
 | 명령 | 역할 |
 |---|---|
-| `routing-comparison-data` | xRouteBench 다운로드/검증, 통합 데이터 구성 |
+| `routing-comparison-data` | xRouteBench 다운로드/검증, 기록 점수 재채점(`audit-outcomes`), 통합 데이터 구성 |
 | `routing-tfidf-baseline` | TF-IDF+Logistic Regression |
 | `routing-objective-comparison` | outcome 준비, 목표별 학습, validation 동결, test/RouterArena 평가 |
 | `routerbench-labeling` | 기존 RouterBench 원천 다운로드·라벨링·전처리 |

@@ -1,0 +1,27 @@
+{
+  "audit_version": "benchmark-outcome-audit-v1",
+  "routerbench": {
+    "gsm8k_cells_regraded": 81950,
+    "gsm8k_success_flipped": 14904,
+    "mcq_answer_not_in_options": 8,
+    "mcq_gold_regrade_cells_changed": 8,
+    "mcq_gold_unmatched_or_ambiguous": 13,
+    "mmlu_redux_bad_options_clarity": 25,
+    "mmlu_redux_bad_question_clarity": 132,
+    "mmlu_redux_corrected_answer_cells_changed": 781,
+    "mmlu_redux_corrected_items": 99,
+    "mmlu_redux_expert": 32,
+    "mmlu_redux_multiple_correct_answers": 39,
+    "mmlu_redux_no_correct_answer": 36,
+    "mmlu_redux_wrong_groundtruth": 5,
+    "cells_changed": 82529,
+    "excluded_items": 290
+  },
+  "xroutebench": {
+    "em_mc_format_false_negative": 5546,
+    "gsm8k_format_false_negative": 1804,
+    "math_equivalent_false_negative": 124,
+    "squad_contains_gold_answer": 6259,
+    "cells_changed": 13733
+  }
+}

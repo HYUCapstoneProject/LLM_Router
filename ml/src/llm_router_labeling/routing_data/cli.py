@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from ..shared.dataset_io import download_source, load_config
+from .outcome_audit import build_outcome_audit
 from .preprocessing import build_comparison_dataset
 
 
@@ -23,6 +24,13 @@ def build_parser() -> argparse.ArgumentParser:
         "download-xroutebench", help="Download and verify pinned xRouteBench sources"
     )
     download.add_argument("--data-dir", type=Path)
+
+    audit = subparsers.add_parser(
+        "audit-outcomes",
+        help="Regrade recorded benchmark outcomes against pinned public gold answers",
+    )
+    audit.add_argument("--project-root", type=Path, default=Path("."))
+    audit.add_argument("--output-dir", type=Path, required=True)
 
     build = subparsers.add_parser(
         "build", help="Build the versioned dataset and train-only threshold selection"
@@ -67,6 +75,12 @@ def main() -> None:
     if args.command == "download-xroutebench":
         result: dict[str, Any] = _download(
             config, args.data_dir or _default_xroute_dir(config)
+        )
+    elif args.command == "audit-outcomes":
+        result = build_outcome_audit(
+            config,
+            project_root=args.project_root.resolve(),
+            output_dir=args.output_dir,
         )
     else:
         result = build_comparison_dataset(

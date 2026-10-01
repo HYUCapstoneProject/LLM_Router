@@ -1,5 +1,7 @@
 # ML 최종 실험 명세
 
+> **2026-10-01:** 학습·평가에 쓴 벤치마크 기록 점수에서 체계적인 채점 오류를 발견해 검증 데이터셋 v2를 만들었다. v1 기반 실험 수치는 재검증 전까지 잠정 결과다. → [2.5.1절](#outcome-audit)
+
 기준일: 2026-09-27. 데이터·라우팅 비교·평가·재학습·캐시·실행 관리의 **현재 기준은 이 파일 하나**다. 과거 설정·실험 기록은 [Deprecated settings](../deprecated-settings.md), 설치·CLI 입구는 [ml/README](../../ml/README.md), 프로젝트 개요·협업 규칙은 [문서 시작점](../README.md)을 따른다. 프로젝트 결정 원장은 memorize다.
 
 > 어떤 조건에서 임베딩 캐시와 에스컬레이션 피드백 학습을 결합한 라우팅 시스템이 더 나은 비용–품질 균형을 만드는가?
@@ -245,6 +247,49 @@ overall_solve_rate(q) = accepted_model_count(q) / valid_model_count(q)
 ```
 
 RouterBench도 실제 유효 모델 수를 분모로 검증한다. upstream에서 만들어진 `overall_solve_rate`를 읽을 때는 재계산 결과와 일치해야 한다. 분모가 0이면 라벨을 만들 수 없다.
+
+<a id="outcome-audit"></a>
+#### 2.5.1. 벤치마크 채점 오류와 검증 데이터셋 v2 — 2026-10-01
+
+**위 표의 원점수를 그대로 믿으면 안 된다.** 공개 정답과 모델 응답을 직접 대조한 결과, 두 벤치마크에 기록된 채점이 실제 정오와 크게 달랐다. 이 오류는 v1 데이터셋의 난이도 라벨, R1/R2/R3의 후보별 성공 라벨, D_gate·D_stream 평가, F0~F3 시뮬레이션에 모두 들어가 있다. 2026-10-01 이전의 모든 실험 수치는 오류가 포함된 v1 기준이다.
+
+| 원천·과제 | 발견한 오류 | 정정 방법 | 규모 |
+|---|---|---|---|
+| RouterBench GSM8K | 점수가 정오가 아니라 0.25 단위 평가값이다. 세 모델이 모두 정답 숫자를 냈는데 0.75/0.5/0.5로 기록되는 식이다. `>=0.70` 기준 때문에 0.5점 정답(97%가 실제 정답)이 실패가 됐다. GPT-4 정답률이 68.1%로 기록됐지만 실제는 95.3%다 | GSM8K 공식 정답과 최종 답 숫자를 대조해 재채점 | 81,950칸 재채점, 14,904칸 성공 여부 반전 |
+| RouterBench MMLU | MMLU 원본 정답 키 자체의 오류(예: `−47 = g + 24`의 정답이 −23으로 표기). RouterBench 채점은 원본 키와 일치한다 | MMLU-Redux 2.0 사람 검수: 정답 오류는 정정 답으로 재채점, 질문·보기 불명확·복수 정답·정답 없음·전문가 판단 필요는 제외 | 99문항 정정(781칸), 269문항 제외 |
+| RouterBench 기타 객관식 | HellaSwag·ARC·Winogrande는 공개 정답과 일치. claude-instant 8칸만 불일치 | 공개 정답으로 재채점 | 8칸 |
+| xRouteBench `em_mc` | `(C)` 형식만 정답 처리하고, 정답 글자 `C`나 `C. 보기문`은 0점 | 명확한 정답 글자면 성공으로 정정 | 5,546칸 |
+| xRouteBench GSM8K | `$720.00`, `\boxed{12}`, `24{,}960` 같은 정답 형식을 실패 처리 | 최종 답 숫자가 공식 정답과 같으면 성공 | 1,804칸 |
+| xRouteBench MATH | `\text{odd}` 대 `odd`, `(-4,\,1)` 대 `(-4,1)` 같은 표기 차이를 실패 처리 | 표기를 정규화한 boxed 답이 같으면 성공 | 124칸 |
+| xRouteBench SQuAD | token F1 `>=0.70`이라 "comes from Latin." 같은 문장형 정답이 실패. 응답의 80.6%가 정답을 포함하는데 성공은 2.4% | F1 `>=0.70` 또는 정규화한 정답 포함 | 6,259칸 |
+
+정정 원칙은 다음과 같다.
+
+- **xRouteBench는 실패를 성공으로만 고친다.** 형식 차이가 명백한 경우만 고치고, 기록된 성공은 취소하지 않는다. MATH의 단위 생략(`8 cm`→`8`)처럼 원 채점기 판단이 타당한 경우가 섞여 있기 때문이다.
+- **최종 답 추출은 보수적으로 한다.** 박스 답·`####` 답을 우선하고, 없으면 마지막 줄의 첫 숫자와 끝 숫자만 본다. 줄 가운데 숫자는 인정하지 않으므로 중간에 끊긴 응답은 통과하지 못한다. 표본 검사에서 오탐이 없었고, GPT-4 등 모델별 재채점 정답률이 공개 성능과 일치했다.
+- **RouterBench 학습 라벨은 5-shot 원본(34,271행)과 0-shot 원본(507행)에서 왔다.** 응답 대조도 행별로 같은 원본을 사용한다.
+
+검증하지 못한 범위도 남긴다. RouterBench MBPP와 xRouteBench `code_eval`은 같은 응답에 다른 점수가 붙은 사례가 0건이지만, 코드를 실행해 재채점하지 않았다. MT-Bench는 judge 평점이라 그대로 둔다. MMLU-Redux가 다루지 않는 8,342문항의 MMLU 정답 오류, HellaSwag의 알려진 라벨 잡음, RouterBench 5-shot 원본의 중복 `sample_id` 14개(182칸 불일치)는 남아 있다. RouterArena는 모델 응답·채점 기록 없이 공식 난이도와 정답만 쓰므로 이번 정정 대상이 아니다.
+
+| 산출물 | 위치 |
+|---|---|
+| 정정표·제외 목록·요약 | `ml/artifacts/benchmark-outcome-audit-v1/` (`audit-outcomes`로 재생성) |
+| 정정 규칙 코드·테스트 | [`outcome_audit.py`](../../ml/src/llm_router_labeling/routing_data/outcome_audit.py), [`test_outcome_audit.py`](../../ml/tests/test_outcome_audit.py) |
+| v2 데이터 config | [`modernbert_initial_v2_verified_data.json`](../../ml/config/modernbert_initial_v2_verified_data.json) — 공개 정답 파일의 URL·SHA-256 고정 |
+| v2 데이터셋 | `ml/artifacts/modernbert-initial-v2-verified/dataset/` |
+| 점검 보고서 | [benchmark-outcome-audit-20261001](../../experiments/results/benchmark-outcome-audit-20261001/REPORT.md) |
+
+```bash
+# 공개 정답 파일은 config의 gold_sources URL에서 ml/data/raw/gold/ 아래로 받는다
+routing-comparison-data --config ml/config/modernbert_initial_v2_verified_data.json \
+  audit-outcomes --output-dir ml/artifacts/benchmark-outcome-audit-v1
+routing-comparison-data --config ml/config/modernbert_initial_v2_verified_data.json \
+  build --output-dir ml/artifacts/modernbert-initial-v2-verified/dataset
+```
+
+v2는 42,646행(v1 대비 제외 289행)이다. 성공률이 올라 train-only 임계값 선택이 T1 hard/easy 경계를 0.27/0.64에서 **0.36/0.73**으로 바꿨고, 난이도 라벨의 19.6%가 달라졌다(easy 50.1%→45.5%, hard 13.1%→15.4%). 같은 seed로 다시 층화 분할했기 때문에 문항의 59.0%만 v1과 같은 분할에 남았다. v1과 v2의 D_gate·D_stream 수치를 같은 문항 비교로 읽지 않는다.
+
+`outcome_audit`가 없는 config(v1)는 기존 동작 그대로 빌드되므로 과거 산출물은 재현할 수 있다. **새 학습·평가는 v2를 기준으로 한다.** v2로 R0를 다시 학습하고 R0~R3·F0~F3 결론을 재검증하기 전까지, v1에서 나온 순위와 수치는 잠정 결과로 취급한다.
 
 <a id="data-6"></a>
 ### 2.6. 통합 난이도 T1/T2

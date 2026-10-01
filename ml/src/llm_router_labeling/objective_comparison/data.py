@@ -11,6 +11,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from ..routing_data.outcome_audit import apply_routerbench_audit, load_outcome_audit
 from ..routing_data.preprocessing import (
     _routerbench_accepted,
     _routerbench_models,
@@ -119,6 +120,11 @@ def _routerbench_matrices(
         "routerbench:"
     )
     success = _routerbench_accepted(raw_for_acceptance, models)
+    audit = load_outcome_audit(config, project_root)
+    if audit is not None:
+        quality.index = range(len(quality))
+        success, _ = apply_routerbench_audit(success, raw_for_acceptance, audit, quality)
+        quality.index = wanted.to_numpy()
     success.index = (
         "routerbench:" + raw_for_acceptance["sample_id"].astype(str).to_numpy()
     )
@@ -156,6 +162,7 @@ def _xroute_matrices(
             exact_metrics=set(section["exact_metrics"]),
             continuous_metrics=set(section["continuous_metrics"]),
             structured=config.get("input_contract") == "structure-preserving-v2",
+            outcome_audit=load_outcome_audit(config, project_root),
         )
         validated["sample_id"] = validated["query_key"].map(
             lambda key: (
