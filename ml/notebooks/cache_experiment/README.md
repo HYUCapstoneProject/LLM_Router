@@ -56,6 +56,7 @@ python3.11 -m venv .venv-cache
 | [`report.py`](report.py) | 봉인 산출물로 표·그림·보고서 초안 생성 |
 | [`experiment_config.json`](experiment_config.json) | 입력 SHA, 모델 revision, 라우터 파일 SHA, 서비스 입력 한도, 운영 설정값, D1·D2·보정·지연 조건 |
 | [`build_kit.py`](build_kit.py) | Colab kit 생성(소스 ZIP·입력 복사·SHA 확인) |
+| [`annotation_tool.py`](annotation_tool.py) | 주석 시트로 브라우저 주석 도구(HTML 한 파일) 생성: 한 문항씩 판정, 시트 id 숨김, 자동 저장, 시트 형식 그대로 CSV 내보내기 |
 | `requirements.txt` / `requirements-colab.txt` | 로컬 / Colab 고정 버전 |
 
 ## 핵심 규칙

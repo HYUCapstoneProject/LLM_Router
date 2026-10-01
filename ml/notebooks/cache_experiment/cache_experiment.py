@@ -980,11 +980,28 @@ ANNOTATION_COLUMNS = ["item_id", "original_text", "variant_text", "cached_answer
                       "semantic_equivalent", "cached_answer_correct_for_target", "rationale", "annotator"]
 
 
+def blind_id(item_id, seed):
+    """Opaque sheet id. Real item ids end in -p/-n and would reveal the author's intent."""
+    return "v" + digest([seed, "blind", str(item_id)])[:12]
+
+
+def unblind(frame, variants, seed):
+    """Map blind sheet ids back to item ids; sheets that already use item ids pass through."""
+    real = set(variants.item_id)
+    if set(frame.item_id) <= real:
+        return frame
+    mapping = {blind_id(i, seed): i for i in variants.item_id}
+    unknown = set(frame.item_id) - set(mapping)
+    if unknown:
+        raise ValueError(f"Sheet has ids that match no sealed variant: {sorted(unknown)[:3]}")
+    return frame.assign(item_id=frame.item_id.map(mapping))
+
+
 def annotation_sheet(variants, originals, seed):
-    """Blind sheet: the author's intended role is hidden and the order shuffled."""
+    """Blind sheet: role hidden behind opaque ids, order shuffled."""
     base = originals.set_index("group_id")
     frame = pd.DataFrame({
-        "item_id": variants.item_id,
+        "item_id": [blind_id(i, seed) for i in variants.item_id],
         "original_text": [base.loc[g].request_text for g in variants.group_id],
         "variant_text": variants.variant_text,
         "cached_answer": [base.loc[g].routed_answer for g in variants.group_id],

@@ -349,13 +349,16 @@ def _read_annotation(path):
 
 def d2_merge_annotations(run, filled_a, filled_b, adjudication_csv=None):
     """Agreement report; returns items still needing adjudication (empty = done)."""
-    a, b = _read_annotation(filled_a), _read_annotation(filled_b)
     variants = ce.read_parquet(run.require("d2", "variants.parquet"))
-    if set(a.item_id) != set(variants.item_id):
+    seed = run.config["d2"]["annotation_seed"]
+    a = ce.unblind(_read_annotation(filled_a), variants, seed)
+    b = ce.unblind(_read_annotation(filled_b), variants, seed)
+    if set(a.item_id) != set(variants.item_id) or set(b.item_id) != set(variants.item_id):
         raise ValueError("Annotation sheet items differ from the sealed variants")
     adjudication = None
     if adjudication_csv is not None:
         adjudication = pd.read_csv(adjudication_csv, encoding="utf-8-sig", dtype=str, keep_default_na=False)
+        adjudication = ce.unblind(adjudication, variants, seed)
         adjudication["final"] = adjudication.final.str.strip().str.upper()
     merged, pending, agreement = ce.merge_annotations(a, b, adjudication)
     if len(pending):
@@ -367,6 +370,7 @@ def d2_merge_annotations(run, filled_a, filled_b, adjudication_csv=None):
         sheet["rationale_a"] = [labels_a.loc[i, "rationale"] for i in sheet.item_id]
         sheet["rationale_b"] = [labels_b.loc[i, "rationale"] for i in sheet.item_id]
         sheet["final"], sheet["reason"], sheet["adjudicator"] = "", "", ""
+        sheet["item_id"] = [ce.blind_id(i, seed) for i in sheet.item_id]
         sheet.to_csv(run.path("d2", "adjudication-needed.csv"), index=False, encoding="utf-8-sig")
         return agreement, pending
     if merged[["semantic_equivalent", "cached_answer_correct_for_target"]].isna().any().any():

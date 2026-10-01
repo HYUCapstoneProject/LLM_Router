@@ -313,6 +313,12 @@ class D2Test(unittest.TestCase):
         variants = ce.variants_from(sheet, originals)
         blank = ce.annotation_sheet(variants, originals, 1)
         self.assertNotIn("role", blank.columns)
+        self.assertFalse(blank.item_id.str.contains(r"-[pn]$").any())
+        self.assertEqual(sorted(ce.unblind(blank, variants, 1).item_id), sorted(variants.item_id))
+        self.assertTrue(ce.unblind(variants[["item_id"]], variants, 1).equals(variants[["item_id"]]))
+        with self.assertRaises(ValueError):
+            ce.unblind(blank.assign(item_id="vbogus"), variants, 1)
+        blank = ce.unblind(blank, variants, 1)
         a = blank.assign(semantic_equivalent=["Y", "N"], cached_answer_correct_for_target=["Y", "N"], annotator="ann1")
         b = blank.assign(semantic_equivalent=["Y", "Y"], cached_answer_correct_for_target=["Y", "N"], annotator="ann2")
         merged, pending, report = ce.merge_annotations(a, b)
