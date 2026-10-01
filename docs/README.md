@@ -63,7 +63,38 @@ flowchart LR
 
 - 작업은 목적과 하나의 산출물이 분명한 issue로 관리한다. Milestone, `area:*`, `priority:*`를 지정하고 큰 작업은 분할한다. `p0`는 차단 해결, `p1`은 현재 milestone, `p2`는 개선이다.
 - [Delivery](https://github.com/orgs/HYUCapstoneProject/projects/2)는 구현·배포·문서, [Experiments](https://github.com/orgs/HYUCapstoneProject/projects/3)는 데이터·학습·평가를 추적한다. `Backlog → Ready → In Progress → Review → Done`, 막히면 `Blocked`에 이유와 필요한 도움을 적는다. 문서에 과거 issue 수나 진행 상태를 복제하지 않는다.
-- `main`에 직접 push하지 않는다. 목적별 branch와 PR을 사용하고 최소 1명 리뷰 후 merge한다. Branch는 `feat/`, `fix/`, `docs/` 등 작업 유형으로 표현한다. Commit은 `[FEAT|FIX|DOCS|CHORE|REFACTOR|TEST|BUILD|CI] 요약` 형식을 따른다.
+- `main`에 직접 push하지 않는다. 목적별 branch와 PR을 사용하고 최소 1명 리뷰 후 merge한다. Branch는 `feat/`, `fix/`, `docs/` 등 작업 유형으로 표현한다.
+- 커밋 메시지 첫 줄은 아래 형식을 따른다. `[TYPE]`은 대문자, 요약은 한국어 한 줄이며 끝에 마침표를 붙이지 않는다. `LLM_Router`, `LLM_Router-serving` 두 저장소 모두 적용한다.
+
+  ```
+  [TYPE] 변경 내용 요약
+  ```
+
+  | 타입 | 의미 |
+  |---|---|
+  | `[FEAT]` | 새 기능 추가 |
+  | `[FIX]` | 버그 수정 |
+  | `[DOCS]` | 문서만 변경 |
+  | `[CHORE]` | 빌드·설정 등 기능에 영향 없는 잡일 |
+  | `[REFACTOR]` | 동작은 그대로 두고 구조만 바꾼 변경 |
+  | `[TEST]` | 테스트 추가·수정 |
+  | `[BUILD]` | 빌드 시스템·의존성·이미지 변경 |
+  | `[CI]` | CI 설정 변경 |
+
+  예:
+
+  ```
+  [DOCS] timeline 학습 우선 계획 반영
+  [FEAT] router-serving FastAPI skeleton 추가
+  [FIX] gateway 캐시 미스 처리 오류 수정
+  ```
+
+  두 저장소 모두 초반에는 이 형식을 따랐으나, 이후 일부 세션이 영어 소문자
+  Conventional Commits 형식(`type: description`, 예: `fix: pass routing
+  objectives through training CLI and image`)으로 바꿔 쓰면서 규칙이
+  섞였다. 이 규칙은 지금부터 만드는 커밋에 적용하며, 이미 push된 과거 커밋
+  메시지는 rebase로 재작성하지 않는다 — 다른 branch·PR·issue의 참조 SHA가
+  깨지고 force-push가 필요해 팀 작업 중에는 하지 않기로 했다.
 - 커밋·push 검사는 개발용 agent의 설정·지시·세션 파일과 명시적인 도구 작성자 표식을 차단한다. `.codex/`, `.agents/`, `.claude/` 같은 도구 전용 경로와 `AGENTS.md` 등은 로컬에만 둔다. `AnthropicConfig.java`, Claude API 호출, LLM routing·모델·데이터·평가 코드는 서비스 구성요소이므로 파일명이나 메시지에 AI·LLM·Claude·Anthropic·OpenAI가 있다는 이유로 차단하지 않는다. 일반 코드 생성기의 표식, 정책·테스트의 문자열 예시와 실제 agent 작성자 표식도 구분한다. 비밀정보 제외 규칙은 별도로 유지한다.
 - PR에는 문제·변경·검증·관련 issue를 적는다. 검증하지 못한 내용과 이유도 명시한다. 하나의 PR에는 목적이 같은 변경을 담고, 실행 방법·계약이 바뀌면 해당 소유 문서를 함께 갱신한다.
 - API의 endpoint·요청·응답·오류 계약은 구현과 함께 갱신한다. Breaking change는 issue/PR에 표시하고 영향을 받는 팀과 공유한다. HTTP 상세는 serving API 계약에만 둔다.
