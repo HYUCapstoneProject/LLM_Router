@@ -1,0 +1,146 @@
+[
+ {
+  "text": "How does semantic caching work?",
+  "tokens": 9
+ },
+ {
+  "text": "What is 2 + 2?",
+  "tokens": 8
+ },
+ {
+  "text": "Explain the difference between TCP and UDP, with examples.",
+  "tokens": 15
+ },
+ {
+  "text": "def foo(x):\n    return x**2  # square\n\nprint(foo(3))",
+  "tokens": 22
+ },
+ {
+  "text": "SELECT id, name FROM users WHERE created_at > '2026-01-01';",
+  "tokens": 22
+ },
+ {
+  "text": "https://example.com/path?q=1&lang=en#section",
+  "tokens": 21
+ },
+ {
+  "text": "café naïve résumé Ångström",
+  "tokens": 7
+ },
+ {
+  "text": "İstanbul straße ΣΊΣΥΦΟΣ",
+  "tokens": 12
+ },
+ {
+  "text": "“smart quotes” — em dash … ellipsis",
+  "tokens": 13
+ },
+ {
+  "text": "emoji 😀👍🏽 and family 👨‍👩‍👧",
+  "tokens": 9
+ },
+ {
+  "text": "中文字符测试 and 日本語のテキスト",
+  "tokens": 17
+ },
+ {
+  "text": "시맨틱 캐싱은 어떻게 동작하나요?",
+  "tokens": 32
+ },
+ {
+  "text": "Use [MASK] and [CLS] tokens literally [SEP]",
+  "tokens": 10
+ },
+ {
+  "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "tokens": 3
+ },
+ {
+  "text": "supercalifragilisticexpialidocious antidisestablishmentarianism",
+  "tokens": 21
+ },
+ {
+  "text": "tabs\tand\nnewlines\r\nand  multiple   spaces",
+  "tokens": 10
+ },
+ {
+  "text": "﻿BOM and NBSP and​ZWSP and LS",
+  "tokens": 15
+ },
+ {
+  "text": "control\u0007chars\u0000here�",
+  "tokens": 7
+ },
+ {
+  "text": "∑ ∫ √ ≤ ≥ ≠ ∞ → ← ± × ÷",
+  "tokens": 14
+ },
+ {
+  "text": "$100 @user #tag %50 ^caret &amp; *star ~tilde `code` |pipe| \\back",
+  "tokens": 29
+ },
+ {
+  "text": "Numbers 3.14159 1,000,000 1e-9 0xFF",
+  "tokens": 19
+ },
+ {
+  "text": "Ünïcödé ÀÉÎÕÜ àéîõü",
+  "tokens": 9
+ },
+ {
+  "text": "x̃ combining tilde and é decomposed",
+  "tokens": 11
+ },
+ {
+  "text": "",
+  "tokens": 2
+ },
+ {
+  "text": " ",
+  "tokens": 2
+ },
+ {
+  "text": "Hello",
+  "tokens": 3
+ },
+ {
+  "text": "[UNK]",
+  "tokens": 3
+ },
+ {
+  "text": "«guillemets» ¿qué? ¡hola!",
+  "tokens": 15
+ },
+ {
+  "text": "Arabic مرحبا Hebrew שלום Thai สวัสดี Hindi नमस्ते",
+  "tokens": 20
+ },
+ {
+  "text": "ｆｕｌｌｗｉｄｔｈ ＡＢＣ １２３",
+  "tokens": 5
+ },
+ {
+  "text": "ﬁ ligature ﬀ ﬃ",
+  "tokens": 7
+ },
+ {
+  "text": "Ⅻ roman ① circled",
+  "tokens": 6
+ },
+ {
+  "text": "cache, transformer brown embedding PostgreSQL, quick latency? brown, brown? quick dog transformer dog vector, model? jumps model, fox, embedding vector quick, Kubernetes? cache? throughput. model, over, brown. PostgreSQL? cache? model fox? over. jumps? latency brown. cache. Kubernetes? brown routing? brown model? model? embedding throughput. over Kubernetes lazy. jumps, transformer? Kubernetes",
+  "tokens": 116
+ },
+ {
+  "text": "over? transformer. jumps? vector. latency. transformer, jumps over, dog, the? over. model jumps? vector. cache, PostgreSQL throughput? transformer? transformer Kubernetes? quick, brown, throughput, fox. quick the, vector embedding brown, transformer, routing. embedding? fox Kubernetes? Kubernetes? model jumps cache. Kubernetes, PostgreSQL lazy. jumps PostgreSQL. brown. PostgreSQL. over. dog. dog, dog? dog, PostgreSQL? embedding the. Kubernetes. lazy. throughput. embedding dog dog? lazy. lazy? the? embedding fox? lazy? over? cache transformer? transformer over, jumps jumps? jumps? embedding, vector, the fox, latency, lazy routing, model, cache. vector? jumps embedding? PostgreSQL? PostgreSQL, vector, PostgreSQL throughput, the, over, Kubernetes vector cache? fox dog, routing fox? vector brown? cache, routing? PostgreSQL? PostgreSQL, PostgreSQL. vector, throughput, latency transformer? cache dog? brown, model jumps. jumps. jumps? dog transformer? over, over? PostgreSQL? cache? lazy. cache embedding cache? throughput transformer. PostgreSQL. PostgreSQL fox, fox routing. quick, routing, latency. transformer, vector? cache routing over? brown. the routing dog routing throughput cache? routing, quick, fox, routing over, model. PostgreSQL, model? PostgreSQL, routing. the. quick the, PostgreSQL? dog? fox? Kubernetes? PostgreSQL. lazy, cache, jumps? embedding jumps brown. latency, quick transformer. dog. quick? over, routing? the. embedding. vector. dog model, embedding, the. transformer Kubernetes. PostgreSQL, dog brown. brown, transformer transformer model. dog PostgreSQL, transformer. Kubernetes,",
+  "tokens": 504
+ },
+ {
+  "text": "model, quick? PostgreSQL, PostgreSQL dog the jumps. fox? throughput the, Kubernetes. the? brown PostgreSQL Kubernetes. brown. dog, dog? Kubernetes? brown? model lazy jumps. routing. jumps Kubernetes Kubernetes. fox, Kubernetes. PostgreSQL. throughput? throughput vector, model Kubernetes model? brown? routing? lazy, brown jumps. embedding, PostgreSQL. fox. dog? Kubernetes? the, the? throughput? model, latency. transformer. fox. the. cache? fox, the. routing. brown? transformer embedding? routing routing quick. jumps, routing? PostgreSQL. lazy. latency transformer, brown latency? jumps. Kubernetes vector, over? latency. model. routing. transformer, model? vector? fox, over lazy? vector, throughput. throughput? jumps, dog over. vector cache, embedding. lazy latency? latency, transformer. cache Kubernetes. embedding, PostgreSQL, brown. dog? transformer? latency. the, quick? Kubernetes? the transformer? throughput, fox, jumps, PostgreSQL throughput vector the, dog model, routing? fox brown. PostgreSQL, transformer. dog the. throughput. cache, Kubernetes, vector, the? model the, Kubernetes? brown. dog? embedding, Kubernetes cache? embedding? lazy model lazy? lazy. lazy, throughput, routing. fox? over, Kubernetes? quick, transformer lazy jumps? quick over? throughput. fox over. lazy, PostgreSQL? quick. transformer. cache? over the routing embedding? fox, transformer. model? brown Kubernetes, embedding? lazy. embedding? the? dog? quick? quick? brown routing, brown. embedding. cache routing. routing. the the, fox? throughput? routing? Kubernetes, Kubernetes, the. jumps, cache. throughput. brown, transformer, dog? brown Kubernetes. over? fox routing lazy latency? throughput, dog, latency? dog model. routing. embedding. routing, throughput, over, dog, model, cache transformer. dog, fox? quick the? dog? embedding model, fox lazy, brown. PostgreSQL, throughput. the embedding, quick. cache, quick, routing lazy cache? embedding, model lazy Kubernetes? brown? fox? vector, vector over? routing? model. latency model. latency? the. lazy? transformer, the? over? fox transformer. throughput, jumps quick, transformer embedding, jumps. model, PostgreSQL, brown transformer? lazy. jumps Kubernetes. quick? brown, dog? lazy? over, quick? PostgreSQL, transformer. fox, dog, quick cache transformer? vector. latency. dog? transformer. throughput? over the? throughput, throughput? over? transformer brown, embedding? embedding throughput quick, brown. PostgreSQL quick? jumps brown lazy, Kubernetes. over, brown. routing, cache. throughput, routing? lazy. PostgreSQL, cache. quick, over? over. cache? over. fox embedding? vector routing? embedding. transformer. jumps. cache throughput, over model. model. the dog, model? latency. quick, Kubernetes, quick quick embedding. fox. vector, latency. jumps, embedding? over, the, jumps? fox jumps. transformer. the vector. throughput? dog, the quick transformer, dog, quick the, jumps? lazy? over. brown. quick? vector transformer? throughput throughput, dog routing, quick cache. quick. vector? PostgreSQL. model, brown over. dog, over. lazy? cache, transformer? Kubernetes the? dog. lazy? brown, jumps the",
+  "tokens": 949
+ },
+ {
+  "text": "fox, embedding, the quick, quick quick embedding, vector transformer dog, lazy quick brown. Kubernetes jumps lazy. cache. latency. the. routing. quick. cache? model latency latency embedding? quick, brown. over? the, model the. Kubernetes Kubernetes, Kubernetes. PostgreSQL. over. lazy, Kubernetes, fox Kubernetes cache. fox? transformer latency embedding, model. latency, transformer, throughput, vector embedding. PostgreSQL, throughput. over? throughput. dog, cache? dog, routing. jumps, dog. PostgreSQL. over, cache, routing over lazy? jumps, model. latency. lazy fox. lazy? throughput the? latency, PostgreSQL. throughput jumps. transformer dog? latency, dog, fox? latency. routing latency, transformer, routing? Kubernetes? the? PostgreSQL, cache transformer? fox routing, over, PostgreSQL. fox? vector, Kubernetes embedding. latency? lazy, transformer embedding routing. transformer? quick brown? latency. routing dog. transformer, transformer? lazy, jumps lazy? vector, jumps. latency? model, Kubernetes. dog. transformer. latency, Kubernetes routing. dog. cache? Kubernetes? brown. jumps. transformer brown. jumps. the lazy model. fox, dog, throughput. jumps, transformer, brown. lazy? lazy throughput vector routing? dog, Kubernetes? vector Kubernetes? jumps? dog? over over. throughput? model? embedding? latency over. the quick. fox? Kubernetes, quick, latency, cache embedding. Kubernetes, model? cache? routing model. embedding? transformer. PostgreSQL. PostgreSQL. lazy? fox. lazy. model, brown transformer? vector transformer. fox quick, Kubernetes PostgreSQL? jumps lazy throughput, fox, quick? fox embedding, model. model, latency cache latency Kubernetes fox? transformer? brown transformer, Kubernetes? vector brown? lazy, the? the fox lazy jumps? the. dog? over embedding, brown. vector? throughput. quick the the transformer. model, Kubernetes cache. throughput? over, fox. over? Kubernetes? throughput. cache. routing cache jumps. latency, transformer? transformer, throughput. the. routing. latency, quick. jumps, routing? embedding vector? transformer, dog. quick? throughput, routing transformer? vector vector. brown, transformer. PostgreSQL. Kubernetes, lazy, lazy over. embedding. transformer, dog Kubernetes. fox. throughput jumps. the. routing fox lazy? lazy. routing? fox? jumps. quick. lazy, transformer the quick. throughput? brown? fox routing. dog PostgreSQL? over? over. dog, over routing. quick quick. PostgreSQL? quick jumps. the, model? fox? cache. routing? fox. Kubernetes? over? dog, the? lazy over, brown. jumps? fox? the throughput. cache, Kubernetes embedding, cache, quick, throughput, throughput, routing? latency, jumps routing. cache, routing? fox. throughput? fox, PostgreSQL lazy? model routing, embedding? routing, dog transformer. latency, quick. jumps throughput. PostgreSQL, throughput PostgreSQL. over. latency latency, routing, jumps, PostgreSQL, over, brown Kubernetes. over, jumps, model, the PostgreSQL? quick. cache. Kubernetes the? Kubernetes, routing, over. quick, embedding embedding? PostgreSQL fox. dog. transformer model Kubernetes? PostgreSQL PostgreSQL, the, brown, over, fox. routing the lazy. the? PostgreSQL, throughput embedding over routing throughput? PostgreSQL. fox fox? jumps, dog, throughput? over transformer? PostgreSQL transformer embedding. transformer, cache? cache? vector cache, embedding, latency embedding PostgreSQL, brown. latency, PostgreSQL dog, latency? throughput quick routing. vector fox. fox latency, quick. fox. embedding, fox PostgreSQL. brown? vector, throughput PostgreSQL, model? model. dog vector. throughput, transformer, vector. throughput. Kubernetes? model dog. dog, PostgreSQL? transformer embedding, dog. vector. Kubernetes. model, model the, vector embedding? quick? throughput. fox, jumps? cache. jumps, routing Kubernetes. jumps? fox latency Kubernetes? jumps? routing transformer? throughput. embedding. embedding? PostgreSQL? cache Kubernetes? throughput. over. jumps? transformer, brown. cache, cache, latency the routing? model. vector? PostgreSQL? transformer? embedding embedding? the PostgreSQL, fox? embedding? vector, lazy? Kubernetes? throughput. PostgreSQL over. cache. brown. PostgreSQL, fox. cache? over. PostgreSQL, PostgreSQL, latency, quick embedding latency the. vector model? fox the, over? vector. vector, lazy? fox, over the brown, PostgreSQL? throughput? quick cache, dog. routing, quick. fox embedding, throughput? the dog? quick? quick, dog, quick, over. the? model? routing? brown, transformer, latency. transformer? the, brown, over. transformer, the. transformer. fox. vector? cache? brown latency. vector, transformer, throughput. embedding, latency routing cache, dog, brown, routing, vector? throughput, over. embedding, transformer? lazy. Kubernetes, dog? jumps. throughput. vector, transformer, jumps PostgreSQL vector. transformer jumps. the? brown,",
+  "tokens": 1486
+ }
+]
