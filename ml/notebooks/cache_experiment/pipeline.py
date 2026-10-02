@@ -391,6 +391,40 @@ def d2_merge_annotations(run, filled_a, filled_b, adjudication_csv=None):
     return agreement, pending
 
 
+def d2_seal_single_annotation(run, filled_csv, provenance, duplicates=()):
+    """Seal labels from a single annotator, e.g. an LLM (decision 2026-10-02).
+
+    Recorded as annotation_mode=single_llm with no inter-annotator agreement.
+    `duplicates` are other submitted files that were identical to this one; they
+    are pinned in the manifest but not counted as additional annotators.
+    """
+    if run.path("d2", "annotations.parquet").exists():
+        raise FileExistsError("Annotations are already sealed in this run")
+    variants = ce.read_parquet(run.require("d2", "variants.parquet"))
+    sheet = ce.unblind(_read_annotation(filled_csv), variants, run.config["d2"]["annotation_seed"])
+    if set(sheet.item_id) != set(variants.item_id):
+        raise ValueError("Annotation sheet items differ from the sealed variants")
+    labels = ce.single_annotation(sheet)
+    for other in duplicates:
+        again = ce.unblind(_read_annotation(other), variants, run.config["d2"]["annotation_seed"]).set_index("item_id")
+        cols = ["semantic_equivalent", "cached_answer_correct_for_target", "rationale"]
+        if not again.loc[labels.item_id, cols].reset_index(drop=True).equals(labels[cols]):
+            raise ValueError(f"{other} is not identical; it is a second annotation, not a duplicate")
+    final = variants.merge(labels, on="item_id", validate="one_to_one")
+    digest = ce.write_parquet_once(run.path("d2", "annotations.parquet"), final)
+    if not run.path("d2", "annotation-single-filled.csv").exists():
+        shutil.copyfile(filled_csv, run.path("d2", "annotation-single-filled.csv"))
+    manifest = {"frozen_at": now(), "annotations_sha256": digest, "annotation_mode": "single_llm",
+                "provenance": provenance, "annotator": labels.annotator.iat[0],
+                "source_sha256": ce.sha(filled_csv),
+                "identical_duplicates": [{"file": Path(p).name, "sha256": ce.sha(p)} for p in duplicates],
+                "agreement": None,
+                "final_counts": {f: final[f].value_counts().to_dict() for f in ("semantic_equivalent", "cached_answer_correct_for_target")},
+                "by_split_role": final.groupby(["d2_split", "role"]).size().rename("n").reset_index().to_dict("records")}
+    ce.exact_json(run.path("d2", "dataset-manifest.json"), manifest)
+    return manifest
+
+
 def _d2_split_inputs(run, split, embedder, reranker, limit=16):
     """Cache = the split's originals + the D1 pool as background; queries = variants."""
     labels = ce.read_parquet(run.require("d2", "annotations.parquet"))

@@ -171,6 +171,8 @@ def build(run, representative_trace=None):
                          ignore_index=True)
     exposure.to_csv(tables / "threshold-exposure.csv", index=False)
 
+    dataset = ce.read(run.path("d2", "dataset-manifest.json")) if run.path("d2", "dataset-manifest.json").exists() else {}
+    mode = dataset.get("annotation_mode", "two_annotators" if dataset else None)
     pricing = cfg["pricing"]
     lines = [f"# 캐시 실험 결과 초안 ({cfg['experiment_id']} / {run.run_id})", "",
              "`06_report.ipynb`가 봉인된 산출물로 만든 **초안**이다. 해석과 결론은 사람이 검토해 채운다.", "",
@@ -181,7 +183,9 @@ def build(run, representative_trace=None):
              f"- 추론 장치: {json.dumps(prepare.get('devices'), ensure_ascii=False)}; 임계값 ±1e-4 안의 판정 수(D1 C2·C3 합): "
              f"{int(exposure[['near_cosine_floor', 'near_rerank_cosine', 'near_rerank_score']].to_numpy().sum())}", "",
              "## D1 (운영 설정, seed 평균)", "", _md(main.filter(regex="repeat_fraction|^arm$|_mean$")), "",
-             "## D2 test", "", "```json", json.dumps(d2, indent=1, ensure_ascii=False) if d2 else "아직 실행하지 않음", "```", "",
+             "## D2 test", "",
+             f"판정 방식: {mode}" + (" — **LLM 판정 1개 기준. 사람 검증된 안전성으로 주장하지 않는다.**" if mode == "single_llm" else ""),
+             "", "```json", json.dumps(d2, indent=1, ensure_ascii=False) if d2 else "아직 실행하지 않음", "```", "",
              "## 지연 (로컬 실측)", "", _md(latency) if latency is not None else "아직 측정하지 않음", "",
              f"연산 단가: {pricing['compute_usd_per_hour']} USD/h ({pricing['compute_price_source']}, "
              f"{pricing['compute_price_snapshot_date']})", "", "## 그림", ""] + [f"- `{p.relative_to(run.root)}`" for p in paths]

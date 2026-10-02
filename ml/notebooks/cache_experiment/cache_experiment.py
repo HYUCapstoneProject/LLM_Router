@@ -1060,6 +1060,21 @@ def merge_annotations(first, second, adjudication=None):
     return out.reset_index(), pending, report
 
 
+def single_annotation(sheet):
+    """Final labels from one annotator (no agreement statistics are possible)."""
+    fields = ("semantic_equivalent", "cached_answer_correct_for_target")
+    allowed = {"semantic_equivalent": {YES, NO}, "cached_answer_correct_for_target": {YES, NO, UNSURE}}
+    if sheet.annotator.fillna("").str.strip().eq("").any():
+        raise ValueError("Every row needs the annotator recorded")
+    if sheet.annotator.nunique() != 1:
+        raise ValueError("A single-annotator sheet must come from one annotator")
+    for f in fields:
+        bad = ~sheet[f].isin(allowed[f])
+        if bad.any():
+            raise ValueError(f"Invalid {f} values: {sorted(set(sheet.loc[bad, f]))[:5]}")
+    return sheet[["item_id", *fields, "rationale", "annotator"]].reset_index(drop=True)
+
+
 # ----------------------------------------------------------- D2 evaluation --
 
 def candidate_table(query_vectors, cache_vectors, limit=16):

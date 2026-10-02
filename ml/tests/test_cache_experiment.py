@@ -342,6 +342,16 @@ class D2Test(unittest.TestCase):
                          {"g1-p": "low-quality trap", "g1-n": "low-quality trap", "g2-p": "", "g2-n": ""})
         self.assertEqual(ce.quality_flags("source anomaly: x"), ["source anomaly"])
 
+    def test_single_annotation(self):
+        sheet = pd.DataFrame({"item_id": ["a", "b"], "semantic_equivalent": ["Y", "N"],
+                              "cached_answer_correct_for_target": ["Y", "U"], "rationale": ["r", "r"],
+                              "annotator": ["llm", "llm"]})
+        self.assertEqual(len(ce.single_annotation(sheet)), 2)
+        with self.assertRaises(ValueError):
+            ce.single_annotation(sheet.assign(annotator=["llm", "other"]))
+        with self.assertRaises(ValueError):
+            ce.single_annotation(sheet.assign(semantic_equivalent=["Y", "U"]))
+
     def test_kappa(self):
         self.assertAlmostEqual(ce.cohen_kappa(["Y", "N", "Y", "N"], ["Y", "N", "Y", "N"]), 1.0)
         self.assertLess(ce.cohen_kappa(["Y", "N", "Y", "N"], ["N", "Y", "N", "Y"]), 0)
