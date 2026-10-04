@@ -1,0 +1,79 @@
+{
+  "rows": 4050,
+  "decided": 4042,
+  "unknown": 8,
+  "agreement_on_decided": 0.9992577931716972,
+  "disagreements": 3,
+  "table": [
+    {
+      "source_dataset": "routerbench",
+      "task_family": "mcq",
+      "scored": "correct",
+      "recorded_success": 1.0,
+      "rows": 2307
+    },
+    {
+      "source_dataset": "routerbench",
+      "task_family": "mcq",
+      "scored": "incorrect",
+      "recorded_success": 0.0,
+      "rows": 1209
+    },
+    {
+      "source_dataset": "routerbench",
+      "task_family": "mcq",
+      "scored": "unknown",
+      "recorded_success": 0.0,
+      "rows": 1
+    },
+    {
+      "source_dataset": "xroutebench",
+      "task_family": "mcq",
+      "scored": "correct",
+      "recorded_success": 1.0,
+      "rows": 317
+    },
+    {
+      "source_dataset": "xroutebench",
+      "task_family": "mcq",
+      "scored": "incorrect",
+      "recorded_success": 0.0,
+      "rows": 64
+    },
+    {
+      "source_dataset": "xroutebench",
+      "task_family": "numeric",
+      "scored": "correct",
+      "recorded_success": 0.0,
+      "rows": 3
+    },
+    {
+      "source_dataset": "xroutebench",
+      "task_family": "numeric",
+      "scored": "correct",
+      "recorded_success": 1.0,
+      "rows": 78
+    },
+    {
+      "source_dataset": "xroutebench",
+      "task_family": "numeric",
+      "scored": "incorrect",
+      "recorded_success": 0.0,
+      "rows": 64
+    },
+    {
+      "source_dataset": "xroutebench",
+      "task_family": "numeric",
+      "scored": "unknown",
+      "recorded_success": 0.0,
+      "rows": 2
+    },
+    {
+      "source_dataset": "xroutebench",
+      "task_family": "numeric",
+      "scored": "unknown",
+      "recorded_success": 1.0,
+      "rows": 5
+    }
+  ]
+}
