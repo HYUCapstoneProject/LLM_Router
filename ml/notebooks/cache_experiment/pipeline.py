@@ -583,7 +583,8 @@ def bundle(run):
     """results-for-review.zip without raw benchmark text or embeddings."""
     target = run.path("report", "results-for-review.zip")
     skip = (".npy", "pool.parquet", "requests.parquet", "authoring", "annotation-", "adjudication", "variants.parquet",
-            "annotations.parquet", "test-outcomes.parquet", "parity.parquet", "scorer-selfcheck.parquet")
+            "annotations.parquet", "test-outcomes.parquet", "parity.parquet", "scorer-selfcheck.parquet",
+            "originals.parquet")
     with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as z:
         for path in sorted(run.root.rglob("*")):
             if path.is_file() and path != target and not any(s in path.name for s in skip):
