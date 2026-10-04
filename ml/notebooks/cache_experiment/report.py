@@ -174,6 +174,7 @@ def build(run, representative_trace=None):
     dataset = ce.read(run.path("d2", "dataset-manifest.json")) if run.path("d2", "dataset-manifest.json").exists() else {}
     mode = dataset.get("annotation_mode", "two_annotators" if dataset else None)
     pricing = cfg["pricing"]
+    calibration = calibration_lines(run)
     lines = [f"# 캐시 실험 결과 초안 ({cfg['experiment_id']} / {run.run_id})", "",
              "`06_report.ipynb`가 봉인된 산출물로 만든 **초안**이다. 해석과 결론은 사람이 검토해 채운다.", "",
              "## 준비", "",
@@ -183,6 +184,7 @@ def build(run, representative_trace=None):
              f"- 추론 장치: {json.dumps(prepare.get('devices'), ensure_ascii=False)}; 임계값 ±1e-4 안의 판정 수(D1 C2·C3 합): "
              f"{int(exposure[['near_cosine_floor', 'near_rerank_cosine', 'near_rerank_score']].to_numpy().sum())}", "",
              "## D1 (운영 설정, seed 평균)", "", _md(main.filter(regex="repeat_fraction|^arm$|_mean$")), "",
+             "## D2 보정 (calibration 100그룹)", ""] + calibration + ["",
              "## D2 test", "",
              f"판정 방식: {mode}" + (" — **LLM 판정 1개 기준. 사람 검증된 안전성으로 주장하지 않는다.**" if mode == "single_llm" else ""),
              "", "```json", json.dumps(d2, indent=1, ensure_ascii=False) if d2 else "아직 실행하지 않음", "```", "",
@@ -191,6 +193,26 @@ def build(run, representative_trace=None):
              f"{pricing['compute_price_snapshot_date']})", "", "## 그림", ""] + [f"- `{p.relative_to(run.root)}`" for p in paths]
     run.path("report", "REPORT-draft.md").write_text("\n".join(lines) + "\n")
     return main, d2, latency, e2e
+
+
+def calibration_lines(run):
+    """What 03 froze, and how close the grid came when nothing met the limit."""
+    if not run.path("d2", "frozen-policy.json").exists():
+        return ["아직 보정하지 않음"]
+    policy = ce.read(run.path("d2", "frozen-policy.json"))
+    lines = [f"- 상태: `{policy['status']}` (상한 false reuse among hits ≤ {policy['limit']})",
+             f"- 봉인 정책: `{json.dumps(policy['spec'], ensure_ascii=False)}` → 운영 형태 "
+             f"`{json.dumps(policy['operational_policy'], ensure_ascii=False)}`"]
+    if policy["spec"] is None:
+        lines.append("- 상한을 만족하는 의미 캐시 정책이 없어 C_cal은 exact-only다. D1의 C_cal은 C1과 같은 정책이다.")
+    grid = run.path("d2", "calibration-grid.parquet")
+    if grid.exists():
+        g = ce.read_parquet(grid).query("hits > 0")
+        best = g.sort_values(["false_reuse_among_hits", "reusable_hits"], ascending=[True, False]).iloc[0]
+        cols = ["kind", "k", "cosine", "rerank_similarity", "rerank_score", "hits", "false_reuse",
+                "false_reuse_among_hits", "reusable_hits", "paraphrase_hit_rate", "hard_negative_hit_rate"]
+        lines += [f"- 격자 {len(g)}개 설정 중 false reuse among hits 최저 설정:", "", _md(best[cols].to_frame().T)]
+    return lines
 
 
 def _md(frame):
