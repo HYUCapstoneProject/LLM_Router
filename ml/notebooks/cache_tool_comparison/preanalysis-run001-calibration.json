@@ -1,0 +1,73 @@
+{
+ "split": "calibration",
+ "items": 200,
+ "retrieval": {
+  "own_original_top1": 0.995,
+  "own_original_in_top16": 1.0
+ },
+ "separability": {
+  "auc_cosine_equivalent_vs_not": 0.6834683468346835,
+  "auc_rerank_equivalent_vs_not": 0.6862686268626863,
+  "groups_with_equivalent_paraphrase": 99,
+  "groups_trap_cosine_ge_paraphrase": 0.3434343434343434,
+  "groups_trap_rerank_ge_paraphrase": 0.18181818181818182,
+  "traps_cosine_ge_0_99": 0.21,
+  "paraphrases_cosine_ge_0_99": 0.34,
+  "by_role": {
+   "cos": {
+    "hard_negative": 0.9653,
+    "paraphrase": 0.9857
+   },
+   "rerank": {
+    "hard_negative": 0.4815,
+    "paraphrase": 0.908
+   }
+  }
+ },
+ "keyword_guard": {
+  "blocks_traps": 0.62,
+  "blocks_equivalent_paraphrases": 0.3838383838383838,
+  "blocks_reusable": 0.36619718309859156,
+  "blocks_traps_by_type": {
+   "code_language": 1.0,
+   "entity_swap": 0.647,
+   "negation": 0.615,
+   "number_unit": 0.667,
+   "order": 0.45,
+   "output_format": 0.571,
+   "time": 0.625
+  },
+  "paraphrase_block_reasons": {
+   "negation": 4,
+   "time": 8,
+   "order": 18,
+   "number": 17,
+   "output_format": 1
+  }
+ },
+ "escalation_overwrite": {
+  "overwrite_similarity": 0.95,
+  "traps_c3_hit_and_ge_overwrite": 0.56,
+  "traps_ge_overwrite": 0.69
+ },
+ "most_similar_traps": [
+  {
+   "group_id": "d2-136",
+   "negative_type": "order",
+   "cosine": 0.99965,
+   "rerank": 0.9322
+  },
+  {
+   "group_id": "d2-039",
+   "negative_type": "order",
+   "cosine": 0.99949,
+   "rerank": 0.9747
+  },
+  {
+   "group_id": "d2-129",
+   "negative_type": "number_unit",
+   "cosine": 0.99932,
+   "rerank": 0.9059
+  }
+ ]
+}
