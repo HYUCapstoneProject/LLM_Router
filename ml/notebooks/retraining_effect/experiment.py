@@ -6,8 +6,12 @@ operational 1.0 anchor) replays recorded benchmark outcomes to create upward
 escalation feedback; F1 learns only the current cycle's feedback, F2 adds the
 operational history replay and base rehearsal, F3 adds to F2 confirmed-easy
 rows (logger routed easy and the low tier solved it first try) drawn without
-reuse so the three labels are as even as possible. Heavy ML imports happen
-only for training/inference.
+reuse so the three labels are as even as possible. F4 replaces the upward
+escalation feedback with every arrived request whose logger label differs from
+its original benchmark label in either direction, trained on that original
+label with the same history replay and base rehearsal as F2; it is evaluated
+on the sealed test and RouterArena. Heavy ML imports happen only for
+training/inference.
 """
 from __future__ import annotations
 
@@ -26,17 +30,22 @@ import pandas as pd
 
 LABELS = ("easy", "medium", "hard")
 TIERS = ("low", "medium", "high")
-ARMS = ("f1_cycle_only", "f2_replay", "f3_balanced_easy")
+ARMS = ("f1_cycle_only", "f2_replay", "f3_balanced_easy", "f4_bidirectional")
 DEFAULT_ARMS = ["f1_cycle_only", "f2_replay"]
 FROZEN = "f0_frozen"
 INPUT_ROLES = ("train", "dev", "gate", "feedback", "forget", "routerarena")
 FINAL_ROLES = ("gate", "forget", "routerarena")
-OUTCOME_ROLES = ("feedback", "gate", "forget")
+EXTRA_ROLES = ("test",)
+ALL_FINAL_ROLES = (*FINAL_ROLES, *EXTRA_ROLES)
+# Never trained on; a shared text between two of these is reported, not treated as leakage.
+EVALUATION_ONLY = frozenset({"routerarena", "test"})
+OUTCOME_ROLES = ("feedback", "gate", "forget", "test")
 OUTCOME_COLUMNS = tuple(f"{kind}_{tier}" for kind in ("success", "quality", "actual_cost") for tier in TIERS)
 TRAINER_COLUMNS = ["sample_id", "duplicate_group_id", "model_input_text", "difficulty_label",
                    "sample_weight", "split", "label_origin"]
 FEEDBACK_ORIGIN = "simulated_observed_escalation"
 CONFIRMED_EASY_ORIGIN = "simulated_confirmed_first_try_easy"
+DISAGREEMENT_ORIGIN = "simulated_label_disagreement"
 HERE = Path(__file__).resolve().parent
 SOURCE_ROOT = HERE.parents[1] / "src" / "llm_router_labeling"
 
@@ -95,12 +104,21 @@ def run_arms(config):
     return list(config.get("arms", DEFAULT_ARMS))
 
 
+def final_roles(config):
+    roles = list(config.get("final_roles", FINAL_ROLES))
+    if not roles or set(roles) - set(ALL_FINAL_ROLES) or len(set(roles)) != len(roles):
+        raise ValueError(f"Unknown or duplicated final roles: {roles}")
+    return roles
+
+
 def steps_per_epoch(rows, config):
     return math.ceil(math.ceil(rows / config["train_batch_size"]) / config["gradient_accumulation_steps"])
 
 
 def validate_frames(frames):
-    seen = {"sample_id": set(), "duplicate_group_id": set(), "text": set()}
+    """Reject leakage across roles; returns tolerated text overlaps between evaluation-only roles."""
+    seen = {"sample_id": {}, "duplicate_group_id": {}, "text": {}}
+    overlaps = {}
     for role, frame in frames.items():
         required = {"sample_id", "duplicate_group_id", "model_input_text", "difficulty_label",
                     "source_dataset", "category"}
@@ -117,9 +135,15 @@ def validate_frames(frames):
                   "duplicate_group_id": frame.duplicate_group_id.astype(str),
                   "text": frame.model_input_text.map(text_key)}
         for key, series in values.items():
-            if (key != "duplicate_group_id" and series.duplicated().any()) or seen[key] & set(series):
+            if key != "duplicate_group_id" and series.duplicated().any():
                 raise ValueError(f"Duplicate/leakage in {role}: {key}; keep identities unique and groups within one role")
-            seen[key].update(series)
+            shared = [value for value in set(series) if value in seen[key]]
+            owners = {seen[key][value] for value in shared}
+            if shared and not (key == "text" and role in EVALUATION_ONLY and owners <= EVALUATION_ONLY):
+                raise ValueError(f"Duplicate/leakage in {role}: {key}; keep identities unique and groups within one role")
+            if shared:
+                overlaps[f"{role}~{'+'.join(sorted(owners))}:{key}"] = len(shared)
+            seen[key].update(dict.fromkeys(series, role))
         if role in OUTCOME_ROLES:
             missing = set(OUTCOME_COLUMNS) - set(frame.columns)
             if missing:
@@ -132,9 +156,38 @@ def validate_frames(frames):
                 raise ValueError(f"{role}: success columns must be 0/1")
             if (frame[[f"actual_cost_{t}" for t in TIERS]].to_numpy(float) < 0).any():
                 raise ValueError(f"{role}: negative recorded cost")
+    return overlaps
 
 
-def load_inputs(config_path, pins_path, data_dir):
+def load_extra_inputs(config, extra_inputs):
+    """Evaluation-only roles shipped with a kit (e.g. the sealed test), pinned by its manifest."""
+    roles = list(config.get("extra_input_roles", []))
+    if set(roles) - set(EXTRA_ROLES) or len(set(roles)) != len(roles):
+        raise ValueError(f"Unknown or duplicated extra input roles: {roles}")
+    missing = [r for r in final_roles(config) if r in EXTRA_ROLES and r not in roles]
+    if missing:
+        raise ValueError(f"Final roles {missing} must be declared in extra_input_roles")
+    if not roles:
+        if extra_inputs is not None:
+            raise ValueError("Extra inputs given but the config declares no extra_input_roles")
+        return {}, {}
+    if extra_inputs is None:
+        raise ValueError(f"This config needs --extra-inputs for roles {roles}")
+    manifest_path = Path(extra_inputs).resolve()
+    manifest = read(manifest_path)
+    frames, pins = {}, {}
+    for role in roles:
+        entry = manifest["roles"][role]
+        path = (manifest_path.parent / entry["path"]).resolve()
+        if not path.is_relative_to(manifest_path.parent):
+            raise ValueError("Extra input path traversal")
+        file_pin(path, entry["sha256"])
+        frames[role] = pd.read_parquet(path).reset_index(drop=True)
+        pins[role] = {"path": str(path), "sha256": entry["sha256"], "rows": int(len(frames[role]))}
+    return frames, pins
+
+
+def load_inputs(config_path, pins_path, data_dir, extra_inputs=None):
     config, pins = read(config_path), read(pins_path)
     if config["promotion_mode"] != "direct_research_only" or config["train_max_length"] != 512:
         raise ValueError("Protocol requires research-only direct promotion and 512-token training")
@@ -153,6 +206,7 @@ def load_inputs(config_path, pins_path, data_dir):
         raise ValueError("F1 matches F2's optimizer steps; prepare them together")
     if "f3_balanced_easy" in arms and not isinstance(config.get("easy_supplement_seed"), int):
         raise ValueError("F3 needs an integer easy_supplement_seed")
+    final_roles(config)
     if config.get("feedback_per_window_cap") is not None:
         raise ValueError("2026-09-28 decision: every valid feedback event is used; no per-window cap")
     pins = json.loads(json.dumps(pins))
@@ -189,7 +243,11 @@ def load_inputs(config_path, pins_path, data_dir):
         path = Path(data_dir) / f"{role}.parquet"
         file_pin(path, pins["data_sha256"][role])
         frames[role] = pd.read_parquet(path).reset_index(drop=True)
-    validate_frames(frames)
+    extra_frames, extra_pins = load_extra_inputs(config, extra_inputs)
+    frames.update(extra_frames)
+    overlaps = validate_frames(frames)
+    if extra_pins:
+        pins["extra_inputs"] = {"roles": extra_pins, "evaluation_only_text_overlaps": overlaps}
     return config, pins, frames
 
 
@@ -286,7 +344,7 @@ def logger_receipt(pins, log_path):
 
 
 def build_logger_log(args):
-    config, pins, frames = load_inputs(args.config, args.pins, args.data_dir)
+    config, pins, frames = load_inputs(args.config, args.pins, args.data_dir, getattr(args, "extra_inputs", None))
     path = Path(args.output_file)
     if path.exists() or path.with_suffix(".json").exists():
         raise ValueError("Logger output already exists; do not overwrite the frozen stream")
@@ -305,6 +363,21 @@ def parent_update(update, config):
     """Operational successfulHttpRequest rule: each major cycle restarts from its .0 anchor."""
     cycle_start = ((update - 1) // config["updates_per_major"]) * config["updates_per_major"]
     return "anchor" if cycle_start == 0 else f"update-{cycle_start:02d}"
+
+
+def disagreement_rows(stream):
+    """Arrived requests whose logger label differs from the original benchmark label (both directions).
+
+    The training label stays the original benchmark label; logger_direction records
+    whether the logger had routed higher or lower than that label.
+    """
+    logged = stream.initial_label.map(LABELS.index).to_numpy()
+    original = stream.difficulty_label.map(LABELS.index).to_numpy()
+    rows = stream[logged != original].copy()
+    rows["benchmark_difficulty_label"] = rows.difficulty_label
+    rows["logger_direction"] = np.where(logged[logged != original] > original[logged != original], "higher", "lower")
+    rows["label_origin"] = DISAGREEMENT_ORIGIN
+    return rows
 
 
 def make_updates(config, frames, log):
@@ -339,6 +412,7 @@ def make_updates(config, frames, log):
     confirmed["benchmark_difficulty_label"] = confirmed.difficulty_label
     confirmed["difficulty_label"] = "easy"
     confirmed["label_origin"] = CONFIRMED_EASY_ORIGIN
+    disagreements = disagreement_rows(stream)
     used_easy, supplement = set(), {}
     per = config["updates_per_major"]
     for update in range(1, config["windows"] + 1):
@@ -358,6 +432,11 @@ def make_updates(config, frames, log):
             supplement[name] = {"target_easy": target, "base_easy": int(counts["easy"]), "added_easy": int(len(added)),
                                 "pool_available": int(len(pool)), "shortfall": int(need - len(added))}
             rows["f3_balanced_easy"] = pd.concat([replay, added], ignore_index=True)
+        if "f4_bidirectional" in arms:
+            # Same replay recipe as F2, with label disagreements in place of escalation feedback.
+            current4 = disagreements[disagreements.window.between(cycle_start + 1, update)]
+            history4 = per_label(disagreements[disagreements.window.le(cycle_start)], config["history_per_label"], seed)
+            rows["f4_bidirectional"] = pd.concat([current4, history4, base], ignore_index=True)
         for arm in arms:
             train = rows[arm].assign(split="train", sample_weight=1.0)
             updates[arm][name] = pd.concat([train[TRAINER_COLUMNS], validation[TRAINER_COLUMNS]], ignore_index=True)
@@ -365,9 +444,9 @@ def make_updates(config, frames, log):
 
 
 def training_budget(config, updates):
-    """F2/F3 use the operational 3 epochs of their own rows; F1 repeats epochs to match F2's steps."""
+    """F2/F3/F4 use the operational 3 epochs of their own rows; F1 repeats epochs to match F2's steps."""
     budget = {arm: {} for arm in updates}
-    for arm in ("f2_replay", "f3_balanced_easy"):
+    for arm in ("f2_replay", "f3_balanced_easy", "f4_bidirectional"):
         for name, data in updates.get(arm, {}).items():
             rows = int(data.split.eq("train").sum())
             budget[arm][name] = {"train_rows": rows, "epochs": config["f2_epochs"],
@@ -380,8 +459,23 @@ def training_budget(config, updates):
     return budget
 
 
+def selection_summary(stream, config):
+    rows = disagreement_rows(stream)
+    windows = range(1, config["windows"] + 1)
+    by_window = rows.groupby(["window", "logger_direction"]).size().unstack(fill_value=0)
+    by_window = by_window.reindex(index=windows, columns=["higher", "lower"], fill_value=0)
+    short = {int(w): int(n) for w, n in by_window.sum(1).items() if n < config["minimum_feedback_per_window"]}
+    if short:
+        raise ValueError(f"Windows {short} have fewer than {config['minimum_feedback_per_window']} disagreement rows")
+    return {"per_window": {str(w): {k: int(v) for k, v in r.items()} for w, r in by_window.iterrows()},
+            "label_counts": {k: int(v) for k, v in rows.difficulty_label.value_counts().items()},
+            "direction_label_counts": {f"{d}/{l}": int(v) for (d, l), v in rows.groupby(["logger_direction", "difficulty_label"]).size().items()},
+            "source_counts": {k: int(v) for k, v in rows.source_dataset.value_counts().items()},
+            "logger_label_accuracy": float(1 - len(rows) / len(stream))}
+
+
 def prepare(args):
-    config, pins, frames = load_inputs(args.config, args.pins, args.data_dir)
+    config, pins, frames = load_inputs(args.config, args.pins, args.data_dir, getattr(args, "extra_inputs", None))
     log_path = Path(args.logger_log)
     receipt = read(log_path.with_suffix(".json"))
     if receipt != logger_receipt(pins, log_path):
@@ -407,6 +501,8 @@ def prepare(args):
             "anchor_archive": read(archives)["r0"] if archives.exists() else None,
             "training_budget": training_budget(config, updates),
             "easy_supplement": supplement,
+            "bidirectional_selection": selection_summary(stream, config) if "f4_bidirectional" in run_arms(config) else None,
+            "final_roles": final_roles(config),
             "feedback_per_window": {str(k): int(v) for k, v in events.window.value_counts().sort_index().items()},
             "feedback_label_counts": {k: int(v) for k, v in events.difficulty_label.value_counts().items()},
             "feedback_source_counts": {k: int(v) for k, v in events.source_dataset.value_counts().items()},
@@ -419,6 +515,8 @@ def prepare(args):
     print(json.dumps({"run_dir": str(root), "feedback_per_window": plan["feedback_per_window"],
                       "feedback_label_counts": plan["feedback_label_counts"],
                       "easy_supplement": plan["easy_supplement"],
+                      "bidirectional_selection": plan["bidirectional_selection"],
+                      "extra_inputs": pins.get("extra_inputs"),
                       "training_budget": plan["training_budget"]}, indent=2))
 
 
@@ -605,8 +703,8 @@ def score_final(args):
     root = Path(args.run_dir)
     plan = load_plan(root)
     cfg, pins = plan["config"], plan["pins"]
-    if args.role not in FINAL_ROLES:
-        raise ValueError("Unsupported final role")
+    if args.role not in final_roles(cfg):
+        raise ValueError(f"Final roles of this run: {final_roles(cfg)}")
     if not (root / "final-lock.json").exists():
         raise ValueError("Final evaluation needs final-lock.json after all training and window scoring")
     lock = read(root / "final-lock.json")
@@ -623,8 +721,12 @@ def score_final(args):
             raise ValueError("Final checkpoint changed after the lock")
     else:
         raise ValueError("Unsupported arm/seed")
-    path = Path(plan["data_dir"]) / f"{args.role}.parquet"
-    file_pin(path, pins["data_sha256"][args.role])
+    extra = pins.get("extra_inputs", {}).get("roles", {})
+    if args.role in extra:
+        path, data_sha = Path(extra[args.role]["path"]), extra[args.role]["sha256"]
+    else:
+        path, data_sha = Path(plan["data_dir"]) / f"{args.role}.parquet", pins["data_sha256"][args.role]
+    file_pin(path, data_sha)
     frame = pd.read_parquet(path)
     plan_sha = sha(root / "plan.json")
     model_digest = digest(model_inventory(model))
@@ -634,7 +736,7 @@ def score_final(args):
     start = time.monotonic()
     logits = infer(model, frame, cfg["evaluation_max_length"], cfg["eval_batch_size"])
     write_scores(directory, frame, logits, {"arm": args.arm, "seed": args.seed, "role": args.role},
-                 plan_sha, pins["data_sha256"][args.role], model_digest, time.monotonic() - start)
+                 plan_sha, data_sha, model_digest, time.monotonic() - start)
 
 
 def paired_bootstrap(frame, left, right, draws, seed):
@@ -842,6 +944,218 @@ def compare(args):
     print(out)
 
 
+def tier_points(frame):
+    """Always-low/medium/high as (relative cost, mean quality) within one source; None if high is not costlier."""
+    cost = frame[[f"actual_cost_{t}" for t in TIERS]].to_numpy(float).mean(0)
+    quality = frame[[f"quality_{t}" for t in TIERS]].to_numpy(float).mean(0)
+    span = cost[2] - cost[0]
+    if span <= 0:
+        return None, cost[0], span
+    return [(float((c - cost[0]) / span), float(q)) for c, q in zip(cost, quality)], float(cost[0]), float(span)
+
+
+def mixing_frontier(points, x):
+    """Best mean quality reachable at relative cost x by randomly mixing always-tier policies."""
+    best = max([q for c, q in points if c <= x + 1e-12], default=float("nan"))
+    for i, (c1, q1) in enumerate(points):
+        for c2, q2 in points[i + 1:]:
+            lo, hi = sorted([(c1, q1), (c2, q2)])
+            if lo[0] <= x <= hi[0] and hi[0] > lo[0]:
+                best = max(best, lo[1] + (hi[1] - lo[1]) * (x - lo[0]) / (hi[0] - lo[0]))
+    return float(best)
+
+
+def first_choice(frame, predicted):
+    """Quality and source-normalized cost of the first routed tier (no escalation)."""
+    p = np.asarray(predicted, dtype=int)
+    idx = np.arange(len(frame))
+    quality = frame[[f"quality_{t}" for t in TIERS]].to_numpy(float)[idx, p]
+    cost = frame[[f"actual_cost_{t}" for t in TIERS]].to_numpy(float)[idx, p]
+    relative = np.full(len(frame), np.nan)
+    for source in frame.source_dataset.unique():
+        mask = frame.source_dataset.eq(source).to_numpy()
+        _, low, span = tier_points(frame[mask])
+        if span > 0:
+            relative[mask] = (cost[mask] - low) / span
+    return quality, relative
+
+
+def routing_by_source(frame, predicted):
+    quality, relative = first_choice(frame, predicted)
+    rows = []
+    for source in sorted(frame.source_dataset.unique()):
+        mask = frame.source_dataset.eq(source).to_numpy()
+        points, _, _ = tier_points(frame[mask])
+        q, c = float(quality[mask].mean()), float(relative[mask].mean())
+        frontier = mixing_frontier(points, c) if points else float("nan")
+        rows.append({"source": source, "rows": int(mask.sum()), "initial_quality": q, "relative_cost": c,
+                     "mixing_frontier_quality": frontier, "gain_over_mixing": q - frontier})
+    return rows
+
+
+def prequential_rows(cfg, stream, sources, missing):
+    rows = []
+    logger = stream.initial_label.map(LABELS.index).to_numpy()
+    for window in range(2, cfg["windows"] + 1):
+        mask = stream.window.eq(window).to_numpy()
+        rows.append({"arm": FROZEN, "seed": 0, "window": window, **all_metrics(stream[mask].reset_index(drop=True), logger[mask])})
+    for arm, (arm_root, arm_plan) in sources.items():
+        for seed in cfg["seeds"]:
+            for window in range(2, cfg["windows"] + 1):
+                directory = arm_root / "scores" / arm / f"seed-{seed}" / f"window-{window:02d}"
+                if not (directory / "receipt.json").exists():
+                    missing.append(f"{arm}/{seed}/window-{window:02d}")
+                    continue
+                receipt = read(directory / "receipt.json")
+                if receipt["plan_sha256"] != arm_plan:
+                    raise ValueError("Cannot combine results from different plans")
+                file_pin(directory / "predictions.parquet", receipt["predictions_sha256"])
+                frame = pd.read_parquet(directory / "predictions.parquet")
+                rows.append({"arm": arm, "seed": seed, "window": window,
+                             **all_metrics(frame, frame.prediction.map(LABELS.index).to_numpy())})
+    return pd.DataFrame(rows)
+
+
+def compare_final(args):
+    """F0 versus retrained arms on the sealed test and RouterArena (plus prequential context)."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    root = Path(args.run_dir)
+    plan = load_plan(root)
+    cfg = plan["config"]
+    plan_sha = sha(root / "plan.json")
+    roles, arms = final_roles(cfg), run_arms(cfg)
+    lock = root / "final-lock.json"
+    if not lock.exists() or read(lock)["plan_sha256"] != plan_sha:
+        raise ValueError("Compare after final-lock.json of this plan")
+    out = root / "report-final"
+    out.mkdir(exist_ok=True)
+    missing = []
+    stream = pd.read_parquet(root / "shared-data" / "stream-windows.parquet")
+    sources = {}
+    for reference in getattr(args, "reference_run", None) or []:
+        sources.update(reference_sources(plan, reference, stream))
+    sources.update({arm: (root, plan_sha) for arm in arms})
+    prequential = prequential_rows(cfg, stream, sources, missing)
+    prequential.to_csv(out / "prequential-metrics.csv", index=False)
+    predictions = {}
+    for arm, seeds in [(FROZEN, [0])] + [(a, cfg["seeds"]) for a in arms]:
+        for seed in seeds:
+            for role in roles:
+                directory = root / "scores" / arm / f"seed-{seed}" / "final" / role
+                if not (directory / "receipt.json").exists():
+                    missing.append(f"{arm}/{seed}/final/{role}")
+                    continue
+                receipt = read(directory / "receipt.json")
+                if receipt["plan_sha256"] != plan_sha:
+                    raise ValueError("Cannot combine results from different plans")
+                file_pin(directory / "predictions.parquet", receipt["predictions_sha256"])
+                frame = pd.read_parquet(directory / "predictions.parquet").sort_values("sample_id").reset_index(drop=True)
+                predictions[(arm, seed, role)] = frame
+    metric_rows, routing_rows, contrasts = [], [], []
+    for (arm, seed, role), frame in predictions.items():
+        predicted = frame.prediction.map(LABELS.index).to_numpy()
+        metric_rows.append({"arm": arm, "seed": seed, "role": role, **all_metrics(frame, predicted)})
+        if set(OUTCOME_COLUMNS).issubset(frame.columns):
+            for row in routing_by_source(frame, predicted):
+                routing_rows.append({"arm": arm, "seed": seed, "role": role, **row})
+    metrics = pd.DataFrame(metric_rows)
+    routing = pd.DataFrame(routing_rows)
+    metrics.to_csv(out / "final-metrics.csv", index=False)
+    routing.to_csv(out / "test-routing-by-source.csv", index=False)
+    for role in roles:
+        base_key = (FROZEN, 0, role)
+        if base_key not in predictions:
+            continue
+        base = predictions[base_key]
+        y = base.difficulty_label.map(LABELS.index).to_numpy()
+        paired = base[["sample_id", "source_dataset", "duplicate_group_id"]].copy()
+        p0 = base.prediction.map(LABELS.index).to_numpy()
+        paired[f"{FROZEN}_correct"] = (p0 == y).astype(float)
+        has_outcomes = set(OUTCOME_COLUMNS).issubset(base.columns)
+        if has_outcomes:
+            paired[f"{FROZEN}_quality"], paired[f"{FROZEN}_relative_cost"] = first_choice(base, p0)
+        for arm in arms:
+            frames = [predictions.get((arm, seed, role)) for seed in cfg["seeds"]]
+            if any(f is None for f in frames):
+                continue
+            if any(not f.sample_id.equals(base.sample_id) for f in frames):
+                raise ValueError(f"{arm}/{role}: rows differ from F0")
+            seed_preds = [f.prediction.map(LABELS.index).to_numpy() for f in frames]
+            paired[f"{arm}_correct"] = np.mean([(p == y).astype(float) for p in seed_preds], 0)
+            metrics_list = ["correct"]
+            if has_outcomes:
+                choice = [first_choice(base, p) for p in seed_preds]
+                paired[f"{arm}_quality"] = np.mean([q for q, _ in choice], 0)
+                paired[f"{arm}_relative_cost"] = np.mean([c for _, c in choice], 0)
+                metrics_list += ["quality", "relative_cost"]
+            for scope in ["all", *sorted(base.source_dataset.unique())]:
+                part = paired if scope == "all" else paired[paired.source_dataset.eq(scope)]
+                for metric in metrics_list:
+                    value, low, high = paired_bootstrap(part, f"{FROZEN}_{metric}", f"{arm}_{metric}",
+                                                        cfg["bootstrap_draws"], cfg["bootstrap_seed"])
+                    contrasts.append({"role": role, "scope": scope, "contrast": f"{arm}_minus_{FROZEN}",
+                                      "metric": metric, "difference": value,
+                                      "conditional_ci95_low": low, "conditional_ci95_high": high})
+    contrasts = pd.DataFrame(contrasts)
+    contrasts.to_csv(out / "paired-comparisons.csv", index=False)
+    summary = {}
+    if len(metrics):
+        keys = ["accuracy", "macro_f1", "source_macro_f1", "hard_recall", "under_route_rate", "over_route_rate",
+                "predicted_easy_share", "predicted_hard_share", "initial_quality", "resolved_rate", "mean_cost"]
+        keys = [k for k in keys if k in metrics.columns]
+        summary = {f"{arm}/{role}": {k: [float(v) for v in group[k].agg(["mean", "min", "max"])] for k in keys
+                                     if group[k].notna().all()}
+                   for (arm, role), group in metrics.groupby(["arm", "role"])}
+    if len(routing):
+        macro = routing.groupby(["arm", "seed", "role"])[["initial_quality", "relative_cost", "gain_over_mixing"]].mean()
+        for (arm, role), group in macro.groupby(level=["arm", "role"]):
+            summary.setdefault(f"{arm}/{role}", {}).update(
+                {f"source_macro_{k}": [float(v) for v in group[k].agg(["mean", "min", "max"])] for k in group.columns})
+    status = {"complete": not missing, "missing": missing, "summary_mean_min_max_over_seeds": summary,
+              "evaluation_only_text_overlaps": plan["pins"].get("extra_inputs", {}).get("evaluation_only_text_overlaps"),
+              "production_approved": False, "plan_sha256": plan_sha}
+    (out / "status.json").write_text(json.dumps(status, indent=2, ensure_ascii=False) + "\n")
+    if len(routing) and "test" in roles and (FROZEN, 0, "test") in predictions:
+        base = predictions[(FROZEN, 0, "test")]
+        test_sources = sorted(base.source_dataset.unique())
+        fig, axes = plt.subplots(1, len(test_sources), figsize=(6 * len(test_sources), 4.5), squeeze=False)
+        for ax, source in zip(axes[0], test_sources):
+            points, _, _ = tier_points(base[base.source_dataset.eq(source)])
+            if points:
+                xs = np.linspace(0, 1, 101)
+                ax.plot(xs, [mixing_frontier(points, x) for x in xs], color="0.6", label="always-tier mixing")
+                for (c, q), name in zip(points, TIERS):
+                    ax.scatter([c], [q], color="0.4", marker="s")
+                    ax.annotate(f"always-{name}", (c, q), textcoords="offset points", xytext=(4, -10), fontsize=8)
+            part = routing[(routing.role.eq("test")) & (routing.source.eq(source))]
+            for arm, group in part.groupby("arm"):
+                ax.scatter(group.relative_cost, group.initial_quality, label=arm, s=40)
+            ax.set(title=f"test / {source}", xlabel="Relative cost of first routed tier", ylabel="First-try quality")
+            ax.legend(fontsize=8)
+        fig.tight_layout()
+        fig.savefig(out / "test-quality-cost.png", dpi=160)
+        plt.close(fig)
+    pre = prequential.groupby("arm")[["predicted_easy_share", "initial_quality", "first_try_rate", "resolved_rate",
+                                      "mean_cost", "source_macro_f1"]].mean() if len(prequential) else pd.DataFrame()
+    shown = metrics.groupby(["arm", "role"])[[k for k in ("accuracy", "macro_f1", "source_macro_f1", "hard_recall",
+                                                           "under_route_rate", "over_route_rate", "initial_quality",
+                                                           "resolved_rate", "mean_cost") if k in metrics.columns]].mean() if len(metrics) else pd.DataFrame()
+    macro_table = routing.groupby(["arm", "role"])[["initial_quality", "relative_cost", "gain_over_mixing"]].mean() if len(routing) else pd.DataFrame()
+    (out / "REPORT.md").write_text("# F4 양방향 오류 교정 재학습: 최종 평가\n\n"
+        "생성된 실제 예측만 집계했다. 누락 항목은 완료로 해석하지 않으며 status.json에 표시한다. "
+        "F0는 운영 1.0(anchor)이고 재학습 arm은 seed 42/43/44 평균이다. 라벨은 원래 benchmark 난이도(T1, v1 채점)다.\n\n"
+        f"완료 여부: {not missing}\n\n"
+        "## 최종 평가 (seed 평균)\n\n" + shown.to_csv() + "\n"
+        "## test 라우팅: 원천 평균 첫 시도 품질·상대 비용·혼합선 대비 이득 (seed 평균)\n\n" + macro_table.to_csv() + "\n"
+        "## F0 대비 paired 차이 (질문 그룹 bootstrap, seed 평균 예측 기준)\n\n" + contrasts.to_csv(index=False) + "\n"
+        "## Prequential 참고 (window 2~6, 업데이트 이전 예측)\n\n" + pre.to_csv() + "\n"
+        f"평가 역할 사이 텍스트 중복(학습 누수 아님): {status['evaluation_only_text_overlaps']}\n\n"
+        "운영 설정·CURRENT는 이 결과로 자동 변경하지 않는다.\n", encoding="utf-8")
+    print(out)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     subs = parser.add_subparsers(dest="command", required=True)
@@ -849,6 +1163,7 @@ def main():
         p = subs.add_parser(name)
         for flag in ("config", "pins", "data-dir"):
             p.add_argument("--" + flag, required=True)
+        p.add_argument("--extra-inputs", help="kit manifest of evaluation-only roles such as the sealed test")
         if name == "prepare":
             p.add_argument("--logger-log", required=True)
             p.add_argument("--output-dir", required=True)
@@ -867,15 +1182,18 @@ def main():
     p.add_argument("--run-dir", required=True)
     p.add_argument("--arm", choices=(FROZEN, *ARMS), required=True)
     p.add_argument("--seed", type=int, required=True)
-    p.add_argument("--role", choices=FINAL_ROLES, required=True)
+    p.add_argument("--role", choices=ALL_FINAL_ROLES, required=True)
     subs.add_parser("final-lock").add_argument("--run-dir", required=True)
     p = subs.add_parser("compare")
     p.add_argument("--run-dir", required=True)
     p.add_argument("--reference-run", help="finished run whose F1/F2 used the same sealed stream and logger")
+    p = subs.add_parser("compare-final")
+    p.add_argument("--run-dir", required=True)
+    p.add_argument("--reference-run", action="append", help="finished runs sharing the sealed stream and logger")
     args = parser.parse_args()
     {"prepare": prepare, "build-logger-log": build_logger_log, "train": train,
      "score-windows": score_windows, "final-lock": final_lock, "score-final": score_final,
-     "compare": compare}[args.command](args)
+     "compare": compare, "compare-final": compare_final}[args.command](args)
 
 
 if __name__ == "__main__":

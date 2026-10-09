@@ -1,8 +1,9 @@
 """Build the user-run Drive kit: source ZIP, notebooks and START_HERE.md.
 
-Usage: python build_bundle.py --kit-dir /path/to/retraining-effect [--variant f3]
-No models, data, credentials, Git internals or cloud transfers are included.
-Inputs are reused read-only from the R1->R0 transfer kit already on Drive.
+Usage: python build_bundle.py --kit-dir /path/to/retraining-effect [--variant f3|f4]
+No models, credentials, Git internals or cloud transfers are included. Inputs are
+reused read-only from the R1->R0 transfer kit already on Drive; only the f4 kit
+adds the sealed test (inputs/test.parquet), rebuilt from SHA-checked local artifacts.
 """
 import argparse
 import hashlib
@@ -18,8 +19,12 @@ VARIANTS = {
            "notebooks": ["00_prepare.ipynb", "01_f1_cycle_only.ipynb", "02_f2_replay.ipynb", "03_compare_results.ipynb"]},
     "f3": {"zip": "retraining-source-f3.zip",
            "notebooks": ["00_prepare_f3.ipynb", "01_f3_balanced_easy.ipynb", "02_compare_f3.ipynb"]},
+    "f4": {"zip": "retraining-source-f4.zip",
+           "notebooks": ["00_prepare_f4.ipynb", "01_f4_bidirectional.ipynb", "02_compare_f4.ipynb"]},
 }
-PUBLIC = ["README.md", "experiment.py", "experiment_config.json", "experiment_config_f3.json",
+SEALED_TEST = "ml/artifacts/frozen-evaluation-outcomes/continual-v1-20260924-28cbc342c510"
+TEST_PARTS = ("test_routerbench.parquet", "test_xroutebench.parquet")
+PUBLIC = ["README.md", "experiment.py", "experiment_config.json", "experiment_config_f3.json", "experiment_config_f4.json",
           "requirements-colab.txt", "prepare_models.py", "build_bundle.py",
           *[name for variant in VARIANTS.values() for name in variant["notebooks"]]]
 START_HERE = """# 직접 실행 — R0 재학습 효과 실험 (F0/F1/F2)
@@ -42,6 +47,39 @@ START_HERE_F3 = """# 직접 실행 — F3: easy 보충 재학습
 
 연결이 끊기면 같은 노트북을 다시 실행하면 이어서 합니다. 오류가 나면 다음 노트북으로 넘어가지 말고 오류 셀을 전달합니다. 운영 서버·GCS·`CURRENT`는 바꾸지 않습니다.
 """
+START_HERE_F4 = """# 직접 실행 — F4: 양방향 오류 교정 재학습
+
+1. 이 `retraining-effect-f4` 폴더 전체를 **alexyoo0506@gmail.com** Google Drive의 `내 드라이브/LLM_Router/` 아래에 업로드합니다. `inputs/test.parquet`(봉인 test 7,202문항)이 함께 들어 있습니다. 첫 실험 폴더 `LLM_Router/retraining-effect`(로거 결과와 run001), F3 폴더 `LLM_Router/retraining-effect-f3`, 입력 `LLM_Router/transfer-experiments/inputs/experiment-A`는 읽기 전용으로 재사용하므로 그대로 둡니다.
+2. `notebooks/00_prepare_f4.ipynb`를 **런타임 버전 2026.07(Python 3.12)** 으로 **모두 실행**합니다. GPU 추론 없이 계획만 봉인하며, window별로 고른 문항 수(원래 라벨보다 높게/낮게)가 표로 출력됩니다.
+3. `01_f4_bidirectional.ipynb`를 **T4 GPU**에서 **모두 실행**합니다. seed 3개 × 재학습 6회와 window 평가를 합니다(약 1.5~2시간).
+4. 끝나면 `02_compare_f4.ipynb`를 T4 GPU에서 **모두 실행**합니다(약 1~1.5시간). 초기 R0(F0)와 F4 최종 모델을 test·RouterArena에서 평가해 비교하고 `results-for-review.zip`을 내려받습니다. Drive의 `retraining-effect-f4/runs/` 아래에도 그대로 남습니다.
+
+연결이 끊기면 같은 노트북을 다시 실행하면 이어서 합니다. 오류가 나면 다음 노트북으로 넘어가지 말고 오류 셀을 전달합니다. 운영 서버·GCS·`CURRENT`는 바꾸지 않습니다.
+"""
+
+
+def build_test_input(kit):
+    """Concatenate the sealed RouterBench/xRouteBench test after checking the frozen manifest SHAs."""
+    import pandas as pd
+    held = ROOT / SEALED_TEST
+    manifest = json.loads((held / "manifest.json").read_text())
+    parts = []
+    for name in TEST_PARTS:
+        path = held / name
+        if hashlib.sha256(path.read_bytes()).hexdigest() != manifest["artifacts"][name]["sha256"]:
+            raise ValueError(f"Sealed test checksum differs: {path}")
+        parts.append(pd.read_parquet(path))
+    frame = pd.concat(parts, ignore_index=True)
+    out = kit / "inputs" / "test.parquet"
+    out.parent.mkdir(parents=True)
+    frame.to_parquet(out, index=False)
+    record = {"schema_version": "retraining-extra-inputs-v1",
+              "roles": {"test": {"path": "test.parquet", "sha256": hashlib.sha256(out.read_bytes()).hexdigest(),
+                                 "rows": int(len(frame)),
+                                 "source_rows": {k: int(v) for k, v in frame.source_dataset.value_counts().items()},
+                                 "built_from": {f"{SEALED_TEST}/{n}": manifest["artifacts"][n]["sha256"] for n in TEST_PARTS}}}}
+    (kit / "inputs" / "extra-inputs.json").write_text(json.dumps(record, indent=2) + "\n")
+    return record
 
 
 def main():
@@ -77,8 +115,10 @@ def main():
     (kit / "notebooks").mkdir()
     for name in variant["notebooks"]:
         shutil.copyfile(HERE / name, kit / "notebooks" / name)
-    (kit / "START_HERE.md").write_text(START_HERE_F3 if args.variant == "f3" else START_HERE, encoding="utf-8")
-    print(json.dumps({"kit": str(kit), "source_sha256": checksum, "files": len(records)}, indent=2))
+    start = {"v1": START_HERE, "f3": START_HERE_F3, "f4": START_HERE_F4}[args.variant]
+    (kit / "START_HERE.md").write_text(start, encoding="utf-8")
+    extra = build_test_input(kit) if args.variant == "f4" else None
+    print(json.dumps({"kit": str(kit), "source_sha256": checksum, "files": len(records), "extra_inputs": extra}, indent=2))
 
 
 if __name__ == "__main__":

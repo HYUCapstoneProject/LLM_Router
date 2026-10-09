@@ -315,9 +315,139 @@ class RetrainingEffectContracts(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "different stream"):
                 experiment.reference_sources(current, ref)
 
+    def f4_setup(self):
+        config = experiment.read(HELPER.parent / "experiment_config_f4.json")
+        # Half of the requests are routed easy (they escalate); the rest alternate medium/hard.
+        n = len(self.frames["feedback"])
+        self.log["initial_label"] = ["easy" if i % 2 == 0 else ("medium" if i % 4 == 1 else "hard") for i in range(n)]
+        return config
+
+    def test_f4_learns_both_directions_with_original_labels_and_f2_rehearsal(self):
+        config = self.f4_setup()
+        updates, stream, _, _ = experiment.make_updates(config, self.frames, self.log)
+        self.assertEqual(list(updates), ["f4_bidirectional"])
+        window_of = dict(zip(stream.sample_id, stream.window))
+        original = dict(zip(self.frames["feedback"].sample_id, self.frames["feedback"].difficulty_label))
+        logged = dict(zip(self.log.sample_id, self.log.initial_label))
+        base_ids = set(self.frames["train"].sample_id)
+        directions = set()
+        for update in range(1, 7):
+            name = f"update-{update:02d}"
+            cycle_start = 0 if update <= 3 else 3
+            data = updates["f4_bidirectional"][name]
+            train = data[data.split.eq("train")]
+            picked = train[train.label_origin.eq(experiment.DISAGREEMENT_ORIGIN)]
+            for sample_id, label in zip(picked.sample_id, picked.difficulty_label):
+                self.assertEqual(label, original[sample_id])
+                self.assertNotEqual(logged[sample_id], original[sample_id])
+                directions.add(experiment.LABELS.index(logged[sample_id]) > experiment.LABELS.index(label))
+            windows = {window_of[x] for x in picked.sample_id}
+            self.assertTrue(all(w <= update for w in windows), name)
+            current = {x for x in picked.sample_id if window_of[x] > cycle_start}
+            expected = {x for x in stream[stream.window.between(cycle_start + 1, update)].sample_id if logged[x] != original[x]}
+            self.assertEqual(current, expected)
+            history = picked[[window_of[x] <= cycle_start for x in picked.sample_id]]
+            self.assertTrue(history.difficulty_label.value_counts().le(32).all())
+            self.assertEqual(len(set(train.sample_id) & base_ids), 96)
+            self.assertEqual(int(data.split.eq("validation").sum()), 48)
+        self.assertEqual(directions, {True, False})
+        budget = experiment.training_budget(config, updates)["f4_bidirectional"]
+        for name, data in updates["f4_bidirectional"].items():
+            rows = int(data.split.eq("train").sum())
+            self.assertEqual(budget[name], {"train_rows": rows, "epochs": 3,
+                                            "max_train_steps": experiment.steps_per_epoch(rows, config) * 3})
+        summary = experiment.selection_summary(stream, config)
+        self.assertEqual(sum(sum(v.values()) for v in summary["per_window"].values()),
+                         sum(logged[x] != original[x] for x in stream.sample_id))
+
+    def test_evaluation_roles_may_share_text_but_never_with_training_roles(self):
+        frames = dict(self.frames, test=frame("test", 30))
+        frames["test"].loc[0, "model_input_text"] = frames["routerarena"].model_input_text.iloc[0]
+        overlaps = experiment.validate_frames(frames)
+        self.assertEqual(overlaps, {"test~routerarena:text": 1})
+        frames["test"].loc[1, "model_input_text"] = frames["train"].model_input_text.iloc[0]
+        with self.assertRaisesRegex(ValueError, "leakage in test"):
+            experiment.validate_frames(frames)
+
+    def test_extra_inputs_must_be_declared_and_pinned(self):
+        config = experiment.read(HELPER.parent / "experiment_config_f4.json")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            frame("test", 9).to_parquet(root / "test.parquet", index=False)
+            manifest = {"roles": {"test": {"path": "test.parquet", "sha256": experiment.sha(root / "test.parquet")}}}
+            (root / "extra.json").write_text(json.dumps(manifest))
+            frames, pins = experiment.load_extra_inputs(config, root / "extra.json")
+            self.assertEqual(len(frames["test"]), 9)
+            self.assertEqual(pins["test"]["rows"], 9)
+            with self.assertRaisesRegex(ValueError, "needs --extra-inputs"):
+                experiment.load_extra_inputs(config, None)
+            with self.assertRaisesRegex(ValueError, "extra_input_roles"):
+                experiment.load_extra_inputs(dict(config, extra_input_roles=[]), None)
+            with self.assertRaisesRegex(ValueError, "declares no"):
+                experiment.load_extra_inputs(self.config, root / "extra.json")
+            manifest["roles"]["test"]["sha256"] = "0" * 64
+            (root / "extra.json").write_text(json.dumps(manifest))
+            with self.assertRaisesRegex(ValueError, "mismatch"):
+                experiment.load_extra_inputs(config, root / "extra.json")
+
+    def test_mixing_frontier_and_first_choice(self):
+        points = [(0.0, .5), (.1, .8), (1.0, .9)]
+        self.assertAlmostEqual(experiment.mixing_frontier(points, .05), .65)
+        self.assertAlmostEqual(experiment.mixing_frontier(points, .55), .85)
+        data = frame("route", 4)
+        for tier, quality in zip(experiment.TIERS, (0., 1., 1.)):
+            data[f"quality_{tier}"] = quality
+        # Rows alternate source-b/source-a: source-b always gets low, source-a always medium.
+        rows = {r["source"]: r for r in experiment.routing_by_source(data, [0, 1, 0, 1])}
+        self.assertAlmostEqual(rows["source-b"]["initial_quality"], 0.)
+        self.assertAlmostEqual(rows["source-b"]["relative_cost"], 0.)
+        self.assertAlmostEqual(rows["source-a"]["initial_quality"], 1.)
+        self.assertAlmostEqual(rows["source-a"]["relative_cost"], (.01 - .001) / (.1 - .001))
+        self.assertAlmostEqual(rows["source-a"]["gain_over_mixing"], 0.)
+
+    def test_compare_final_reports_f0_versus_retrained_arm(self):
+        config = experiment.read(HELPER.parent / "experiment_config_f4.json")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "plan.json").write_text("{}")
+            plan_sha = experiment.sha(root / "plan.json")
+            experiment.exact_json(root / "final-lock.json", {"plan_sha256": plan_sha})
+            stream = self.frames["feedback"].drop(columns="model_input_text").assign(
+                window=[i % 6 + 1 for i in range(600)], initial_label="medium")
+            (root / "shared-data").mkdir()
+            stream.to_parquet(root / "shared-data" / "stream-windows.parquet", index=False)
+            test = frame("test", 60)
+            arena = frame("routerarena", 30, outcomes=False)
+            logits = lambda n, label: np.eye(3)[[label] * n]
+            for arm, seeds, label in [("f0_frozen", [0], 0), ("f4_bidirectional", config["seeds"], 1)]:
+                for seed in seeds:
+                    for role, data in (("test", test), ("routerarena", arena)):
+                        experiment.write_scores(root / "scores" / arm / f"seed-{seed}" / "final" / role, data,
+                                                logits(len(data), label), {"arm": arm, "seed": seed, "role": role},
+                                                plan_sha, "d", "m", 0.)
+                    if arm != "f0_frozen":
+                        for window in range(2, 7):
+                            rows = self.frames["feedback"][stream.window.eq(window).to_numpy()]
+                            experiment.write_scores(root / "scores" / arm / f"seed-{seed}" / f"window-{window:02d}", rows,
+                                                    logits(len(rows), label), {"arm": arm, "seed": seed}, plan_sha, "d", "m", 0.)
+            plan = {"config": config, "pins": {"extra_inputs": {"evaluation_only_text_overlaps": {}}}}
+            with patch.object(experiment, "load_plan", return_value=plan):
+                experiment.compare_final(SimpleNamespace(run_dir=root, reference_run=None))
+            report = root / "report-final"
+            status = experiment.read(report / "status.json")
+            self.assertTrue(status["complete"], status["missing"])
+            contrasts = pd.read_csv(report / "paired-comparisons.csv")
+            correct = contrasts[(contrasts.role.eq("test")) & contrasts.scope.eq("all") & contrasts.metric.eq("correct")]
+            # Labels cycle easy/medium/hard: F0 always easy, F4 always medium -> same accuracy.
+            self.assertAlmostEqual(float(correct.difference.iloc[0]), 0.)
+            cost = contrasts[(contrasts.role.eq("test")) & contrasts.scope.eq("all") & contrasts.metric.eq("relative_cost")]
+            self.assertGreater(float(cost.difference.iloc[0]), 0)
+            self.assertTrue((report / "test-quality-cost.png").is_file())
+            self.assertIn("F4", (report / "REPORT.md").read_text())
+
     def test_notebook_code_and_clean_outputs(self):
         notebooks = sorted(HELPER.parent.glob("*.ipynb"))
-        self.assertEqual(len(notebooks), 7)
+        self.assertEqual(len(notebooks), 10)
         for path in notebooks:
             notebook = experiment.read(path)
             self.assertEqual(notebook["nbformat"], 4)
