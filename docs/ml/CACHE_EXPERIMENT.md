@@ -2,6 +2,8 @@
 
 작성일: 2026-09-30. 이 문서는 **실행 전 사전 계획**이며 결과 보고서나 운영 변경 승인이 아니다. run001 결과는 [실험 보고서](../../experiments/results/cache-experiment-v1-20261005/REPORT.md)와 14절에 있다(2026-10-05). 전체 사양은 [ML 단일 문서 6장](README.md#cache)을 따르고, 이 문서는 그 사양을 현재 운영 구성과 확보한 데이터에 맞춰 실행 가능한 형태로 고정한다. 실행 코드는 [`ml/notebooks/cache_experiment/`](../../ml/notebooks/cache_experiment/README.md)에 있다(2026-09-30).
 
+**선행 실험.** 8월 캐시 실험(`experiments/results/cache-threshold`, `reranker-20260830`, `rerank-endtoend`, `experiments/GPTCACHE_COMPARISON.md`)과의 관계는 설계 때 대조하지 않았다. 2026-10-10에 사후 대조했고, 결과는 [run001 보고서 7절](../../experiments/results/cache-experiment-v1-20261005/REPORT.md#7-8월-선행-실험과의-관계-2026-10-10-추가)에 있다. D2는 8월 선별 보고서가 다음 단계로 남긴 독립 평가셋에 해당한다.
+
 **범위 원칙.** 일정에 맞춰 줄이지 않는다. README 6장의 최소 실험(D1, D2, C0/C1/C2)과 선택 확장(C3, 보정 정책, 용량 민감도)을 모두 수행한다. 제외 항목은 10절에 이유와 함께 적는다.
 
 ## 1. 목적과 질문
