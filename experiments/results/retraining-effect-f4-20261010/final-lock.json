@@ -1,0 +1,9 @@
+{
+  "plan_sha256": "98254387bff711155d19a35954d49b19e3a931f107e925d573d8e56fab3cd9b3",
+  "final_model_digests": {
+    "f4_bidirectional/42": "b198b6789e68e0c3e6ced1cce962359b2026bf975b060b3f1dbb2832ca0666af",
+    "f4_bidirectional/43": "9adc7650a86bebc2224ffffb611bc7be28e7a1ca02d06d85147f4b75de0c71ce",
+    "f4_bidirectional/44": "24e2466f34b9f3fce06fcbc369cf762d615dee989cbda98e78380f5c0d97f14b"
+  },
+  "production_approved": false
+}
