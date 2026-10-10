@@ -14,10 +14,13 @@
 | F4-0 | [00_prepare_f4.ipynb](00_prepare_f4.ipynb) | 첫 실험의 로거로 F4 계획 봉인(GPU 추론 없음), 봉인 test 입력 확인 |
 | F4-1 | [01_f4_bidirectional.ipynb](01_f4_bidirectional.ipynb) | 양방향 오류 + 복습 × seed 3, window별 prequential 예측 |
 | F4-2 | [02_compare_f4.ipynb](02_compare_f4.ipynb) | 초기 R0(F0)와 F4 최종 모델을 봉인 test·RouterArena에서 평가·비교 |
+| F5-0 | [00_prepare_f5.ipynb](00_prepare_f5.ipynb) | F5 계획 봉인(GPU 추론 없음), window별 선택 수와 학습 라벨 비율 확인 |
+| F5-1 | [01_f5_matched_prior.ipynb](01_f5_matched_prior.ipynb) | 오답 전부 + 비율을 맞추는 정답 문항 + 실제 비율 복습 × seed 3 |
+| F5-2 | [02_compare_f5.ipynb](02_compare_f5.ipynb) | F0·F4(참고 run)·F5를 봉인 test·RouterArena 같은 문항에서 비교 |
 
 ## 실행 흐름
 
-1. [`build_bundle.py`](build_bundle.py)로 만든 `retraining-effect` kit(F3는 `--variant f3`, F4는 `--variant f4`로 만든 kit)를 개인 Drive의 `MyDrive/LLM_Router/`에 올린다. F4 kit에는 봉인 test(`inputs/test.parquet`)가 들어 있으며, 로컬 frozen manifest의 SHA를 확인한 뒤 만든다.
+1. [`build_bundle.py`](build_bundle.py)로 만든 `retraining-effect` kit(F3는 `--variant f3`, F4·F5는 `--variant f4`·`--variant f5`로 만든 kit)를 개인 Drive의 `MyDrive/LLM_Router/`에 올린다. F4·F5 kit에는 봉인 test(`inputs/test.parquet`)가 들어 있으며, 로컬 frozen manifest의 SHA를 확인한 뒤 만든다.
 2. 00 → (01, 02를 별도 세션에서) → 03 순서로 전체 실행한다.
 3. 03이 내려받는 `results-for-review.zip`을 검토에 사용한다.
 
@@ -31,6 +34,7 @@
 - **평가 보호:** window j+1은 update j 모델이 학습 전에 예측한다. gate·retention·RouterArena는 모든 학습과 window 평가가 끝나고 `final-lock.json`이 생긴 뒤에만 평가한다.
 - **F3 easy 보충:** 도착한 window에서 로거가 easy로 보내 첫 시도에 해결된 질문을, medium·hard 평균 수가 되도록 F2 구성에 더한다. 한 번 쓴 easy는 다시 뽑지 않는다. 계획서 12절 참조.
 - **F4 양방향 오류 교정:** 도착한 window에서 로거 예측이 원래 benchmark 난이도 라벨과 다른 질문을 방향(높게/낮게)과 관계없이 모두 골라 **원래 라벨**로 학습한다. 지난 cycle 오류의 라벨별 32개와 초기 학습 라벨별 32개를 F2와 같이 섞고, 자기 학습 행 기준 3 epoch로 학습한다. 최종 평가는 봉인 test와 RouterArena이며 `compare-final`이 F0 대비 차이를 보고한다. 계획서 14절 참조.
+- **F5 라벨 비율 맞춤:** window마다 F4의 오답을 전부 넣고, 맞게 예측한 질문을 라벨별로 더해 그 window의 원래 라벨 비율을 되돌린다. 비율을 묶는 라벨(현재 hard)은 오답만 쓴다. 복습은 F2·F4와 같은 크기(지난 cycle 96행 + 초기 학습 96행)를 실제 라벨 비율대로 뽑는다. `compare-final --reference-run`에 F4 run을 주면 같은 평가 데이터(SHA 일치)를 쓴 참고 run의 최종 예측을 함께 읽어 F5−F4 차이를 낸다. 계획서 15절 참조.
 - **평가 역할 사이 중복:** 봉인 test와 RouterArena는 둘 다 학습에 쓰지 않으므로 같은 질문 텍스트를 허용하고 개수를 계획에 기록한다(현재 2문항). 학습·검증·stream과 겹치면 기존처럼 중단한다.
 - **판정:** window 2~6의 초기 선택 품질 차이(0.01 초과)와 비용·호출 깊이 차이를 질문 그룹 bootstrap으로 보고하고, retention source-macro-F1 하락 0.01 이내를 망각 기준으로 쓴다.
 

@@ -443,11 +443,116 @@ class RetrainingEffectContracts(unittest.TestCase):
             cost = contrasts[(contrasts.role.eq("test")) & contrasts.scope.eq("all") & contrasts.metric.eq("relative_cost")]
             self.assertGreater(float(cost.difference.iloc[0]), 0)
             self.assertTrue((report / "test-quality-cost.png").is_file())
-            self.assertIn("F4", (report / "REPORT.md").read_text())
+            self.assertIn("f4_bidirectional", (report / "REPORT.md").read_text())
+
+    def f5_setup(self):
+        config = experiment.read(HELPER.parent / "experiment_config_f5.json")
+        n = len(self.frames["feedback"])
+        # Labels cycle easy/medium/hard; the logger is right on two thirds of the easy rows only.
+        self.log["initial_label"] = ["easy" if i % 3 == 0 else ("medium" if i % 3 == 2 and i % 2 else "easy")
+                                     for i in range(n)]
+        return config
+
+    def test_f5_keeps_every_error_and_restores_window_label_proportions(self):
+        config = self.f5_setup()
+        updates, stream, _, _ = experiment.make_updates(config, self.frames, self.log)
+        selected, summary = experiment.matched_prior_selection(stream, config)
+        logged = dict(zip(self.log.sample_id, self.log.initial_label))
+        for window, rows in stream.groupby("window"):
+            picked = selected[selected.window.eq(window)]
+            errors = set(rows[rows.initial_label.ne(rows.difficulty_label)].sample_id)
+            self.assertTrue(errors <= set(picked.sample_id))
+            fills = picked[picked.label_origin.eq(experiment.AGREEMENT_FILL_ORIGIN)]
+            self.assertTrue(all(logged[x] == y for x, y in zip(fills.sample_id, fills.difficulty_label)))
+            self.assertFalse(picked.sample_id.duplicated().any())
+            shares = rows.difficulty_label.value_counts(normalize=True)
+            mix = picked.difficulty_label.value_counts()
+            for label in experiment.LABELS:
+                info = summary[str(window)][label]
+                if not info["shortfall"]:
+                    self.assertLessEqual(abs(mix.get(label, 0) - shares[label] * len(picked)), 2, (window, label))
+        base_ids = set(self.frames["train"].sample_id)
+        window_of = dict(zip(stream.sample_id, stream.window))
+        for update in range(1, 7):
+            name = f"update-{update:02d}"
+            cycle_start = 0 if update <= 3 else 3
+            train = updates["f5_matched_prior"][name]
+            train = train[train.split.eq("train")]
+            base = train[train.sample_id.isin(base_ids)]
+            self.assertEqual(len(base), 96)
+            history = [x for x in train.sample_id if x in window_of and window_of[x] <= cycle_start]
+            self.assertEqual(len(history), 0 if update <= 3 else 96)
+            self.assertTrue(all(window_of[x] <= update for x in train.sample_id if x in window_of))
+        budget = experiment.training_budget(config, updates)["f5_matched_prior"]
+        for name, data in updates["f5_matched_prior"].items():
+            rows = int(data.split.eq("train").sum())
+            self.assertEqual(budget[name]["max_train_steps"], experiment.steps_per_epoch(rows, config) * 3)
+
+    def test_proportional_sample_follows_label_shares(self):
+        data = frame("prop", 100)
+        data["difficulty_label"] = ["easy"] * 50 + ["medium"] * 37 + ["hard"] * 13
+        picked = experiment.proportional_sample(data, 96, 7)
+        self.assertEqual(len(picked), 96)
+        self.assertEqual(picked.difficulty_label.value_counts().to_dict(), {"easy": 48, "medium": 36, "hard": 12})
+
+    def test_compare_final_adds_reference_finals_on_identical_data(self):
+        config4 = experiment.read(HELPER.parent / "experiment_config_f4.json")
+        config5 = experiment.read(HELPER.parent / "experiment_config_f5.json")
+        test = frame("test", 60)
+        arena = frame("routerarena", 30, outcomes=False)
+        logits = lambda n, label: np.eye(3)[[label] * n]
+        stream = self.frames["feedback"].drop(columns="model_input_text").assign(
+            window=[i % 6 + 1 for i in range(600)], initial_label="medium", outcome="first_try", resolved_tier=1)
+        with tempfile.TemporaryDirectory() as tmp:
+            runs = {}
+            for name, config, arm, label in [("f4", config4, "f4_bidirectional", 1), ("f5", config5, "f5_matched_prior", 2)]:
+                root = Path(tmp) / name
+                (root / "shared-data").mkdir(parents=True)
+                stream.to_parquet(root / "shared-data" / "stream-windows.parquet", index=False)
+                plan = {"config": config, "logger_receipt": {"log_sha256": "a"},
+                        "data_sha256": {"stream-windows": experiment.sha(root / "shared-data" / "stream-windows.parquet")},
+                        "pins": {"data_sha256": {"routerarena": "arena"},
+                                 "extra_inputs": {"roles": {"test": {"sha256": "test"}}, "evaluation_only_text_overlaps": {}}}}
+                experiment.exact_json(root / "plan.json", plan)
+                experiment.exact_json(root / "plan.sha256.json", {"sha256": experiment.sha(root / "plan.json")})
+                plan_sha = experiment.sha(root / "plan.json")
+                experiment.exact_json(root / "final-lock.json", {"plan_sha256": plan_sha})
+                for a, seeds, lab in [("f0_frozen", [0], 0), (arm, config["seeds"], label)]:
+                    for seed in seeds:
+                        for role, data in (("test", test), ("routerarena", arena)):
+                            experiment.write_scores(root / "scores" / a / f"seed-{seed}" / "final" / role, data,
+                                                    logits(len(data), lab), {"arm": a, "seed": seed, "role": role},
+                                                    plan_sha, "d", "m", 0.)
+                        if a != "f0_frozen":
+                            for window in range(2, 7):
+                                rows = self.frames["feedback"][stream.window.eq(window).to_numpy()]
+                                experiment.write_scores(root / "scores" / a / f"seed-{seed}" / f"window-{window:02d}", rows,
+                                                        logits(len(rows), lab), {"arm": a, "seed": seed}, plan_sha, "d", "m", 0.)
+                runs[name] = (root, plan)
+            root, plan = runs["f5"]
+            with patch.object(experiment, "load_plan", return_value=plan):
+                experiment.compare_final(SimpleNamespace(run_dir=root, reference_run=[runs["f4"][0]]))
+            report = root / "report-final"
+            self.assertTrue(experiment.read(report / "status.json")["complete"])
+            contrasts = pd.read_csv(report / "paired-comparisons.csv")
+            self.assertIn("f5_matched_prior_minus_f4_bidirectional", set(contrasts.contrast))
+            self.assertIn("f4_bidirectional_minus_f0_frozen", set(contrasts.contrast))
+            metrics = pd.read_csv(report / "final-metrics.csv")
+            self.assertEqual(set(metrics.arm), {"f0_frozen", "f4_bidirectional", "f5_matched_prior"})
+            found = experiment.reference_finals(plan, [runs["f4"][0]], ["test", "routerarena"])
+            self.assertEqual(set(found), {("f4_bidirectional", "test"), ("f4_bidirectional", "routerarena")})
+            # A reference that scored different test data only contributes RouterArena.
+            other = Path(tmp) / "other"
+            other.mkdir()
+            ref_plan = experiment.read(runs["f4"][0] / "plan.json")
+            ref_plan["pins"]["extra_inputs"]["roles"]["test"]["sha256"] = "other"
+            experiment.exact_json(other / "plan.json", ref_plan)
+            found = experiment.reference_finals(plan, [other], ["test", "routerarena"])
+            self.assertEqual(set(found), {("f4_bidirectional", "routerarena")})
 
     def test_notebook_code_and_clean_outputs(self):
         notebooks = sorted(HELPER.parent.glob("*.ipynb"))
-        self.assertEqual(len(notebooks), 10)
+        self.assertEqual(len(notebooks), 13)
         for path in notebooks:
             notebook = experiment.read(path)
             self.assertEqual(notebook["nbformat"], 4)

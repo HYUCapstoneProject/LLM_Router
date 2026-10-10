@@ -10,8 +10,11 @@ reuse so the three labels are as even as possible. F4 replaces the upward
 escalation feedback with every arrived request whose logger label differs from
 its original benchmark label in either direction, trained on that original
 label with the same history replay and base rehearsal as F2; it is evaluated
-on the sealed test and RouterArena. Heavy ML imports happen only for
-training/inference.
+on the sealed test and RouterArena. F5 keeps every F4 disagreement but adds
+agreeing rows per window until the window's original label proportions are
+restored, and draws its rehearsal in natural label proportions, so the whole
+training mix follows the stream's label distribution. Heavy ML imports happen
+only for training/inference.
 """
 from __future__ import annotations
 
@@ -30,7 +33,7 @@ import pandas as pd
 
 LABELS = ("easy", "medium", "hard")
 TIERS = ("low", "medium", "high")
-ARMS = ("f1_cycle_only", "f2_replay", "f3_balanced_easy", "f4_bidirectional")
+ARMS = ("f1_cycle_only", "f2_replay", "f3_balanced_easy", "f4_bidirectional", "f5_matched_prior")
 DEFAULT_ARMS = ["f1_cycle_only", "f2_replay"]
 FROZEN = "f0_frozen"
 INPUT_ROLES = ("train", "dev", "gate", "feedback", "forget", "routerarena")
@@ -46,6 +49,7 @@ TRAINER_COLUMNS = ["sample_id", "duplicate_group_id", "model_input_text", "diffi
 FEEDBACK_ORIGIN = "simulated_observed_escalation"
 CONFIRMED_EASY_ORIGIN = "simulated_confirmed_first_try_easy"
 DISAGREEMENT_ORIGIN = "simulated_label_disagreement"
+AGREEMENT_FILL_ORIGIN = "simulated_label_agreement_fill"
 HERE = Path(__file__).resolve().parent
 SOURCE_ROOT = HERE.parents[1] / "src" / "llm_router_labeling"
 
@@ -206,6 +210,8 @@ def load_inputs(config_path, pins_path, data_dir, extra_inputs=None):
         raise ValueError("F1 matches F2's optimizer steps; prepare them together")
     if "f3_balanced_easy" in arms and not isinstance(config.get("easy_supplement_seed"), int):
         raise ValueError("F3 needs an integer easy_supplement_seed")
+    if "f5_matched_prior" in arms and not isinstance(config.get("prior_fill_seed"), int):
+        raise ValueError("F5 needs an integer prior_fill_seed")
     final_roles(config)
     if config.get("feedback_per_window_cap") is not None:
         raise ValueError("2026-09-28 decision: every valid feedback event is used; no per-window cap")
@@ -380,6 +386,46 @@ def disagreement_rows(stream):
     return rows
 
 
+def proportional_sample(frame, total, seed):
+    """Draw `total` rows whose label counts follow the frame's own label proportions."""
+    shares = frame.difficulty_label.value_counts(normalize=True).reindex(LABELS, fill_value=0.0)
+    counts = {label: int(math.floor(total * shares[label])) for label in LABELS}
+    for label in sorted(LABELS, key=lambda l: (-(total * shares[l] - counts[l]), LABELS.index(l))):
+        if sum(counts.values()) >= total:
+            break
+        counts[label] += 1
+    return pd.concat([stable_sample(frame[frame.difficulty_label.eq(label)], counts[label], seed) for label in LABELS],
+                     ignore_index=True)
+
+
+def matched_prior_selection(stream, config):
+    """Per arrived window: every label disagreement plus agreeing rows of each label until the
+    window's original label proportions are restored. The binding label keeps only its errors;
+    a label short of agreeing rows records a shortfall instead of reusing rows."""
+    disagreements = disagreement_rows(stream)
+    parts, summary = [], {}
+    for window, rows in stream.groupby("window", sort=True):
+        wrong = disagreements[disagreements.window.eq(window)]
+        right = rows[~rows.sample_id.isin(wrong.sample_id)]
+        shares = rows.difficulty_label.value_counts(normalize=True).reindex(LABELS, fill_value=0.0)
+        scale = max((int(wrong.difficulty_label.eq(label).sum()) / shares[label]
+                     for label in LABELS if shares[label] > 0), default=0.0)
+        info = {}
+        for label in LABELS:
+            errors = wrong[wrong.difficulty_label.eq(label)]
+            target = max(len(errors), int(round(scale * shares[label])))
+            pool = right[right.difficulty_label.eq(label)]
+            fill = stable_sample(pool, target - len(errors), config["prior_fill_seed"] + int(window)).copy()
+            fill["benchmark_difficulty_label"] = fill.difficulty_label
+            fill["logger_direction"] = "agree"
+            fill["label_origin"] = AGREEMENT_FILL_ORIGIN
+            parts += [errors, fill]
+            info[label] = {"errors": int(len(errors)), "agreeing_fill": int(len(fill)), "target": target,
+                           "shortfall": int(target - len(errors) - len(fill)), "window_rows": int(rows.difficulty_label.eq(label).sum())}
+        summary[str(int(window))] = info
+    return pd.concat(parts, ignore_index=True), summary
+
+
 def make_updates(config, frames, log):
     feedback = frames["feedback"]
     if log.sample_id.duplicated().any() or set(log.sample_id) != set(feedback.sample_id):
@@ -413,6 +459,10 @@ def make_updates(config, frames, log):
     confirmed["difficulty_label"] = "easy"
     confirmed["label_origin"] = CONFIRMED_EASY_ORIGIN
     disagreements = disagreement_rows(stream)
+    if "f5_matched_prior" in run_arms(config):
+        matched, _ = matched_prior_selection(stream, config)
+        natural_base = proportional_sample(frames["train"], 3 * config["base_per_label"], seed).assign(
+            label_origin="benchmark_difficulty")
     used_easy, supplement = set(), {}
     per = config["updates_per_major"]
     for update in range(1, config["windows"] + 1):
@@ -437,6 +487,11 @@ def make_updates(config, frames, log):
             current4 = disagreements[disagreements.window.between(cycle_start + 1, update)]
             history4 = per_label(disagreements[disagreements.window.le(cycle_start)], config["history_per_label"], seed)
             rows["f4_bidirectional"] = pd.concat([current4, history4, base], ignore_index=True)
+        if "f5_matched_prior" in arms:
+            # Same rehearsal size as F2/F4, drawn in natural label proportions.
+            current5 = matched[matched.window.between(cycle_start + 1, update)]
+            history5 = stable_sample(matched[matched.window.le(cycle_start)], 3 * config["history_per_label"], seed)
+            rows["f5_matched_prior"] = pd.concat([current5, history5, natural_base], ignore_index=True)
         for arm in arms:
             train = rows[arm].assign(split="train", sample_weight=1.0)
             updates[arm][name] = pd.concat([train[TRAINER_COLUMNS], validation[TRAINER_COLUMNS]], ignore_index=True)
@@ -444,9 +499,9 @@ def make_updates(config, frames, log):
 
 
 def training_budget(config, updates):
-    """F2/F3/F4 use the operational 3 epochs of their own rows; F1 repeats epochs to match F2's steps."""
+    """F2-F5 use the operational 3 epochs of their own rows; F1 repeats epochs to match F2's steps."""
     budget = {arm: {} for arm in updates}
-    for arm in ("f2_replay", "f3_balanced_easy", "f4_bidirectional"):
+    for arm in ("f2_replay", "f3_balanced_easy", "f4_bidirectional", "f5_matched_prior"):
         for name, data in updates.get(arm, {}).items():
             rows = int(data.split.eq("train").sum())
             budget[arm][name] = {"train_rows": rows, "epochs": config["f2_epochs"],
@@ -501,7 +556,11 @@ def prepare(args):
             "anchor_archive": read(archives)["r0"] if archives.exists() else None,
             "training_budget": training_budget(config, updates),
             "easy_supplement": supplement,
-            "bidirectional_selection": selection_summary(stream, config) if "f4_bidirectional" in run_arms(config) else None,
+            "bidirectional_selection": selection_summary(stream, config) if {"f4_bidirectional", "f5_matched_prior"} & set(run_arms(config)) else None,
+            "matched_prior_selection": matched_prior_selection(stream, config)[1] if "f5_matched_prior" in run_arms(config) else None,
+            "stream_label_mix": {k: int(v) for k, v in stream.difficulty_label.value_counts().items()},
+            "training_label_mix": {arm: {name: {k: int(v) for k, v in data[data.split.eq("train")].difficulty_label.value_counts().items()}
+                                         for name, data in phases.items()} for arm, phases in updates.items()},
             "final_roles": final_roles(config),
             "feedback_per_window": {str(k): int(v) for k, v in events.window.value_counts().sort_index().items()},
             "feedback_label_counts": {k: int(v) for k, v in events.difficulty_label.value_counts().items()},
@@ -516,6 +575,7 @@ def prepare(args):
                       "feedback_label_counts": plan["feedback_label_counts"],
                       "easy_supplement": plan["easy_supplement"],
                       "bidirectional_selection": plan["bidirectional_selection"],
+                      "training_label_mix": plan["training_label_mix"],
                       "extra_inputs": pins.get("extra_inputs"),
                       "training_budget": plan["training_budget"]}, indent=2))
 
@@ -1016,8 +1076,33 @@ def prequential_rows(cfg, stream, sources, missing):
     return pd.DataFrame(rows)
 
 
+def role_data_sha(plan, role):
+    extra = plan["pins"].get("extra_inputs", {}).get("roles", {})
+    return extra[role]["sha256"] if role in extra else plan["pins"]["data_sha256"].get(role)
+
+
+def reference_finals(plan, references, roles):
+    """Final-evaluation sources of reference runs that scored the same role data (same SHA)."""
+    found = {}
+    for reference in references:
+        ref = Path(reference)
+        ref_plan = read(ref / "plan.json")
+        ref_sha = sha(ref / "plan.json")
+        ref_roles = final_roles(ref_plan["config"])
+        for arm in run_arms(ref_plan["config"]):
+            for role in roles:
+                if role in ref_roles and role_data_sha(ref_plan, role) == role_data_sha(plan, role):
+                    found[(arm, role)] = (ref, ref_sha, ref_plan["config"]["seeds"])
+    return found
+
+
 def compare_final(args):
-    """F0 versus retrained arms on the sealed test and RouterArena (plus prequential context)."""
+    """F0 versus retrained arms on the sealed test and RouterArena (plus prequential context).
+
+    Reference runs that share the stream and logger add their prequential windows, and their
+    final predictions when they scored the same role data, so arms of earlier runs can be
+    compared with this run's arms on identical rows.
+    """
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -1039,20 +1124,26 @@ def compare_final(args):
     sources.update({arm: (root, plan_sha) for arm in arms})
     prequential = prequential_rows(cfg, stream, sources, missing)
     prequential.to_csv(out / "prequential-metrics.csv", index=False)
+    finals = {(arm, role): (root, plan_sha, cfg["seeds"]) for arm in arms for role in roles}
+    finals.update({(FROZEN, role): (root, plan_sha, [0]) for role in roles})
+    for key, value in reference_finals(plan, getattr(args, "reference_run", None) or [], roles).items():
+        if key in finals:
+            raise ValueError(f"Reference arm {key[0]} duplicates an arm of this run")
+        finals[key] = value
+    reference_arms = sorted({arm for (arm, _), (owner, _, _) in finals.items() if owner != root})
     predictions = {}
-    for arm, seeds in [(FROZEN, [0])] + [(a, cfg["seeds"]) for a in arms]:
+    for (arm, role), (owner, owner_sha, seeds) in finals.items():
         for seed in seeds:
-            for role in roles:
-                directory = root / "scores" / arm / f"seed-{seed}" / "final" / role
-                if not (directory / "receipt.json").exists():
-                    missing.append(f"{arm}/{seed}/final/{role}")
-                    continue
-                receipt = read(directory / "receipt.json")
-                if receipt["plan_sha256"] != plan_sha:
-                    raise ValueError("Cannot combine results from different plans")
-                file_pin(directory / "predictions.parquet", receipt["predictions_sha256"])
-                frame = pd.read_parquet(directory / "predictions.parquet").sort_values("sample_id").reset_index(drop=True)
-                predictions[(arm, seed, role)] = frame
+            directory = owner / "scores" / arm / f"seed-{seed}" / "final" / role
+            if not (directory / "receipt.json").exists():
+                missing.append(f"{arm}/{seed}/final/{role}")
+                continue
+            receipt = read(directory / "receipt.json")
+            if receipt["plan_sha256"] != owner_sha:
+                raise ValueError("Cannot combine results from different plans")
+            file_pin(directory / "predictions.parquet", receipt["predictions_sha256"])
+            frame = pd.read_parquet(directory / "predictions.parquet").sort_values("sample_id").reset_index(drop=True)
+            predictions[(arm, seed, role)] = frame
     metric_rows, routing_rows, contrasts = [], [], []
     for (arm, seed, role), frame in predictions.items():
         predicted = frame.prediction.map(LABELS.index).to_numpy()
@@ -1076,9 +1167,11 @@ def compare_final(args):
         has_outcomes = set(OUTCOME_COLUMNS).issubset(base.columns)
         if has_outcomes:
             paired[f"{FROZEN}_quality"], paired[f"{FROZEN}_relative_cost"] = first_choice(base, p0)
-        for arm in arms:
-            frames = [predictions.get((arm, seed, role)) for seed in cfg["seeds"]]
-            if any(f is None for f in frames):
+        seed_mean = {}
+        for arm in [*arms, *reference_arms]:
+            seeds = finals.get((arm, role), (None, None, []))[2]
+            frames = [predictions.get((arm, seed, role)) for seed in seeds]
+            if not frames or any(f is None for f in frames):
                 continue
             if any(not f.sample_id.equals(base.sample_id) for f in frames):
                 raise ValueError(f"{arm}/{role}: rows differ from F0")
@@ -1090,12 +1183,16 @@ def compare_final(args):
                 paired[f"{arm}_quality"] = np.mean([q for q, _ in choice], 0)
                 paired[f"{arm}_relative_cost"] = np.mean([c for _, c in choice], 0)
                 metrics_list += ["quality", "relative_cost"]
+            seed_mean[arm] = metrics_list
+        pairs = [(FROZEN, arm) for arm in seed_mean] + [(ref, arm) for arm in arms if arm in seed_mean
+                                                        for ref in reference_arms if ref in seed_mean]
+        for left, right in pairs:
             for scope in ["all", *sorted(base.source_dataset.unique())]:
                 part = paired if scope == "all" else paired[paired.source_dataset.eq(scope)]
-                for metric in metrics_list:
-                    value, low, high = paired_bootstrap(part, f"{FROZEN}_{metric}", f"{arm}_{metric}",
+                for metric in seed_mean[right]:
+                    value, low, high = paired_bootstrap(part, f"{left}_{metric}", f"{right}_{metric}",
                                                         cfg["bootstrap_draws"], cfg["bootstrap_seed"])
-                    contrasts.append({"role": role, "scope": scope, "contrast": f"{arm}_minus_{FROZEN}",
+                    contrasts.append({"role": role, "scope": scope, "contrast": f"{right}_minus_{left}",
                                       "metric": metric, "difference": value,
                                       "conditional_ci95_low": low, "conditional_ci95_high": high})
     contrasts = pd.DataFrame(contrasts)
@@ -1143,9 +1240,10 @@ def compare_final(args):
                                                            "under_route_rate", "over_route_rate", "initial_quality",
                                                            "resolved_rate", "mean_cost") if k in metrics.columns]].mean() if len(metrics) else pd.DataFrame()
     macro_table = routing.groupby(["arm", "role"])[["initial_quality", "relative_cost", "gain_over_mixing"]].mean() if len(routing) else pd.DataFrame()
-    (out / "REPORT.md").write_text("# F4 양방향 오류 교정 재학습: 최종 평가\n\n"
+    (out / "REPORT.md").write_text(f"# 재학습 최종 평가: {', '.join(arms)}\n\n"
         "생성된 실제 예측만 집계했다. 누락 항목은 완료로 해석하지 않으며 status.json에 표시한다. "
         "F0는 운영 1.0(anchor)이고 재학습 arm은 seed 42/43/44 평균이다. 라벨은 원래 benchmark 난이도(T1, v1 채점)다.\n\n"
+        f"같은 평가 데이터를 쓴 참고 run의 arm: {reference_arms or '없음'}\n\n"
         f"완료 여부: {not missing}\n\n"
         "## 최종 평가 (seed 평균)\n\n" + shown.to_csv() + "\n"
         "## test 라우팅: 원천 평균 첫 시도 품질·상대 비용·혼합선 대비 이득 (seed 평균)\n\n" + macro_table.to_csv() + "\n"
