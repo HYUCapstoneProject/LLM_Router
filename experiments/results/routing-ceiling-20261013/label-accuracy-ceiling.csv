@@ -1,0 +1,13 @@
+source,method,accuracy
+routerbench,always the majority label,0.480564353584797
+routerbench,task majority label (train),0.5709761013532969
+routerbench,F0 (operational R0 1.0),0.5738554563777714
+routerbench,F4 bidirectional,0.3197043862174873
+routerbench,F5 matched prior,0.5369037335636817
+routerbench,"label-noise ceiling (Bayes, knows true solve rate)",0.7935994395845414
+xroutebench,always the majority label,0.5781710914454278
+xroutebench,task majority label (train),0.5269509251810137
+xroutebench,F0 (operational R0 1.0),0.6613032984714401
+xroutebench,F4 bidirectional,0.23974255832662913
+xroutebench,F5 matched prior,0.6198265844283543
+xroutebench,"label-noise ceiling (Bayes, knows true solve rate)",0.8753854211635944

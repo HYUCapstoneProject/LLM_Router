@@ -1,0 +1,513 @@
+{
+  "config": {
+    "experiment_id": "retraining-effect-v4-f5",
+    "schema_version": "router-retraining-effect-v1",
+    "arms": [
+      "f5_matched_prior"
+    ],
+    "prior_fill_seed": 20261010,
+    "final_roles": [
+      "test",
+      "routerarena"
+    ],
+    "extra_input_roles": [
+      "test"
+    ],
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "windows": 6,
+    "updates_per_major": 3,
+    "promotion_mode": "direct_research_only",
+    "feedback_per_window_cap": null,
+    "minimum_feedback_per_window": 32,
+    "history_per_label": 32,
+    "base_per_label": 32,
+    "validation_per_label": 16,
+    "rehearsal_seed": 20260912,
+    "stream_seed": 20260929,
+    "f2_epochs": 3,
+    "train_max_length": 512,
+    "evaluation_max_length": 8192,
+    "train_batch_size": 8,
+    "gradient_accumulation_steps": 4,
+    "eval_batch_size": 1,
+    "learning_rate": 2e-05,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.1,
+    "gradient_clip_norm": 1.0,
+    "gradient_checkpointing": true,
+    "precision": "fp16",
+    "attention_implementation": "eager",
+    "checkpoint_every_steps": 25,
+    "keep_last_checkpoints": 2,
+    "minimum_improvement": 0.01,
+    "maximum_forgetting_drop": 0.01,
+    "bootstrap_draws": 1000,
+    "bootstrap_seed": 20260929
+  },
+  "pins": {
+    "schema_version": "router-transfer-source-pins-v1",
+    "models": {
+      "r0": {
+        "path": "/content/drive/MyDrive/LLM_Router/transfer-experiments/inputs/experiment-A/models/r0",
+        "files": {
+          "_SUCCESS": "37a40f08d8548dba289b9b0bb35bcf63b359f6d37ee86044ebc6b6da080b9ec1",
+          "artifact_manifest.json": "f121c475ca381d73b03b413aa4f8f3be177b6d83d9313790ed95592fc87c5aee",
+          "config.json": "ec78dcebe3890eaf422a55e3261f70a8579cdd4298cb51ec0fcc2949538646b5",
+          "metrics.json": "a3b6b0b2a1e876280faf42b1a1c4e39c303c947e77aeb05918a9755ee86c7fa0",
+          "model.safetensors": "e1a40fec7d269d8f925b5391e4f5e75df5d0fedbb1e37b4eea96521e27b1a6a7",
+          "special_tokens_map.json": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049",
+          "tokenizer.json": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+          "tokenizer_config.json": "626c86908d7c711f93b0feffd8657b782cc2727b391f9be190240e8cafb626d5",
+          "training_config.json": "ccbad2aeae5ee063593526c23cc573a41e4b693910a7ce81071a8036def999da"
+        },
+        "cohort": {
+          "training_rows_sha256": "9c8a1fc0cce11888f4a66b2c120b227b14eab6408cef944d2a7d746a1a3505db",
+          "split_manifest_sha256": "f6a4cff1684bc2626a8901dbfda9f81e7d5d7e8753e5f48320cb1ada44c8cca4",
+          "label_definition_sha256": "a652d508ed0af054a2d2898ac7539fffefa8cd498c5ea6ae8ab24fd0b9ea9bf3",
+          "candidate_pool_sha256": "47052a8a02820804e3091f7b60aad25a06e8d0fe75eb1b974a23414b10ff4b20",
+          "backbone_revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+          "initial_optimizer_steps": 2007,
+          "initial_seed": 42,
+          "training_max_length": 512
+        }
+      },
+      "r1": {
+        "path": "models/r1",
+        "files": {
+          "_SUCCESS": "37a40f08d8548dba289b9b0bb35bcf63b359f6d37ee86044ebc6b6da080b9ec1",
+          "artifact_manifest.json": "02112cdc8babe81139ef1d72cc109221335fc785e1d1ced3e27e3668f7b7cc39",
+          "config.json": "7f821a24095a05f416d2934f959abd213cf3b52452c46734ec7c4c5682641a98",
+          "metrics.json": "884fbb51a79f30278c3c7a2665154725d8a5e42520d5470a0d5558b31be99b0f",
+          "model.safetensors": "b49696de6904cb647cd03671cfdfb8901728fc59a8e568fba1b0be141e5326d3",
+          "special_tokens_map.json": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049",
+          "tokenizer.json": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+          "tokenizer_config.json": "2966a59b9e9cf122279aec1249e22e5bc7ad8430c754e95031b13fd128d4e560",
+          "training_config.json": "91d404a5cf42e9aebaaad7e57b8e392bbd56392988e0a9ef6053864f29293624"
+        },
+        "cohort": {
+          "training_rows_sha256": "9c8a1fc0cce11888f4a66b2c120b227b14eab6408cef944d2a7d746a1a3505db",
+          "split_manifest_sha256": "f6a4cff1684bc2626a8901dbfda9f81e7d5d7e8753e5f48320cb1ada44c8cca4",
+          "label_definition_sha256": "a652d508ed0af054a2d2898ac7539fffefa8cd498c5ea6ae8ab24fd0b9ea9bf3",
+          "candidate_pool_sha256": "47052a8a02820804e3091f7b60aad25a06e8d0fe75eb1b974a23414b10ff4b20",
+          "backbone_revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+          "initial_optimizer_steps": 2007,
+          "initial_seed": 42,
+          "training_max_length": 512
+        }
+      }
+    },
+    "data_sha256": {
+      "train": "d9b0db47defd1d7162c1cf70059a6db806d743641d094c1e84b4c696bcbd56bf",
+      "dev": "aa9d973fcf886c7465fbf9e06701984d099cd74a5eabf508cc610845613edef8",
+      "feedback": "52a890baa95b404143837387708383dfbe3591bcecba66bdcc770676e111388c",
+      "gate": "baefa029ecf5946a248765cef2de7e311ed67981f962bb7dda3aba0d153090ba",
+      "forget": "750deca9315b31734778eb75ce2f0bea63f4f44a57a949c6960ad9b9aa7f807d",
+      "routerarena": "e60418d94ced38ba95115bad9a36247a699f14c20f67e49a39f15bc8fa40a308"
+    },
+    "r1_policy": {
+      "path": "r1-policy.json",
+      "sha256": "c7cbbad1e5cade33dd08dc3524a5db67c4706393d6ac5a09b769123c02881e4b"
+    },
+    "runtime_contract": {
+      "path": "/content/drive/MyDrive/LLM_Router/transfer-experiments/inputs/experiment-A/runtime.json",
+      "sha256": "c2b98693b58b70ecdb065b8a0e6f0928e3b3e0ee5bfaa7727b4f3bbf1cac349c"
+    },
+    "extra_inputs": {
+      "roles": {
+        "test": {
+          "path": "/content/drive/MyDrive/LLM_Router/retraining-effect-f5/inputs/test.parquet",
+          "sha256": "26bb12ed063a2fcf9d1d0edbbc609617465dd2d78bcef2ef4ddddda6654f4c00",
+          "rows": 7202
+        }
+      },
+      "evaluation_only_text_overlaps": {
+        "test~routerarena:text": 2
+      }
+    }
+  },
+  "data_dir": "/content/drive/MyDrive/LLM_Router/transfer-experiments/inputs/experiment-A/data",
+  "logger_receipt": {
+    "kind": "fixed_logger_anchor_r0",
+    "feedback_sha256": "52a890baa95b404143837387708383dfbe3591bcecba66bdcc770676e111388c",
+    "log_sha256": "bcbaafa070ec94eb5b8b1ebc07165e288729d6bb712840a4475cd8559fb13c7d",
+    "logger_model_digest": "c4cec54a796ff2ba9c92c33e2ab01c46da7dbd39fb7c4b810500d13908124487",
+    "logging_max_length": 8192
+  },
+  "data_sha256": {
+    "f5_matched_prior/update-01": "1e7bb07dc62c6befe74196487535c3550721a19d4d8e0b6fa8d203510c73c1b9",
+    "f5_matched_prior/update-02": "83bd97b6e937eb114e4250d4770a50b7d6b4e5de27f95237d4edcd17800fbcd0",
+    "f5_matched_prior/update-03": "c2f64b6fdc9de453c3620a361242fc0a694847f7c92fd3f77cb1a7e350646319",
+    "f5_matched_prior/update-04": "fe59ad6b4bac429061b0921df824d9e298619191eefc028769dd9ab34970f861",
+    "f5_matched_prior/update-05": "b02a4c793660ccf5ce57bc4f5e69265e32d8806199193d0dad7a136b0e3f2039",
+    "f5_matched_prior/update-06": "bc9a59d237b1d5eb4e5b3f00f80a0e4ab5ab38c3708702a6a7a8c4ddca5652b5",
+    "stream-windows": "c921ca32d0cf416e17481ab83ddfcd9cb7b47670668a0d8c93296d4a830fae26"
+  },
+  "anchor_archive": {
+    "drive_relative_path": "LLM_Router/modernbert-initial-v1-20260924/attempt-recovery-eb016ac/final-model.tar",
+    "sha256": "d15da837971f5535f1f96dcbe036717d066e339afad923d449c8a74e5a041e4f"
+  },
+  "training_budget": {
+    "f5_matched_prior": {
+      "update-01": {
+        "train_rows": 726,
+        "epochs": 3,
+        "max_train_steps": 69
+      },
+      "update-02": {
+        "train_rows": 1344,
+        "epochs": 3,
+        "max_train_steps": 126
+      },
+      "update-03": {
+        "train_rows": 2024,
+        "epochs": 3,
+        "max_train_steps": 192
+      },
+      "update-04": {
+        "train_rows": 898,
+        "epochs": 3,
+        "max_train_steps": 87
+      },
+      "update-05": {
+        "train_rows": 1575,
+        "epochs": 3,
+        "max_train_steps": 150
+      },
+      "update-06": {
+        "train_rows": 2241,
+        "epochs": 3,
+        "max_train_steps": 213
+      }
+    }
+  },
+  "easy_supplement": {},
+  "bidirectional_selection": {
+    "per_window": {
+      "1": {
+        "higher": 103,
+        "lower": 230
+      },
+      "2": {
+        "higher": 106,
+        "lower": 230
+      },
+      "3": {
+        "higher": 109,
+        "lower": 246
+      },
+      "4": {
+        "higher": 130,
+        "lower": 254
+      },
+      "5": {
+        "higher": 113,
+        "lower": 248
+      },
+      "6": {
+        "higher": 102,
+        "lower": 243
+      }
+    },
+    "label_counts": {
+      "medium": 1055,
+      "easy": 556,
+      "hard": 503
+    },
+    "direction_label_counts": {
+      "higher/easy": 556,
+      "higher/medium": 107,
+      "lower/hard": 503,
+      "lower/medium": 948
+    },
+    "source_counts": {
+      "routerbench": 1923,
+      "xroutebench": 191
+    },
+    "logger_label_accuracy": 0.6061847988077496
+  },
+  "matched_prior_selection": {
+    "1": {
+      "easy": {
+        "errors": 87,
+        "agreeing_fill": 222,
+        "target": 309,
+        "shortfall": 0,
+        "window_rows": 439
+      },
+      "medium": {
+        "errors": 177,
+        "agreeing_fill": 75,
+        "target": 252,
+        "shortfall": 0,
+        "window_rows": 358
+      },
+      "hard": {
+        "errors": 69,
+        "agreeing_fill": 0,
+        "target": 69,
+        "shortfall": 0,
+        "window_rows": 98
+      }
+    },
+    "2": {
+      "easy": {
+        "errors": 89,
+        "agreeing_fill": 210,
+        "target": 299,
+        "shortfall": 0,
+        "window_rows": 433
+      },
+      "medium": {
+        "errors": 171,
+        "agreeing_fill": 72,
+        "target": 243,
+        "shortfall": 0,
+        "window_rows": 352
+      },
+      "hard": {
+        "errors": 76,
+        "agreeing_fill": 0,
+        "target": 76,
+        "shortfall": 0,
+        "window_rows": 110
+      }
+    },
+    "3": {
+      "easy": {
+        "errors": 90,
+        "agreeing_fill": 246,
+        "target": 336,
+        "shortfall": 0,
+        "window_rows": 442
+      },
+      "medium": {
+        "errors": 173,
+        "agreeing_fill": 79,
+        "target": 252,
+        "shortfall": 0,
+        "window_rows": 332
+      },
+      "hard": {
+        "errors": 92,
+        "agreeing_fill": 0,
+        "target": 92,
+        "shortfall": 0,
+        "window_rows": 121
+      }
+    },
+    "4": {
+      "easy": {
+        "errors": 112,
+        "agreeing_fill": 233,
+        "target": 345,
+        "shortfall": 0,
+        "window_rows": 437
+      },
+      "medium": {
+        "errors": 175,
+        "agreeing_fill": 89,
+        "target": 264,
+        "shortfall": 0,
+        "window_rows": 335
+      },
+      "hard": {
+        "errors": 97,
+        "agreeing_fill": 0,
+        "target": 97,
+        "shortfall": 0,
+        "window_rows": 123
+      }
+    },
+    "5": {
+      "easy": {
+        "errors": 95,
+        "agreeing_fill": 242,
+        "target": 337,
+        "shortfall": 0,
+        "window_rows": 445
+      },
+      "medium": {
+        "errors": 176,
+        "agreeing_fill": 74,
+        "target": 250,
+        "shortfall": 0,
+        "window_rows": 330
+      },
+      "hard": {
+        "errors": 90,
+        "agreeing_fill": 0,
+        "target": 90,
+        "shortfall": 0,
+        "window_rows": 119
+      }
+    },
+    "6": {
+      "easy": {
+        "errors": 83,
+        "agreeing_fill": 256,
+        "target": 339,
+        "shortfall": 0,
+        "window_rows": 455
+      },
+      "medium": {
+        "errors": 183,
+        "agreeing_fill": 65,
+        "target": 248,
+        "shortfall": 0,
+        "window_rows": 333
+      },
+      "hard": {
+        "errors": 79,
+        "agreeing_fill": 0,
+        "target": 79,
+        "shortfall": 0,
+        "window_rows": 106
+      }
+    }
+  },
+  "stream_label_mix": {
+    "easy": 2651,
+    "medium": 2040,
+    "hard": 677
+  },
+  "training_label_mix": {
+    "f5_matched_prior": {
+      "update-01": {
+        "easy": 357,
+        "medium": 288,
+        "hard": 81
+      },
+      "update-02": {
+        "easy": 656,
+        "medium": 531,
+        "hard": 157
+      },
+      "update-03": {
+        "easy": 992,
+        "medium": 783,
+        "hard": 249
+      },
+      "update-04": {
+        "easy": 445,
+        "medium": 332,
+        "hard": 121
+      },
+      "update-05": {
+        "easy": 782,
+        "medium": 582,
+        "hard": 211
+      },
+      "update-06": {
+        "easy": 1121,
+        "medium": 830,
+        "hard": 290
+      }
+    }
+  },
+  "final_roles": [
+    "test",
+    "routerarena"
+  ],
+  "feedback_per_window": {
+    "1": 249,
+    "2": 253,
+    "3": 238,
+    "4": 255,
+    "5": 237,
+    "6": 260
+  },
+  "feedback_label_counts": {
+    "medium": 886,
+    "hard": 606
+  },
+  "feedback_source_counts": {
+    "routerbench": 1409,
+    "xroutebench": 83
+  },
+  "logger_stream_outcomes": {
+    "first_try": 3186,
+    "escalated_success": 1492,
+    "fail_all": 690
+  },
+  "helper_sha256": "048d8fa9751a245d4c41d44a7ccd0d9d6dc9bb860cfea618f461d995cd5052c6",
+  "source_code_sha256": {
+    "__init__.py": "acb23a8fe9e0d341c36d5d3671d3af5527f9651c51d8a9cefe60f2fd1b0dda42",
+    "__main__.py": "08d48b3c29795606c46599c0d7cbb8a6eaf00cbe2e4d78f855252643885143b9",
+    "comparison/__init__.py": "dff88eed42c73db223e88cdece03f4a9233bfea324f204f91d73d38aae1314fa",
+    "comparison/evaluation.py": "c1e6ae282a068d5d553ecab65049cbf3749aea98c389e68a09e2f9fd6d41014e",
+    "comparison/tfidf_baseline.py": "ebc08debb7b67215fe60c2931789277f5af91182a8a60b110ce1a140529572cb",
+    "comparison/tfidf_cli.py": "714d32b66b4f1319ab6f8a1211992d4f55159fda143eb30dcc8439e7eb5657af",
+    "deployment/__init__.py": "e2bbee7652886ceeb79ab942a2fb3bf04f8541a10a72f4db2f6dc2ba560cf198",
+    "deployment/cloud_foundation.py": "893dc1d08be2119d97eb03d07a2f415f04c0b6bc09901c923caf04be5af7ce4f",
+    "deployment/deploy_gate.py": "6f14d440f714ed210f4d438078e580d70eb0fedf0fbb85b332f914000ab1a71d",
+    "deployment/deploy_gate_cli.py": "b423b75d22b5edf8b931ef28dc7e33039c72d091b96e7ac15d810caaaa203b7b",
+    "deployment/direct_promotion.py": "4c9b2acd09086ca580e4bf9d1d7b27788cda137a2b069d37d59bddcc9f4da058",
+    "deployment/model_package.py": "87daea7142d78f057e1fe3da6a1ab1e5c8be138682e602143b24192ccb94ab30",
+    "deployment/model_package_cli.py": "e45bb2f9871f50ea5e04f4f65ad5c574bd5513cd08d312e2c9d00293a660705e",
+    "deployment/model_publish.py": "d1e45786cb02005dc42bbb5002a6df3464bbac29c870eadd78bc2428f122d979",
+    "deployment/model_publish_cli.py": "a5dda02164825baa78d4015a98f1ed162bc87bcb4908b391a8d326b9e477cef0",
+    "deployment/promotion_evidence.py": "c5f51488f2e990dd1f9010ba06264f5d8667850aeafafe8bb9ac28602d6c51e9",
+    "deployment/r0_initial.py": "8e71f0ef8cba85ce53ebaa23cbd6a648bb62acf3a3b6e7fa99fc17bdd8560122",
+    "deployment/r0_release.py": "691677645a1346fd87e0da42aa3e9cad9ae253ece41313d61d9fe9fdadf11d10",
+    "evaluation/__init__.py": "6c7bcf092c2ea3ade22a4c2b44e216b09b21d36946244ed4119393578f8f179f",
+    "evaluation/continual_gate.py": "299352499306b420127f7279557b7ce4eef802c0de48c96963544ee84a06258c",
+    "evaluation/external_data.py": "a26899c4d33787e35c9ddf849e6a65ab3be3ee6b35fa1467c5915365b47812c3",
+    "evaluation/routerarena_cli.py": "f30684db938c1c87a5b090536a68ca09fbd530bd8529343078af9871f145f282",
+    "evaluation/routerarena_epoch_evaluation.py": "a7e3a8d23d16fbb72a1da4b9f61a4b5af1931a9366535126eadf1a4b69e6544d",
+    "evaluation/routerarena_evaluation_cli.py": "96bbd79533334dd397c0613353d43251c9039ee4980268ef3ff8b9c506da2098",
+    "evaluation/routerarena_preprocessing.py": "6f7e8da0df352c8053622020bab64de6e144229431ec43d662fda191d9029560",
+    "evaluation/routerarena_routing_evaluator.py": "4e15d7769d2f9b58763b76e1977fc9138dacd04c146dff3c604c160467e8e90a",
+    "evaluation/routerarena_visualization.py": "3502264ea0c1c2117628e49604826fc0e4a417973f93ddc98e8597a15973c9c4",
+    "generalization/__init__.py": "318c7c9b4bea43a1b071456b6c83d001554be8cd306b7308f7f38761d134b44c",
+    "generalization/__main__.py": "6d8b7d7846a845059d7a3107143f11131f63c5511d669b44085b15ec5e3d2279",
+    "generalization/cli.py": "727bd42c36103e7143bb859cf9005a689c95f89c30d40eb1d9325a2678cdfd54",
+    "generalization/data.py": "1d60456cfa666d45c7b790caa03629b7fd3fb024f2b7d1f64c783e5d0b68b0a6",
+    "generalization/eval_cli.py": "e39d47289a1b7259f90685028d4771faffee56b5de5fd6afaa164033a867d645",
+    "generalization/evaluation.py": "93d0ea3d45b1b2da815bfa46deaca9147edf87ca247a8457b2d15e53e0a5a684",
+    "generalization/train_cli.py": "87ff3638b304adacad5e2742c151ede957a3481c372752a4bee74e645e772121",
+    "generalization/training.py": "3e0aeed8bec6004533c524abf56d496343731de73603dc4dc38c0b4fdae767d8",
+    "objective_comparison/__init__.py": "d2037f5f9159f459537c2a2c9823de023b15c7c27baa6ddfc49ffcb25efde39a",
+    "objective_comparison/cli.py": "0d8c9ec5aaf3b8dcd05d48ff2a20094d37707b4bbc2e3ea980810f7716e39a60",
+    "objective_comparison/data.py": "b32d7c7a723691bba664569de93a1e191132ac0e60844f78d093e6032e254565",
+    "objective_comparison/evaluation.py": "59f1de2108c848be58e6419d2f63e4c8ff92874e93f6f32edb6e3b36c460a1a0",
+    "objective_comparison/objectives.py": "0070e4ff004ea84fe7aa7ff8f4360337cea4032a25ef762bb00a2e2e48f79e45",
+    "objective_comparison/sealed_protocol.py": "65d426e2ab8bca5a3ffbc67def9d20539fb58e8a3b9dc51be3961ba9ec136f6a",
+    "objective_comparison/selection.py": "a011cfabca4fc34e194c1d23ddfa51e997d5223279047646c466532f752081e0",
+    "objective_comparison/shared_training.py": "434684b34a9f8238976ebef2fafade013b96cf3713ecf0238f44bdca502ce280",
+    "objective_comparison/training.py": "9f26a0b04804421683f4d67167c6b9fcaea34cc468a87e39a522299fa8f3e91d",
+    "routing_data/__init__.py": "b725400d3cd5c3f827a8e9d26a69a0c816e91fd2026c97166e3c1d1e7b44eaf8",
+    "routing_data/cli.py": "97910b4610f5d3f35aa8a676b47baea896b24b4e2c4c27a48aeee2e8b98329fd",
+    "routing_data/continual.py": "df3af659feaa975f21a177bd434ab88affb12403d18a1fd5257e11cfa1d3c37e",
+    "routing_data/outcome_audit.py": "b93025e2172d5fad9750946426cc2a0e37d03a95198b1ce5a94eaba9545b250d",
+    "routing_data/preprocessing.py": "3812d1e2049345b5bca4387fe463649ba78a0925a9dbc1502dfe807922d23099",
+    "routing_data/text.py": "e5548fc65cd2bb1a341912dd223336a65e74ece39fa8b348787dde923be4ff93",
+    "shared/__init__.py": "d199236c98856020916bffdca2cf1e9890ee5d147aad0c6d74c055c910ca4aaa",
+    "shared/dataset_io.py": "df147df47882d21eee34d26991ebc419e2378f83ef7074a2798c79ef5bd187f5",
+    "shared/object_store.py": "e6f229fa6ed8e6d6ef92879f31aca51e63514d41f406457f72ff8eb63535c817",
+    "shared/observability.py": "80abf6b05cf6da218dcbceff5368a537f9da404a663378eb26112e3ec2ee7831",
+    "shared/structured_text.py": "586437da40e3b5d77d15e474b4ec36e92681f66c40d777260c6cf16094a2b390",
+    "shared/text_normalization.py": "101448dee97a41a4bd7766d6cf7a67c6688fd546be7e6cafe0de84f632edfaa6",
+    "training/__init__.py": "b9e303dc87ae9bb973c5f94a22fd040a3e6701d95a080eae13b0d586a9d871e5",
+    "training/feedback_retraining_cli.py": "6c422a746a00227fcd3db0df60b438846453c1de3f6ae700050637c1b20bcb66",
+    "training/feedback_retraining_preprocessing.py": "5730d71a57c94a0f46fc333ecee52e4bc43d9bd74d9b52d0118a1c0685da5a39",
+    "training/frozen_outcome_projection.py": "df1d5309e7f5329cb290ac07fa63d9c7bbfaeae51a53979d298a94d930a43058",
+    "training/modernbert_checkpointing.py": "48d030fe98e060b6d1e8254a0e2915c0453a51149b538691fd10eaf0eddc28bc",
+    "training/modernbert_colab_training.py": "0a0a9fbfe5d0a9b334b2a024175af117f50f268defd69096054110493275ba9b",
+    "training/modernbert_colab_training_cli.py": "828bcb0794d725c0f5eb93dc8d4e49bf2f154d2410ecc164c020b895fcfed37a",
+    "training/modernbert_runtime.py": "d5e502a12e0d05bbaa1a68c75258d5fdc605bcf49e3b1a92ca4e55e15c3983b5",
+    "training/modernbert_training.py": "84d492e375d4722c1099e8195e02402bd932a3ca92c8789ad31c1c5a30c2f63a",
+    "training/modernbert_training_cli.py": "324497a165ff01e9d18e87f335ed746c6995f4fe10ddf0162425309e920eda5c",
+    "training/modernbert_validation_progress.py": "5bf0d153ac6a634cf143cf13eb72e1b88cb823b6753925103f10c484facb1d73",
+    "training/protected_retraining_base.py": "52c943a6bcebbf21f8a7fafd49f41a928fbb4c89ad442cdaa6484e7b5a0a3c4c",
+    "training/routerbench_cli.py": "96cdc8bf97b92cad90b9ebf3ffa3795800390eb2bd2306f8730a9226e08903c5",
+    "training/routerbench_labeling.py": "6c05318aff9f6de4aa477856ad273df325b428f069386aaaa58beff1d9635fa0",
+    "training/routerbench_preprocessing.py": "15d9561dd71934243a227b1a064102e88d9b3c66b9c83d6fee98552d2d5ab22c",
+    "training/routing_policy.py": "eeb8852f6aead323a3fa3ff5493ff6b792dc7053f60cb84d0c6d11cad4068b07"
+  },
+  "production_approved": false,
+  "status": "prepared_not_trained"
+}
