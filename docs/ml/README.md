@@ -665,7 +665,7 @@ always-high의 주 지표는 기록된 답변 품질·비용이다. 모든 난�
 <a id="routing-8"></a>
 ### 3.8. 논문 라우터
 
-**2026-10-13 결정: 논문 라우터 전체 비교(EV-06)는 하지 않는다.** 9/30 재설계 초안(kNN 효용 라우터·RouteLLM-MF·IRT-Router·CARROT·RouterDC·EquiRouter)은 [라우터 평가 계획서](ROUTER_EVALUATION_V2_PLAN.md)로 축소·대체했고, 강한 단순 기준선인 kNN 효용 라우터만 EV-07·EV-08에 포함한다. 초안 원문은 `git show 3c10d04:docs/ml/ROUTER_COMPARISON_EXPERIMENT.md`로 조회한다. 아래 RouterDC 계약은 실행하지 않은 기존 계획으로 남긴다.
+**2026-09-30 재설계 초안.** 최근 문헌(라우팅 정체·쏠림 연구)을 반영해 논문 비교 대상을 kNN 효용 라우터·RouteLLM-MF·IRT-Router·CARROT·RouterDC·EquiRouter로 넓히는 [논문 라우터 비교 실험 계획서](ROUTER_COMPARISON_EXPERIMENT.md)를 작성했다. 사용자가 계획서 9절의 결정 항목을 확정하기 전까지 아래 기존 계약을 유지하며, 확정 후 이 절과 3.3절 표를 갱신한다. 2026-10-13 사용자 결정으로 비교는 그대로 하되, 평가는 [라우터 평가 계획서](ROUTER_EVALUATION_V2_PLAN.md)의 통일 기준을 따른다.
 
 <a id="routing-routerdc-첫-공식-비교군"></a>
 #### RouterDC: 첫 공식 비교군

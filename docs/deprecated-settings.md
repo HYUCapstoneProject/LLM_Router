@@ -110,6 +110,5 @@ git show 1ad9c89:docs/retraining-observability-plan.md
 | `experiments/RERANKER_REQUEST.md` | 2026-08 리랭커 요청·결정 기준 | 실험 목록 CA-02·CA-03 보고서 |
 | `docs/ml/R1_PRODUCTION_HANDOFF.md` | R1 운영 인수 계획(9/24~26). 9/27 R1 도입 보류로 무효 | ML 명세 5.11~5.14절, 대기 브랜치 `feat/r1-retraining-8192` |
 | `docs/ml/R0_USER_HANDOFF.md` | 9/27 R0 운영 인계의 일회성 할 일 목록 | 출발 모델 SHA는 ML 명세 5.11절, Spring 배포는 [배포 안내](../infra/DEPLOY.md)·[공통 Spring 인계](ml/SPRING_COMMON_HANDOFF.md) |
-| `docs/ml/ROUTER_COMPARISON_EXPERIMENT.md` | 논문 라우터 비교 계획서(EV-06) | [라우터 평가 계획서](ml/ROUTER_EVALUATION_V2_PLAN.md)(EV-07·EV-08) |
 | `frontend/README.md` | 내용 없는 자리표시(`# front`) | – |
 
