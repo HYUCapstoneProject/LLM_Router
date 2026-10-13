@@ -29,7 +29,11 @@ class RerankGateServiceTest {
     private static final double SCORE = 0.03581769;
 
     private RerankGateService gate(String mode) {
-        return new RerankGateService(routerClient, mode, SIMILARITY, SCORE);
+        return new RerankGateService(routerClient, mode, SIMILARITY, SCORE, "");
+    }
+
+    private RerankGateService gateExpecting(String mode, String modelVersion) {
+        return new RerankGateService(routerClient, mode, SIMILARITY, SCORE, modelVersion);
     }
 
     private static CachedResponse candidate(long id, String question, double similarity) {
@@ -150,6 +154,50 @@ class RerankGateServiceTest {
 
         assertThat(d.accepted()).isNotNull();
         assertThat(d.score()).isNull();
+    }
+
+    // --- 모델 버전 --------------------------------------------------------
+
+    /** 기준값은 잰 모델에서만 의미가 있다. 다른 모델 점수로는 판정하지 않는다. */
+    @Test
+    void enforceFallsBackToCacheMissWhenTheScoringModelIsNotTheExpectedOne() {
+        when(routerClient.rerank(anyString(), any()))
+                .thenReturn(new RouterRerank(new double[]{0.99},
+                        "cross-encoder/quora-distilroberta-base@f62e7a4"));
+
+        RerankDecision d = gateExpecting("enforce", "tasksource/deberta-base-long-nli@04dcf11")
+                .evaluate("질문", one(0.95));
+
+        assertThat(d.accepted()).isNull();
+        assertThat(d.reason()).isEqualTo("model_mismatch");
+        // ChatService 가 "rerank_" 를 붙여 fallback_reason VARCHAR(32) 에 저장한다.
+        assertThat(("rerank_" + d.reason()).length()).isLessThanOrEqualTo(32);
+    }
+
+    @Test
+    void shadowKeepsServingOnModelMismatch() {
+        when(routerClient.rerank(anyString(), any()))
+                .thenReturn(new RouterRerank(new double[]{0.99}, "other-model"));
+
+        RerankDecision d = gateExpecting("shadow", "tasksource/deberta-base-long-nli@04dcf11")
+                .evaluate("질문", one(0.95));
+
+        assertThat(d.accepted()).isNotNull();
+        assertThat(d.reason()).isEqualTo("model_mismatch_shadow");
+        assertThat(("rerank_" + d.reason()).length()).isLessThanOrEqualTo(32);
+    }
+
+    @Test
+    void enforceJudgesNormallyWhenTheModelMatches() {
+        when(routerClient.rerank(anyString(), any()))
+                .thenReturn(new RouterRerank(new double[]{0.9},
+                        "tasksource/deberta-base-long-nli@04dcf11"));
+
+        RerankDecision d = gateExpecting("enforce", "tasksource/deberta-base-long-nli@04dcf11")
+                .evaluate("질문", one(0.95));
+
+        assertThat(d.accepted()).isNotNull();
+        assertThat(d.reason()).isEqualTo("accepted");
     }
 
     // --- 경계 ------------------------------------------------------------

@@ -85,7 +85,9 @@ llm:
     # HNSW 가 훑을 후보 수이자 리랭커에 넘길 수 있는 최대치.
     # 키우면 리랭커가 순위를 바로잡을 기회가 늘지만 rerank 지연도 같이 는다.
     # FastAPI 의 rerank_max_candidates(기본 16)를 넘으면 400 을 맞는다.
-    candidate-limit: 5
+    # 1: 코사인 1위 후보 하나만 NLI 로 검증한다. 오프라인 평가에서 후보 전체를 검증해도
+    # 정확도가 같았고(같은 뜻이 다른 원질문에 재사용된 경우 0), 검증 지연은 후보 수에 비례한다.
+    candidate-limit: 1
 
     thresholds:
       easy: 0.80
@@ -113,10 +115,15 @@ llm:
       # 사용자는 정상 답변을 받지만, 막지 못한 오탐은 틀린 답이 그대로 나간다.
       mode: ${RERANK_MODE:enforce}
 
-      # 스크리닝이 고른 AND 조건. 코사인 단독으로는 두 분포가 겹쳐 갈리지 않는다.
-      # quora-distilroberta-base@f62e7a4 에서만 유효한 값이다 — 모델이 바뀌면 재측정한다.
-      similarity-threshold: 0.8774
-      score-threshold: 0.03581769
+      # NLI 검증(FastAPI LLM_ROUTER_RERANK_KIND=nli)의 기준. 코사인은 검색 기준(0.80)과 같게 두어
+      # 추가 조건을 걸지 않고, 양방향 함의 최소값 0.28154424 이상이면 재사용한다.
+      # calibration 에서 함정 통과 5% 이하로 고른 값이며 아래 모델에서만 유효하다.
+      #   test: 같은 뜻 재사용 84.1% / 95.5%, 함정 통과 4.7% / 1.0% (대화형 / 벤치마크형)
+      # 이전 quora-distilroberta-base@f62e7a4 기준은 코사인 0.8774 AND 점수 0.03581769 였다.
+      similarity-threshold: 0.80
+      score-threshold: 0.28154424
+      # FastAPI 가 다른 모델 점수를 돌려주면 판정하지 않고 캐시 미스로 처리한다. 비우면 검사하지 않는다.
+      expected-model-version: ${RERANK_EXPECTED_MODEL_VERSION:tasksource/deberta-base-long-nli@04dcf11}
 
   retraining:
     # 에스컬레이션 정정 라벨을 FastAPI 로 보내 재학습을 트리거한다 (04 API Contract).

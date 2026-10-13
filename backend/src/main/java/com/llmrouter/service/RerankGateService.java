@@ -13,7 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 캐시 후보를 cross-encoder 로 재검증한다.
+ * 캐시 후보를 FastAPI 의 검증 모델로 재검증한다.
+ *
+ * <p>현재 검증 모델은 NLI(tasksource/deberta-base-long-nli@04dcf11)다. FastAPI 가 두 질문이
+ * 공유하는 문장을 빼고 양방향 함의 확률의 최소값을 돌려준다. 코사인 1위 후보 하나만 넘기고
+ * ({@code candidate-limit: 1}) 점수 0.28154424 이상이면 재사용한다. 대화형·벤치마크형
+ * 테스트(같은 뜻 584, 함정 392)에서 같은 뜻 재사용 84.1% / 95.5%, 함정 통과 4.7% / 1.0% 였다
+ * (LLM_Router experiments/nli-diff-v1). 아래는 그 전 quora cross-encoder 를 고를 때의 측정이다.
  *
  * <p>bi-encoder 는 두 문장을 각각 따로 압축하므로 {@code Python} 이 {@code Java} 로
  * 바뀌어도 벡터가 거의 안 움직인다. 배포된 서버에 92문항을 던져 측정한 결과다.
@@ -36,18 +42,22 @@ public class RerankGateService {
     private final RerankMode mode;
     private final double similarityThreshold;
     private final double scoreThreshold;
+    private final String expectedModelVersion;
 
     public RerankGateService(
             RouterClient routerClient,
             @Value("${llm.cache.rerank.mode:off}") String mode,
             @Value("${llm.cache.rerank.similarity-threshold:0.8774}") double similarityThreshold,
-            @Value("${llm.cache.rerank.score-threshold:0.03581769}") double scoreThreshold) {
+            @Value("${llm.cache.rerank.score-threshold:0.03581769}") double scoreThreshold,
+            @Value("${llm.cache.rerank.expected-model-version:}") String expectedModelVersion) {
         this.routerClient = routerClient;
         this.mode = RerankMode.parse(mode);
         this.similarityThreshold = similarityThreshold;
         this.scoreThreshold = scoreThreshold;
-        log.info("리랭커 게이트 mode={} 코사인>={} 점수>={}",
-                this.mode, similarityThreshold, scoreThreshold);
+        this.expectedModelVersion = expectedModelVersion == null ? "" : expectedModelVersion.strip();
+        log.info("리랭커 게이트 mode={} 코사인>={} 점수>={} 모델={}",
+                this.mode, similarityThreshold, scoreThreshold,
+                this.expectedModelVersion.isEmpty() ? "(검사 안 함)" : this.expectedModelVersion);
     }
 
     /**
@@ -85,6 +95,9 @@ public class RerankGateService {
             modelVersion = result.modelVersion();
         } catch (RouterClientException error) {
             return onFailure(cosineBest, error);
+        }
+        if (!expectedModelVersion.isEmpty() && !expectedModelVersion.equals(modelVersion)) {
+            return onModelMismatch(cosineBest, modelVersion);
         }
 
         // AND 조건이다. 코사인 단독으로는 paraphrase 와 hard negative 분포가 겹쳐
@@ -138,6 +151,20 @@ public class RerankGateService {
      * enforce 에서는 <b>캐시 미스로 떨어뜨린다(fail-closed)</b>. 검증할 수 없는 캐시 답을
      * 내보내는 것보다 Claude 를 한 번 더 부르는 편이 싸다.
      */
+    /**
+     * 기준값은 그 값을 잰 모델의 점수에서만 의미가 있다. FastAPI 와 Spring 의 배포 순서가
+     * 어긋나 다른 모델의 점수가 오면 판정할 수 없으므로 장애와 같게 다룬다.
+     */
+    private RerankDecision onModelMismatch(CachedResponse cosineBest, String actual) {
+        if (mode == RerankMode.SHADOW) {
+            log.warn("리랭커 shadow: 모델 버전 불일치 기대={} 실제={}", expectedModelVersion, actual);
+            return RerankDecision.passthrough(cosineBest, "model_mismatch_shadow");
+        }
+        log.warn("리랭커 모델 버전 불일치 — 캐시 미스로 처리한다 기대={} 실제={}",
+                expectedModelVersion, actual);
+        return RerankDecision.passthrough(null, "model_mismatch");
+    }
+
     private RerankDecision onFailure(CachedResponse cosineBest, RouterClientException error) {
         if (mode == RerankMode.SHADOW) {
             log.warn("리랭커 shadow 실패 — 캐시 판정은 그대로 둔다 status={}",
