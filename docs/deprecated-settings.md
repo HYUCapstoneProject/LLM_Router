@@ -69,7 +69,7 @@
 | 배포·smoke 기록 | 08-16 GCE 호출, 08-17 compiler 추가 후 GPU smoke, 09-12~16 API/version/모델 동기화 기록. 최신 유효 feedback GPU E2E·현재 live health 증명과 구분한다. |
 | 기존 gateway 실험 | `main`의 [기존 평가 색인](../experiments/results/README.md)과 원본 REPORT·CSV·JSON·그림을 보존했다. 파레토 +0.0119는 Yi/Yi/gpt-4 배정이며 서로 다른 세 모델 배정은 +0.0079다. 당시 uniform random·v2 split·소규모 cache 관측을 최신 공통 실험의 결과로 바꾸지 않는다. |
 
-2026-09-23 `main` 통합에서 [PLAN](../PLAN.md)·[HANDOFF](../HANDOFF.md)의 원문을 당시 계획·시연·인수인계 증거로 보존하고 현행 우선권을 표시했다. Exact cache 미구현, reranker 미정, URI batch·수동 승격, Claude 대량 호출 실험 제안은 현재 지시가 아니다. 통합 소스에는 exact-first와 Spring rerank 모드, inline feedback 연동이 있다. Spring의 batch-size 1,000은 최대 전송 크기, auto-submit은 기본 false이며 FastAPI 최소 1건 계약과 충돌하지 않는다. 실제 배포 설정·health를 이번 통합에서 확인한 것은 아니다.
+2026-09-23 `main` 통합에서 PLAN·HANDOFF의 원문을 당시 계획·시연·인수인계 증거로 보존하고 현행 우선권을 표시했다. Exact cache 미구현, reranker 미정, URI batch·수동 승격, Claude 대량 호출 실험 제안은 현재 지시가 아니다. 통합 소스에는 exact-first와 Spring rerank 모드, inline feedback 연동이 있다. Spring의 batch-size 1,000은 최대 전송 크기, auto-submit은 기본 false이며 FastAPI 최소 1건 계약과 충돌하지 않는다. 실제 배포 설정·health를 이번 통합에서 확인한 것은 아니다.
 
 ## 6. 문서 통합과 원문 조회
 
@@ -99,3 +99,17 @@ git show 1ad9c89:docs/retraining-observability-plan.md
 **Git에 원본 데이터·대형 로그·가중치가 전부 보관된 것은 아니다.** `ml/data/`, `ml/artifacts/`는 ignore 대상이다. Drive/GCS/로컬의 보관 위치와 checksum을 따로 확인한다. 문서 삭제와 함께 코드·config·JSON fixture·원본 artifact를 삭제하지 않았다. 원본 artifact가 없으면 문서 수치만으로 재현했다고 표시하지 않는다.
 
 이후 변경은 현재 소유 문서를 수정하고, 이 파일에 대체된 설정·이유·상태·근거 commit을 짧게 남긴다. 과거 설정 전문과 날짜별 문서 사본은 추가하지 않는다.
+
+## 2026-10-13 문서 정리로 삭제한 페이지
+
+대체되었거나 일회성 지시만 남은 페이지를 저장소에서 지웠다. 원문은 모두 `3c10d04`(main)에 남아 있으므로 `git show 3c10d04:<경로>`로 조회한다. 실험의 현재 상태는 [실험 목록](../experiments/REGISTRY.md)이 기준이다.
+
+| 경로 | 내용 | 대체 |
+|---|---|---|
+| `PLAN.md`, `HANDOFF.md` | 2026-08 계획·시연·인수인계 원문(9/23부터 과거 보존 표시) | [문서 시작점](README.md), [ML 명세](ml/README.md) |
+| `experiments/RERANKER_REQUEST.md` | 2026-08 리랭커 요청·결정 기준 | 실험 목록 CA-02·CA-03 보고서 |
+| `docs/ml/R1_PRODUCTION_HANDOFF.md` | R1 운영 인수 계획(9/24~26). 9/27 R1 도입 보류로 무효 | ML 명세 5.11~5.14절, 대기 브랜치 `feat/r1-retraining-8192` |
+| `docs/ml/R0_USER_HANDOFF.md` | 9/27 R0 운영 인계의 일회성 할 일 목록 | 출발 모델 SHA는 ML 명세 5.11절, Spring 배포는 [배포 안내](../infra/DEPLOY.md)·[공통 Spring 인계](ml/SPRING_COMMON_HANDOFF.md) |
+| `docs/ml/ROUTER_COMPARISON_EXPERIMENT.md` | 논문 라우터 비교 계획서(EV-06) | [라우터 평가 계획서](ml/ROUTER_EVALUATION_V2_PLAN.md)(EV-07·EV-08) |
+| `frontend/README.md` | 내용 없는 자리표시(`# front`) | – |
+

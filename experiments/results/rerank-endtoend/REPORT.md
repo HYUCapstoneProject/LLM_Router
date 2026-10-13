@@ -34,7 +34,7 @@
 pgvector 의 판정을 numpy 로 재현했다. 재현이 정당한 근거는 두 가지다.
 
 - `1 - (embedding <=> v)` 는 코사인 유사도이고, 반환 벡터가 L2 정규화되어 있음을
-  이미 확인했다(전 문항 norm 1.000000, `../../RERANKER_REQUEST.md`). 따라서 내적과 같다.
+  이미 확인했다(전 문항 norm 1.000000, `RERANKER_REQUEST.md`, 2026-10-13 삭제·`git show 3c10d04:experiments/RERANKER_REQUEST.md`). 따라서 내적과 같다.
 - 조회 SQL(top-k → 행별 threshold → 유사도 내림차순)을 그대로 옮겼다.
 
 즉 **임베딩과 리랭커는 실제 배포본이 계산했고**, 그 위의 판정 로직만 재현했다.
