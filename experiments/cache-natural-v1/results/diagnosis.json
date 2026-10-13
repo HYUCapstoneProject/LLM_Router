@@ -1,0 +1,263 @@
+{
+ "1_lexical": {
+  "auc_para_vs_trap": {
+   "cosine": 0.725,
+   "rerank": 0.7263861111111111,
+   "word_jaccard": 0.036727777777777776,
+   "content_word_jaccard": 0.28857222222222223
+  },
+  "spearman_with_word_jaccard": {
+   "rerank_all": -0.10730122574178202,
+   "cosine_all": -0.04425522505262363,
+   "rerank_paras_only": 0.33170767487616065,
+   "rerank_traps_only": 0.04319069498617674
+  },
+  "median_jaccard": {
+   "para_light": 0.25,
+   "para_heavy": 0.2727272727272727,
+   "trap": 0.7142857142857143
+  }
+ },
+ "2_same_word_set_traps": {
+  "n": 5,
+  "c3_pass": 3,
+  "median_rerank": 0.8563745021820068,
+  "examples": [
+   [
+    "How do I convert a string to an integer in Java?",
+    "How do I convert an integer to a string in Java?",
+    0.965
+   ],
+   [
+    "How do I convert a Python list to a comma-separated string?",
+    "How do I convert a comma-separated string to a Python list?",
+    0.856
+   ],
+   [
+    "How do I convert a Unix timestamp to a date in Python?",
+    "How do I convert a date to a Unix timestamp in Python?",
+    0.986
+   ],
+   [
+    "How do I convert kilometers to miles?",
+    "How do I convert miles to kilometers?",
+    0.018
+   ],
+   [
+    "How do I convert Celsius to Kelvin?",
+    "How do I convert Kelvin to Celsius?",
+    0.013
+   ]
+  ]
+ },
+ "3_reranker_native_boundary": {
+  "para_score_ge_0.5": 0.4116666666666667,
+  "trap_score_ge_0.5": 0.11,
+  "para_score_lt_0.036": 0.4066666666666667,
+  "trap_score_lt_0.036": 0.7966666666666666
+ },
+ "4_matched_operating_point": {
+  "production_AND": {
+   "trap_pass": 0.12666666666666668,
+   "para_pass": 0.505
+  },
+  "cosine_only": [
+   0.921303305002346,
+   0.12666666666666668,
+   0.33666666666666667
+  ],
+  "rerank_only": [
+   0.250302255153656,
+   0.12666666666666668,
+   0.435
+  ],
+  "z_sum_cos_plus_rerank_logit": [
+   0.7815239454201467,
+   0.12666666666666668,
+   0.4716666666666667
+  ],
+  "auc_z_sum": 0.7647888888888889
+ },
+ "5_by_trap_type": {
+  "output_format": {
+   "n": 6,
+   "median_cos": 0.878,
+   "median_rerank": 0.0551,
+   "median_jaccard": 0.683,
+   "c3_pass": 0.333
+  },
+  "direction": {
+   "n": 14,
+   "median_cos": 0.903,
+   "median_rerank": 0.0256,
+   "median_jaccard": 0.804,
+   "c3_pass": 0.429
+  },
+  "scope": {
+   "n": 47,
+   "median_cos": 0.872,
+   "median_rerank": 0.0221,
+   "median_jaccard": 0.632,
+   "c3_pass": 0.319
+  },
+  "negation": {
+   "n": 7,
+   "median_cos": 0.941,
+   "median_rerank": 0.0081,
+   "median_jaccard": 0.778,
+   "c3_pass": 0.143
+  },
+  "polarity": {
+   "n": 25,
+   "median_cos": 0.866,
+   "median_rerank": 0.0063,
+   "median_jaccard": 0.667,
+   "c3_pass": 0.24
+  },
+  "superlative": {
+   "n": 7,
+   "median_cos": 0.83,
+   "median_rerank": 0.0055,
+   "median_jaccard": 0.8,
+   "c3_pass": 0.0
+  },
+  "time": {
+   "n": 10,
+   "median_cos": 0.884,
+   "median_rerank": 0.0028,
+   "median_jaccard": 0.699,
+   "c3_pass": 0.1
+  },
+  "number_unit": {
+   "n": 31,
+   "median_cos": 0.88,
+   "median_rerank": 0.001,
+   "median_jaccard": 0.778,
+   "c3_pass": 0.065
+  },
+  "entity": {
+   "n": 139,
+   "median_cos": 0.81,
+   "median_rerank": 0.0005,
+   "median_jaccard": 0.7,
+   "c3_pass": 0.036
+  },
+  "code_language": {
+   "n": 14,
+   "median_cos": 0.88,
+   "median_rerank": 0.0003,
+   "median_jaccard": 0.789,
+   "c3_pass": 0.0
+  }
+ },
+ "5_paraphrase_reference": {
+  "para_light": {
+   "median_cos": 0.912,
+   "median_rerank": 0.1947,
+   "median_jaccard": 0.25
+  },
+  "para_heavy": {
+   "median_cos": 0.893,
+   "median_rerank": 0.0545,
+   "median_jaccard": 0.273
+  }
+ },
+ "6_length": {
+  "short_le7_words": {
+   "n_groups": 108,
+   "auc_cos": 0.8485082304526749,
+   "auc_rerank": 0.761338305898491
+  },
+  "long_gt7_words": {
+   "n_groups": 192,
+   "auc_cos": 0.6497667100694444,
+   "auc_rerank": 0.7074245876736112
+  }
+ },
+ "7_by_domain": {
+  "cs": {
+   "auc_cos": 0.773,
+   "auc_rerank": 0.729,
+   "median_rerank_para_heavy": 0.0528,
+   "median_rerank_trap": 0.0007,
+   "median_jac_para_heavy": 0.25,
+   "median_jac_trap": 0.692,
+   "trap_types": {
+    "entity": 28,
+    "scope": 11,
+    "number_unit": 5,
+    "polarity": 4
+   }
+  },
+  "everyday": {
+   "auc_cos": 0.843,
+   "auc_rerank": 0.844,
+   "median_rerank_para_heavy": 0.11,
+   "median_rerank_trap": 0.0016,
+   "median_jac_para_heavy": 0.25,
+   "median_jac_trap": 0.7,
+   "trap_types": {
+    "entity": 29,
+    "scope": 6,
+    "polarity": 3,
+    "time": 3
+   }
+  },
+  "general": {
+   "auc_cos": 0.943,
+   "auc_rerank": 0.91,
+   "median_rerank_para_heavy": 0.3522,
+   "median_rerank_trap": 0.0005,
+   "median_jac_para_heavy": 0.286,
+   "median_jac_trap": 0.692,
+   "trap_types": {
+    "entity": 25,
+    "scope": 10,
+    "number_unit": 5,
+    "polarity": 3
+   }
+  },
+  "math_science": {
+   "auc_cos": 0.719,
+   "auc_rerank": 0.782,
+   "median_rerank_para_heavy": 0.1622,
+   "median_rerank_trap": 0.0013,
+   "median_jac_para_heavy": 0.273,
+   "median_jac_trap": 0.75,
+   "trap_types": {
+    "entity": 22,
+    "number_unit": 14,
+    "direction": 2,
+    "scope": 2
+   }
+  },
+  "programming": {
+   "auc_cos": 0.387,
+   "auc_rerank": 0.427,
+   "median_rerank_para_heavy": 0.0015,
+   "median_rerank_trap": 0.0052,
+   "median_jac_para_heavy": 0.226,
+   "median_jac_trap": 0.778,
+   "trap_types": {
+    "scope": 15,
+    "entity": 14,
+    "code_language": 13,
+    "polarity": 10
+   }
+  },
+  "writing": {
+   "auc_cos": 0.826,
+   "auc_rerank": 0.809,
+   "median_rerank_para_heavy": 0.913,
+   "median_rerank_trap": 0.0037,
+   "median_jac_para_heavy": 0.345,
+   "median_jac_trap": 0.679,
+   "trap_types": {
+    "entity": 21,
+    "output_format": 5,
+    "polarity": 3,
+    "scope": 3
+   }
+  }
+ }
+}

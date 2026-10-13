@@ -1,0 +1,15 @@
+steps:
+  - name: 'python:3.11-slim'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        set -e
+        pip install --quiet --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+        pip install --quiet --no-cache-dir "gptcache==0.1.44" "numpy<2" "onnxruntime>=1.20,<2" faiss-cpu sqlalchemy \
+          "sentence-transformers>=5.1,<6" "transformers>=4.44,<5" huggingface-hub sentencepiece protobuf
+        pip freeze | grep -i -E "gptcache|onnxruntime|faiss|sqlalchemy|sentence|transformers|numpy|torch"
+        python run_gptcache.py
+timeout: '7200s'
+options:
+  machineType: 'E2_HIGHCPU_32'

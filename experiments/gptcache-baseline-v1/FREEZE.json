@@ -1,0 +1,11 @@
+{
+ "frozen_at": "2026-10-12, before run",
+ "sha256": {
+  "PLAN.md": "713a88c255a9c3c93daff509616a4125dcb61edf48a3d6742754fa40e57939b7",
+  "make_inputs.py": "68f6446bc896d34fbee71a24528720443fd8cc932bfa62c39264912618da0ef6",
+  "cloud/run_gptcache.py": "14629f355839797ebdd10bfeb2395e3a233d1fd58ffcf2acc83c9066d31226aa",
+  "cloud/cloudbuild.yaml": "e20560657b1988da23c7d45c60f71f3d2bde85054a09c106b16b2a0af7cea259",
+  "cloud/inputs.json": "ef8d1f5d6f19f3b8c84ddabfcf393119c8188fd4f52b8bd69d90af470b299e60"
+ },
+ "note": "68ee7861 failed at pip install (python 3.10 image, flit_core); image changed to python:3.11-slim, nothing else; 73a7d3d6 failed importing onnxruntime 1.16.3 (executable stack); pinned onnxruntime>=1.20,<2; fa1c787f ran but every put/get failed (transformers 5 removed encode_plus used by gptcache 0.1.44); pinned transformers<5; 8413e6f0: max_size kwarg is ignored for sqlite,faiss (eviction_params used, default 1000) -> d2 cache evicted to 886; pass eviction_params and assert count. chat results of 8413e6f0 unaffected (300 entries)"
+}

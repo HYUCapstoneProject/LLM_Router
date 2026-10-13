@@ -1,0 +1,4 @@
+data/
+cloud/inputs.json
+cloud/*.log
+results/raw_*.json
