@@ -64,8 +64,8 @@
 | EV-05 | 통일 평가 시제품 (어댑터·상향 고려 규칙) | 10-13 | 완료·PR 검토 중 | 어댑터 후 R0 ≈ R1. 상향 고려 규칙 ≈ κ별 최선의 고정 시작 단계 | [README](results/unified-eval-prototype-20261013/README.md) |
 | EV-06 | 논문 라우터 비교 | – | 폐기(10-13, EV-07·08로 대체) | 계획서 초안(PR47)은 삭제. kNN 효용 라우터만 EV-07·08에 포함 | `git show 3c10d04:docs/ml/ROUTER_COMPARISON_EXPERIMENT.md` |
 | EV-07 | 통일 기준 재평가 (계획서 E2) | – | 계획 | 학습 없이 R0·R0-τ·R1·R2·R3·kNN·고정 정책 비교 | [계획서 6절](../docs/ml/ROUTER_EVALUATION_V2_PLAN.md) |
-| EV-08 | 외부·세대 전이 (계획서 E3) | – | 계획 | LLMRouterBench·SPROUT·RouterArena 700문항, 추론만 | 같음 |
-| EV-09 | RouterArena 해결률 실측 (계획서 E4) | – | 선택 | 층화 표본 약 1,000문항을 서비스 후보로 호출. EV-08 결과 후 결정 | 같음 |
+| EV-08 | 외부·세대 전이 (계획서 E3) | – | 계획 | LLMRouterBench·SPROUT·RouterArena 700문항, 추론만 | 같음, [SPROUT 비용 추산](../docs/ml/SPROUT_COST_ESTIMATION.md) |
+| EV-09 | RouterArena 해결률 실측 (계획서 E4) | – | 보류(10-13) | 층화 표본 약 1,000문항을 서비스 후보로 호출. API 비용 때문에 팀원과 협의한 뒤 결정 | 같음 |
 
 ### 2.5. 캐시 (CA)
 
@@ -99,6 +99,7 @@
 | XA-06 | 시작 단계별 최종 해결률 (stream) | low부터 시작의 우위 8.3%p(v1) → 5.1%p(v2) | EV-04 4절 |
 | XA-07 | v1 채점 오류 영향 정리 | 방법 순위 Kendall τ .93~1.0. 라벨 20% 변경(정정 자체 8.4%). R1 학습 정답 4.6~7.8% 변경 | 계획서 5절 |
 | XA-08 | RouterArena와 외부 데이터의 같은 문항 | 700문항(LLMRouterBench 663, SPROUT 38) | 계획서 4절 |
+| XA-09 | SPROUT 비용 시험 계산 (calibration만) | 데이터 저자 단가 × 모델별 토큰으로 질문당 비용이 최저 대비 1~232배(토큰만 쓰면 1~1.95배). 세 단계 규칙은 Llama 3.2 3B / GPT-4o-mini / GPT-4o를 고르고, 오픈 모델 단가 0.5~2배에도 같다 | [SPROUT 비용 추산](../docs/ml/SPROUT_COST_ESTIMATION.md) 6·7절 |
 
 ## 3. 관계 한눈에
 
@@ -108,7 +109,7 @@ DT-01 ─┬─ RT-04 ── RT-05 ──┬── EV-01, EV-02, EV-03
        │                   └── RF-01 ── RF-02 ── RF-03 ── RF-04
        ├─ RT-06 ── EV-02, EV-03
        └─ CA-05 (운영 R0 고정) ── CA-06(계획)
-DT-02 ─── EV-04 · EV-05 ── RT-08 · EV-07 · EV-08 (계획) ── EV-09(선택)
+DT-02 ─── EV-04 · EV-05 ── RT-08 · EV-07 · EV-08 (계획) ── EV-09(보류)
 DT-03 ─── EV-08 (계획)
 8월 선행: RT-01~03, CA-01~04
 ```
