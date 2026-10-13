@@ -1,0 +1,8 @@
+{
+ "frozen_at": "2026-10-11",
+ "dataset_sha256": "1eb3103a43aa3ba301acf78d979748570ded41a514121c64139da2dc790dba33",
+ "originals_sha256": "b0dc66fd6cc5fee53411be53c077534957d2ccbf7a3276c1c72f5c6af299fa53",
+ "background_sha256": "3d1cb84629823cabe856e944ebe45d2118ba3d13627ff5d212115353fedcdb47",
+ "groups": 300,
+ "note": "Frozen before any embedding or judge score was computed on this data."
+}

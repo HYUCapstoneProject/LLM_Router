@@ -2,6 +2,8 @@
 
 > **2026-10-01 데이터 오류 경고:** RouterBench·xRouteBench의 기록 점수에서 체계적인 채점 오류를 발견했다(RouterBench GSM8K 등급 점수, MMLU 정답 키 오류, xRouteBench 형식 오답 처리, SQuAD F1 기준). 아래 2026-09 실험은 모두 오류가 포함된 v1 데이터 기준이다. 현재 기준은 v1을 유지하며, v2는 교체용으로 보관한다(재실험 여부 보류). → [점검 보고서와 검증 데이터셋 v2](benchmark-outcome-audit-20261001/REPORT.md)
 
+2026-10-14 추가 (캐시 판정 교체, Notion 15번): [대화형 300그룹 C3 평가·진단·판정기 비교](../cache-natural-v1/REPORT.md), [D2 재현본](../d2-replica-v1/REPORT.md), [NLI 도입 방식](../nli-adoption-v1/REPORT.md), [차이 문장 NLI·모델 7종](../nli-diff-v1/REPORT.md), [GPTCache 0.1.44 실제 실행](../gptcache-baseline-v1/REPORT.md), [배포 구성의 동결 기준 재평가](../cache-eval-v2/REPORT.md). 질문·벤치마크 원문은 Git에 넣지 않았다.
+
 2026-09-25 추가: [R1/R3 natural·balanced 최종 평가](routing-generalization-v1-20260925/report.md), [R0~R3 통합 판단](routing-method-review-20260925/REVIEW.md), [Git·원본 보관 범위](ARTIFACT_STORAGE.md).
 
 현재 최종 설계에 따른 실행 기록은 [R0 초기 학습·복구](modernbert-initial-v1-20260924/REPORT.md), [R0/R1/R2 통합 A 비교](routing-objectives-continual-v1-A-20260924/REPORT.md), [비교 결과 해석](routing-objectives-continual-v1-A-20260924/ANALYSIS.md)에 있다. 세 방법을 같은 2,007 step·seed 42로 비교했으며 D_dev 비용–품질 nAUC는 R1 0.863179, R2 0.833874, R0 0.166115로 R1이 선정됐다. GCS·개인 Drive 보존을 검증했다. 공개 후보의 단일 seed 결과이며, [독립 test 7,202문항 평가](routing-objectives-continual-v1-A-20260924/sealed-tests/REPORT.md)도 완료했으며, R1/R2의 일부 source 비용 상한 초과를 기록했다. 실제 Claude 서비스 검증·운영 활성화는 별도다. 이후 실험은 [공통 보고서 형식](../templates/RUN_REPORT.md)으로 데이터·학습 조건, 비교·선정, 결과·해석, 파일 보존·게시 상태를 기록한다.
