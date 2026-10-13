@@ -1,5 +1,7 @@
 # 라우터 분류 성능 실측
 
+실험 코드: **RT-01** · [실험 목록](../../REGISTRY.md)
+
 측정일: 2026-08-16 (개방형 질문), 2026-08-30 (RouterBench held-out)
 대상: 배포된 FastAPI `/router/classify`
 모델: `router-modernbert-base-routerbench-20260814-45dcc6d`

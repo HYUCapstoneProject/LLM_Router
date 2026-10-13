@@ -1,5 +1,7 @@
 # 리랭커 실적용 검증 — 오탐이 실제로 줄어드는가
 
+실험 코드: **CA-03** · [실험 목록](../../REGISTRY.md)
+
 측정일: 2026-08-30
 대상: **배포된 운영 스택** (FastAPI `10.138.0.2:8000`, bge-large-en-v1.5, quora-distilroberta-base@f62e7a4)
 스크립트: `experiments/validate_reranker_endtoend.py`

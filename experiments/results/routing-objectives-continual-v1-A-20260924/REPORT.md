@@ -1,5 +1,7 @@
 # R0/R1/R2 통합 A 비교 보고서
 
+실험 코드: **RT-05** · [실험 목록](../../REGISTRY.md)
+
 D_dev source-macro 비용–품질 nAUC의 validation lock 선정 방법은 **R1 success BCE**다. 이 보고서는 로컬의 봉인된 검증 파일과 lock을 대조한 결과이며 운영 승인·활성화 증거가 아니다.
 
 - 범위: `routing-objectives-continual-v1-A`, seed `42`, canonical 세 방법. B·RouterDC·추가 seed 반복은 포함하지 않는다.

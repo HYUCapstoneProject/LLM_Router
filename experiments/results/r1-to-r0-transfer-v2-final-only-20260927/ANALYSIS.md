@@ -1,5 +1,7 @@
 # R1→R0 전이 실험 결과 분석 — 2026-09-27
 
+실험 코드: **RF-01** · [실험 목록](../../REGISTRY.md)
+
 실행 ID `r1-to-r0-transfer-v2-run001`, config `r1-to-r0-transfer-v2-final-only`, plan SHA-256 `05fcfd4c…7e77185`. 사전 계획은 [설계서](../../../docs/ml/R1_TO_R0_TRANSFER_EXPERIMENT.md)를 따른다. 이 문서는 04 노트북이 생성한 `report/`를 검토한 결과이며, 서비스 승격 승인이 아니다.
 
 ## 1. 결론

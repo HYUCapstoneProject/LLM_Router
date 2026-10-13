@@ -1,5 +1,7 @@
 # 실제 R0/R1/R2 비교 결과 해석
 
+실험 코드: **RT-05** · [실험 목록](../../REGISTRY.md)
+
 `REPORT.md`와 `report.json`은 `render-routing-objective-report.py`가 원본 검증 산출물과 validation lock을 재검산해 생성했다. 이 문서는 그 결과의 해석과 보관 범위를 보충한다. 추가 학습, 정책 재선택, sealed 평가, 운영 활성화는 수행하지 않았다.
 
 ## 선정 결과와 해석

@@ -1,5 +1,7 @@
 # R1에서 R0로 전환하는 재학습 실험
 
+실험 코드: **RF-01** · [실험 목록](../../experiments/REGISTRY.md)
+
 작성일: 2026-09-27. 이 문서는 실험의 사전 계획이며 운영 배포 승인 기록이 아니다. 전체 연구·운영 계약은 [ML 단일 문서](README.md)를 따른다. 실제 실행 config는 `r1-to-r0-transfer-v2-final-only`다. 2026-09-27 run `r1-to-r0-transfer-v2-run001`로 학습·최종 평가를 완료했으며, 결과는 [결과 분석](../../experiments/results/r1-to-r0-transfer-v2-final-only-20260927/ANALYSIS.md)에 둔다. 요약: A 선택 고정, B 가설 불지지, 두 군 모두 망각 기준 미달로 배포 후보 없음.
 
 ## 1. 목적과 세 비교군

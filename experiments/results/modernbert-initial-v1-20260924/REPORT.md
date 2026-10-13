@@ -1,5 +1,7 @@
 # ModernBERT R0 후보 학습·복구 — RouterBench + xRouteBench
 
+실험 코드: **RT-04** · [실험 목록](../../REGISTRY.md)
+
 최초 실행은 고정된 3 epoch 학습과 개발 검증을 끝냈지만, 학교 Drive 용량 부족으로 최종 모델 파일이 보존되지 않았다. **최초 실행의 아래 수치는 stdout 관측 결과이며, 게시 가능한 최종 모델의 검증 완료 결과가 아니다.** 모든 파일을 검증한 step 500 체크포인트에서 같은 실험을 복구했으며, 복구 모델의 GCS·개인 Drive 보존까지 검증했다.
 
 기준일: 2026-09-24. 기계 판독 기록은 [run.json](run.json), 공통 형식은 [실험 보고서 템플릿](../../templates/RUN_REPORT.md), 설계 근거는 [ML 최종 명세](../../../docs/ml/README.md)다.

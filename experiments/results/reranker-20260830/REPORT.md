@@ -1,5 +1,7 @@
 # Cross-encoder reranker screening 결과
 
+실험 코드: **CA-02** · [실험 목록](../../REGISTRY.md)
+
 평가일: 2026-08-30
 평가 장치: CPU, batch size 8
 평가셋: `rerank-eval-pairs.csv` 58쌍 (positive 21, hard negative 37)

@@ -1,5 +1,7 @@
 # 티어 재현율 — 배정 없이 분류 품질만 재려던 시도
 
+실험 코드: **RT-03** · [실험 목록](../../REGISTRY.md)
+
 측정일: 2026-09-12
 대상: 배포된 `/router/classify` 예측 (RouterBench held-out test 3,218건)
 스크립트: `experiments/tier_agreement.py`

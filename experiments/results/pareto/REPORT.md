@@ -1,5 +1,7 @@
 # 기존 기법 대비 비용-성능 파레토 (RouterBench)
 
+실험 코드: **RT-02** · [실험 목록](../../REGISTRY.md)
+
 평가일: 2026-08-30
 데이터: RouterBench 0-shot, 11개 모델 × 36,497 질의
 평가 대상: 라우터 학습셋의 **held-out test split 전량 3,218건**

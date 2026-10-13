@@ -1,5 +1,7 @@
 # 추가 외부 평가 데이터 선정과 준비 (external-evaluation-v1)
 
+실험 코드: **DT-03** · [실험 목록](../../experiments/REGISTRY.md)
+
 작성일: 2026-10-01. [README 4.9절](README.md#external-evaluation-candidates)에서 조사한 후보 중 실제로 쓸 데이터를 고르고, 평가에 바로 쓸 수 있게 정리한 기록이다. **평가 전용**이며 학습·임계값 조정·모델 선택에 쓰지 않는다. 이 문서는 데이터 준비까지이고 모델 평가 결과는 없다.
 
 ## 1. 선정 기준
