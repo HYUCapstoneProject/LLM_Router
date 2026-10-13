@@ -79,6 +79,27 @@ R0 계열 재학습(F1~F5)과 R1 모두 초기 R0나 단순 기준선을 크게 
 - 라우터가 사는 것은 **첫 시도 성공**이다. RouterBench에서 F0는 low부터보다 첫 시도 +.089에 비용 +.060을 쓰고, medium부터 시작하는 것보다 비용은 .025 싸지만 첫 시도가 .140 낮다.
 - 따라서 서비스의 비용 대비 품질은 "최종 해결률"이 아니라 **첫 시도 실패 한 번의 비용(지연·불만·이탈)**을 얼마로 보느냐에 달려 있다. 그 값이 작으면 라우터 없이 싸게 시작하는 것이 최선이고, 크면 첫 시도 성공을 올리는 라우터(R1류)가 의미를 가진다.
 
+### 4.1. 실제 문제 해결률 (채점 정정 v2 포함)
+
+![solve rates](resolution-rates.png)
+
+막대는 2026-10-01 채점 점검의 정정(v2)을 같은 test 문항에 적용한 값이고, 검은 세로선은 기록된 v1 값이다. RouterBench는 정정 2,256칸(성공 여부가 바뀐 칸 519)을 반영하고 제외 문항 28개를 뺐다. xRouteBench는 정정 374칸을 반영했다(test 문항 100% 연결).
+
+| 해결률 (v2) | RouterBench 첫 시도 | RouterBench 최종 | xRouteBench 첫 시도 | xRouteBench 최종 |
+|---|---:|---:|---:|---:|
+| low부터 시작 | 50.8% | **93.5%** | 72.3% | **88.3%** |
+| medium부터 시작 | 75.7% | 92.2% | 77.5% | 87.6% |
+| high만 | 88.8% | 88.8% | 84.1% | 84.1% |
+| F0 (운영 R0 1.0) | 61.5% | 92.5% | 75.5% | 87.6% |
+| F5 | 64.8% | 92.3% | 74.7% | 87.9% |
+| F4 | 74.3% | 91.4% | 79.7% | 87.1% |
+| R1 (잠긴 정책) | 84.6% | 90.6% | 82.0% | 85.8% |
+| oracle | 93.5% | 93.5% | 88.3% | 88.3% |
+
+- 상향을 허용하면 모든 방식이 85~94%를 푼다. 정정 후에도 "low부터 시작"이 oracle과 같은 최종 해결률이다.
+- 정정은 비싼 모델에 유리하게 작용한다(high만: RouterBench 82.4%→88.8%). 그래도 순서는 바뀌지 않는다.
+- RouterArena는 모델 응답·정답 여부 기록이 없어 해결률을 계산할 수 없다. 측정하려면 서비스 후보 등 실제 LLM 호출이 필요하다.
+
 ## 5. RouterArena: 공식 난이도 라벨과의 일치
 
 ![RouterArena alignment](arena-alignment.png)
@@ -119,7 +140,11 @@ python experiments/results/routing-ceiling-20261013/ceiling_analysis.py \
   --f5-run <Drive>/LLM_Router/retraining-effect-f5/runs/retraining-effect-v4-f5-run001 \
   --routerbench-raw ml/data/raw --output-dir experiments/results/routing-ceiling-20261013
 python experiments/results/routing-ceiling-20261013/plot_ceiling.py experiments/results/routing-ceiling-20261013
+python experiments/results/routing-ceiling-20261013/resolution_rates.py --test <kit>/inputs/test.parquet \
+  --scores-root experiments/results/context-length-qualification-20260925 --f4-run <F4 run> --f5-run <F5 run> \
+  --audit-dir ml/artifacts/benchmark-outcome-audit-v1 --src-root ml/src \
+  --xroute-raw-test ml/data/raw/xroutebench/<revision>/llmrouter_generic-test.parquet --output-dir experiments/results/routing-ceiling-20261013
 python experiments/results/routing-ceiling-20261013/arena_figure.py ml/artifacts/routerarena-diagnostics-v1-20260924/prepared/evaluation.parquet
 ```
 
-산출물: [curves.csv](curves.csv)(곡선 점), [curve-summary.csv](curve-summary.csv), [methods-resolution-cost.csv](methods-resolution-cost.csv), [label-accuracy-ceiling.csv](label-accuracy-ceiling.csv), [notes.json](notes.json), [arena-alignment.csv](arena-alignment.csv).
+산출물: [curves.csv](curves.csv)(곡선 점), [curve-summary.csv](curve-summary.csv), [methods-resolution-cost.csv](methods-resolution-cost.csv), [label-accuracy-ceiling.csv](label-accuracy-ceiling.csv), [notes.json](notes.json), [arena-alignment.csv](arena-alignment.csv), [resolution-rates.csv](resolution-rates.csv).
