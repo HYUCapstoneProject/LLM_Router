@@ -79,14 +79,36 @@ R0 계열 재학습(F1~F5)과 R1 모두 초기 R0나 단순 기준선을 크게 
 - 라우터가 사는 것은 **첫 시도 성공**이다. RouterBench에서 F0는 low부터보다 첫 시도 +.089에 비용 +.060을 쓰고, medium부터 시작하는 것보다 비용은 .025 싸지만 첫 시도가 .140 낮다.
 - 따라서 서비스의 비용 대비 품질은 "최종 해결률"이 아니라 **첫 시도 실패 한 번의 비용(지연·불만·이탈)**을 얼마로 보느냐에 달려 있다. 그 값이 작으면 라우터 없이 싸게 시작하는 것이 최선이고, 크면 첫 시도 성공을 올리는 라우터(R1류)가 의미를 가진다.
 
-## 5. 한계
+## 5. RouterArena: 공식 난이도 라벨과의 일치
+
+![RouterArena alignment](arena-alignment.png)
+
+RouterArena 8,379문항에는 문항별 모델 정답 기록과 비용이 없고 공식 난이도 라벨만 있다. 그래서 1·4절의 품질·비용·해결률 그림에는 올릴 수 없고, 라벨 일치만 따로 본다. 라벨 잡음 상한도 계산할 수 없다(모델별 기록이 없음).
+
+| | 정확도 | macro-F1 | easy / medium / hard 예측 |
+|---|---:|---:|---|
+| 공식 라벨 분포 | – | – | 47 / 29 / 23% |
+| 항상 easy | **.475** | .215 | 100 / 0 / 0% |
+| F0 (운영 R0 1.0) | .454 | **.394** | 51 / 39 / 10% |
+| F5 | .444 | .362 | 46 / 47 / 7% |
+| F3 | .326 | .318 | 27 / 30 / 43% |
+| F4 | .244 | .226 | 11 / 62 / 27% |
+| F1 | .222 | .193 | 0 / 44 / 56% |
+| F2 | .218 | .192 | 1 / 45 / 54% |
+| R1* / R2* | .228 / .214 | .175 / .193 | – |
+
+- 재학습 arm 가운데 F0를 넘는 것은 없다. 정확도로는 F0도 "항상 easy"(.475)를 넘지 못하고, macro-F1에서만 앞선다.
+- F0와 F5는 hard를 10%·7%만 예측하지만 공식 라벨은 23%가 hard다. 상향 피드백으로 학습한 F1·F2는 반대로 절반 이상을 hard로 보낸다.
+- *R1·R2는 비용 없이 고른 후보를 난이도 칸에 대응시킨 값(2026-09-24 진단)이며 난이도 분류기가 아니다. seed 범위는 F1~F5만 있다.
+
+## 6. 한계
 
 - v1 채점 기준이다. v1의 채점 오류(특히 RouterBench GSM8K)가 비싼 모델의 실패를 부풀려, high만 쓸 때의 품질과 "늦게 시작"의 해결률을 실제보다 낮게 만든다(채점 점검 보고서 참조).
 - 시뮬레이션은 사용자가 실패할 때마다 끝까지 상향한다고 가정한다.
 - "다른 LLM 8개" 경계는 RouterBench만 계산했다. xRouteBench 원천 기록과 데이터셋 ID를 연결하지 않았다.
 - 곡선은 test에서의 범위를 보인 것이며, 그 위의 점을 정책으로 고르면 test를 보고 고르는 것이 된다.
 
-## 6. 재현
+## 7. 재현
 
 ```bash
 python experiments/results/routing-ceiling-20261013/ceiling_analysis.py \
@@ -97,6 +119,7 @@ python experiments/results/routing-ceiling-20261013/ceiling_analysis.py \
   --f5-run <Drive>/LLM_Router/retraining-effect-f5/runs/retraining-effect-v4-f5-run001 \
   --routerbench-raw ml/data/raw --output-dir experiments/results/routing-ceiling-20261013
 python experiments/results/routing-ceiling-20261013/plot_ceiling.py experiments/results/routing-ceiling-20261013
+python experiments/results/routing-ceiling-20261013/arena_figure.py ml/artifacts/routerarena-diagnostics-v1-20260924/prepared/evaluation.parquet
 ```
 
-산출물: [curves.csv](curves.csv)(곡선 점), [curve-summary.csv](curve-summary.csv), [methods-resolution-cost.csv](methods-resolution-cost.csv), [label-accuracy-ceiling.csv](label-accuracy-ceiling.csv), [notes.json](notes.json).
+산출물: [curves.csv](curves.csv)(곡선 점), [curve-summary.csv](curve-summary.csv), [methods-resolution-cost.csv](methods-resolution-cost.csv), [label-accuracy-ceiling.csv](label-accuracy-ceiling.csv), [notes.json](notes.json), [arena-alignment.csv](arena-alignment.csv).
