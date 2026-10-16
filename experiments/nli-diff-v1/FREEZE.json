@@ -1,0 +1,12 @@
+{
+ "frozen_at": "2026-10-12, before scoring",
+ "sha256": {
+  "cloud/cloudbuild.yaml": "22dce4788e2b6675a5f9afb4c79d342b87c50ac9fc1a72b209b17168a35e2df0",
+  "cloud/diff_rows.json": "fef4f3c9d59d3ce42cbf634e4da80c3455d3fcec784be55186ebe67edc3b33ea",
+  "cloud/pairs.json": "92134964d36e2348054e0c3ac6bd9ebff9a11019ffee3a6c546afb3adf4a0a20",
+  "cloud/score.py": "08ef858924136127ebc13881e13ca96deb88d75715d9f5e5d27b62f42e6287f0",
+  "diffpair.py": "559f4ad17e061ecc7cc8eb142eb00313670a57d633a3bde1c09cd77174ee959f",
+  "PLAN.md": "440973ab052549b0080141946a0cf96d1aa4a104173a5b3475e99980594ebdc0",
+  "make_pairs.py": "c733c6edc632e9ca2dd5f1a3ca2010151aef58f25588befac36d60f503342ddd"
+ }
+}

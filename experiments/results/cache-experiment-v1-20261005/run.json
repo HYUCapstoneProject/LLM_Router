@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "run_id": "cache-experiment-v1/run001",
+ "comparison_scope": "cache",
+ "status": "succeeded",
+ "data": {
+  "pool_rows": 5335,
+  "excluded": {"exceeds_service_input_limit_512": 33},
+  "d1_pool_rows": 5035,
+  "d1_traces": {"requests": 4000, "repeat_fractions": [0, 0.1, 0.3, 0.5], "seeds": [20260930, 20260931, 20260932]},
+  "d2": {"groups": 300, "calibration_groups": 100, "test_groups": 200, "variants": 600,
+         "variant_authoring": "LLM draft + 2 external reviews", "annotation_mode": "single_llm", "annotator_agreement": null},
+  "manifests": ["manifests/prepare-manifest.json", "manifests/variants-manifest.json", "manifests/dataset-manifest.json"]
+ },
+ "training_config": null,
+ "code": {"branch": "feat/cache-experiment", "pull_request": 53, "report_kit_commit": "218ae9e"},
+ "runtime": {"python": "3.12.13", "torch": "2.5.1", "transformers": "4.48.3",
+             "inference": "Colab T4 (00-04, 06)", "latency": "local Mac, 2 threads, pgvector/pgvector:pg17 --cpus=2"},
+ "attempts": {"d2_test": "d2/test-lock.json"},
+ "verified_artifacts": {
+  "drive_run": {"location": "MyDrive/LLM_Router/cache-experiment/runs/run001", "file_list": "manifests/run001-files.json"},
+  "review_zip": {"path": "report/results-for-review.zip", "bytes": 935648,
+                 "sha256": "50af68acabb21e79ea2b3e0f216644d34eb10824921af4d09ba1c0b6e29931c9"}
+ },
+ "interpretation": {
+  "calibration_status": "no_policy_meets_limit_fallback_exact_only",
+  "d2_test_false_reuse_among_hits": {"C2": 0.4975, "C3": 0.4534},
+  "d1_r30_call_reduction": {"C1": 0.300, "C2": 0.416, "C3": 0.320},
+  "labels": "D2 numbers are estimates under a single LLM judgment, not human-verified safety"
+ },
+ "adoption_policy": {"production_change": false, "note": "operational cache settings are not changed automatically by this result"}
+}

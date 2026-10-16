@@ -1,0 +1,4 @@
+data/
+cloud/pairs.json
+cloud/*.log
+results/scores_*.json

@@ -1,0 +1,63 @@
+{
+  "frozen_at": "2026-10-04T14:40:53+00:00",
+  "spec": null,
+  "operational_policy": {
+    "exact": true,
+    "semantic": false
+  },
+  "status": "no_policy_meets_limit_fallback_exact_only",
+  "limit": 0.01,
+  "models": {
+    "embed": {
+      "id": "BAAI/bge-large-en-v1.5",
+      "revision": "d4aa6901d3a41ba39fb536a557fa166f842b0e09",
+      "version": "bge-large-en-v1.5",
+      "dimension": 1024,
+      "max_length": 512
+    },
+    "rerank": {
+      "id": "cross-encoder/quora-distilroberta-base",
+      "revision": "f62e7a4b20b97195c2868e53ec59126df5eac743",
+      "version": "cross-encoder/quora-distilroberta-base@f62e7a4",
+      "max_length": 512
+    }
+  },
+  "annotations_sha256": "a9ff7fc85b7602369b896336cdef8feb8df5eb07867768f3c13909eb339ce876",
+  "calibration_grid_sha256": "9427d92f51c17c7d76d813fa61f826a874915a869813381b00c6da5b7724a2cb",
+  "calibration_production_metrics": {
+    "C2": {
+      "items": 200,
+      "hits": 200,
+      "false_reuse": 101,
+      "false_reuse_among_hits": 0.505,
+      "false_reuse_ci95_low": 0.4335866549750117,
+      "false_reuse_ci95_high": 0.5762629496829226,
+      "reusable_items": 73,
+      "reusable_hits": 73,
+      "reusable_recall": 1.0,
+      "wrong_answers_among_hits": 110,
+      "unknown_answers_among_hits": 17,
+      "answer_error_among_hits_conservative": 0.635,
+      "answer_error_among_hits_optimistic": 0.55,
+      "hard_negative_hit_rate": 1.0,
+      "paraphrase_hit_rate": 1.0
+    },
+    "C3": {
+      "items": 200,
+      "hits": 165,
+      "false_reuse": 78,
+      "false_reuse_among_hits": 0.4727272727272727,
+      "false_reuse_ci95_low": 0.39462560034704297,
+      "false_reuse_ci95_high": 0.5518261765773931,
+      "reusable_items": 73,
+      "reusable_hits": 65,
+      "reusable_recall": 0.8904109589041096,
+      "wrong_answers_among_hits": 85,
+      "unknown_answers_among_hits": 15,
+      "answer_error_among_hits_conservative": 0.6060606060606061,
+      "answer_error_among_hits_optimistic": 0.5151515151515151,
+      "hard_negative_hit_rate": 0.77,
+      "paraphrase_hit_rate": 0.88
+    }
+  }
+}

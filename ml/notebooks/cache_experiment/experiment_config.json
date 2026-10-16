@@ -1,0 +1,254 @@
+{
+  "experiment_id": "cache-experiment-v1",
+  "schema_version": "cache-experiment-v1",
+  "service_input_tokens": 512,
+  "service_input_source": "BGE tokens incl. special tokens; FastAPI MESSAGE_TOO_LONG (serving #11) and Spring 400 (#50). Longer questions are never cached and are excluded from the pool.",
+  "inputs": {
+    "stream": {
+      "path": "ml/artifacts/frozen-evaluation-outcomes/continual-v1-20260924-28cbc342c510/stream.parquet",
+      "sha256": "52a890baa95b404143837387708383dfbe3591bcecba66bdcc770676e111388c"
+    },
+    "routerbench_5shot": {
+      "path": "ml/data/raw/routerbench_5shot.pkl",
+      "sha256": "fbd7d3d16fba2759a18fa0ad44409d3e0e92ba80d03d90827eed1a6d084c9ffe"
+    },
+    "xroutebench_train": {
+      "path": "ml/data/raw/xroutebench/ea4b6e1b29d9a734f55f0a637baf326bad6aa681/llmrouter_generic-train.parquet",
+      "sha256": "6ae53d6b619396271e345a242bd32c253fc9796a45a75d3c122ad74843f8a7ef"
+    },
+    "xroutebench_test": {
+      "path": "ml/data/raw/xroutebench/ea4b6e1b29d9a734f55f0a637baf326bad6aa681/llmrouter_generic-test.parquet",
+      "sha256": "cc7f33f03298c734c1f4b3c380d8d9b84dc8723eb0d08f850de033d2645778f4"
+    },
+    "logger_log": {
+      "path": "ml/artifacts/cache-experiment-v1/inputs/logger-log.parquet",
+      "sha256": "bcbaafa070ec94eb5b8b1ebc07165e288729d6bb712840a4475cd8559fb13c7d",
+      "origin": "MyDrive/LLM_Router/retraining-effect/logger/logger-log.parquet (retraining-effect 00, anchor R0 8192 inference)"
+    },
+    "production_questions": {
+      "path": "experiments/questions-v2.json",
+      "sha256": "0884f7e1c1b512e37c22be8863ec006adc817362a3d60ea3cc65c3dc4c16d81f"
+    },
+    "production_probes": {
+      "path": "experiments/results/rerank-endtoend/results.json",
+      "sha256": "de44765e3792a613f080b0d605fef7805d65286f12fc616821683f6379e6e73e"
+    }
+  },
+  "router": {
+    "model_version": "router-modernbert-r0-a-20260927-v1",
+    "logger_model_digest": "c4cec54a796ff2ba9c92c33e2ab01c46da7dbd39fb7c4b810500d13908124487",
+    "logging_max_length": 8192,
+    "package_path": "ml/artifacts/r0-release-20260927/approved",
+    "request_input": "query_text",
+    "parity_sample": 200,
+    "parity_min_agreement": 0.99,
+    "colab_package_path": "transfer-experiments/inputs/experiment-A/models/r0",
+    "file_sha256": {
+      "model.safetensors": "e1a40fec7d269d8f925b5391e4f5e75df5d0fedbb1e37b4eea96521e27b1a6a7",
+      "config.json": "ec78dcebe3890eaf422a55e3261f70a8579cdd4298cb51ec0fcc2949538646b5",
+      "tokenizer.json": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+      "tokenizer_config.json": "626c86908d7c711f93b0feffd8657b782cc2727b391f9be190240e8cafb626d5"
+    },
+    "note": "Local: the approved package. Colab: the byte-identical R0 copy the R1->R0 transfer kit already put on Drive (same four files). Every request is routed on its text; the logger log is the anchor evidence."
+  },
+  "tier_models": {
+    "routerbench": {
+      "low": "mistralai/mistral-7b-chat",
+      "medium": "zero-one-ai/Yi-34B-Chat",
+      "high": "gpt-4-1106-preview"
+    },
+    "xroutebench": {
+      "low": "gpt-oss-20b",
+      "medium": "gpt-oss-120b",
+      "high": "cogito-v2-1-671b"
+    }
+  },
+  "models": {
+    "embed": {
+      "id": "BAAI/bge-large-en-v1.5",
+      "revision": "d4aa6901d3a41ba39fb536a557fa166f842b0e09",
+      "version": "bge-large-en-v1.5",
+      "dimension": 1024,
+      "max_length": 512
+    },
+    "rerank": {
+      "id": "cross-encoder/quora-distilroberta-base",
+      "revision": "f62e7a4b20b97195c2868e53ec59126df5eac743",
+      "version": "cross-encoder/quora-distilroberta-base@f62e7a4",
+      "max_length": 512
+    }
+  },
+  "runtime_pins": {
+    "torch": "2.5.1",
+    "transformers": "4.48.3",
+    "source": "LLM_Router-serving pyproject.toml (serving image)"
+  },
+  "policies": {
+    "C0": {
+      "exact": false,
+      "semantic": false
+    },
+    "C1": {
+      "exact": true,
+      "semantic": false
+    },
+    "C2": {
+      "exact": true,
+      "semantic": true,
+      "candidate_limit": 5,
+      "thresholds": {
+        "easy": 0.8,
+        "medium": 0.8,
+        "hard": 0.8
+      },
+      "rerank_mode": "off"
+    },
+    "C3": {
+      "exact": true,
+      "semantic": true,
+      "candidate_limit": 5,
+      "thresholds": {
+        "easy": 0.8,
+        "medium": 0.8,
+        "hard": 0.8
+      },
+      "rerank_mode": "enforce",
+      "rerank_similarity": 0.8774,
+      "rerank_score": 0.03581769
+    }
+  },
+  "operational_settings_source": "backend/src/main/resources/application.yml llm.cache (main 9ba734d)",
+  "parity": {
+    "cosine_abs_tolerance": 0.0001,
+    "rerank_abs_tolerance": 0.0001
+  },
+  "d1": {
+    "trace_length": 4000,
+    "repeat_fractions": [
+      0.0,
+      0.1,
+      0.3,
+      0.5
+    ],
+    "trace_seeds": [
+      20260930,
+      20260931,
+      20260932
+    ],
+    "capacity_arms": [
+      "C1",
+      "C2",
+      "C3"
+    ],
+    "capacities": [
+      2000,
+      1000,
+      500
+    ]
+  },
+  "d2": {
+    "selection_seed": 20260930,
+    "annotation_seed": 20261001,
+    "calibration_fraction": 0.3333333333,
+    "strata": {
+      "rb_mcq": 129,
+      "rb_math": 51,
+      "rb_open": 21,
+      "xrb_mcq": 51,
+      "xrb_numeric": 27,
+      "xrb_open": 21
+    },
+    "negative_types": {
+      "rb_mcq": [
+        "negation",
+        "entity_swap",
+        "number_unit",
+        "time",
+        "order"
+      ],
+      "rb_math": [
+        "number_unit",
+        "order",
+        "time"
+      ],
+      "rb_open": [
+        "code_language",
+        "output_format",
+        "entity_swap"
+      ],
+      "xrb_mcq": [
+        "negation",
+        "entity_swap",
+        "number_unit",
+        "time",
+        "order"
+      ],
+      "xrb_numeric": [
+        "number_unit",
+        "order",
+        "output_format"
+      ],
+      "xrb_open": [
+        "code_language",
+        "output_format",
+        "entity_swap"
+      ]
+    }
+  },
+  "calibration": {
+    "max_false_reuse_among_hits": 0.01,
+    "candidate_limits": [
+      1,
+      4,
+      8,
+      16
+    ],
+    "cosine_start": 0.7,
+    "cosine_stop": 0.99,
+    "cosine_step": 0.005,
+    "rerank_scores": [
+      0.001,
+      0.002,
+      0.005,
+      0.01,
+      0.02,
+      0.03581769,
+      0.05,
+      0.1,
+      0.2,
+      0.3,
+      0.5,
+      0.7,
+      0.9
+    ]
+  },
+  "bootstrap": {
+    "draws": 2000,
+    "seed": 20261002
+  },
+  "latency": {
+    "torch_threads": 2,
+    "device": "cpu",
+    "warmup": 20,
+    "requests": 500,
+    "rerank_batch": 5,
+    "cache_sizes": [
+      500,
+      2000,
+      4000
+    ],
+    "pgvector_image": "pgvector/pgvector:pg17",
+    "pgvector_port": 55432,
+    "docker_cpus": 2,
+    "hnsw_ef_search": null,
+    "assumed_cross_region_rtt_ms": 120,
+    "assumed_rtt_source": "experiments/results/exact-match/REPORT.md (2026-08 operational observation)"
+  },
+  "pricing": {
+    "compute_usd_per_hour": null,
+    "compute_price_source": null,
+    "compute_price_snapshot_date": null,
+    "note": "Fill before 06_report to convert measured CPU seconds into USD. LLM costs come from the recorded benchmark costs, not from this field."
+  },
+  "inference_device": "auto"
+}

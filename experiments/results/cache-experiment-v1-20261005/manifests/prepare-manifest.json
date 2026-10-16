@@ -1,0 +1,154 @@
+{
+  "stage": "prepare",
+  "created_at": "2026-10-01T18:39:36+00:00",
+  "config": {
+    "path": "experiment_config.json",
+    "sha256": "58377de6736b5d0539cc3a7ec2b35960e6bd4f808e64dee3bd85f0cf433a75be"
+  },
+  "runtime": {
+    "torch": "2.5.1",
+    "transformers": "4.48.3",
+    "expected": {
+      "torch": "2.5.1",
+      "transformers": "4.48.3"
+    },
+    "mismatch": {},
+    "python": "3.12.13",
+    "platform": "Linux-6.6.122+-x86_64-with-glibc2.35"
+  },
+  "devices": {
+    "embed": "cuda",
+    "rerank": "cuda",
+    "router": "cuda",
+    "router_package": "/content/drive/MyDrive/LLM_Router/transfer-experiments/inputs/experiment-A/models/r0"
+  },
+  "inputs": {
+    "stream": {
+      "path": "ml/artifacts/frozen-evaluation-outcomes/continual-v1-20260924-28cbc342c510/stream.parquet",
+      "sha256": "52a890baa95b404143837387708383dfbe3591bcecba66bdcc770676e111388c"
+    },
+    "routerbench_5shot": {
+      "path": "ml/data/raw/routerbench_5shot.pkl",
+      "sha256": "fbd7d3d16fba2759a18fa0ad44409d3e0e92ba80d03d90827eed1a6d084c9ffe"
+    },
+    "xroutebench_train": {
+      "path": "ml/data/raw/xroutebench/ea4b6e1b29d9a734f55f0a637baf326bad6aa681/llmrouter_generic-train.parquet",
+      "sha256": "6ae53d6b619396271e345a242bd32c253fc9796a45a75d3c122ad74843f8a7ef"
+    },
+    "xroutebench_test": {
+      "path": "ml/data/raw/xroutebench/ea4b6e1b29d9a734f55f0a637baf326bad6aa681/llmrouter_generic-test.parquet",
+      "sha256": "cc7f33f03298c734c1f4b3c380d8d9b84dc8723eb0d08f850de033d2645778f4"
+    },
+    "logger_log": {
+      "path": "ml/artifacts/cache-experiment-v1/inputs/logger-log.parquet",
+      "sha256": "bcbaafa070ec94eb5b8b1ebc07165e288729d6bb712840a4475cd8559fb13c7d"
+    },
+    "production_questions": {
+      "path": "experiments/questions-v2.json",
+      "sha256": "0884f7e1c1b512e37c22be8863ec006adc817362a3d60ea3cc65c3dc4c16d81f"
+    },
+    "production_probes": {
+      "path": "experiments/results/rerank-endtoend/results.json",
+      "sha256": "de44765e3792a613f080b0d605fef7805d65286f12fc616821683f6379e6e73e"
+    }
+  },
+  "pool": {
+    "rows": 5335,
+    "by_source": {
+      "routerbench": 4670,
+      "xroutebench": 665
+    },
+    "by_family": {
+      "mcq": 3898,
+      "mcq_no_gold": 79,
+      "numeric": 152,
+      "unscorable": 1206
+    },
+    "routed_tier": {
+      "high": 459,
+      "low": 2821,
+      "medium": 2055
+    },
+    "empty_routed_answers": 60,
+    "mean_routed_quality": 0.6218408982272098,
+    "total_routed_cost": 4.38095485
+  },
+  "exclusions": {
+    "exceeds_service_input_limit_512": 33
+  },
+  "scorer_selfcheck": {
+    "rows": 4050,
+    "decided": 4042,
+    "unknown": 8,
+    "agreement_on_decided": 0.9992577931716972,
+    "disagreements": 3
+  },
+  "production_parity": {
+    "probes": 73,
+    "top_candidate_mismatches": 0,
+    "max_cosine_diff": 7.923801433884492e-07,
+    "max_rerank_diff": 2.6226043701171875e-06,
+    "cosine_decision_mismatches": 0,
+    "rerank_decision_mismatches": 0,
+    "passed": true
+  },
+  "router_anchor_parity": {
+    "rows": 200,
+    "agreement": 1.0,
+    "minimum": 0.99,
+    "passed": true
+  },
+  "router_input_diagnostic": {
+    "input": "query_text",
+    "rows": 5368,
+    "agreement_with_logger_training_input": 0.8649403874813711,
+    "by_label": {
+      "easy": {
+        "easy": 2751,
+        "hard": 17,
+        "medium": 81
+      },
+      "hard": {
+        "easy": 50,
+        "hard": 279,
+        "medium": 130
+      },
+      "medium": {
+        "easy": 428,
+        "hard": 19,
+        "medium": 1613
+      }
+    }
+  },
+  "embedding_norm_range": [
+    0.9999998807907104,
+    1.0000001192092896
+  ],
+  "d2_originals": {
+    "groups": 300,
+    "by_stratum": {
+      "rb_math": 51,
+      "rb_mcq": 129,
+      "rb_open": 21,
+      "xrb_mcq": 51,
+      "xrb_numeric": 27,
+      "xrb_open": 21
+    },
+    "by_split": {
+      "calibration": 100,
+      "test": 200
+    }
+  },
+  "d1_pool_rows": 5035,
+  "artifacts": {
+    "pool.parquet": "e656a384e39e61dcc7c008c80ba61b6391327c143e0263564a04e1f3d7114937",
+    "exclusions.parquet": "f45ff49084d54ea58eb77d4ef1671b8c4f47893a1d07cfd2b7a469eb055f67d0",
+    "tokens.parquet": "77280bfe640ad7aded531556a070796a5f7f36399ef4410a07cc0e8daa2b3ff8",
+    "routing.parquet": "3fa55b8448cc4b96c7ada0496e29374d8dffc94810edbc157b577a9ab670909c",
+    "scorer-selfcheck.parquet": "52cc1cce136e87588c514229f185c4ca2bdb6301fde6aa725d9d4aa2363482b5",
+    "parity.parquet": "77a48c99d851c6516c4ef1dafec10afad400b41ab50362f7d644ccbc1d27dcd7",
+    "embeddings.npy": "7335b759f2d5b84ef6c720d6a0bbafc6c7a309c6b6a8822e1315ed46f31181f6",
+    "d2/originals.parquet": "7bd535e352ccc6be49b773b917999b08b7b3c62a8b20beca118bb6b1c96d237c",
+    "d2/authoring-sheet.csv": "4117990299a04a38b747f5d7b8e86018e806b4e35d91a18881fd0d5be11d67b0"
+  }
+}
