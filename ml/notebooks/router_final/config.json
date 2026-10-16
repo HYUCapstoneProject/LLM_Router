@@ -1,0 +1,60 @@
+{
+  "experiment_id": "ev10-router-final-v1",
+  "tau": 0.8,
+  "frontier_delta": 0.03,
+  "success_threshold": 0.7,
+  "old_t1": {
+    "hard": 0.27,
+    "easy": 0.64
+  },
+  "service_cost": {
+    "low": 0.2,
+    "medium": 0.6,
+    "high": 1.0
+  },
+  "service_cost_basis": "backend application.yml pricing 2026-06: haiku 1/5, sonnet 3/15, opus 5/25 USD per 1M tokens (ratio 1:3:5)",
+  "external_split": {
+    "train": 0.5,
+    "dev": 0.15,
+    "test": 0.35
+  },
+  "split_seed": 20261016,
+  "inputs": {
+    "a_train": "ml/artifacts/routing-objective-continual-v1/dataset/train.parquet",
+    "a_dev": "ml/artifacts/routing-objective-continual-v1/dataset/validation.parquet",
+    "a_test_routerbench": "ml/artifacts/frozen-evaluation-outcomes/continual-v1-20260924-28cbc342c510/test_routerbench.parquet",
+    "a_test_xroutebench": "ml/artifacts/frozen-evaluation-outcomes/continual-v1-20260924-28cbc342c510/test_xroutebench.parquet",
+    "a_candidate_statistics": "ml/artifacts/routing-objective-continual-v1/dataset/candidate-statistics.parquet",
+    "llmrouterbench": "ml/artifacts/external-evaluation-v1/llmrouterbench.parquet",
+    "sprout": "ml/artifacts/external-evaluation-v1/sprout.parquet",
+    "sprout_model_cost": "experiments/results/router-final-inputs/sprout-model-cost-calibration.csv",
+    "routerarena": "ml/data/raw/routerarena/full-00000-of-00001.parquet",
+    "v1_data_config": "ml/config/routing_objective_continual_v1.json",
+    "v2_data_config": "ml/config/modernbert_initial_v2_verified_data.json"
+  },
+  "external": {
+    "llmrouterbench": {
+      "input": "llmrouterbench",
+      "train_slices": [
+        "main_new_family",
+        "same_family"
+      ],
+      "test_only_slices": [
+        "judge_preference_diagnostic"
+      ]
+    },
+    "sprout": {
+      "input": "sprout",
+      "train_slices": [
+        "secondary_general_chat",
+        "secondary_new_family"
+      ],
+      "test_only_slices": []
+    }
+  },
+  "routerarena_overlap": {
+    "rule": "question body before options, alphanumeric lowercase, first 40 chars; or whole text first 80 chars",
+    "body_chars": 40,
+    "text_chars": 80
+  }
+}
