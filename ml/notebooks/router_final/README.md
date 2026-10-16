@@ -6,7 +6,8 @@
 |---|---|---|
 | `00_prepare` | 구현 | 데이터 준비. 아래 참고 |
 | `01_embed` | 구현 | BGE-large-en-v1.5(revision d4aa6901) 임베딩. Colab T4 |
-| `02_rt08` ~ `10_report` | 예정 | 계획서 4.5절 |
+| `02_rt08` | 구현 | RT-08: 기존 정의 R0를 v2 라벨로 재학습. Colab T4 |
+| `03_ours` ~ `10_report` | 예정 | 계획서 4.5절 |
 
 ## 00_prepare
 
@@ -30,3 +31,16 @@
 `embed.py`가 00_prepare 출력의 SHA를 먼저 확인한 뒤, train·dev·test 질문과 RouterArena 질문(`routerarena:<Global Index>`)을 512토큰, 정규화, float16으로 임베딩한다. 출력은 `embeddings.npy`, 행 순서가 같은 `ids.parquet`, `manifest.json`(모델 revision, 입력·출력 SHA, 역할별 행 수)이다.
 
 Drive 구성(`LLM_Router/router-final/runs/run001/`): `code/`(embed.py, requirements-colab.txt), `prepare/`(00_prepare 출력), `inputs/routerarena-full.parquet`. 노트북은 결과를 `embed/`에 쓰고, 이미 있으면 멈춘다.
+
+## 02_rt08 (RT-08)
+
+`rt08.py build`(로컬)가 00_prepare의 A 분할 train·D_dev에서 v2 제외 문항을 빼고, 라벨을 기존 정의의 v2 라벨(전체 모델 해결률, 경계 .27/.64)로 바꿔 `training.parquet`과 manifest(v1·v2 라벨 비율, 바뀐 비율)를 만든다. `rt08.py train`(Colab)은 RT-04와 같은 `run_colab_training`·`modernbert_initial_v1_training.json`·런타임 계약을 쓰고 step을 RT-04의 2,007로 고정한다.
+
+| | train | D_dev |
+|---|---:|---:|
+| 행 (v2 제외 180행 뺌) | 21,247 | 3,560 |
+| 라벨 easy/medium/hard v1 | 49.7 / 37.9 / 12.4% | 49.5 / 38.0 / 12.5% |
+| 라벨 v2 | 56.5 / 33.6 / 10.0% | 56.5 / 33.7 / 9.8% |
+| 라벨이 바뀐 비율 | RB 7.8%, xRB 13.8% | RB 8.1%, xRB 13.5% |
+
+Colab 소스는 `build_kit.py`가 만드는 `router-final-source.zip`(ml/src·ml/config·이 폴더 코드, 파일별 SHA 포함)이다.

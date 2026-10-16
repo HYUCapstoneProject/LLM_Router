@@ -1,0 +1,7 @@
+# Exact versions match ml/config/modernbert_runtime_cu124_v1.json (same as RT-04).
+# Install torch separately from https://download.pytorch.org/whl/cu124.
+transformers==4.48.3
+numpy==2.1.2
+pandas==2.3.3
+pyarrow==21.0.0
+scikit-learn==1.6.1
