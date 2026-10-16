@@ -9,7 +9,9 @@
 | `02_rt08` | 구현 | RT-08: 기존 정의 R0를 v2 라벨로 재학습. Colab T4 |
 | `03a_r0_group` · `03b_r1_group` · `03c_r1_group_a` | 구현 | 우리 라우터 학습. 서로 독립이라 다른 GPU 세션에서 동시에 실행 가능 |
 | `04_common_track` | 구현 | 논문 라우터 공통 트랙과 R1-BGE. 아래 참고 |
-| `05_finetune_track` ~ `10_report` | 예정 | 계획서 4.5절 |
+| `05a_routerdc` · `05b_routellm_retrained` | 구현 | 인코더까지 학습하는 논문 라우터. 아래 참고 |
+| `06_routellm_released` | 구현 | RouteLLM-BERT 공개본 점수 |
+| `07_lock` ~ `10_report` | 예정 | 계획서 4.5절 |
 
 ## 00_prepare
 
@@ -103,3 +105,20 @@ python ml/notebooks/router_final/common_track.py build-outcomes --run-dir <run00
 python ml/notebooks/router_final/common_track.py fetch --external-dir /tmp/ev10-external
 python ml/notebooks/router_final/common_track.py run --run-dir <run001> --external-dir /tmp/ev10-external --output-dir /tmp/common-smoke --smoke
 ```
+
+## 05_finetune_track (05a · 05b) · 06_routellm_released
+
+`finetune_track.py`가 본체다. 04처럼 외부 코드를 고정 커밋에서 받아 파일마다 SHA-256을 확인하고(`fetch`), 원본 클래스를 불러 학습한다(`run --method ...`). 학습 행은 03·04와 같은 `blended/train.parquet`(35,017행)이고, 입력은 질문 원문이다. 결과는 04와 같은 형식으로 Drive `finetune/<방법>/<설정>/`에 쓴다(`scores.parquet`, `metrics.json`, `_SUCCESS`, 방법별 `manifest.json`). 체크포인트는 Colab 로컬(`/content/finetune-work`)에만 둔다.
+
+| 노트북 · 방법 | 원본 | 설정 | 점수 |
+|---|---|---|---|
+| 05a `routerdc` | LLMRouter `RouterModule`·`DCDataset`·`add_clusters`·`DCTrainer`, mDeBERTa-v3-base | `llmrouter`(YAML: 500 step, batch 32, eval 50) · `official_routerbench`(RouterDC 저장소 RouterBench 스크립트: 1000 step, batch 64, eval 100) × 체크포인트 `best_dev` · `final` | 단계별 유사도 점수 |
+| 05b `routellm_retrained` | RouteLLM BERT 구조(XLM-RoBERTa-base, 3분류), HF Trainer | 공개 체크포인트의 실제 학습 인자, 2000 step | 강한(high) 집단이 필요할 확률(점수 하나) |
+| 06 `routellm_released` | `routellm/bert_gpt4_augmented`(revision 86237e3d), 학습 없음 | 하나 | 강한 모델이 필요할 확률(점수 하나) |
+
+- **RouterDC:** 집단 셋을 후보 LLM 셋으로 두고 점수는 집단 풀 확률이다. 군집은 원본처럼 점수 벡터의 k-means(3)다. 원본 학습기는 "test" 분할로 `best_model.pth`를 고르는데, 그 자리에 우리 dev를 연결했다(계획서 4.3). 원본이 매 평가 때 학습 데이터 전체를 다시 평가하는 부분(추론에 쓰지 않는 `best_training_model.pth`용)은 건너뛴다. top_k·last_k는 후보가 셋이라 3이다.
+- **RouteLLM 재학습본:** 공개 체크포인트에 남은 `training_args.bin`(실행하지 않고 내용만 읽음)과 `trainer_state.json`의 값을 그대로 쓴다: lr 1e-5, weight decay .01, AdamW, 4 epoch 선형 감소, 실효 batch 32, 500 step마다 검증 손실로 선택, fp32, seed 42. 논문의 "약 2000 step"대로 2000에서 멈춘다. 정답은 원본의 세 분류이며, 집단 풀 확률로 만든 부드러운 확률이다(강한 승 = p_high(1 − p_low), 약한 승 = p_low(1 − p_high), 무승부 = 나머지).
+- **원본 함수와 대조:** 두 RouteLLM 점수는 묶음 계산이지만, 원본 `BERTRouter.calculate_strong_win_rate`를 고정 커밋에서 불러 첫 8문항을 직접 비교한다(차이 1e-4 넘으면 멈춤). 로컬 시험에서 차이는 1e-7 수준이었다.
+- **속도·메모리만 바꾼 것:** gradient checkpointing, 묶음마다 전부 패딩인 열 제거, 동적 패딩, 옵티마이저 상태 없는 체크포인트. 결과는 같다.
+- **CPU 라우팅 시간:** 방법마다 dev 50문항을 CPU에서 한 문항씩 처리한 중앙값을 `cpu_ms_per_question`에 남긴다(08의 시간 비교용).
+- 세 노트북은 서로 독립이라 다른 Colab 세션에서 동시에 돌릴 수 있다. 소스는 `router-final-source-finetune.zip`이다.

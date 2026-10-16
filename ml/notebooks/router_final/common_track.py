@@ -213,9 +213,10 @@ def setting_id(method: str, setting: dict) -> str:
 # External code
 # ---------------------------------------------------------------------------------------------
 
-def fetch(dest: Path) -> dict:
+def fetch(dest: Path, external: dict | None = None) -> dict:
     """Download the pinned files and verify every SHA-256 before anything imports them."""
-    for key, spec in EXTERNAL.items():
+    external = EXTERNAL if external is None else external
+    for key, spec in external.items():
         for path, digest in spec["files"].items():
             target = dest / key / path
             if not target.exists():
@@ -226,16 +227,17 @@ def fetch(dest: Path) -> dict:
                     raise SystemExit(f"pinned file changed: {spec['repo']}@{spec['commit']}:{path}")
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_bytes(data)
-    return verify_external(dest)
+    return verify_external(dest, external)
 
 
-def verify_external(dest: Path) -> dict:
-    for key, spec in EXTERNAL.items():
+def verify_external(dest: Path, external: dict | None = None) -> dict:
+    external = EXTERNAL if external is None else external
+    for key, spec in external.items():
         for path, digest in spec["files"].items():
             if sha256_file(dest / key / path) != digest:
                 raise SystemExit(f"external file does not match its pin: {key}/{path}")
     return {key: {k: spec[k] for k in ("repo", "commit", "license")} | {"files": spec["files"]}
-            for key, spec in EXTERNAL.items()}
+            for key, spec in external.items()}
 
 
 def _unused(*args, **kwargs):
@@ -321,7 +323,9 @@ def _load_model(path):
         return pickle.load(handle)
 
 
-def load_llmrouter(dest: Path) -> types.SimpleNamespace:
+def register_llmrouter(dest: Path):
+    """Make `llmrouter.*` importable from the pinned files with stubs for its YAML loader, API and Longformer
+    helpers; returns the stub MetaRouter class whose `context` supplies what the original loader would set."""
     import torch
 
     class MetaRouter(torch.nn.Module):
@@ -344,6 +348,11 @@ def load_llmrouter(dest: Path) -> types.SimpleNamespace:
         "llmrouter.utils", load_model=_load_model, save_model=_save_model, get_longformer_embedding=_unused,
         call_api=_unused, generate_task_query=_unused, calculate_task_performance=_unused)
     sys.modules["llmrouter.models.meta_router"] = _module("llmrouter.models.meta_router", MetaRouter=MetaRouter)
+    return MetaRouter
+
+
+def load_llmrouter(dest: Path) -> types.SimpleNamespace:
+    MetaRouter = register_llmrouter(dest)
     mf = importlib.import_module("llmrouter.models.mfrouter")
     graph = importlib.import_module("llmrouter.models.graphrouter")
     hybrid = importlib.import_module("llmrouter.models.hybrid_llm")
@@ -983,9 +992,11 @@ def runner_for(method: str, ctx: Context, ext, settings, out_dir: Path, data_pat
     return run_r1_bge(ctx, ext, settings)
 
 
-def write_setting(folder: Path, ctx: Context, method: str, setting: dict, scores: np.ndarray, extra: dict, info: dict):
+def write_setting(folder: Path, ctx: Context, method: str, setting: dict, scores: np.ndarray, extra: dict, info: dict,
+                  deviations: list | None = None, external: dict | None = None):
     info = dict(info)
-    external_key = info.pop("external_key", EXTERNAL_OF[method])
+    external_key = info.pop("external_key", EXTERNAL_OF.get(method))
+    external = EXTERNAL if external is None else external
     pooled = ctx.scored.role.ne("diagnostic").to_numpy()  # dev and test rows must always be scored
     if scores.shape != (len(ctx.scored), 3) or not np.isfinite(scores[pooled]).all() or \
             not (np.isfinite(scores[~pooled]).all() or info.get("diagnostic_unscored")):
@@ -998,8 +1009,9 @@ def write_setting(folder: Path, ctx: Context, method: str, setting: dict, scores
         table[name] = np.asarray(values, dtype=np.float64)
     table.to_parquet(folder / "scores.parquet", index=False)
     record = {"method": method, "setting_id": folder.name, "setting": setting, "seed": SEED,
-              "external": external_key and {k: EXTERNAL[external_key][k] for k in ("repo", "commit", "license")},
-              "deviations": DEVIATIONS["all"] + DEVIATIONS[method], "device": ctx.device,
+              "external": external_key and {k: external[external_key][k] for k in ("repo", "commit", "license")},
+              "deviations": DEVIATIONS["all"] + DEVIATIONS[method] if deviations is None else deviations,
+              "device": ctx.device,
               "score_rows": int(len(table)), "score_ms_per_1k": 1e6 * info["score_seconds"] / len(table),
               # plan 4.5: an original that does not work on our data is reported as a reproduction failure
               "degenerate": bool((scores[pooled].std(axis=0) < 1e-6).all()),

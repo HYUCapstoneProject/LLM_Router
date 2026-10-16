@@ -174,8 +174,8 @@
 | `02_rt08` | 기존 정의 R0를 A 분할 v2로 재학습 (RT-08) | T4 | 1시간 |
 | `03_ours` | R0-집단, R1-집단(섞은 데이터), R1-집단-A(A만) 학습 | T4 | 4.5시간 |
 | `04_common_track` | kNN·MLP·SVM(+kNN-A), MF, GraphRouter, Hybrid LLM, IRT-Router, Avengers-Pro, R1-BGE를 설정마다 학습하고 dev·test·RouterArena 점수 저장 | T4 런타임(sklearn 부분은 CPU) | 1~2시간 |
-| `05_finetune_track` | RouterDC, RouteLLM-BERT 재학습 | T4 | 3~4.5시간 |
-| `06_released` | RouteLLM-BERT 공개본으로 dev·test 점수 계산 | T4 | 15분 |
+| `05a_routerdc` · `05b_routellm_retrained` | RouterDC(설정 2 × 체크포인트 2), RouteLLM-BERT 재학습본. 둘은 독립이라 다른 세션에서 동시에 돌린다 | T4 | 약 2~2.5시간 · 1~1.5시간 |
+| `06_routellm_released` | RouteLLM-BERT 공개본으로 dev·test·RouterArena 점수 계산 | T4 | 15분 |
 | `07_lock` | 방법별 설정 선택, 원천별 어댑터 보정, ρ, 결정 규칙을 `selection-lock.json`으로 고정한다. **여기서 멈추고 사용자에게 lock 내용을 보고한다** | CPU | 15분 |
 | `08_test` | 원천 4개의 test를 한 번씩 열어 두 갈래 평가(A test는 v1 병기), CPU 라우팅 시간 측정 | T4, CPU | 1.5시간 |
 | `09_seeds` | 판정 경계 근처 결과에만 seed 17·73 추가(잠근 설정 그대로) | T4 | 필요할 때 |
@@ -221,6 +221,7 @@
 | 2026-10-16 | RT-08은 기존 정의 R0만 A 분할 v2로 한 번 학습한다. EV-06·07·08은 EV-10으로 통합한다. A만 학습한 비교용은 R1-집단과 kNN이다. 자원 상한은 두지 않고 seed 반복은 판정 경계 근처일 때만 한다. 계획서는 이 문서 하나로 정리한다 |
 | 2026-10-16 | 04 공통 트랙: 외부 코드는 고정 커밋의 파일을 받아 원본 클래스를 그대로 쓰고, 바꾼 부분은 결과마다 기록한다. 설정 후보는 각 저장소의 기본값·예시 설정에서 고르고 선택은 07_lock에서 한다. 논문 라우터는 원본 학습 방식(원천 가중치 없음)을 따른다. GraphRouter는 10-17 행을 따른다 |
 | 2026-10-17 | GraphRouter는 사용자 제안대로 중간은 논문 구조(실제 모델 노드, 공식 코드와 하이퍼파라미터)를 쓰고 3단계는 맨 끝에서 집단 모델의 예측 평균으로 만든다. 논문 정답(one-hot 최고 모델)은 0/1 결과에서 정보가 거의 없어(시험 실행 dev 상관 약 0), 질문–모델 성공을 정답으로 한 부분 차용(1000·100 epoch)을 함께 둔다. LLMRouter 판(단계 노드 3개)은 합 집계 포화로 재현 실패로 기록한다. 모델별 성공 기록은 03_ours 학습 행만으로 만든다(`common-inputs`) |
+| 2026-10-17 | 05·06: RouterDC는 LLMRouter 구현(MIT, 커밋 고정)으로 mDeBERTa-v3-base를 학습하고, 설정은 LLMRouter YAML(500 step, batch 32)과 RouterDC 저장소의 RouterBench 스크립트(1000 step, batch 64) 둘이다. 원본이 test로 고르던 체크포인트 자리에는 우리 dev를 연결하고 마지막 step도 함께 저장한다. RouteLLM-BERT 재학습본은 공개 체크포인트에 남은 실제 학습 인자(lr 1e-5, weight decay .01, 실효 batch 32, 4 epoch 선형 감소, 검증 손실로 선택)를 따르고 논문대로 2000 step에서 멈춘다. 두 RouteLLM 점수는 원본 `calculate_strong_win_rate`와 직접 대조한다. 05는 05a·05b로 나눠 동시에 돌릴 수 있게 한다 |
 
 ## 8. 방향을 정한 질문
 
