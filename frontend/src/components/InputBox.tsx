@@ -19,7 +19,7 @@ export function InputBox({ onSubmit, disabled }: Props) {
     let active = true
     loadVocab()
       .then((loaded) => active && setVocab(loaded))
-      .catch(() => undefined) // 못 받으면 표시만 생략한다. 서버가 최종 판정한다.
+      .catch(() => undefined) // 못 받으면 표시와 차단을 생략한다. 이 경우 긴 질문도 전송된다.
     return () => {
       active = false
     }

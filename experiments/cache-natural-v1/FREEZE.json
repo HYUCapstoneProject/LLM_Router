@@ -1,0 +1,10 @@
+{
+ "frozen_at": "2026-10-10",
+ "revision": 2,
+ "dataset": "data/dataset.jsonl",
+ "dataset_sha256": "812d176d7f48afe09750e21e274d0ee146762b9aff23d01e393a1b87e5609e83",
+ "plan_sha256": "959a2845e0eb7b38edc170b2b05b56e841317ded47ee2993b19b8a8ac3a88efc",
+ "groups": 300,
+ "variants": 900,
+ "note": "Frozen before any embedding or reranker score was computed. Revision 2 replaced 5 groups that matched the 92-question set."
+}

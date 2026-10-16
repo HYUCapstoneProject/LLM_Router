@@ -1,0 +1,14 @@
+steps:
+  - name: 'python:3.11-slim'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        set -e
+        pip install --quiet --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+        pip install --quiet --no-cache-dir "sentence-transformers>=5.1,<6" sentencepiece protobuf
+        python -c "import sentence_transformers as s; print('st', s.__version__)"
+        python score_models.py
+timeout: '2400s'
+options:
+  machineType: 'E2_HIGHCPU_8'

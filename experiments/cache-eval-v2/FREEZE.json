@@ -1,0 +1,14 @@
+{
+ "frozen_at": "2026-10-13, before scoring",
+ "serving_commit": "8acf7f9 (feat/nli-verifier)",
+ "sha256": {
+  "prep.py": "766c5c036d22619c403396cde61ead8bc511315295ae78c01f324dbb803e4171",
+  "run.py": "35647a436b4b5965a71a161982181fe6823ebb0e8a84e788ee9767912afa3a4e",
+  "service.jsonl": "d8527b58929d04443b539474bce2cbbd8858a3e33a76e2892a03dc967c760164",
+  "stream.parquet": "8ace7c4d02f2809a546fa99e62bbb939439e7fcbd26ca103091a369ab7e223bb",
+  "serving.tar": "4d7a2ebf88a99bcc235b57d5eff2fcaf11e3b5f92f18dc16c0df412d824a4d46",
+  "cloudbuild.yaml": "bbbe2ec28ee2d05c1fd2a71214efc6ffe4934637dfd4c9139cd2afad8124b57a",
+  "../PLAN.md": "a4a7412e3de6ac9f882c7b4de8473f5bce5d1fa9f3b28ef8fe94233a34f625ca"
+ },
+ "note": "service set: 100 groups, 431 texts, 102-434 chars (median 192); PLAN said 100-800 chars"
+}
