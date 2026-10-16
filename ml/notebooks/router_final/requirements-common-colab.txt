@@ -1,0 +1,8 @@
+# 04_common_track. Install torch 2.5.1 separately from https://download.pytorch.org/whl/cu124 (same as 02 and 03).
+scikit-learn==1.6.1
+numpy==2.1.2
+pandas==2.3.3
+pyarrow==21.0.0
+torch_geometric==2.6.1
+sentence-transformers==3.4.1
+transformers==4.48.3
