@@ -10,6 +10,9 @@ listed in DEVIATIONS and copied into every output.
 `run` writes raw per-tier scores for every dev, test and RouterArena question, once per setting
 (at most eight per method), to <output>/<method>/<setting>/. 07_lock calibrates them per source on
 dev and picks one setting per method. Test outcomes are never read here.
+
+`build-outcomes` (local, CPU, before `run`) writes the per-model success of the training rows that
+GraphRouter's model nodes need, to <run>/common-inputs/. Only training rows are read.
 """
 from __future__ import annotations
 
@@ -70,6 +73,13 @@ EXTERNAL = {
             "llmrouter/models/largest_llm/router.py": "07c87d9d76dcf3851cb13f6e2a9ca99921bfe3e9506a7734e7a69b9852f41c35",
         },
     },
+    "graphrouter": {
+        "repo": "ulab-uiuc/GraphRouter", "commit": "0edfb8758d45acd93c8029354867ffb49bb8a97f", "license": "MIT",
+        "files": {
+            "LICENSE": "905c5b3e88f78dc96ed4d0b8ec1c0a20fbb3122988b7d992be64d751836ecc92",
+            "model/graph_nn.py": "573baddfe7b89f94014bcb80c335a5091a732389a32c43143c0506e4f56ba9db",
+        },
+    },
     "irt_router": {
         "repo": "Mercidaiha/IRT-Router", "commit": "e8f258ced4ec3c40d795403603acd8c1cdfb994d",
         "license": "none (research use only, not for the service)",
@@ -97,8 +107,16 @@ SETTINGS = {
     "svm": [{}],  # SVMRouter has no options: LinearSVR(random_state=1234)
     # LLMRouter configs/model_config_train/mfrouter.yaml (epochs 5) + MFRouterTrainer default (3)
     "mf": [{"epochs": 5}, {"epochs": 3}],
-    # graphrouter.yaml. The first is the original; the second is partial borrowing (see DEVIATIONS).
-    "graphrouter": [{"aggr": "add", "checkpoint": "best_validation"}, {"aggr": "mean", "checkpoint": "last"}],
+    # impl=llmrouter: LLMRouter graphrouter.yaml with three tier nodes. impl=official: the GraphRouter repository
+    # (configs/config.yaml: hidden 8, lr 3e-4, 1000 epochs, batch 32, mask .5) with one node per model and tiers
+    # formed at the end; its one-hot "best model" label, or per-edge success (partial borrowing; 100 = the
+    # epoch count checked in the feasibility run). See DEVIATIONS.
+    "graphrouter": [
+        {"impl": "llmrouter"},
+        {"impl": "official", "label": "best", "epochs": 1000, "checkpoint": "best_f1"},
+        {"impl": "official", "label": "success", "epochs": 1000, "checkpoint": "last"},
+        {"impl": "official", "label": "success", "epochs": 100, "checkpoint": "last"},
+    ],
     # hybrid_llm.yaml uses probabilistic (tau .1); the other two modes are the router's alternatives
     "hybrid_llm": [{"router_mode": m} for m in ("probabilistic", "deterministic", "transformed")],
     # test_router.py --lamda default .1 (cold-start warm-up); 0 = off. One training serves all three.
@@ -123,16 +141,24 @@ DEVIATIONS = {
     "svm": ["RouterBench SVMRouter with the embedding cache replaced; get_model_to_route_to is the score."],
     "mf": ["LLMRouter MFRouter + MFRouterTrainer; text_dim 1024 (BGE instead of Longformer); score = score_all per question."],
     "graphrouter": [
-        "LLMRouter GraphRouter + GraphTrainer; LLM node features = BGE vectors of the group descriptions.",
-        "Inference scales new questions with the MinMaxScaler fitted on the training questions. The original refits a "
-        "scaler on [already-scaled training rows; raw new rows], which puts new questions on a different scale and makes "
-        "a question's score depend on the rest of the batch.",
-        "Score = sigmoid edge score per tier (GNNPredictor.predict returns only the argmax).",
-        "aggr=add,checkpoint=best_validation is the original. On the full training set every tier node sums ~25k "
-        "question messages, predictions saturate after the first update (BCE ~33) and all scores are 0: reproduction failure.",
-        "aggr=mean,checkpoint=last is partial borrowing: GeneralConv mean aggregation and final-epoch weights. The original "
-        "checkpoint rule keeps the epoch whose argmax pick has the highest mean performance, which here is a near-initial "
-        "model with almost constant scores.",
+        "impl=llmrouter: LLMRouter GraphRouter + GraphTrainer as configured, with the three tiers as nodes (BGE vectors of "
+        "the group descriptions). New questions are scaled with the MinMaxScaler fitted on the training questions (the "
+        "original refits it on [scaled training rows; raw new rows]); score = sigmoid edge score (predict returns only the "
+        "argmax). On the full training set every tier node sums ~25k question messages, predictions saturate after the "
+        "first update (BCE ~33) and all scores are 0: reproduction failure.",
+        "impl=official: the GraphRouter repository's EncoderDecoderNet / GNN_prediction unchanged. As in the paper there is "
+        "one node per model (kept frontier models of the source, BGE vector of 'name, tier, relative price') and one graph "
+        "per model pool; edges carry [performance, relative cost, performance] (Performance First). Task features are "
+        "zero (no task names). Training uses training questions only, 1/8 held out as the official validation split; new "
+        "questions are added as nodes without visible edges. Tiers are formed only at the end: tier score = mean "
+        "predicted edge score of the tier's models. RouterArena questions belong to no pool and are not scored.",
+        "label=best,checkpoint=best_f1 is the paper's label (one-hot best model, ties to the cheaper model) and its "
+        "macro-F1 checkpoint. With 0/1 outcomes the best model is nearly always the cheapest, so this label carries "
+        "little per-question information (feasibility run: dev Spearman with the tier probability about 0).",
+        "label=success,checkpoint=last is partial borrowing: the same network trained on each question-model success "
+        "(BCE), final-epoch weights.",
+        "A missing model record (LLMRouterBench, 2% of cells) is filled with that row's group success probability "
+        "from 03_ours, so a tier's mean over its models equals the R1-group target.",
     ],
     "hybrid_llm": [
         "LLMRouter HybridLLMRouter + HybridLLMTrainer; small model = low group, large model = high group (size tags 1B/3B).",
@@ -324,6 +350,15 @@ def load_llmrouter(dest: Path) -> types.SimpleNamespace:
     return types.SimpleNamespace(MetaRouter=MetaRouter, mf=mf, graph=graph, hybrid=hybrid)
 
 
+def load_graphrouter(dest: Path) -> types.ModuleType:
+    return _load_file("ev10_graphrouter_official", dest / "graphrouter" / "model" / "graph_nn.py")
+
+
+class _NoLog:  # stands in for the wandb run the official trainer logs to
+    def log(self, *args, **kwargs):
+        pass
+
+
 def load_irt(dest: Path) -> types.ModuleType:
     return _load_file("ev10_irt_mirt", dest / "irt_router" / "router" / "MIRT.py")
 
@@ -366,6 +401,88 @@ def group_descriptions(groups: dict, service_cost: dict) -> dict:
     return out
 
 
+def model_descriptions(members: dict) -> dict:
+    """GraphRouter model-node text per source, in pool order: name, tier and price relative to the pool's dearest."""
+    out = {}
+    for source in SOURCES:
+        top = max(m["cost"] for m in members[source])
+        out[source] = [f"{m['model']}: candidate model in the {SOURCE_NAMES[source]} pool, {m['tier']} price tier, "
+                       f"relative price {m['cost'] / top:.3f}." for m in members[source]]
+    return out
+
+
+def fill_missing_with_target(success: pd.DataFrame, tiers: list, target: pd.DataFrame) -> tuple:
+    """Fill a missing model record with the row's group success probability and check the group means.
+
+    success: rows x models (0/1/NaN); tiers: tier of each column; target: rows x success_<tier> from 03_ours.
+    Filling with the observed group mean keeps that mean; a fully missing group takes 03_ours's filled value.
+    """
+    filled = success.copy()
+    for model, tier in zip(success.columns, tiers):
+        filled[model] = success[model].fillna(target[f"success_{tier}"])
+    for tier in TIERS:
+        cols = [m for m, t in zip(success.columns, tiers) if t == tier]
+        if not np.allclose(filled[cols].mean(axis=1).to_numpy(), target[f"success_{tier}"].to_numpy()):
+            raise SystemExit(f"model outcomes do not reproduce the {tier} group probability")
+    return filled, success.isna()
+
+
+def tier_means(pred: np.ndarray, tiers: list) -> np.ndarray:
+    """(questions x models) edge scores -> (questions x 3) mean over each tier's models."""
+    return np.column_stack([pred[:, [i for i, t in enumerate(tiers) if t == tier]].mean(axis=1) for tier in TIERS])
+
+
+def build_outcomes(run_dir: Path, repo: Path, data_root: Path, output_dir: Path) -> dict:
+    """Per-model success of the 03_ours blended training rows, with the loaders 00_prepare used."""
+    here = Path(__file__).resolve().parent
+    sys.path.insert(0, str(here))
+    import prepare as P
+    data_dir, prepare_dir = run_dir / "ours" / "data", run_dir / "prepare"
+    data_manifest = json.loads((data_dir / "manifest.json").read_text())
+    train_path = data_dir / "blended" / "train.parquet"
+    if sha256_file(train_path) != data_manifest["variants"]["blended"]["files"]["train.parquet"]:
+        raise SystemExit("03_ours training data changed")
+    prepare_manifest = json.loads((prepare_dir / "manifest.json").read_text())
+    cfg = prepare_manifest["config"]
+    inputs = {k: (repo / v if (repo / v).exists() else data_root / v) for k, v in cfg["inputs"].items()}
+    train = pd.read_parquet(train_path, columns=["sample_id", "source_dataset"] + [f"success_{t}" for t in TIERS])
+    groups = json.loads((prepare_dir / "groups.json").read_text())
+    if output_dir.exists() and any(output_dir.iterdir()):
+        raise SystemExit("output directory must be new and empty")
+    v2 = P.accepted_matrices(inputs["v2_data_config"], data_root, repo / "ml/src")
+    records = dict(v2)
+    for source, spec in cfg["external"].items():
+        ext = pd.read_parquet(inputs[spec["input"]])
+        ext = ext[ext.exclusion_reason.isna()].set_index("sample_id")
+        records[source] = ext[[c for c in ext.columns if c.startswith("success_")]].rename(columns=lambda c: c[len("success_"):])
+    members, frames, summary = {}, [], {}
+    for source in SOURCES:
+        pool = sorted((r for r in groups[source] if r["kept"]), key=lambda r: r["cost"])
+        sealed = prepare_manifest["summary"]["groups"][source]
+        if {t: sorted(r["model"] for r in pool if r["tier"] == t) for t in TIERS} != {t: sorted(sealed[t]) for t in TIERS}:
+            raise SystemExit(f"groups.json differs from the sealed group list: {source}")
+        members[source] = [{"model": r["model"], "tier": r["tier"], "cost": float(r["cost"])} for r in pool]
+        rows = train[train.source_dataset.eq(source)].set_index("sample_id")
+        names, tiers = [m["model"] for m in members[source]], [m["tier"] for m in members[source]]
+        success = records[source].reindex(rows.index)[names].astype(float)
+        filled, missing = fill_missing_with_target(success, tiers, rows)
+        long = filled.reset_index().melt(id_vars="sample_id", var_name="model", value_name="success")
+        long["filled"] = missing.reset_index().melt(id_vars="sample_id", value_name="m")["m"].to_numpy()
+        frames.append(long.assign(source_dataset=source))
+        summary[source] = {"rows": int(len(rows)), "models": len(names), "filled_cells": int(missing.to_numpy().sum())}
+    output_dir.mkdir(parents=True, exist_ok=True)
+    out = pd.concat(frames, ignore_index=True)[["sample_id", "source_dataset", "model", "success", "filled"]]
+    out.to_parquet(output_dir / "train-model-outcomes.parquet", index=False)
+    (output_dir / "members.json").write_text(json.dumps(members, ensure_ascii=False, indent=1))
+    manifest = {"rows": summary, "check": "group means over models equal the 03_ours targets",
+                "inputs": {"ours_data_manifest": sha256_file(data_dir / "manifest.json"),
+                           "prepare_manifest": sha256_file(prepare_dir / "manifest.json"),
+                           "groups.json": sha256_file(prepare_dir / "groups.json")},
+                "outputs": {n: sha256_file(output_dir / n) for n in ("train-model-outcomes.parquet", "members.json")}}
+    (output_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2))
+    return manifest
+
+
 def encode_texts(texts: list, device: str) -> np.ndarray:
     from sentence_transformers import SentenceTransformer
     model = SentenceTransformer(EMBEDDING_MODEL, revision=EMBEDDING_REVISION, device=device)
@@ -404,14 +521,25 @@ def load_inputs(run_dir: Path, smoke: bool) -> dict:
             raise SystemExit(f"{variant} training rows must all be 01_embed train rows")
     groups = prepare_manifest["summary"]["groups"]  # {source: {tier: [models]}}, sealed with the manifest
     service_cost = prepare_manifest["config"]["service_cost"]
+    hashes = {"embed_manifest": sha256_file(embed_dir / "manifest.json"),
+              "ours_data_manifest": sha256_file(data_dir / "manifest.json"),
+              "prepare_manifest": sha256_file(prepare_dir / "manifest.json")}
+    outcomes_dir, model_outcomes, members = run_dir / "common-inputs", None, None
+    if (outcomes_dir / "manifest.json").exists():  # written by build-outcomes; needed by GraphRouter impl=official
+        om = json.loads((outcomes_dir / "manifest.json").read_text())
+        for name, digest in om["outputs"].items():
+            if sha256_file(outcomes_dir / name) != digest:
+                raise SystemExit(f"common-inputs changed: {name}")
+        if om["inputs"]["ours_data_manifest"] != hashes["ours_data_manifest"]:
+            raise SystemExit("common-inputs were built from different 03_ours data")
+        members = json.loads((outcomes_dir / "members.json").read_text())
+        model_outcomes = pd.read_parquet(outcomes_dir / "train-model-outcomes.parquet")
+        model_outcomes = model_outcomes[model_outcomes.sample_id.isin(train["blended"].sample_id)]
+        hashes["common_inputs_manifest"] = sha256_file(outcomes_dir / "manifest.json")
     return {
-        "vectors": vectors, "row": row, "train": train, "scored": scored, "groups": groups,
-        "service_cost": {t: float(service_cost[t]) for t in TIERS},
-        "hashes": {
-            "embed_manifest": sha256_file(embed_dir / "manifest.json"),
-            "ours_data_manifest": sha256_file(data_dir / "manifest.json"),
-            "prepare_manifest": sha256_file(prepare_dir / "manifest.json"),
-        },
+        "vectors": vectors, "row": row, "train": train, "scored": scored, "groups": groups, "smoke": smoke,
+        "service_cost": {t: float(service_cost[t]) for t in TIERS}, "members": members,
+        "model_outcomes": model_outcomes, "hashes": hashes,
     }
 
 
@@ -420,6 +548,8 @@ class Context:
         self.inputs = inputs
         self.device = device
         self.llm_vectors = description_vectors  # (3, 1024), tier order
+        self.model_vectors = {}  # source -> (models, 1024), pool order; set by run() for GraphRouter impl=official
+        self.smoke = inputs.get("smoke", False)
         self.scored = inputs["scored"]
         self.query = inputs["vectors"][inputs["row"].loc[self.scored.sample_id].to_numpy()]
 
@@ -517,70 +647,171 @@ def run_mf(ctx: Context, ext, settings, out_dir: Path):
 
 
 def run_graphrouter(ctx: Context, ext, settings, out_dir: Path):
-    import functools
+    official = [st for st in settings if st["impl"] == "official"]
+    if any(st["impl"] == "llmrouter" for st in settings):
+        yield from run_graphrouter_llmrouter(ctx, ext, out_dir)
+    if official:
+        yield from run_graphrouter_official(ctx, ext, official, out_dir)
+
+
+def run_graphrouter_llmrouter(ctx: Context, ext, out_dir: Path):
     import torch
     from sklearn.preprocessing import MinMaxScaler
     frame, x, _ = ctx.train()
-    graph_nn = sys.modules["llmrouter.models.graphrouter.graph_nn"]
-    general_conv = graph_nn.GeneralConv
-    for aggr in dict.fromkeys(s["aggr"] for s in settings):  # one training per aggregation
-        folder = out_dir / f"training-aggr={aggr}"
-        seed_everything()
-        routing = ctx.routing_frame()
-        routing["query"] = routing["query"].astype("category")  # same values, faster row lookups in the original loops
-        ext.llmrouter.MetaRouter.context = {
-            "cfg": {"hparam": {"hidden_dim": 64, "learning_rate": 0.001, "weight_decay": 0.0001, "train_epoch": 100,
-                               "batch_size": 4, "train_mask_rate": 0.3, "val_split_ratio": 0.2, "random_state": SEED},
-                    "model_path": {"save_model_path": str(folder / "graphrouter.pt"),
-                                   "ini_model_path": str(folder / "graphrouter-init-unused.pt")},
-                    "llm_data": {t: {"embedding": ctx.llm_vectors[k].tolist()} for k, t in enumerate(TIERS)}},
-            "routing_data_train": routing,
-            "query_embedding_data": torch.from_numpy(x),
-        }
-        folder.mkdir(parents=True, exist_ok=True)
-        start = time.time()
-        graph_nn.GeneralConv = general_conv if aggr == "add" else functools.partial(general_conv, aggr=aggr)
-        try:
-            router = ext.llmrouter.graph.GraphRouter(yaml_path=None)
-        finally:
-            graph_nn.GeneralConv = general_conv
-        if router.model_names != list(TIERS):
-            raise SystemExit("GraphRouter LLM order must be low, medium, high")
-        best = ext.llmrouter.graph.GraphTrainer(router, device=router.device).train()
-        fit = time.time() - start
-        predictor = router.gnn_predictor
-        weights = {"last": {k: v.detach().clone() for k, v in predictor.model.state_dict().items()},
-                   "best_validation": torch.load(folder / "graphrouter.pt", map_location=router.device)}
-        for setting in [s for s in settings if s["aggr"] == aggr]:
-            predictor.model.load_state_dict(weights[setting["checkpoint"]])
+    folder = out_dir / "training-llmrouter"
+    seed_everything()
+    routing = ctx.routing_frame()
+    routing["query"] = routing["query"].astype("category")  # same values, faster row lookups in the original loops
+    ext.llmrouter.MetaRouter.context = {
+        "cfg": {"hparam": {"hidden_dim": 64, "learning_rate": 0.001, "weight_decay": 0.0001, "train_epoch": 100,
+                           "batch_size": 4, "train_mask_rate": 0.3, "val_split_ratio": 0.2, "random_state": SEED},
+                "model_path": {"save_model_path": str(folder / "graphrouter.pt"),
+                               "ini_model_path": str(folder / "graphrouter-init-unused.pt")},
+                "llm_data": {t: {"embedding": ctx.llm_vectors[k].tolist()} for k, t in enumerate(TIERS)}},
+        "routing_data_train": routing,
+        "query_embedding_data": torch.from_numpy(x),
+    }
+    folder.mkdir(parents=True, exist_ok=True)
+    start = time.time()
+    router = ext.llmrouter.graph.GraphRouter(yaml_path=None)
+    if router.model_names != list(TIERS):
+        raise SystemExit("GraphRouter LLM order must be low, medium, high")
+    best = ext.llmrouter.graph.GraphTrainer(router, device=router.device).train()
+    fit = time.time() - start
+    predictor = router.gnn_predictor
+    predictor.model.load_state_dict(torch.load(folder / "graphrouter.pt", map_location=router.device))
+    start = time.time()
+    scaler = MinMaxScaler().fit(x)  # the scaler _prepare_training_data fitted on the training questions
+    new = scaler.transform(ctx.query)
+    n_train, n_new = len(router.query_embedding_list), len(new)
+    queries = np.vstack([router.query_embedding_list, new])
+    edges = (n_train + n_new) * 3
+    mask_train = torch.zeros(edges)
+    mask_train[: n_train * 3] = 1
+    mask_new = 1 - mask_train
+    performance = np.concatenate([router.performance_list, np.zeros(n_new * 3)])
+    label = np.eye(3)[np.argmax(performance.reshape(-1, 3), axis=1)].reshape(-1, 1)
+    data = router.form_data.formulation(
+        query_feature=queries, llm_feature=router.llm_embedding,
+        org_node=[q for q in range(n_train + n_new) for _ in range(3)], des_node=[0, 1, 2] * (n_train + n_new),
+        edge_feature=performance, label=label, edge_mask=mask_new, train_mask=mask_train,
+        valide_mask=torch.zeros(edges), test_mask=mask_new)
+    predictor.model.eval()
+    with torch.no_grad():  # GNNPredictor.predict without the final argmax
+        edge_predict = predictor.model(
+            query_features=data.query_features, llm_features=data.llm_features, edge_index=data.edge_index,
+            edge_mask=data.edge_mask.clone().to(torch.bool),
+            edge_can_see=torch.logical_or(data.train_mask, data.valide_mask).to(torch.bool),
+            edge_weight=data.edge_attr)
+    yield {"impl": "llmrouter"}, edge_predict.reshape(-1, 3).cpu().numpy(), {}, {
+        "fit_seconds": fit, "score_seconds": time.time() - start, "train_rows": len(frame),
+        "best_validation_result": float(best), "variant": "original", "external_key": "llmrouter",
+        "parameters": sum(p.numel() for p in predictor.model.parameters())}
+
+
+def official_graph(form, query: np.ndarray, llm: np.ndarray, effect: np.ndarray, cost: np.ndarray, label: np.ndarray,
+                   edge_mask, train_mask, valide_mask, test_mask):
+    """The official form_data.formulation call: question nodes x model nodes, 3-d edges [effect, cost, effect]."""
+    n, models = len(query), len(llm)
+    return form.formulation(task_id=np.zeros((n, llm.shape[1]), np.float32), query_feature=query, llm_feature=llm,
+                            org_node=[i for i in range(n) for _ in range(models)], des_node=list(range(models)) * n,
+                            edge_feature=effect, label=label, edge_mask=edge_mask,
+                            combined_edge=np.stack([np.tile(cost, n), effect], axis=1),
+                            train_mask=train_mask, valide_mask=valide_mask, test_mask=test_mask)
+
+
+def run_graphrouter_official(ctx: Context, ext, settings, out_dir: Path):
+    import torch
+    if ctx.inputs.get("model_outcomes") is None:
+        raise SystemExit("GraphRouter impl=official needs <run>/common-inputs from `common_track.py build-outcomes`")
+    gr = ext.graphrouter
+    frame, _, _ = ctx.train()
+    outcomes, members = ctx.inputs["model_outcomes"], ctx.inputs["members"]
+    vectors, row = ctx.inputs["vectors"], ctx.inputs["row"]
+    scored_source = ctx.scored.source_dataset.to_numpy()
+    results = {setting_id("graphrouter", st): {"scores": np.full((len(ctx.scored), 3), np.nan), "sources": {},
+                                              "fit": 0.0, "score": 0.0} for st in settings}
+
+    def mask(n, models, questions):
+        m = torch.zeros(n * models)
+        m[np.repeat(questions, models) * models + np.tile(np.arange(models), len(questions))] = 1
+        return m
+
+    for label_kind, epochs in dict.fromkeys((st["label"], st["epochs"]) for st in settings):
+        group = [st for st in settings if (st["label"], st["epochs"]) == (label_kind, epochs)]
+        for source in SOURCES:
+            pool = members[source]
+            names, tiers = [m["model"] for m in pool], [m["tier"] for m in pool]
+            cost = np.array([m["cost"] for m in pool], float)
+            cost = cost / cost.max()
+            wide = outcomes[outcomes.source_dataset.eq(source)].pivot(index="sample_id", columns="model", values="success")
+            wide = wide.reindex(frame.loc[frame.source_dataset.eq(source), "sample_id"])[names]
+            if wide.isna().any().any():
+                raise SystemExit(f"model outcomes must cover every training row: {source}")
+            q_train, perf, llm = vectors[row.loc[wide.index].to_numpy()], wide.to_numpy(float), ctx.model_vectors[source]
+            n_train, models = perf.shape
+            seed_everything()
+            order = np.random.permutation(n_train)
+            val_q, fit_q = order[: n_train // 8], order[n_train // 8:]  # official split .7/.1 of the labelled part
+            effect = perf.reshape(-1)  # Performance First: 1.0 x effect - 0.0 x cost
+            target = np.eye(models)[np.argmax(perf, axis=1)].reshape(-1, 1) if label_kind == "best" else effect.reshape(-1, 1).copy()
+            m_fit, m_val, none = mask(n_train, models, fit_q), mask(n_train, models, val_q), torch.zeros(n_train * models)
+            form = gr.form_data(ctx.device)
+            data_fit = official_graph(form, q_train, llm, effect, cost, target, m_fit, m_fit, m_val, none)
+            data_val = official_graph(form, q_train, llm, effect, cost, target, m_val, m_fit, m_val, none)
+            folder = out_dir / f"training-official-{label_kind}-{epochs}" / source
+            folder.mkdir(parents=True, exist_ok=True)
+            config = {"learning_rate": 3e-4, "weight_decay": 1e-4, "model_path": str(folder / "best_f1.pth"),
+                      "train_epoch": min(epochs, 3) if ctx.smoke else epochs, "batch_size": 32, "train_mask_rate": 0.5,
+                      "llm_num": models}
+            predictor = gr.GNN_prediction(query_feature_dim=q_train.shape[1], llm_feature_dim=llm.shape[1],
+                                          hidden_features_size=8, in_edges_size=3, wandb=_NoLog(), config=config,
+                                          device=ctx.device)
+            losses, criterion = [], predictor.criterion
+
+            def recorded(pred, y, criterion=criterion, losses=losses):
+                loss = criterion(pred, y)
+                losses.append(float(loss))
+                return loss
+            predictor.criterion = recorded
             start = time.time()
-            scaler = MinMaxScaler().fit(x)  # the scaler _prepare_training_data fitted on the training questions
-            new = scaler.transform(ctx.query)
-            n_train, n_new = len(router.query_embedding_list), len(new)
-            queries = np.vstack([router.query_embedding_list, new])
-            edges = (n_train + n_new) * 3
-            mask_train = torch.zeros(edges)
-            mask_train[: n_train * 3] = 1
-            mask_new = 1 - mask_train
-            performance = np.concatenate([router.performance_list, np.zeros(n_new * 3)])
-            label = np.eye(3)[np.argmax(performance.reshape(-1, 3), axis=1)].reshape(-1, 1)
-            data = router.form_data.formulation(
-                query_feature=queries, llm_feature=router.llm_embedding,
-                org_node=[q for q in range(n_train + n_new) for _ in range(3)], des_node=[0, 1, 2] * (n_train + n_new),
-                edge_feature=performance, label=label, edge_mask=mask_new, train_mask=mask_train,
-                valide_mask=torch.zeros(edges), test_mask=mask_new)
-            predictor.model.eval()
-            with torch.no_grad():  # GNNPredictor.predict without the final argmax
-                edge_predict = predictor.model(
-                    query_features=data.query_features, llm_features=data.llm_features, edge_index=data.edge_index,
-                    edge_mask=data.edge_mask.clone().to(torch.bool),
-                    edge_can_see=torch.logical_or(data.train_mask, data.valide_mask).to(torch.bool),
-                    edge_weight=data.edge_attr)
-            original = setting == {"aggr": "add", "checkpoint": "best_validation"}
-            yield setting, edge_predict.reshape(-1, 3).cpu().numpy(), {}, {
-                "fit_seconds": fit, "score_seconds": time.time() - start, "train_rows": len(frame),
-                "best_validation_result": float(best), "variant": "original" if original else "partial borrowing",
-                "parameters": sum(p.numel() for p in predictor.model.parameters())}
+            # data_for_test only feeds the per-epoch log line; it is our validation split, never dev or test
+            predictor.train_validate(data=data_fit, data_validate=data_val, data_for_test=data_val)
+            fit = time.time() - start
+            per_epoch = np.array(losses).reshape(config["train_epoch"], -1)[:, : config["batch_size"]].mean(axis=1)
+            weights = {"last": {k: v.detach().clone() for k, v in predictor.model.state_dict().items()},
+                       "best_f1": torch.load(folder / "best_f1.pth", map_location=ctx.device)}
+            rows_new = np.where(scored_source == source)[0]
+            query = np.vstack([q_train, ctx.query[rows_new]])
+            n = len(query)
+            seen = mask(n, models, np.arange(n_train))
+            new = 1 - seen
+            data = official_graph(form, query, llm, np.concatenate([effect, np.zeros(len(rows_new) * models)]), cost,
+                                  np.zeros((n * models, 1)), new, seen, torch.zeros(n * models), new)
+            for st in group:
+                start = time.time()
+                predictor.model.load_state_dict(weights[st["checkpoint"]])
+                predictor.model.eval()
+                with torch.no_grad():  # GNN_prediction.test: training and validation edges visible
+                    pred = predictor.model(task_id=data.task_id, query_features=data.query_features,
+                                           llm_features=data.llm_features, edge_index=data.edge_index,
+                                           edge_mask=new.bool(), edge_can_see=seen.bool(), edge_weight=data.combined_edge)
+                result = results[setting_id("graphrouter", st)]
+                result["scores"][rows_new] = tier_means(pred.reshape(-1, models).cpu().numpy(), tiers)
+                result["fit"] += fit
+                result["score"] += time.time() - start
+                result["sources"][source] = {"train_questions": int(len(fit_q)), "validation_questions": int(len(val_q)),
+                                             "models": models, "fit_seconds": round(fit, 1),
+                                             "train_loss_first_last_epoch": [round(float(per_epoch[0]), 4),
+                                                                             round(float(per_epoch[-1]), 4)],
+                                             "parameters": sum(p.numel() for p in predictor.model.parameters())}
+    for st in settings:
+        result = results[setting_id("graphrouter", st)]
+        yield st, result["scores"], {}, {
+            "fit_seconds": result["fit"], "score_seconds": result["score"], "train_rows": len(frame),
+            "variant": "original (paper label)" if st["label"] == "best" else "partial borrowing (success label)",
+            "external_key": "graphrouter", "diagnostic_unscored": True, "shared_training_per_label_and_epochs": True,
+            "sources": result["sources"]}
 
 
 def run_hybrid(ctx: Context, ext, settings, out_dir: Path):
@@ -728,7 +959,7 @@ def run_r1_bge(ctx: Context, ext, settings):
 
 METHODS = ("knn", "knn_a", "mlp", "svm", "mf", "graphrouter", "hybrid_llm", "irt_router", "avengers_pro", "r1_bge")
 EXTERNAL_OF = {"knn": "routerbench", "knn_a": "routerbench", "mlp": "routerbench", "svm": "routerbench",
-               "mf": "llmrouter", "graphrouter": "llmrouter", "hybrid_llm": "llmrouter", "irt_router": "irt_router",
+               "mf": "llmrouter", "graphrouter": "graphrouter", "hybrid_llm": "llmrouter", "irt_router": "irt_router",
                "avengers_pro": "avengers_pro", "r1_bge": None}
 
 
@@ -753,7 +984,11 @@ def runner_for(method: str, ctx: Context, ext, settings, out_dir: Path, data_pat
 
 
 def write_setting(folder: Path, ctx: Context, method: str, setting: dict, scores: np.ndarray, extra: dict, info: dict):
-    if scores.shape != (len(ctx.scored), 3) or not np.isfinite(scores).all():
+    info = dict(info)
+    external_key = info.pop("external_key", EXTERNAL_OF[method])
+    pooled = ctx.scored.role.ne("diagnostic").to_numpy()  # dev and test rows must always be scored
+    if scores.shape != (len(ctx.scored), 3) or not np.isfinite(scores[pooled]).all() or \
+            not (np.isfinite(scores[~pooled]).all() or info.get("diagnostic_unscored")):
         raise SystemExit(f"{method} {setting}: scores must be finite with shape {(len(ctx.scored), 3)}")
     folder.mkdir(parents=True, exist_ok=True)
     table = ctx.scored[["sample_id", "source_dataset", "role"]].copy()
@@ -763,11 +998,11 @@ def write_setting(folder: Path, ctx: Context, method: str, setting: dict, scores
         table[name] = np.asarray(values, dtype=np.float64)
     table.to_parquet(folder / "scores.parquet", index=False)
     record = {"method": method, "setting_id": folder.name, "setting": setting, "seed": SEED,
-              "external": EXTERNAL_OF[method] and {k: EXTERNAL[EXTERNAL_OF[method]][k] for k in ("repo", "commit", "license")},
+              "external": external_key and {k: EXTERNAL[external_key][k] for k in ("repo", "commit", "license")},
               "deviations": DEVIATIONS["all"] + DEVIATIONS[method], "device": ctx.device,
               "score_rows": int(len(table)), "score_ms_per_1k": 1e6 * info["score_seconds"] / len(table),
               # plan 4.5: an original that does not work on our data is reported as a reproduction failure
-              "degenerate": bool((scores.std(axis=0) < 1e-6).all()),
+              "degenerate": bool((scores[pooled].std(axis=0) < 1e-6).all()),
               "scores_sha256": sha256_file(folder / "scores.parquet")} | info
     (folder / "metrics.json").write_text(json.dumps(record, ensure_ascii=False, indent=2, default=str))
     (folder / "_SUCCESS").write_text("")
@@ -794,8 +1029,25 @@ def run(run_dir: Path, external_dir: Path, output_dir: Path, methods: list, devi
         desc_path.write_text(json.dumps({"model": EMBEDDING_MODEL, "revision": EMBEDDING_REVISION, "texts": descriptions,
                                          "vectors": description_vectors.tolist()}, ensure_ascii=False, indent=1))
     ctx = Context(inputs, description_vectors, device)
+    model_desc_path = output_dir / "model-descriptions.json"
+    if inputs["members"] is not None:
+        texts = model_descriptions(inputs["members"])
+        if model_desc_path.exists():
+            saved = json.loads(model_desc_path.read_text())
+            if saved["texts"] != texts:
+                raise SystemExit("model descriptions changed since the last run in this folder")
+        else:
+            flat = [t for source in SOURCES for t in texts[source]]
+            vectors = encode_texts(flat, device).tolist()
+            saved, k = {"model": EMBEDDING_MODEL, "revision": EMBEDDING_REVISION, "texts": texts, "vectors": {}}, 0
+            for source in SOURCES:
+                saved["vectors"][source] = vectors[k: k + len(texts[source])]
+                k += len(texts[source])
+            model_desc_path.write_text(json.dumps(saved, ensure_ascii=False, indent=1))
+        ctx.model_vectors = {source: np.asarray(v, dtype=np.float32) for source, v in saved["vectors"].items()}
     ext = types.SimpleNamespace(routerbench=load_routerbench(external_dir), llmrouter=load_llmrouter(external_dir),
-                                irt=load_irt(external_dir), avengers=load_avengers(external_dir))
+                                graphrouter=load_graphrouter(external_dir), irt=load_irt(external_dir),
+                                avengers=load_avengers(external_dir))
     data_path = run_dir / "ours" / "data" / "blended" / "train.parquet"
     for method in methods:
         todo = [s for s in SETTINGS[method] if not (output_dir / method / setting_id(method, s) / "_SUCCESS").exists()]
@@ -817,6 +1069,7 @@ def run(run_dir: Path, external_dir: Path, output_dir: Path, methods: list, devi
         "train_rows": {v: f.groupby("source_dataset").size().to_dict() for v, f in inputs["train"].items()},
         "external": external, "settings": {m: [setting_id(m, s) for s in SETTINGS[m]] for m in METHODS},
         "group_descriptions_sha256": sha256_file(desc_path), "deviations": DEVIATIONS,
+        "model_descriptions_sha256": sha256_file(model_desc_path) if model_desc_path.exists() else None,
         "versions": {"python": sys.version.split()[0], "torch": torch.__version__, "scikit-learn": sklearn.__version__,
                      "numpy": np.__version__, "pandas": pd.__version__,
                      "torch_geometric": importlib.import_module("torch_geometric").__version__},
@@ -831,6 +1084,11 @@ def main(argv=None):
     sub = p.add_subparsers(dest="command", required=True)
     f = sub.add_parser("fetch")
     f.add_argument("--external-dir", type=Path, required=True)
+    b = sub.add_parser("build-outcomes", help="local: per-model success of the training rows (GraphRouter model nodes)")
+    b.add_argument("--run-dir", type=Path, required=True)
+    b.add_argument("--repo", type=Path, required=True, help="checkout holding ml/src and committed inputs")
+    b.add_argument("--data-root", type=Path, default=None, help="root for git-ignored data (defaults to --repo)")
+    b.add_argument("--output-dir", type=Path, required=True, help="normally <run-dir>/common-inputs")
     r = sub.add_parser("run")
     r.add_argument("--run-dir", type=Path, required=True)
     r.add_argument("--external-dir", type=Path, required=True)
@@ -841,6 +1099,8 @@ def main(argv=None):
     a = p.parse_args(argv)
     if a.command == "fetch":
         out = fetch(a.external_dir)
+    elif a.command == "build-outcomes":
+        out = build_outcomes(a.run_dir, a.repo, a.data_root or a.repo, a.output_dir)
     else:
         out = run(a.run_dir, a.external_dir, a.output_dir, a.methods, a.device, a.smoke)
     print(json.dumps(out, ensure_ascii=False, indent=1, default=str)[:4000])

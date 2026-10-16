@@ -59,7 +59,7 @@ Drive 구성(`LLM_Router/router-final/runs/run001/`): `code/`(embed.py, requirem
 | `mlp` | RouterBench `MLPRouter` | 은닉층 (100), (100,100), (100,100,100) | 단계별 회귀값 |
 | `svm` | RouterBench `SVMRouter` | 기본값 하나(LinearSVR) | 단계별 회귀값 |
 | `mf` | LLMRouter `MFRouter`·`MFRouterTrainer` | epoch 5(YAML)·3(기본값) | 질문 × 단계 궁합 점수 |
-| `graphrouter` | LLMRouter `GraphRouter`·`GraphTrainer` | 원본(YAML, 합 집계, 원본 체크포인트)과 부분 차용(평균 집계, 마지막 epoch) | 질문–단계 연결 점수 |
+| `graphrouter` | LLMRouter `GraphRouter`(단계 노드 3개), GraphRouter 공식 `GNN_prediction`(모델 노드) | LLMRouter 원본 하나 + 공식 구조 셋(논문 정답 1000 epoch, 성공 정답 1000·100 epoch) | 질문–단계 연결 점수, 또는 질문–모델 연결 점수를 끝에서 집단 평균 |
 | `hybrid_llm` | LLMRouter `HybridLLMRouter` | probabilistic(YAML)·deterministic·transformed | low로 충분할 확률(점수 하나) |
 | `irt_router` | IRT-Router `MIRT` | 시작 보정 λ 0·.1(기본값)·.3, 학습은 한 번 | 단계별 성공 확률 + 문항 난이도 b |
 | `avengers_pro` | Avengers-Pro `BalanceClusterRouter` | 묶음 25·α .45 / .7 / 1, 묶음 64·α .7 | 가까운 묶음 3개의 순위 점수 |
@@ -70,9 +70,19 @@ Drive 구성(`LLM_Router/router-final/runs/run001/`): `code/`(embed.py, requirem
 - **원천 가중치:** 외부 방법은 원본 학습 방식 그대로(가중치 없음) 둔다. R1-BGE만 가중치 유무를 설정으로 둔다.
 - **원본과 다른 점:** 결과마다 `metrics.json`의 `deviations`에 적는다. 대표적으로 GraphRouter는 새 질문을 학습 질문으로 맞춘 scaler로 정규화한다(원본은 배치마다 scaler를 다시 맞춰 새 질문의 척도가 달라진다).
 - **상수 점수 표시:** 점수가 모든 질문에서 상수면 `degenerate: true`로 기록한다. 라우팅 정보가 없다는 뜻이고, 원인은 결과마다 적는다. 계획서 4.5절대로 억지로 맞추지 않고 결과표에서 구분한다.
-- **GraphRouter:** 원본 그대로는 재현 실패다. 단계 노드 하나가 학습 질문 약 2.5만 개의 메시지를 더하므로(합 집계) 첫 업데이트 뒤 예측이 포화되고(BCE ≈ 33), 모든 점수가 0이 된다. 원본 체크포인트 규칙(고른 단계의 성능 평균이 가장 높은 epoch)도 거의 학습 전 모델을 고른다. 그래서 부분 차용 버전을 따로 둔다: `GeneralConv`를 평균 집계로 바꾸고 마지막 epoch 가중치를 쓴다. 두 결과는 결과표에서 구분한다.
+- **GraphRouter:** 구현 두 가지를 둔다.
+  - LLMRouter 판(단계 3개를 노드로)은 재현 실패다. 단계 노드 하나가 학습 질문 약 2.5만 개의 메시지를 더하므로(합 집계) 첫 업데이트 뒤 예측이 포화되고(BCE ≈ 33) 모든 점수가 0이 된다.
+  - 공식 저장소 판은 논문처럼 실제 모델을 노드로 두고(모델 풀마다 그래프 하나), 공식 신경망과 하이퍼파라미터(hidden 8, lr 3e-4, 1000 epoch, batch 32, mask .5)를 그대로 쓴다. 3단계는 맨 끝에서 집단 모델들의 예측 평균으로 만든다. 과제 노드 특성은 0(과제 이름 금지)이고, RouterArena 질문은 모델 풀이 없어 점수를 내지 않는다.
+  - 논문의 정답(질문마다 one-hot "가장 좋은 모델")은 0/1 결과에서 거의 늘 "가장 싼 모델"이라 정보가 적다(시험 실행에서 dev 상관 약 0). 그래서 같은 신경망으로 질문–모델 성공을 직접 맞히는 부분 차용(마지막 epoch)도 둔다. 시험 실행에서는 원천에 따라 kNN보다 조금 낮거나 높았다.
+  - 모델 노드에는 모델별 성공 기록이 필요하다. `build-outcomes`(로컬)가 03_ours 학습 행만으로 `run001/common-inputs/`를 만든다. 빈 기록(LLMRouterBench 513칸)은 그 행의 집단 풀 확률로 채우며, 집단 평균이 R1-집단 정답과 같은지 확인한다.
 - **Avengers-Pro α = 1(성능만):** 모든 묶음에서 순위가 high > medium > low로 같아 점수가 상수다. 구현 문제가 아니라 방법의 결과다.
 - **출력:** `common/<방법>/<설정>/`에 `scores.parquet`(sample_id, source_dataset, role, score_low/medium/high, IRT는 irt_difficulty), `metrics.json`(학습·점수 시간, 파라미터 수, 원본 커밋, deviations), `_SUCCESS`. `common/manifest.json`은 입력 SHA, 외부 파일 SHA, 라이브러리 버전, 결과 SHA를 담는다. 설정 선택과 원천별 보정은 07_lock이 dev에서 한다.
+
+Colab 실행 전 로컬에서 한 번(GraphRouter 모델 노드용, 원본 데이터가 있는 checkout 필요):
+
+```bash
+python ml/notebooks/router_final/common_track.py build-outcomes --run-dir <run001> --repo . --data-root <원본 데이터 checkout> --output-dir <run001>/common-inputs
+```
 
 로컬 실행(시험):
 

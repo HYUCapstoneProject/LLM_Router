@@ -104,6 +104,32 @@ class MethodHelpersTest(unittest.TestCase):
         np.testing.assert_allclose(mixed, [[0.75, 5 / 12, 2 / 3]])
 
 
+class GraphRouterModelNodeTest(unittest.TestCase):
+    def test_missing_records_take_the_group_probability_so_group_means_match(self):
+        success = pd.DataFrame({"a": [1.0, np.nan, 0.0], "b": [0.0, 1.0, np.nan], "c": [np.nan, np.nan, 1.0],
+                                "d": [0.0, 1.0, 1.0]})
+        target = pd.DataFrame({"success_low": [0.5, 1.0, 0.0], "success_medium": [0.25, 0.75, 1.0],
+                               "success_high": [0.0, 1.0, 1.0]})
+        filled, missing = C.fill_missing_with_target(success, ["low", "low", "medium", "high"], target)
+        self.assertEqual(filled["b"].tolist(), [0.0, 1.0, 0.0])
+        self.assertEqual(filled["c"].tolist(), [0.25, 0.75, 1.0])
+        self.assertEqual(int(missing.to_numpy().sum()), 4)
+        target.loc[0, "success_low"] = 0.9  # inconsistent with the observed records
+        with self.assertRaises(SystemExit):
+            C.fill_missing_with_target(success, ["low", "low", "medium", "high"], target)
+
+    def test_tier_score_is_the_mean_over_the_tier_models(self):
+        pred = np.array([[0.2, 0.4, 0.9, 1.0], [0.0, 0.0, 0.5, 0.0]])
+        np.testing.assert_allclose(C.tier_means(pred, ["low", "low", "medium", "high"]), [[0.3, 0.9, 1.0], [0.0, 0.5, 0.0]])
+
+    def test_model_descriptions_give_price_relative_to_the_pool(self):
+        members = {s: [{"model": f"{s}-cheap", "tier": "low", "cost": 1.0}, {"model": f"{s}-dear", "tier": "high", "cost": 4.0}]
+                   for s in C.SOURCES}
+        texts = C.model_descriptions(members)
+        self.assertIn("relative price 0.250", texts["sprout"][0])
+        self.assertIn("high price tier", texts["sprout"][1])
+
+
 class WriteSettingTest(unittest.TestCase):
     def _ctx(self):
         ctx = types.SimpleNamespace(device="cpu", scored=pd.DataFrame({
@@ -121,6 +147,22 @@ class WriteSettingTest(unittest.TestCase):
             self.assertEqual(list(table.columns), ["sample_id", "source_dataset", "role", "score_low", "score_medium", "score_high"])
             record = C.write_setting(Path(tmp) / "x", self._ctx(), "svm", {}, np.array([[0, 1, 2], [1, 2, 3.0]]), {}, info)
             self.assertFalse(record["degenerate"])
+
+    def test_only_pool_specific_methods_may_leave_routerarena_unscored(self):
+        ctx = types.SimpleNamespace(device="cpu", scored=pd.DataFrame({
+            "sample_id": ["a", "b", "r"], "source_dataset": ["sprout", "sprout", "routerarena"], "role": ["dev", "test", "diagnostic"]}))
+        scores = np.array([[0, 1, 2], [1, 2, 3.0], [np.nan] * 3])
+        info = {"fit_seconds": 1.0, "score_seconds": 0.5, "train_rows": 10}
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(SystemExit):
+                C.write_setting(Path(tmp) / "a", ctx, "graphrouter", {}, scores, {}, info)
+            record = C.write_setting(Path(tmp) / "b", ctx, "graphrouter", {}, scores, {},
+                                     info | {"diagnostic_unscored": True, "external_key": "graphrouter"})
+            self.assertFalse(record["degenerate"])
+            self.assertEqual(record["external"]["repo"], "ulab-uiuc/GraphRouter")
+            dev_nan = scores.copy(); dev_nan[0, 0] = np.nan
+            with self.assertRaises(SystemExit):
+                C.write_setting(Path(tmp) / "c", ctx, "graphrouter", {}, dev_nan, {}, info | {"diagnostic_unscored": True})
 
     def test_rejects_wrong_shape_and_non_finite_scores(self):
         info = {"fit_seconds": 1.0, "score_seconds": 0.5, "train_rows": 10}
