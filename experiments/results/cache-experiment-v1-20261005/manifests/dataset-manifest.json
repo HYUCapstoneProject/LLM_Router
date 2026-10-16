@@ -1,0 +1,48 @@
+{
+  "frozen_at": "2026-10-02T04:36:52+00:00",
+  "annotations_sha256": "a9ff7fc85b7602369b896336cdef8feb8df5eb07867768f3c13909eb339ce876",
+  "annotation_mode": "single_llm",
+  "provenance": "external LLM pre-evaluation provided by the user on 2026-10-02 (model unrecorded); not checked by a person",
+  "annotator": "AI 사전평가 — 유철민 검토용 (본인 미확인)",
+  "source_sha256": "0a49547efdf7c4da90b75576e1d9e3852965782cd927ddbfb32e2d73d7617662",
+  "identical_duplicates": [
+    {
+      "file": "annotation-B-input.csv",
+      "sha256": "d1839b5609247c94c03f176bdc51ab635534b2bffc6b8c39abc07b580d050b08"
+    }
+  ],
+  "agreement": null,
+  "final_counts": {
+    "semantic_equivalent": {
+      "N": 302,
+      "Y": 298
+    },
+    "cached_answer_correct_for_target": {
+      "N": 341,
+      "Y": 210,
+      "U": 49
+    }
+  },
+  "by_split_role": [
+    {
+      "d2_split": "calibration",
+      "role": "hard_negative",
+      "n": 100
+    },
+    {
+      "d2_split": "calibration",
+      "role": "paraphrase",
+      "n": 100
+    },
+    {
+      "d2_split": "test",
+      "role": "hard_negative",
+      "n": 200
+    },
+    {
+      "d2_split": "test",
+      "role": "paraphrase",
+      "n": 200
+    }
+  ]
+}

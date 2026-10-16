@@ -1,0 +1,11 @@
+# Model libraries match the serving image (LLM_Router-serving pyproject.toml).
+# Python 3.11 or 3.12: torch 2.5.1 has no wheels for newer Python.
+torch==2.5.1
+transformers==4.48.3
+numpy==2.1.2
+pandas==2.3.3
+pyarrow==21.0.0
+scipy==1.14.1
+matplotlib==3.10.1
+psycopg[binary]==3.2.3
+jupyterlab==4.3.4

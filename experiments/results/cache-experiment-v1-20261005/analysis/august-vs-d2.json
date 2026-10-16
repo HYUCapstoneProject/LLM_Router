@@ -1,0 +1,180 @@
+{
+ "rule": {
+  "cosine": 0.8774,
+  "rerank": 0.03581769,
+  "limit": 512
+ },
+ "models": {
+  "embed": [
+   "BAAI/bge-large-en-v1.5",
+   "d4aa6901d3a41ba39fb536a557fa166f842b0e09"
+  ],
+  "rerank": [
+   "cross-encoder/quora-distilroberta-base",
+   "f62e7a4b20b97195c2868e53ec59126df5eac743"
+  ]
+ },
+ "lengths": {
+  "bge": {
+   "variant_max": 505,
+   "variant_over_512": 0,
+   "original_max": 501,
+   "original_over_512": 0,
+   "variant_median": 93.0
+  },
+  "reranker_pair": {
+   "pairs": 600,
+   "over_512": 88,
+   "median_tokens": 198.0,
+   "max_tokens": 1007,
+   "over_512_by_stratum": {
+    "rb_mcq": 60,
+    "xrb_mcq": 22,
+    "xrb_open": 6
+   },
+   "edit_visibility_by_role": {
+    "hard_negative": {
+     "hidden_both": 1,
+     "hidden_one": 4,
+     "partly_cut": 6,
+     "visible": 289
+    },
+    "paraphrase": {
+     "hidden_both": 2,
+     "hidden_one": 0,
+     "partly_cut": 5,
+     "visible": 293
+    }
+   }
+  }
+ },
+ "share_summary": [
+  {
+   "dataset": "august",
+   "label": "same",
+   "pairs": 21,
+   "tokens_median": 12.0,
+   "changed_tokens_median": 10.0,
+   "share_median": 0.8333,
+   "share_q25": 0.5833,
+   "share_q75": 1.0,
+   "rerank_median": 0.8734,
+   "pass_rate": 0.9524
+  },
+  {
+   "dataset": "august",
+   "label": "trap",
+   "pairs": 37,
+   "tokens_median": 13.0,
+   "changed_tokens_median": 7.0,
+   "share_median": 0.5,
+   "share_q25": 0.2778,
+   "share_q75": 0.7308,
+   "rerank_median": 0.0008,
+   "pass_rate": 0.0541
+  },
+  {
+   "dataset": "d2",
+   "label": "same",
+   "pairs": 100,
+   "tokens_median": 95.5,
+   "changed_tokens_median": 13.0,
+   "share_median": 0.126,
+   "share_q25": 0.0705,
+   "share_q75": 0.2416,
+   "rerank_median": 0.908,
+   "pass_rate": 0.88
+  },
+  {
+   "dataset": "d2",
+   "label": "trap",
+   "pairs": 100,
+   "tokens_median": 100.0,
+   "changed_tokens_median": 10.5,
+   "share_median": 0.1116,
+   "share_q25": 0.0485,
+   "share_q75": 0.1797,
+   "rerank_median": 0.4815,
+   "pass_rate": 0.76
+  }
+ ],
+ "traps_by_share_bin": [
+  {
+   "share_bin": "(-0.001, 0.05]",
+   "dataset": "d2",
+   "pairs": 27,
+   "pass_rate": 0.8148,
+   "rerank_median": 0.477
+  },
+  {
+   "share_bin": "(0.05, 0.1]",
+   "dataset": "august",
+   "pairs": 2,
+   "pass_rate": 0.0,
+   "rerank_median": 0.0031
+  },
+  {
+   "share_bin": "(0.05, 0.1]",
+   "dataset": "d2",
+   "pairs": 22,
+   "pass_rate": 0.7273,
+   "rerank_median": 0.4524
+  },
+  {
+   "share_bin": "(0.1, 0.2]",
+   "dataset": "august",
+   "pairs": 6,
+   "pass_rate": 0.0,
+   "rerank_median": 0.0004
+  },
+  {
+   "share_bin": "(0.1, 0.2]",
+   "dataset": "d2",
+   "pairs": 34,
+   "pass_rate": 0.7353,
+   "rerank_median": 0.7123
+  },
+  {
+   "share_bin": "(0.2, 0.4]",
+   "dataset": "august",
+   "pairs": 7,
+   "pass_rate": 0.2857,
+   "rerank_median": 0.0161
+  },
+  {
+   "share_bin": "(0.2, 0.4]",
+   "dataset": "d2",
+   "pairs": 14,
+   "pass_rate": 0.7857,
+   "rerank_median": 0.4191
+  },
+  {
+   "share_bin": "(0.4, inf]",
+   "dataset": "august",
+   "pairs": 22,
+   "pass_rate": 0.0,
+   "rerank_median": 0.0006
+  },
+  {
+   "share_bin": "(0.4, inf]",
+   "dataset": "d2",
+   "pairs": 3,
+   "pass_rate": 0.6667,
+   "rerank_median": 0.0468
+  }
+ ],
+ "d2_calibration_traps_by_pair_truncation": [
+  {
+   "truncated": false,
+   "pairs": 88,
+   "pass_rate": 0.7955,
+   "rerank_median": 0.4938
+  },
+  {
+   "truncated": true,
+   "pairs": 12,
+   "pass_rate": 0.5,
+   "rerank_median": 0.0409
+  }
+ ]
+}

@@ -1,0 +1,12 @@
+{
+  "C2": {
+    "requests": 4000,
+    "agreement": 1.0,
+    "disagreements": 0
+  },
+  "C3": {
+    "requests": 4000,
+    "agreement": 1.0,
+    "disagreements": 0
+  }
+}

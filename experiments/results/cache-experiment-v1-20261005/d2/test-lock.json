@@ -1,0 +1,9 @@
+{
+  "frozen_policy_sha256": "cafb4b08aeccda13e52ffb102a694109278934953b81f774de3cba571db9a279",
+  "attempts": [
+    {
+      "started_at": "2026-10-04T15:25:15+00:00",
+      "completed_at": "2026-10-04T15:26:37+00:00"
+    }
+  ]
+}

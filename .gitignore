@@ -86,3 +86,5 @@ ml/.cache/
 
 # 파레토 실험용 venv 와 내려받은 데이터셋 (수백 MB)
 .venv-experiments/
+# 캐시 실험용 venv (서빙과 같은 torch/transformers 고정)
+.venv-cache/

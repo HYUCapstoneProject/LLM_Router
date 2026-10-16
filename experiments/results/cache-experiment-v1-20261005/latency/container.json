@@ -1,0 +1,5 @@
+{
+  "image": "pgvector/pgvector:pg17",
+  "image_id": "sha256:9f6f5e8f6bf64903df0a7743c4580477c14139cdaac1c17056b21721cf34369e",
+  "cpus": 2
+}
