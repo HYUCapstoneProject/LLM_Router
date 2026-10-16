@@ -1,0 +1,16 @@
+{
+  "label_noise_routerbench": {
+    "beta_a": 1.8519218017256893,
+    "beta_b": 1.1479351939618123,
+    "by_model_count": {
+      "11": 0.7935994395845413
+    }
+  },
+  "label_noise_xroutebench": {
+    "beta_a": 0.6912894157804252,
+    "beta_b": 0.5198127050039599,
+    "by_model_count": {
+      "18": 0.8753854211635945
+    }
+  }
+}

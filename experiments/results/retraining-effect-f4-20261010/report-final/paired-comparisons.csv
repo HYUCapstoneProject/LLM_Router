@@ -1,0 +1,12 @@
+role,scope,contrast,metric,difference,conditional_ci95_low,conditional_ci95_high
+test,all,f4_bidirectional_minus_f0_frozen,correct,-0.340831250578543,-0.3587012866796261,-0.32426062204943057
+test,all,f4_bidirectional_minus_f0_frozen,quality,0.08662715828317762,0.07775884736822017,0.09618425390423962
+test,all,f4_bidirectional_minus_f0_frozen,relative_cost,0.1372493893148995,0.12704946883810542,0.14687421758717445
+test,routerbench,f4_bidirectional_minus_f0_frozen,correct,-0.2541510701602841,-0.28150734235531216,-0.22717631250599843
+test,routerbench,f4_bidirectional_minus_f0_frozen,quality,0.1373308378923121,0.12246724733659671,0.15188885689605533
+test,routerbench,f4_bidirectional_minus_f0_frozen,relative_cost,0.1990574932208598,0.18556439380562795,0.2127789731640587
+test,xroutebench,f4_bidirectional_minus_f0_frozen,correct,-0.42156074014481093,-0.443823187628498,-0.39937650844730505
+test,xroutebench,f4_bidirectional_minus_f0_frozen,quality,0.0394043427072795,0.029415179511760668,0.0496826606494291
+test,xroutebench,f4_bidirectional_minus_f0_frozen,relative_cost,0.07968448052825425,0.06419505531702743,0.0947738758260651
+routerarena,all,f4_bidirectional_minus_f0_frozen,correct,-0.2100887138481124,-0.2240527243371088,-0.19626560963379866
+routerarena,routerarena,f4_bidirectional_minus_f0_frozen,correct,-0.2100887138481124,-0.2240527243371088,-0.19626560963379866
