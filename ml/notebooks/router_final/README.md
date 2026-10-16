@@ -5,7 +5,8 @@
 | 노트북 | 상태 | 하는 일 |
 |---|---|---|
 | `00_prepare` | 구현 | 데이터 준비. 아래 참고 |
-| `01_embed` ~ `10_report` | 예정 | 계획서 4.5절 |
+| `01_embed` | 구현 | BGE-large-en-v1.5(revision d4aa6901) 임베딩. Colab T4 |
+| `02_rt08` ~ `10_report` | 예정 | 계획서 4.5절 |
 
 ## 00_prepare
 
@@ -23,3 +24,9 @@
 ```bash
 .venv/bin/python ml/notebooks/router_final/prepare.py --config ml/notebooks/router_final/config.json --repo . --data-root . --output-dir ml/artifacts/router-final-v1/prepare
 ```
+
+## 01_embed
+
+`embed.py`가 00_prepare 출력의 SHA를 먼저 확인한 뒤, train·dev·test 질문과 RouterArena 질문(`routerarena:<Global Index>`)을 512토큰, 정규화, float16으로 임베딩한다. 출력은 `embeddings.npy`, 행 순서가 같은 `ids.parquet`, `manifest.json`(모델 revision, 입력·출력 SHA, 역할별 행 수)이다.
+
+Drive 구성(`LLM_Router/router-final/runs/run001/`): `code/`(embed.py, requirements-colab.txt), `prepare/`(00_prepare 출력), `inputs/routerarena-full.parquet`. 노트북은 결과를 `embed/`에 쓰고, 이미 있으면 멈춘다.
