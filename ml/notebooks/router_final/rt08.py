@@ -4,7 +4,8 @@ build  (local, CPU): A-split train + D_dev rows from 00_prepare, v2 exclusions d
        old definition (overall solve rate, T1 .27/.64) recomputed on v2 outcomes. Writes
        training.parquet plus a manifest comparing the v1 and v2 label mix.
 train  (Colab T4): run the RT-04 training function and config unchanged, with the optimizer
-       step budget pinned to RT-04's 2,007 steps so only the labels differ.
+       same 3-epoch budget. RT-04 ran 2,007 steps on 21,406 rows; dropping the 180 v2-excluded
+       rows gives 1,992 steps, with 2,007 kept only as an upper bound.
 Test rows are not read here; scoring happens once in 08_test.
 """
 from __future__ import annotations
@@ -17,7 +18,7 @@ from pathlib import Path
 import pandas as pd
 
 A_SOURCES = ("routerbench", "xroutebench")
-RT04_STEPS = 2007  # experiments/results/modernbert-initial-v1-20260924/run.json
+RT04_STEPS = 2007  # RT-04 step count (experiments/results/modernbert-initial-v1-20260924/run.json); upper bound here
 
 
 def sha256_file(path: Path) -> str:
@@ -103,8 +104,9 @@ def train(root: Path, data_dir: Path, persistent_dir: Path, pilot: bool) -> dict
         routerbench_validations_per_epoch=0 if pilot else 1,
         save_every_optimizer_steps=50, drive_sync_every_optimizer_steps=500,
     )
-    if not pilot and result.metrics["optimization"]["optimizer_steps"] != RT04_STEPS:
-        raise SystemExit("RT-08 did not complete RT-04's step budget")
+    optimization = result.metrics["optimization"]
+    if not pilot and optimization["optimizer_steps"] != optimization["planned_steps"]:
+        raise SystemExit("RT-08 did not complete its planned steps")
     (persistent_dir / run_name / "rt08-data-manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2))
     return {"status": result.status, "model_dir": str(result.persistent_model_dir), "metrics": result.metrics}
 

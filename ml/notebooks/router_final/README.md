@@ -34,7 +34,7 @@ Drive 구성(`LLM_Router/router-final/runs/run001/`): `code/`(embed.py, requirem
 
 ## 02_rt08 (RT-08)
 
-`rt08.py build`(로컬)가 00_prepare의 A 분할 train·D_dev에서 v2 제외 문항을 빼고, 라벨을 기존 정의의 v2 라벨(전체 모델 해결률, 경계 .27/.64)로 바꿔 `training.parquet`과 manifest(v1·v2 라벨 비율, 바뀐 비율)를 만든다. `rt08.py train`(Colab)은 RT-04와 같은 `run_colab_training`·`modernbert_initial_v1_training.json`·런타임 계약을 쓰고 step을 RT-04의 2,007로 고정한다.
+`rt08.py build`(로컬)가 00_prepare의 A 분할 train·D_dev에서 v2 제외 문항을 빼고, 라벨을 기존 정의의 v2 라벨(전체 모델 해결률, 경계 .27/.64)로 바꿔 `training.parquet`과 manifest(v1·v2 라벨 비율, 바뀐 비율)를 만든다. `rt08.py train`(Colab)은 RT-04와 같은 `run_colab_training`·`modernbert_initial_v1_training.json`·런타임 계약으로 3 epoch를 학습한다. v2 제외 문항이 빠져 1,992 step이 된다(RT-04는 21,406행으로 2,007 step). 2,007은 상한으로만 둔다.
 
 | | train | D_dev |
 |---|---:|---:|
