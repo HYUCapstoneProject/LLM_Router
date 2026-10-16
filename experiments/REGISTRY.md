@@ -62,7 +62,7 @@
 | EV-03 | λ 정밀 탐색 (R0~R3) | 10-02 | 완료 | R0는 λ로 거의 움직이지 않음. R1은 98% 품질 유지에 상대 비용 .39 | [보고서](results/lambda-sweep-20261002/REPORT.md) |
 | EV-04 | 라우팅 천장 분석 | 10-13 | 완료·PR 검토 중 | 학습 라우터는 혼합선 +.02~.04에서 멈춤. 다른 LLM 8개 정답을 알아도 +.052. 라벨 잡음 상한 .794/.875. 상향 허용 시 low부터 시작이 oracle 수준 최종 해결률(v2 93.5% / 88.3%) | [보고서](results/routing-ceiling-20261013/REPORT.md) |
 | EV-05 | 통일 평가 시제품 (어댑터·상향 고려 규칙) | 10-13 | 완료·PR 검토 중 | 어댑터 후 R0 ≈ R1. 상향 고려 규칙 ≈ κ별 최선의 고정 시작 단계 | [README](results/unified-eval-prototype-20261013/README.md) |
-| EV-06 | 논문 라우터 비교 | – | 계획 | kNN 효용 라우터·RouteLLM-MF·IRT-Router·CARROT·RouterDC·EquiRouter를 우리 라우터와 같은 데이터·같은 통일 기준(EV-07 어댑터·효용)으로 비교. 10-13 사용자 결정으로 유지하고 계획서를 통일 기준에 맞춰 개정 예정 | [계획서](../docs/ml/ROUTER_COMPARISON_EXPERIMENT.md) |
+| EV-06 | 논문 라우터 비교 | – | 계획(10-16 대상 확정) | kNN 효용 라우터(+MLP·SVM)·MF·RouterDC·GraphRouter·Hybrid LLM·IRT-Router·RouteLLM-BERT(공개본·재학습본)를 우리 라우터와 같은 데이터로 학습해 통일 기준(EV-07 어댑터·손익분기점)으로 비교. CARROT·Avengers-Pro는 추가 결정 대기 | [계획서](../docs/ml/ROUTER_COMPARISON_EXPERIMENT.md) |
 | EV-07 | 통일 기준 재평가 (계획서 E2) | – | 계획 | 학습 없이 R0·R0-τ·R1·R2·R3·kNN·고정 정책 비교 | [계획서 6절](../docs/ml/ROUTER_EVALUATION_V2_PLAN.md) |
 | EV-08 | 외부·세대 전이 (계획서 E3) | – | 계획 | LLMRouterBench·SPROUT·RouterArena 700문항, 추론만 | 같음, [SPROUT 비용 추산](../docs/ml/SPROUT_COST_ESTIMATION.md) |
 | EV-09 | RouterArena 해결률 실측 (계획서 E4) | – | 보류(10-13) | 층화 표본 약 1,000문항을 서비스 후보로 호출. API 비용 때문에 팀원과 협의한 뒤 결정 | 같음 |
