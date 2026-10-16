@@ -1,5 +1,7 @@
 """Contract tests for the C0/C1/C2/C3 cache experiment harness; synthetic rows only."""
 import json
+import re
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -430,8 +432,15 @@ class ConfigTest(unittest.TestCase):
         for spec in config["inputs"].values():
             self.assertRegex(spec["sha256"], r"^[0-9a-f]{64}$")
 
-    def test_config_matches_backend_application_yml(self):
-        text = (ROOT.parent / "backend/src/main/resources/application.yml").read_text()
+    def test_config_matches_recorded_backend_application_yml(self):
+        # run001 reproduced the C3 settings of the main commit recorded in the config. Production later moved to the
+        # NLI gate (PR #59), so compare against that recorded commit rather than today's application.yml.
+        commit = re.search(r"main ([0-9a-f]{7,40})", ce.load_config()["operational_settings_source"]).group(1)
+        try:
+            text = subprocess.run(["git", "-C", str(ROOT.parent), "show", f"{commit}:backend/src/main/resources/application.yml"],
+                                  check=True, capture_output=True, text=True).stdout
+        except (OSError, subprocess.CalledProcessError):
+            self.skipTest(f"git history with main {commit} is not available")
         for needle in ("candidate-limit: 5", "easy: 0.80", "medium: 0.80", "hard: 0.80",
                        "similarity-threshold: 0.8774", "score-threshold: 0.03581769", "mode: ${RERANK_MODE:enforce}"):
             self.assertIn(needle, text)
