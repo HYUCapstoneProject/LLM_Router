@@ -1,5 +1,7 @@
 # 성능 평가 색인
 
+> **실험 코드와 전체 목록:** [실험 목록](../REGISTRY.md). 실험을 가리킬 때는 그 코드(예: RT-05, RF-03)를 쓴다.
+
 > **2026-10-01 데이터 오류 경고:** RouterBench·xRouteBench의 기록 점수에서 체계적인 채점 오류를 발견했다(RouterBench GSM8K 등급 점수, MMLU 정답 키 오류, xRouteBench 형식 오답 처리, SQuAD F1 기준). 아래 2026-09 실험은 모두 오류가 포함된 v1 데이터 기준이다. 현재 기준은 v1을 유지하며, v2는 교체용으로 보관한다(재실험 여부 보류). → [점검 보고서와 검증 데이터셋 v2](benchmark-outcome-audit-20261001/REPORT.md)
 
 2026-10-14 추가 (캐시 판정 교체, Notion 15번): [대화형 300그룹 C3 평가·진단·판정기 비교](../cache-natural-v1/REPORT.md), [D2 재현본](../d2-replica-v1/REPORT.md), [NLI 도입 방식](../nli-adoption-v1/REPORT.md), [차이 문장 NLI·모델 7종](../nli-diff-v1/REPORT.md), [GPTCache 0.1.44 실제 실행](../gptcache-baseline-v1/REPORT.md), [배포 구성의 동결 기준 재평가](../cache-eval-v2/REPORT.md). 질문·벤치마크 원문은 Git에 넣지 않았다.

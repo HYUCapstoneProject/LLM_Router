@@ -1,5 +1,7 @@
 # 임베딩 계약과 캐시 임계값 실측
 
+실험 코드: **CA-01** · [실험 목록](../../REGISTRY.md)
+
 측정일: 2026-08-16
 대상: 배포된 FastAPI `/router/embed` (`bge-large-en-v1.5`)
 질문셋: `experiments/questions-v2.json` 92문항

@@ -458,9 +458,11 @@ A의 운영 후보 선정 완료가 B의 논문 비교 완료를 뜻하지 않�
 | ModernBERT + R0 CE | 필수 | 기본 난이도 분류기 |
 | ModernBERT + R1 success | 필수 | 후보별 성공 예측 |
 | ModernBERT + R2 pairwise | 필수 | 후보 간 상대 품질 예측 |
-| RouterDC, 동일 세 후보 | 필수 논문 비교 1개 | 공식 방식과의 직접 비교 |
+| 논문 라우터 8종 (EV-10) | 필수 | kNN 효용 라우터(+MLP·SVM), MF, RouterDC, GraphRouter, Hybrid LLM, IRT-Router, RouteLLM-BERT(공개본·재학습본), Avengers-Pro. [최종 실험 계획서](ROUTER_FINAL_EXPERIMENT_PLAN.md) 4.1절 |
 | RoBERTa-base + CE | 자원 여유 후 우선 확장 | 근접 규모 backbone 비교 |
-| GraphRouter, CARROT, R3 regret | 선택 확장 | 다른 구조·학습 목표의 추가 검증 |
+| R3 regret | 선택 확장 | G1 분할 안에서만 비교 |
+
+2026-10-16부터 남은 실험의 비교군은 [최종 실험 계획서](ROUTER_FINAL_EXPERIMENT_PLAN.md)가 우선한다. 단계는 원천마다 모델 집단으로 정의하고, 우리 쪽은 R0-집단·R1-집단·R1-BGE로 비교한다. 위 표의 R0 CE·R1 success·R2 pairwise 행은 9월 비교(RT-05)의 기록이다.
 
 DeBERTa·Qwen 등 이전의 광범위한 backbone sweep은 최종 최소 범위가 아니다. RouteLLM 원형의 두 후보 비교도 3-action 방법을 사용할 수 없는 경우에만 별도 두 후보 실험으로 둔다. 이미 존재하는 구현과 notebook은 연구 선택지를 보존한 것이며 전부 실행하라는 지시가 아니다.
 
@@ -665,7 +667,7 @@ always-high의 주 지표는 기록된 답변 품질·비용이다. 모든 난�
 <a id="routing-8"></a>
 ### 3.8. 논문 라우터
 
-**2026-09-30 재설계 초안.** 최근 문헌(라우팅 정체·쏠림 연구)을 반영해 논문 비교 대상을 kNN 효용 라우터·RouteLLM-MF·IRT-Router·CARROT·RouterDC·EquiRouter로 넓히는 [논문 라우터 비교 실험 계획서](ROUTER_COMPARISON_EXPERIMENT.md)를 작성했다. 사용자가 계획서 9절의 결정 항목을 확정하기 전까지 아래 기존 계약을 유지하며, 확정 후 이 절과 3.3절 표를 갱신한다.
+**2026-09-30 재설계 초안.** 최근 문헌(라우팅 정체·쏠림 연구)을 반영해 논문 비교 대상을 kNN 효용 라우터·RouteLLM-MF·IRT-Router·CARROT·RouterDC·EquiRouter로 넓히는 [논문 라우터 비교 실험 계획서](ROUTER_COMPARISON_EXPERIMENT.md)를 작성했다. 사용자가 계획서 9절의 결정 항목을 확정하기 전까지 아래 기존 계약을 유지하며, 확정 후 이 절과 3.3절 표를 갱신한다. 2026-10-13 사용자 결정으로 비교는 그대로 하되, 평가는 [라우터 평가 계획서](ROUTER_EVALUATION_V2_PLAN.md)의 통일 기준을 따른다. 2026-10-16에 비교 대상·평가 기준·학습 데이터를 모두 확정해 [최종 실험 계획서](ROUTER_FINAL_EXPERIMENT_PLAN.md) 4절(EV-10)로 합쳤다. 아래 RouterDC·선택 확장 계약은 이전 계획이며, 내용이 다르면 최종 계획서를 따른다.
 
 <a id="routing-routerdc-첫-공식-비교군"></a>
 #### RouterDC: 첫 공식 비교군
@@ -1325,7 +1327,7 @@ R0/R1/R2의 개발 검증 우승 방법과 즉시 운영 가능한 package는 �
 | 6 | 방법별 이미지 digest→IR→config/data SHA 고정·게시 | smoke gate·빈 baseline·미확정 정책을 차단하고 새 immutable 객체로 보존 | 방법별 코드 확정 후 |
 | 7 | 실제 서버 환경·지연·메모리·연결 및 재학습 E2E | 202→학습→gate→CURRENT→실제 적재, 실패·재시도·rollback 검증 | 서버 배포 후 |
 
-**2026-09-27 변경: 기존 큰 A 데이터로 R0 학습한 ModernBERT를 초기 서비스 및 재학습의 출발점으로 채택한다.** 이 결정은 9월 26일의 R1 운영 우선 방침을 대체한다. R1 관측 수집·재학습은 연구 브랜치에 보존하고 운영 범위에서 보류한다. R1→R0 전환 학습이 아니며 기존 R0 체크포인트의 실제 manifest·SHA·데이터 이력을 확인해 사용한다. 학습 길이 512 이력은 유지하고 추론·승격 비교는 8192로 검증한다. 출발 모델 보존 기록은 A train 21,406·dev 3,581·2,007 step의 `modernbert-initial-v1-20260924`이며, archive·weights SHA와 재검증 경계는 [사용자 인계](R0_USER_HANDOFF.md#출발-모델)에 기록한다. 향후 R0↔R1 전환 때 기존 API 경로·요청·응답 필드를 바꾸지 않는다. Spring은 기존 `/router/classify`와 feedback API를 계속 사용하고 서버 내부의 모델·loss·정책·설정만 전환한다. v2 상세 진단 경로가 존재해도 서비스 연결의 필수 조건으로 만들지 않는다.
+**2026-09-27 변경: 기존 큰 A 데이터로 R0 학습한 ModernBERT를 초기 서비스 및 재학습의 출발점으로 채택한다.** 이 결정은 9월 26일의 R1 운영 우선 방침을 대체한다. R1 관측 수집·재학습은 연구 브랜치에 보존하고 운영 범위에서 보류한다. R1→R0 전환 학습이 아니며 기존 R0 체크포인트의 실제 manifest·SHA·데이터 이력을 확인해 사용한다. 학습 길이 512 이력은 유지하고 추론·승격 비교는 8192로 검증한다. 출발 모델 보존 기록은 A train 21,406·dev 3,581·2,007 step의 `modernbert-initial-v1-20260924`이며, 보존 archive는 `gs://llm-router-mlserver/training-runs/initial-v1-20260924-2cee27e/final-model.tar`(SHA-256 `d15da837971f5535f1f96dcbe036717d066e339afad923d449c8a74e5a041e4f`), weights SHA-256은 `e1a40fec7d269d8f925b5391e4f5e75df5d0fedbb1e37b4eea96521e27b1a6a7`이며 2026-09-27 GCS에서 다시 받아 artifact manifest의 7개 파일 SHA와 함께 검증했다. 향후 R0↔R1 전환 때 기존 API 경로·요청·응답 필드를 바꾸지 않는다. Spring은 기존 `/router/classify`와 feedback API를 계속 사용하고 서버 내부의 모델·loss·정책·설정만 전환한다. v2 상세 진단 경로가 존재해도 서비스 연결의 필수 조건으로 만들지 않는다.
 
 **9월 27일 실행 상태:** 기존 A R0의 archive·7개 파일 SHA를 검증하고, D_dev에서 먼저 동결한 기준으로 D_gate 3,581건을 실제8192 평가했다. 정확도59.76%, macro-F1 0.50825로 초기 등록의9개 기준을 통과했다. D_dev conversation8건은 사전 소표본 정책에 따라 보고 전용이며 대화 품질은 미검증이다. 새 R0 registry에 `router-modernbert-r0-a-20260927-v1`을 논리1.0·initial_training으로 승인 등록했고 승인manifest SHA는 `68dd3b9cd5c13bd5275e4d0ac05fcfbc7f8c7e1e9d112908d5181873590ad1d2`다. 실제 승인 baseline에 결합한 normal release 설정·보호 데이터18개 객체를 GCS에 게시하고 원격 재읽기 SHA를 확인했다. [검증 원본과 상태](../../experiments/results/r0-production-qualification-20260927/REPORT.md)에 기록한다. 이미지5개는 amd64 로컬 빌드·검사 완료이며 원격 digest·새 IR·실제 VM8192/재학습 인수는 남는다. 현재 운영 VM은 여전히8월 R0와 이전설정을 사용하므로 **GCS 등록을 운영 배포 완료로 해석하지 않는다.** 원본 작업 디렉터리의 미커밋 실험 코드는 변경하지 않았다.
 
@@ -1372,7 +1374,7 @@ R0 교체 브랜치의 실제 입력·CLI·Spring/FastAPI 설정 계약은 [R0 r
 | 공정한 기준선·논문 비교 | source-only B의 실제 공통 세 후보에서 TF-IDF, BGE+kNN, ModernBERT 및 RouterDC를 같은 조건으로 비교한다. finalist 추가 seed, confidence 보정, group bootstrap을 마무리한다. |
 | 인지 수준·최종 보고서 | blind 주석·통제 문항쌍과 사람 검증을 수행하고, 난이도 label 일치·후보 선택 품질·인지 정렬을 분리해 재현 가능한 보고서와 그림을 완성한다. |
 
-권장 실행 순서는 **R0 공통·운영 코드 통합 → 운영 인수1~5 → 재학습 효과 → 캐시 → 외부 일반화·논문 비교 보완**이다. 독립적인 데이터 적합성 조사·보고서 정리는 병렬로 진행할 수 있다. 사용자가 직접 확인할 작업과 Spring 담당자 인계는 [R0 사용자 인계](R0_USER_HANDOFF.md)에 정리한다. R1의 연구 선정 결과는 그대로 보존하며 운영 선택 변경을 실험 우승 변경으로 표현하지 않는다.
+권장 실행 순서는 **R0 공통·운영 코드 통합 → 운영 인수1~5 → 재학습 효과 → 캐시 → 외부 일반화·논문 비교 보완**이다. 독립적인 데이터 적합성 조사·보고서 정리는 병렬로 진행할 수 있다. Spring 배포 설정과 DB 적용 순서는 [배포 안내](../../infra/DEPLOY.md)와 [공통 Spring 인계](SPRING_COMMON_HANDOFF.md)를 따른다. R1의 연구 선정 결과는 그대로 보존하며 운영 선택 변경을 실험 우승 변경으로 표현하지 않는다.
 
 <a id="r0-promotion-thresholds"></a>
 ### 5.13. R0 1.0의 승격 하한선과 산정 근거

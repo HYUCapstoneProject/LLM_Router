@@ -11,6 +11,8 @@
 | 이전 설정이 왜 바뀌었는지·과거 결과·원문 복구 | [Deprecated settings](deprecated-settings.md) |
 | ML 설치·CLI·코드 탐색 | [ML 실행 진입점](../ml/README.md) |
 | Spring·React·DB 배포 절차 | [배포 안내](../infra/DEPLOY.md) |
+| 실험 코드·실험별 상태·결과 위치 | [실험 목록](../experiments/REGISTRY.md) |
+| 남은 라우터 실험의 최종 계획(RT-08·EV-10) | [라우터 최종 실험 계획서](ml/ROUTER_FINAL_EXPERIMENT_PLAN.md) |
 | 기존 서비스·라우터 실측과 원본 결과 | [과거 평가 색인](../experiments/results/README.md) |
 | Serving 설치·운영·GCS·Vertex 연결 | [Serving 실행 안내](../../LLM_Router-serving/README.md) |
 | 현재 HTTP 요청·응답·오류·관측 계약 | [Serving API 계약](../../LLM_Router-serving/docs/api-contract.md) |
@@ -106,6 +108,6 @@ flowchart LR
 
 ## 문서를 다시 늘리지 않는 원칙
 
-새 결정은 memorize와 위 표의 해당 문서에 반영한다. 같은 정책을 설명하는 별도 최신 계획·보고서·체크리스트를 만들지 않는다. 현재 설계의 변경은 소유 문서를 직접 수정하고, 대체된 설정의 이유와 전환 조건만 [Deprecated settings](deprecated-settings.md)에 짧게 추가한다. 과거 문서 전문·회의별 사본·날짜별 설정 파일은 Git에서 조회한다. `main`에서 합류한 [PLAN](../PLAN.md)·[HANDOFF](../HANDOFF.md)는 당시 기록으로, 기존 `experiments/results`는 관측 증거로 보존하며 최신 명세와 경쟁하는 계획으로 갱신하지 않는다.
+새 결정은 memorize와 위 표의 해당 문서에 반영한다. 같은 정책을 설명하는 별도 최신 계획·보고서·체크리스트를 만들지 않는다. 현재 설계의 변경은 소유 문서를 직접 수정하고, 대체된 설정의 이유와 전환 조건만 [Deprecated settings](deprecated-settings.md)에 짧게 추가한다. 과거 문서 전문·회의별 사본·날짜별 설정 파일은 Git에서 조회한다. `main`에서 합류했던 8월 PLAN·HANDOFF는 2026-10-13에 삭제했으며 원문은 `git show 3c10d04:PLAN.md`·`git show 3c10d04:HANDOFF.md`로 조회한다. 기존 `experiments/results`는 관측 증거로 보존하고 최신 명세와 경쟁하는 계획으로 갱신하지 않는다.
 
 문서 압축 과정에서는 원본 데이터·가중치·로그와 재현용 fixture를 삭제하지 않았다. 함께 통합한 선택 실행용 실험 코드의 현재 지원 범위는 ML 명세의 구현 차이 표를 따른다. 문서·코드 통합을 운영 배포나 최종 실험 완료로 간주하지 않는다. Agent 지침은 로컬에, 컴포넌트별 실행 진입점은 각 패키지에 유지한다.

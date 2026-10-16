@@ -1,5 +1,7 @@
 # R0 운영 출발 모델 등록 검증 — 2026-09-27
 
+실험 코드: **SY-01** · [실험 목록](../../REGISTRY.md)
+
 기존 A(RouterBench+xRouteBench train 21,406)의 final checkpoint를 재학습 없이 사용한다. 추론·평가는 8192이며 원래 학습512 기록과 가중치는 보존했다. 원본 archive와 manifest의7개 파일 SHA를 재확인했다.
 
 D_dev 3,581건의 기존 CUDA/fp32/eager/8192 score는 모델·데이터·파일 SHA와 sample ID 및 원본25개 공통열 일치를 확인해 재사용했다. D_dev group bootstrap1,000회·seed42의 pointwise95% 하단을 D_gate 실행 전에 동결했다. 다중비교 보정이나 서비스 품질보장이 아니며, D_dev가 모델 개발에 사용됐다는 한계가 있다.

@@ -1,5 +1,7 @@
 # 라우터 분류 성능 실측
 
+실험 코드: **RT-01** · [실험 목록](../../REGISTRY.md)
+
 측정일: 2026-08-16 (개방형 질문), 2026-08-30 (RouterBench held-out)
 대상: 배포된 FastAPI `/router/classify`
 모델: `router-modernbert-base-routerbench-20260814-45dcc6d`
@@ -125,7 +127,7 @@ out-of-domain 이다. 같이 보면 **"학습 분포를 벗어나면 무너진�
 이야기가 된다. 재학습 시 개방형 질문 데이터를 넣어야 한다는 근거다.
 
 **(4) 시연에서 즉흥 질문을 쓰면 안 된다.** 검증된 질문셋이
-`PLAN.md` §5-0 에 있다(easy 는 confidence 0.93~0.97 로 안정적, hard 는
+`PLAN.md` §5-0(2026-10-13 삭제, `git show 3c10d04:PLAN.md`)에 있다(easy 는 confidence 0.93~0.97 로 안정적, hard 는
 0.52~0.64 로 맞지만 확신이 낮다).
 
 ## 6. 재현

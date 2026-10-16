@@ -1,5 +1,7 @@
 # exact match 캐시 계층 실측
 
+실험 코드: **CA-04** · [실험 목록](../../REGISTRY.md)
+
 측정일: 2026-08-30
 대상: **배포된 운영 스택** (Cloud Run → nginx → GCE Spring → PostgreSQL/pgvector)
 관련 커밋: `90358d1`, 마이그레이션 `05-exact-match-cache.sql`
