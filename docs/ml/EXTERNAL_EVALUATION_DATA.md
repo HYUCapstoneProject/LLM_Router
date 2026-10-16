@@ -108,10 +108,12 @@ MMLU-Pro 중복이 많은 이유는 MMLU-Pro가 **원래 MMLU 문항에 선택�
 
 ## 6. 사용 규칙
 
+> **2026-10-16 변경:** LLMRouterBench·SPROUT를 EV-10의 학습에도 쓰기로 했다([라우터 최종 실험 계획서](ROUTER_FINAL_EXPERIMENT_PLAN.md) 2.4절). 기존 calibration 30% / test 70%는 test를 연 적이 없으므로 버리고, 중복 묶음 단위로 train 50 / dev 15 / test 35로 다시 나눈다. RouterArena와 겹치는 700문항과 LLMRouterBench 판정 선호 진단(arenahard)은 학습에 넣지 않고 test에 둔다. RouterArena는 평가 전용으로 유지한다. 아래 규칙 1의 "calibration"은 새 dev로 읽고, 규칙 2·4는 이 변경에 맞춰 고쳤다.
+
 1. test 세트는 평가 방식·후보 세 개·판정 기준을 calibration에서 모두 고정한 뒤 **한 번만** 평가한다.
-2. 새 풀의 세 모델을 low/medium/high에 넣은 결과를 **기존 RB/xRB 결과의 외부 성능**이라고 보고하지 않는다. "다른 모델 풀로의 전이" 평가다.
+2. 새 풀의 결과를 **기존 RB/xRB 결과의 외부 성능**이라고 보고하지 않는다. 10-16부터 단계는 원천마다 모델 집단(최종 계획서 2.1절)으로 정의하며, "A만 학습한 버전"의 결과만 "다른 모델 풀로의 전이"로 부른다.
 3. 주 평가(새 계열)와 같은 계열·판정 진단·SPROUT 결과를 합산하지 않고 따로 보고한다.
-4. SPROUT은 비용 지표 없이 품질·라벨 정렬만 보고한다. 데이터 저자 단가표로 비용을 추산하는 방법을 [SPROUT 비용 추산](SPROUT_COST_ESTIMATION.md)에서 검토 중이며, 확정되면 이 항목을 고친다.
+4. 평가 비용은 모든 원천에서 서비스 가격 비율(Haiku:Sonnet:Opus = 1:3:5)로 통일한다(최종 계획서 2.3절). SPROUT의 데이터 저자 단가표 비용([SPROUT 비용 추산](SPROUT_COST_ESTIMATION.md))은 모델을 가격대 집단으로 나눌 때만 쓴다.
 5. 라우터 평가는 전체(8,192 이내)로 하고, 캐시와 함께 보는 서비스 경로 결과는 `within_cache_embed_limit=true` 부분집합으로 따로 보고한다.
 6. 공개 모델 결과이므로 Claude 서비스의 실제 성공률로 해석하지 않는다.
 

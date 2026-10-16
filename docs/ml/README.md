@@ -458,9 +458,11 @@ A의 운영 후보 선정 완료가 B의 논문 비교 완료를 뜻하지 않�
 | ModernBERT + R0 CE | 필수 | 기본 난이도 분류기 |
 | ModernBERT + R1 success | 필수 | 후보별 성공 예측 |
 | ModernBERT + R2 pairwise | 필수 | 후보 간 상대 품질 예측 |
-| RouterDC, 동일 세 후보 | 필수 논문 비교 1개 | 공식 방식과의 직접 비교 |
+| 논문 라우터 8종 (EV-10) | 필수 | kNN 효용 라우터(+MLP·SVM), MF, RouterDC, GraphRouter, Hybrid LLM, IRT-Router, RouteLLM-BERT(공개본·재학습본), Avengers-Pro. [최종 실험 계획서](ROUTER_FINAL_EXPERIMENT_PLAN.md) 4.1절 |
 | RoBERTa-base + CE | 자원 여유 후 우선 확장 | 근접 규모 backbone 비교 |
-| GraphRouter, CARROT, R3 regret | 선택 확장 | 다른 구조·학습 목표의 추가 검증 |
+| R3 regret | 선택 확장 | G1 분할 안에서만 비교 |
+
+2026-10-16부터 남은 실험의 비교군은 [최종 실험 계획서](ROUTER_FINAL_EXPERIMENT_PLAN.md)가 우선한다. 단계는 원천마다 모델 집단으로 정의하고, 우리 쪽은 R0-집단·R1-집단·R1-BGE로 비교한다. 위 표의 R0 CE·R1 success·R2 pairwise 행은 9월 비교(RT-05)의 기록이다.
 
 DeBERTa·Qwen 등 이전의 광범위한 backbone sweep은 최종 최소 범위가 아니다. RouteLLM 원형의 두 후보 비교도 3-action 방법을 사용할 수 없는 경우에만 별도 두 후보 실험으로 둔다. 이미 존재하는 구현과 notebook은 연구 선택지를 보존한 것이며 전부 실행하라는 지시가 아니다.
 
@@ -665,7 +667,7 @@ always-high의 주 지표는 기록된 답변 품질·비용이다. 모든 난�
 <a id="routing-8"></a>
 ### 3.8. 논문 라우터
 
-**2026-09-30 재설계 초안.** 최근 문헌(라우팅 정체·쏠림 연구)을 반영해 논문 비교 대상을 kNN 효용 라우터·RouteLLM-MF·IRT-Router·CARROT·RouterDC·EquiRouter로 넓히는 [논문 라우터 비교 실험 계획서](ROUTER_COMPARISON_EXPERIMENT.md)를 작성했다. 사용자가 계획서 9절의 결정 항목을 확정하기 전까지 아래 기존 계약을 유지하며, 확정 후 이 절과 3.3절 표를 갱신한다. 2026-10-13 사용자 결정으로 비교는 그대로 하되, 평가는 [라우터 평가 계획서](ROUTER_EVALUATION_V2_PLAN.md)의 통일 기준을 따른다. 2026-10-16에 비교 대상과 평가 기준을 확정해 계획서를 개정했다. 아래 RouterDC·선택 확장 계약과 3.3절 표는 계획서 10절의 남은 결정이 확정되면 계획서에 맞춰 고친다.
+**2026-09-30 재설계 초안.** 최근 문헌(라우팅 정체·쏠림 연구)을 반영해 논문 비교 대상을 kNN 효용 라우터·RouteLLM-MF·IRT-Router·CARROT·RouterDC·EquiRouter로 넓히는 [논문 라우터 비교 실험 계획서](ROUTER_COMPARISON_EXPERIMENT.md)를 작성했다. 사용자가 계획서 9절의 결정 항목을 확정하기 전까지 아래 기존 계약을 유지하며, 확정 후 이 절과 3.3절 표를 갱신한다. 2026-10-13 사용자 결정으로 비교는 그대로 하되, 평가는 [라우터 평가 계획서](ROUTER_EVALUATION_V2_PLAN.md)의 통일 기준을 따른다. 2026-10-16에 비교 대상·평가 기준·학습 데이터를 모두 확정해 [최종 실험 계획서](ROUTER_FINAL_EXPERIMENT_PLAN.md) 4절(EV-10)로 합쳤다. 아래 RouterDC·선택 확장 계약은 이전 계획이며, 내용이 다르면 최종 계획서를 따른다.
 
 <a id="routing-routerdc-첫-공식-비교군"></a>
 #### RouterDC: 첫 공식 비교군

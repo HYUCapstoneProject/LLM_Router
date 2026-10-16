@@ -112,3 +112,14 @@ git show 1ad9c89:docs/retraining-observability-plan.md
 | `docs/ml/R0_USER_HANDOFF.md` | 9/27 R0 운영 인계의 일회성 할 일 목록 | 출발 모델 SHA는 ML 명세 5.11절, Spring 배포는 [배포 안내](../infra/DEPLOY.md)·[공통 Spring 인계](ml/SPRING_COMMON_HANDOFF.md) |
 | `frontend/README.md` | 내용 없는 자리표시(`# front`) | – |
 
+## 2026-10-16 라우터 실험 설계 변경
+
+남은 라우터 실험의 기준은 [라우터 최종 실험 계획서](ml/ROUTER_FINAL_EXPERIMENT_PLAN.md)다. 대체된 설정과 이유만 적는다.
+
+| 이전 설정 | 바뀐 설정 | 이유 |
+|---|---|---|
+| 단계 = 원천마다 대표 모델 1개(train Pareto 규칙) | 단계 = 원천마다 가성비 경계 근처 모델을 가격대 셋으로 묶은 모델 집단 | 일반화된 상·중·하를 Claude 세 단계에 잇는다는 원래 목표에 맞추고, 모델 하나의 우연한 정답·오답에 덜 흔들리게 |
+| 비용 = 데이터 속 모델의 실제·추정 비용(단계 간 17~88배) | 비용 = 서비스 가격 비율 Haiku:Sonnet:Opus = 1:3:5, 단계별 고정(길이 반영은 민감도) | 라우터가 실제로 고르는 것은 Claude 세 단계이고, 데이터 비용은 원천마다 극단적으로 달라서 |
+| LLMRouterBench·SPROUT는 평가 전용(calibration 30% / test 70%) | train 50 / dev 15 / test 35로 다시 나눠 train을 학습에 씀. RouterArena는 평가 전용 유지 | 새 세대 모델(2025)과 서비스형 질문을 학습에 반영하려고. test는 연 적이 없어 다시 나눌 수 있었다 |
+| 라우터 평가 계획서(E1~E4)와 논문 라우터 비교 계획서(EV-06)를 따로 둠 | 최종 실험 계획서 하나(RT-08·EV-10). EV-06·07·08은 EV-10으로 통합 | 왜·무엇을·어떻게를 한 문서에서 보도록. 이전 두 문서는 맨 위에 안내를 달고 남겨 두었다 |
+
