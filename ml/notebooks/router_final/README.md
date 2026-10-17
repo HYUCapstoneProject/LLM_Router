@@ -13,6 +13,7 @@
 | `06_routellm_released` | 구현 | RouteLLM-BERT 공개본 점수 |
 | `07a_score_ours` | 구현 | 03·02 ModernBERT 모델의 dev·test·RouterArena 점수 |
 | `07b_lock` | 구현 | 설정 선택·보정·결정 규칙 고정. 여기서 멈추고 보고 |
+| `08a_latency` | 구현 | 라우팅 지연(CPU 주, T4 참고). 07b 뒤 |
 | `08_test` ~ `10_report` | 예정 | 계획서 4.5절 |
 
 ## 00_prepare
@@ -141,3 +142,14 @@ python ml/notebooks/router_final/common_track.py run --run-dir <run001> --extern
 - **출력:** `selection-lock.json`(선택 설정, ρ, 비용 목표, λ 표, 규칙, 의존 파일 SHA), `calibrated/<방법>.parquet`(dev·test 단계별 확률), `selection-table.parquet`(모든 설정의 dev 근거), `lock-summary.md`.
 
 dev 점수 SHA는 각 단계의 manifest와 대조하며, 빠진 점수가 있으면 멈춘다(`--allow-missing`은 시험용). 07b가 끝나면 lock 요약을 보고하고 확인을 받은 뒤 08로 간다. 소스는 `router-final-source-lock.zip`이다(운영 R0 점수 파일 포함).
+
+## 08a_latency
+
+`routing_latency.py`가 07b lock에서 고른 라우터마다 **질문 원문 → 시작 단계** 시간을 잰다(계획서 2.5). 같은 Colab 세션에서 dev 200문항(원천마다 50, sample_id 해시로 고정)을 한 문항씩, 워밍업 20문항 뒤 측정하고 중앙값·p95를 `latency/latency-<cpu|cuda>.parquet`에 쓴다.
+
+- **나누어 재는 구간:** 인코더(BGE 또는 라우터 자체 인코더), 라우터 본체(이웃 검색·회귀·그래프·묶음 점수 등), 보정과 결정 규칙(isotonic 세 개 + 상향 고려 규칙, 모든 라우터 공통).
+- **BGE 라우터:** `total_with_bge`(BGE 포함)와 `added_given_bge`(서비스가 캐시용으로 BGE를 이미 계산했을 때 더해지는 부분)를 함께 남긴다.
+- **다시 만드는 라우터:** 지연은 구조와 데이터 크기로 정해지므로, 가중치를 남기지 않은 04 본체(같은 클래스·설정·학습 데이터 크기, 짧게 학습)와 05 인코더(같은 구조)는 다시 만들어 잰다. ModernBERT(03·RT-08)와 RouteLLM 공개본은 실제 가중치를 쓴다. 운영 R0의 8,192토큰 조건은 같은 구조의 RT-08 가중치로 따로 잰다.
+- **GraphRouter:** 원본 추론처럼 새 질문을 학습 그래프에 붙여 그래프 전체를 한 번 계산한다.
+- 로컬 시험(Mac CPU, 문항 12개): BGE-large 인코딩 약 300ms, ModernBERT R1-집단 약 130ms, BGE 라우터 본체는 MLP·SVM·MF·R1-BGE 1ms 미만, kNN 약 37ms, IRT 약 25ms, GraphRouter 공식 약 53ms·LLMRouter 판 약 141ms였다. 값은 장비에 따라 다르므로 Colab 한 세션의 값만 비교한다.
+- 소스는 `router-final-source-latency.zip`이다.
