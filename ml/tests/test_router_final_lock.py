@@ -1,3 +1,4 @@
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -91,6 +92,28 @@ class CalibrationTest(unittest.TestCase):
         ids = [f"q{i}" for i in range(50)]
         self.assertEqual(L.fold_of(ids).tolist(), L.fold_of(ids).tolist())
         self.assertEqual(set(L.fold_of(ids)), set(range(L.FOLDS)))
+
+
+class EnglishOnlyTest(unittest.TestCase):
+    def test_exclusion_list_holds_ids_only(self):
+        table = pd.read_csv(ROOT.parent / L.NON_ENGLISH)
+        self.assertEqual(list(table.columns),
+                         ["sample_id", "source_dataset", "role", "source_family", "slice", "dominant_script"])
+        self.assertTrue(table.sample_id.is_unique)
+        self.assertTrue(table.role.isin(["dev", "test", "diagnostic"]).all())
+        ids, record = L.english_exclusions(ROOT.parent)
+        self.assertEqual(len(ids), record["rows"])
+        self.assertEqual(sum(record["by_source_role"].values()), len(ids))
+        self.assertIn("llmrouterbench/test", json.loads(json.dumps(record))["by_source_role"])
+
+    def test_duplicate_ids_are_refused(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / L.NON_ENGLISH
+            path.parent.mkdir(parents=True)
+            pd.DataFrame({"sample_id": ["a", "a"], "source_dataset": ["s", "s"], "role": ["test", "test"]}).to_csv(path, index=False)
+            with self.assertRaises(SystemExit):
+                L.english_exclusions(Path(tmp))
 
 
 if __name__ == "__main__":
