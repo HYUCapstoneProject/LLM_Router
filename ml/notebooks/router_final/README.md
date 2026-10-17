@@ -137,6 +137,7 @@ python ml/notebooks/router_final/common_track.py run --run-dir <run001> --extern
 - **어댑터:** 원천·단계별 isotonic 회귀. 분류 출력(R0-집단, RT-08, 운영 R0)은 먼저 train의 "분류별 단계 성공률" 표를 곱하고, 점수 하나만 내는 방법(Hybrid LLM, RouteLLM)은 그 점수를 세 단계에 함께 쓴다. 설정 선택과 λ에는 dev 5분할 교차 보정을, test 적용에는 dev 전체로 맞춘 보정을 쓴다.
 - **ρ:** EV-05와 같은 식을 dev의 집단 풀 확률에 적용한 원천별 단계 간 실패 상관이다.
 - **비용 목표:** 원천마다 가장 싼·가장 비싼 고정 시작 단계의 기대 비용 사이 25·50·75% 지점이다(계획서 2.5, 10-17 확정). 상향이 반드시 따라와서 .25·.5는 대부분 원천에서 도달할 수 없기 때문이다.
+- **길이 반영 민감도:** 질문마다 비용 = 단계 가격 × L / (원천 dev의 L 평균), L = 입력 토큰 + 5 × 출력 토큰 중앙값. 입력은 `length_inputs.py`(로컬, 원본 데이터 필요)가 만든 `run001/length-inputs/`이고, 07b가 SHA를 확인한다. 선택된 설정마다 이 비용의 비용 목표와 λ 표를 만든다(`sensitivity_length`). 설정의 이유와 나중에 점검할 것은 계획서 2.3에 있다.
 - **집단 가격 민감도:** 단계 비용을 Claude 1:3:5 대신 집단 모델의 평균 데이터 가격(`prepare/groups.json`, high = 1)으로 바꿔, 선택된 설정마다 비용 목표와 λ 표를 한 번 더 만든다(`sensitivity_group_price`). 설정 선택은 1:3:5로만 한다. groups.json의 모델 목록은 봉인된 00_prepare manifest와 대조한다.
 - **λ 표:** (원천, 규칙, κ, 비용 수준)마다 dev 기대 비용이 목표에 가장 가까운 λ다. 규칙은 상향 고려와 한 번에 고르기이고, 갈래 ②의 τ 규칙(τ = .8, 곡선 .5~.95)은 λ가 필요 없다.
 - **설정 선택:** 상향 고려 규칙의 (최종 해결 − κ × 실패 횟수)에서, 같은 dev 비용에서 고정 시작 단계(혼합 포함)가 낼 수 있는 가장 좋은 값을 뺀 "이득"을 원천·κ 격자·비용 수준에 걸쳐 평균하고, 가장 큰 설정을 고른다.
@@ -145,6 +146,14 @@ python ml/notebooks/router_final/common_track.py run --run-dir <run001> --extern
 - **출력:** `selection-lock.json`(선택 설정, ρ, 비용 목표, λ 표, 규칙, 의존 파일 SHA), `calibrated/<방법>.parquet`(dev·test 단계별 확률), `selection-table.parquet`(모든 설정의 dev 근거), `lock-summary.md`.
 
 dev 점수 SHA는 각 단계의 manifest와 대조하며, 빠진 점수가 있으면 멈춘다(`--allow-missing`은 시험용). 07b가 끝나면 lock 요약을 보고하고 확인을 받은 뒤 08로 간다. 소스는 `router-final-source-lock.zip`이다(운영 R0 점수 파일과 영어 제외 목록 포함).
+
+## length_inputs (길이 반영 민감도 입력, 로컬)
+
+`length_inputs.py build`가 dev·test 문항마다 입력 토큰(라우터 토크나이저, 자르지 않음)과 출력 토큰 중앙값(그 질문에 답한 데이터 모델 전부)을 `run001/length-inputs/lengths.parquet`에 쓴다. 정답 여부는 쓰지 않는다. 출력 길이는 LLMRouterBench `completion_tokens`, SPROUT `num_output_tokens`, xRouteBench `output_tokens`이고, RouterBench는 답 원문을 같은 토크나이저로 센다. 원본 데이터가 있는 checkout에서 한 번 실행한다(약 30초).
+
+```
+python ml/notebooks/router_final/length_inputs.py --run-dir <run001> --repo . --output-dir <run001>/length-inputs
+```
 
 ## 08a_latency
 
@@ -163,7 +172,7 @@ dev 점수 SHA는 각 단계의 manifest와 대조하며, 빠진 점수가 있�
 
 - **입력 확인:** lock이 시험 실행(빠진 점수)이 아닌지, 보정 파일·영어 제외 목록·00 test 출력의 SHA가 기록과 같은지 확인한다. 출력 폴더 `RUN/test`가 이미 있으면 멈춘다(test는 한 번 연다).
 - **평가 행:** test에서 v2 제외 문항, 영어가 아닌 246건, 집단 풀 확률이 비어 있는 행을 뺀다. 건수는 `manifest.json`의 `counts`에 남는다.
-- **갈래 ①:** 라우터 × 규칙(상향 고려, 한 번에 고르기) × κ 21개 × 비용 수준 3개마다 test 효용(최종 해결 − κ × 실패 횟수)에서 같은 test 비용의 고정 시작 단계(혼합 포함) 값을 뺀 이득. 기준은 Claude 1:3:5(주), 집단 평균 가격(민감도), A test v1 채점(점 추정). oracle(참 확률, λ를 test에서 맞춤)과 운영 R0(A 분할)는 참고용으로만 싣고 순위에 넣지 않는다.
+- **갈래 ①:** 라우터 × 규칙(상향 고려, 한 번에 고르기) × κ 21개 × 비용 수준 3개마다 test 효용(최종 해결 − κ × 실패 횟수)에서 같은 test 비용의 고정 시작 단계(혼합 포함) 값을 뺀 이득. 기준은 Claude 1:3:5(주), 집단 평균 가격·길이 반영(민감도), A test v1 채점(점 추정). oracle(참 확률, λ를 test에서 맞춤)과 운영 R0(A 분할)는 참고용으로만 싣고 순위에 넣지 않는다.
 - **구간:** 질문 묶음 단위 paired bootstrap 10,000회(seed 42). 묶음은 A 분할이 `duplicate_group_id`, 외부 데이터가 `split_group_id`다. 한 원천 안에서는 모든 라우터·규칙·κ·수준이 같은 표본을 쓰고, 원천끼리는 따로 뽑는다. macro는 원천 4개의 평균이다.
 - **κ\*:** 이득 > .01이고 95% 구간 하한 > 0인 가장 작은 κ(`kappa-star.parquet`).
 - **갈래 ②:** τ .5~.95마다 필요 단계 정확도·첫 시도 성공·최종 해결·호출 수·비용. 고정 시작과 "필요 단계에서 시작"도 함께 싣는다. RouterArena와 겹치는 외부 test 문항은 `track2-arena-overlap.parquet`에 따로 낸다.

@@ -9,7 +9,8 @@ dropped, as in 07b.
 Track 1 (cost-aware): for each router, rule (escalation-aware, one-shot), kappa and cost level, the router's test
 value (resolved - kappa x failed attempts) minus the best fixed start tier or mixture at the router's test cost
 (the "gain"). Paired group bootstrap (same draws for every router of a source). kappa* = smallest kappa with gain
-> .01 and a 95% interval above 0. Bases: main (Claude 1:3:5), group_price (sensitivity), v1 (A test, point only).
+> .01 and a 95% interval above 0. Bases: main (Claude 1:3:5), group_price and length (sensitivities, plan 2.3),
+v1 (A test, point only).
 Track 2 (tau rule): start at the cheapest tier with calibrated p >= tau, escalate on failure; needed-tier
 accuracy, first-attempt success, resolution, calls and cost over the tau curve.
 
@@ -337,7 +338,10 @@ def run(run_dir: Path, repo: Path, data_root: Path, output_dir: Path, rehearse: 
     methods = sorted(rec["methods"])
     cal = {m: calibrated(lock["files"][m], frame, role) for m in methods}
     cal["r0_operational"] = calibrated(lock["files"]["r0_operational-group"], frame, role)
-    group_price = ev["sensitivity"]["group_price"]
+    group_price, length_cfg = ev["sensitivity"]["group_price"], ev["sensitivity"]["length"]
+    length, length_info = L.length_table(run_dir)
+    if length_info["sha256"] != length_cfg["lengths_sha256"]:
+        raise SystemExit("length-inputs changed since 07b")
     output_dir.mkdir(parents=True)
 
     track1, fixed_rows, track2, overlap, starts_cols, summaries = [], [], [], [], {}, {}
@@ -348,7 +352,9 @@ def run(run_dir: Path, repo: Path, data_root: Path, output_dir: Path, rehearse: 
         draws = Draws(rows.group_id, iterations, BOOT["seed"], si)
         names = methods + ["oracle"] + (["r0_operational"] if source in A_SOURCES else [])
         bases = {"main": (L.SERVICE_COST, ev["cost_levels"]["targets"][source], P, draws),
-                 "group_price": (np.array(group_price["tier_cost"][source]), group_price["targets"][source], P, draws)}
+                 "group_price": (np.array(group_price["tier_cost"][source]), group_price["targets"][source], P, draws),
+                 "length": (L.length_costs(length, ids, length_cfg["normalizer_mean_dev_length"][source]),
+                            length_cfg["targets"][source], P, draws)}
         if source in A_SOURCES:
             Pv1 = rows[[f"p_v1_{t}" for t in TIERS]].to_numpy(float)
             ok = np.isfinite(Pv1).all(axis=1)
@@ -363,13 +369,13 @@ def run(run_dir: Path, repo: Path, data_root: Path, output_dir: Path, rehearse: 
                     lam, rho = oracle_lambdas(truth_P if basis != "v1" else truth_P[ok], targets, cost), 0.0
                     Phat_b = np.nan_to_num(truth_P)
                 elif name == "r0_operational":
-                    if basis == "group_price":
+                    if basis in ("group_price", "length"):
                         continue
                     lam, rho, Phat_b = lambda_lookup(rec["rt08"]["group"]["models"]["r0_operational"]["lambda"][source]), \
                         rec["rt08"]["group"]["rho"][source], Phat
                 else:
-                    table = rec["methods"][name]["lambda"] if basis != "group_price" else \
-                        rec["methods"][name]["sensitivity_group_price"]["lambda"]
+                    table = {"group_price": rec["methods"][name]["sensitivity_group_price"]["lambda"],
+                             "length": rec["methods"][name]["sensitivity_length"]["lambda"]}.get(basis, rec["methods"][name]["lambda"])
                     lam, rho, Phat_b = lambda_lookup(table[source]), ev["rho"][source], Phat
                 sets = decision_sets(Phat_b, lam, rho, targets, cost)
                 use = slice(None) if basis != "v1" else ok
@@ -452,7 +458,7 @@ def run(run_dir: Path, repo: Path, data_root: Path, output_dir: Path, rehearse: 
 
 def mean_gain_table(summaries: dict, t1: pd.DataFrame) -> pd.DataFrame:
     rows = []
-    for basis in ("main", "group_price"):
+    for basis in ("main", "group_price", "length"):
         by_method = {}
         for (b, source, name), s in summaries.items():
             if b != basis:
@@ -673,9 +679,11 @@ def summary_markdown(manifest: dict, mean_gain: pd.DataFrame, ks: pd.DataFrame, 
     head = "08 test 요약 (dev 리허설 — test가 아니다)" if manifest["rehearsal_on_dev"] else "08 test 요약"
     lines = [f"# {head}", "", f"평가 행: {manifest['counts']['evaluated']}", "",
              "## 평균 이득 (갈래 ①, 상향 고려 규칙, κ 격자·비용 수준 평균, 95% 구간)", "",
-             "| 방법 | " + " | ".join(list(SOURCES) + ["macro"]) + " | 집단 가격 macro |", "|---|" + "---:|" * (len(SOURCES) + 2)]
+             "| 방법 | " + " | ".join(list(SOURCES) + ["macro"]) + " | 집단 가격 macro | 길이 반영 macro |",
+             "|---|" + "---:|" * (len(SOURCES) + 3)]
     main = mean_gain[mean_gain.basis.eq("main")].set_index(["method", "source"])
     gp = mean_gain[mean_gain.basis.eq("group_price")].set_index(["method", "source"])
+    ln = mean_gain[mean_gain.basis.eq("length")].set_index(["method", "source"])
     macro = mean_gain[mean_gain.basis.eq("main") & mean_gain.source.eq("macro")].sort_values("mean_gain", ascending=False)
     order = list(macro.method) + [m for m in main.index.get_level_values(0).unique() if m not in set(macro.method)]
     for m in order:
@@ -687,7 +695,8 @@ def summary_markdown(manifest: dict, mean_gain: pd.DataFrame, ks: pd.DataFrame, 
             else:
                 cells.append("–")
         g = f"{gp.loc[(m, 'macro')].mean_gain:+.3f}" if (m, "macro") in gp.index else "–"
-        lines.append(f"| {m} | " + " | ".join(cells) + f" | {g} |")
+        n = f"{ln.loc[(m, 'macro')].mean_gain:+.3f}" if (m, "macro") in ln.index else "–"
+        lines.append(f"| {m} | " + " | ".join(cells) + f" | {g} | {n} |")
     lines += ["", "## 가설", ""]
     for key in ("H1", "H2", "H3", "H4", "H5", "H6", "H7", "RT-08"):
         lines.append(f"- **{key}**: {hyp[key]['rule']}")

@@ -49,6 +49,7 @@ KIND = {"knn": "per_tier", "knn_a": "per_tier", "mlp": "per_tier", "svm": "per_t
 OURS_03 = ("r0_group", "r1_group", "r1_group_a")
 OPERATIONAL_R0 = "experiments/results/context-length-qualification-20260925/r0/scores"
 NON_ENGLISH = "experiments/results/router-final-inputs/non-english-eval-exclusions.csv"  # see the .md beside it
+OUTPUT_WEIGHT = 5.0  # length cost: Claude output price / input price (Haiku 1/5, Sonnet 3/15, Opus 5/25 USD per 1M)
 
 
 # ---------------------------------------------------------------------------------------------
@@ -56,12 +57,14 @@ NON_ENGLISH = "experiments/results/router-final-inputs/non-english-eval-exclusio
 # ---------------------------------------------------------------------------------------------
 
 def outcomes(P: np.ndarray, start: np.ndarray, cost: np.ndarray = SERVICE_COST) -> dict:
-    """Per-question expectations when starting at `start` and escalating on failure (independent draws)."""
+    """Per-question expectations when starting at `start` and escalating on failure (independent draws).
+
+    `cost` is one price per tier (3,) or one per question and tier (n, 3) (length-cost sensitivity)."""
     n = len(P)
     reach, spent, fails = np.ones(n), np.zeros(n), np.zeros(n)
     for t in range(3):
         on = t >= start
-        spent += np.where(on, reach * cost[t], 0.0)
+        spent += np.where(on, reach * cost[..., t], 0.0)
         fails += np.where(on, reach * (1 - P[:, t]), 0.0)
         reach = np.where(on, reach * (1 - P[:, t]), reach)
     return {"first": P[np.arange(n), start], "resolved": 1 - reach, "cost": spent, "fails": fails}
@@ -117,7 +120,7 @@ def predicted_chain(Phat: np.ndarray, rho: float, cost: np.ndarray = SERVICE_COS
             prev = joint[-1]
             joint.append(rho * np.minimum(prev, f[:, k]) + (1 - rho) * prev * f[:, k])
         R[:, s] = 1 - joint[-1]
-        Cst[:, s] = cost[s] + sum(joint[k - 1] * cost[s + k] for k in range(1, f.shape[1]))
+        Cst[:, s] = cost[..., s] + sum(joint[k - 1] * cost[..., s + k] for k in range(1, f.shape[1]))
         Fl[:, s] = sum(joint)
     return R, Cst, Fl
 
@@ -260,6 +263,32 @@ def group_prices(run_dir: Path) -> tuple:
     return prices, C.sha256_file(prepare_dir / "groups.json")
 
 
+def length_table(run_dir: Path) -> tuple:
+    """Plan 2.3 sensitivity 1: token-weighted length L = input + 5 x median output tokens per question."""
+    folder = run_dir / "length-inputs"
+    manifest = json.loads((folder / "manifest.json").read_text())
+    path = folder / "lengths.parquet"
+    if C.sha256_file(path) != manifest["outputs"]["lengths.parquet"]:
+        raise SystemExit("length-inputs changed since it was built")
+    t = pd.read_parquet(path)
+    filled = {}
+    for source in SOURCES:  # no valid answer recorded: the source's dev median output length
+        rows = t.source_dataset.eq(source)
+        gap = rows & t.output_tokens_median.isna()
+        filled[source] = int(gap.sum())
+        t.loc[gap, "output_tokens_median"] = t.loc[rows & t.role.eq("dev"), "output_tokens_median"].median()
+    t["length"] = t.input_tokens + OUTPUT_WEIGHT * t.output_tokens_median
+    return t.drop_duplicates("sample_id").set_index("sample_id").length, {"sha256": C.sha256_file(path), "filled": filled}
+
+
+def length_costs(length: pd.Series, ids, normalizer: float) -> np.ndarray:
+    """Per question and tier: tier price x length / (the source's mean dev length)."""
+    L = length.reindex(ids).to_numpy(float)
+    if not np.isfinite(L).all():
+        raise SystemExit("questions without a length")
+    return (L / normalizer)[:, None] * SERVICE_COST[None, :]
+
+
 def lambda_record(tables: dict) -> dict:
     return {s: {rule: [{k: r[k] for k in ("kappa", "level", "lambda", "dev_cost")} for r in t[rule]] for rule in RULES}
             for s, t in tables.items()}
@@ -384,11 +413,15 @@ def lock(run_dir: Path, repo: Path, output_dir: Path, allow_missing: bool) -> di
     complete_dev = dev[dev[group_cols].notna().all(axis=1)]
 
     prices, groups_sha = group_prices(run_dir)
-    rho, targets, price_targets = {}, {}, {}
+    length, length_info = length_table(run_dir)
+    rho, targets, price_targets, length_targets, normalizer = {}, {}, {}, {}, {}
     for source in SOURCES:
-        P = complete_dev.loc[complete_dev.source_dataset.eq(source), group_cols].to_numpy(float)
+        rows = complete_dev[complete_dev.source_dataset.eq(source)]
+        P = rows[group_cols].to_numpy(float)
         rho[source], targets[source] = estimate_rho(P), cost_targets(P)
         price_targets[source] = cost_targets(P, prices[source])
+        normalizer[source] = float(length.reindex(rows.sample_id).mean())
+        length_targets[source] = cost_targets(P, length_costs(length, rows.sample_id, normalizer[source]))
     blended = data["blended"]
     label_tables = {"r0_group": {s: class_table(blended.loc[blended.source_dataset.eq(s), "difficulty_label"],
                                                 blended.loc[blended.source_dataset.eq(s), [f"success_{t}" for t in TIERS]].to_numpy(float),
@@ -419,6 +452,8 @@ def lock(run_dir: Path, repo: Path, output_dir: Path, allow_missing: bool) -> di
         score, setting, path, frozen, per_source, oof = max(evaluated, key=lambda e: e[0])
         # sensitivity: the selected setting priced with the group mean data prices (selection stays on 1:3:5)
         priced = {s: lambda_table(Y, Phat, rho[s], price_targets[s], prices[s]) for s, (d, X, Y, Phat) in oof.items()}
+        lengthy = {s: lambda_table(Y, Phat, rho[s], length_targets[s], length_costs(length, d.sample_id, normalizer[s]))
+                   for s, (d, X, Y, Phat) in oof.items()}
         out_path = output_dir / "calibrated" / f"{method}.parquet"
         frozen.to_parquet(out_path, index=False)
         methods[method] = {
@@ -427,7 +462,8 @@ def lock(run_dir: Path, repo: Path, output_dir: Path, allow_missing: bool) -> di
             "scores_sha256": C.sha256_file(path), "calibrated_file": f"calibrated/{method}.parquet",
             "calibrated_sha256": C.sha256_file(out_path),
             "lambda": lambda_record(per_source),
-            "sensitivity_group_price": {"dev_mean_gain": mean_gain(priced), "lambda": lambda_record(priced)}}
+            "sensitivity_group_price": {"dev_mean_gain": mean_gain(priced), "lambda": lambda_record(priced)},
+            "sensitivity_length": {"dev_mean_gain": mean_gain(lengthy), "lambda": lambda_record(lengthy)}}
 
     # RT-08: retrained old-definition R0 (v2 labels) against the operational R0 (v1), A split, two bases
     rt08 = {}
@@ -477,7 +513,13 @@ def lock(run_dir: Path, repo: Path, output_dir: Path, allow_missing: bool) -> di
                 "definition": "per source, mean data price of each tier's group models (00_prepare train means; SPROUT "
                               "price table), high = 1; same adapters and selected settings, own cost targets and lambdas",
                 "tier_cost": {s: prices[s].tolist() for s in SOURCES}, "targets": price_targets,
-                "groups_sha256": groups_sha}},
+                "groups_sha256": groups_sha},
+                "length": {
+                "definition": "per question and tier: tier price (1:3:5) x L / mean dev L of the source, L = input "
+                              "tokens + 5 x median output tokens over the source's data models (plan 2.3); same adapters "
+                              "and selected settings, own cost targets and lambdas",
+                "output_weight": OUTPUT_WEIGHT, "normalizer_mean_dev_length": normalizer, "targets": length_targets,
+                "lengths_sha256": length_info["sha256"], "output_length_filled_with_dev_median": length_info["filled"]}},
             "rho": rho, "tau": TAU, "tau_curve": list(TAU_CURVE), "rules": list(RULES) + ["tau"],
             "adapter": "per source and tier isotonic regression on dev (increasing='auto'); class outputs are first "
                        "multiplied by the train table P(tier succeeds | class); single scores feed all three tiers",
@@ -505,28 +547,30 @@ def summary_markdown(record: dict, table: pd.DataFrame) -> str:
     ev, en = record["evaluation"], record["english_only"]
     lines += [f"**영어만 평가:** 영어가 아닌 문항 {en['rows']}건 제외(dev {en['dev_rows_removed']}건, "
               f"나머지 test). 목록: `{en['file']}`", ""]
-    gp = ev["sensitivity"]["group_price"]
+    gp, ln = ev["sensitivity"]["group_price"], ev["sensitivity"]["length"]
     lines += ["## 원천별 값", "", "비용 목표는 원천마다 가장 싼·가장 비싼 고정 시작 단계의 기대 비용 사이 25/50/75% 지점이다. "
               "주 기준은 Claude 가격 1:3:5(.2/.6/1.0), 민감도는 집단 모델의 평균 데이터 가격(high = 1)이다.", "",
-              "| 원천 | dev 행 | ρ | 비용 목표(1:3:5) | 집단 평균 가격 low/medium/high | 비용 목표(집단 가격) |",
-              "|---|---:|---:|---|---|---|"]
+              "| 원천 | dev 행 | ρ | 비용 목표(1:3:5) | 집단 평균 가격 low/medium/high | 비용 목표(집단 가격) | 비용 목표(길이 반영) |",
+              "|---|---:|---:|---|---|---|---|"]
     for s in SOURCES:
         lines.append(f"| {s} | {record['inputs']['dev_rows'].get(s, 0)} | {ev['rho'][s]:.3f} | "
                      + " / ".join(f"{c:.3f}" for c in ev["cost_levels"]["targets"][s]) + " | "
                      + " / ".join(f"{c:.3f}" for c in gp["tier_cost"][s]) + " | "
-                     + " / ".join(f"{c:.3f}" for c in gp["targets"][s]) + " |")
+                     + " / ".join(f"{c:.3f}" for c in gp["targets"][s]) + " | "
+                     + " / ".join(f"{c:.3f}" for c in ln["targets"][s]) + " |")
     sel = {m: v["selected_setting"] for m, v in record["methods"].items()}
     chosen = table[table.apply(lambda r: sel.get(r["method"]) == r["setting"], axis=1)]
     gains = chosen.groupby(["method", "source"]).dev_gain.mean().unstack()
     lines += ["", "## 방법별 선택 설정과 dev 이득", "",
               "이득 = 상향 고려 규칙의 (최종 해결 − κ × 실패 횟수)에서 같은 dev 비용의 고정 시작 단계(혼합 포함) 값을 뺀 값. "
-              "κ 격자와 비용 수준 평균. 설정은 1:3:5 기준으로 고르고, 마지막 열은 같은 설정을 집단 평균 가격으로 계산한 값이다.", "",
-              "| 방법 | 선택 설정 | 시도 | " + " | ".join(SOURCES) + " | 평균 | 집단 가격 평균 |",
-              "|---|---|---:|" + "---:|" * (len(SOURCES) + 2)]
+              "κ 격자와 비용 수준 평균. 설정은 1:3:5 기준으로 고르고, 마지막 두 열은 같은 설정을 집단 평균 가격과 길이 반영 비용으로 "
+              "계산한 값이다.", "",
+              "| 방법 | 선택 설정 | 시도 | " + " | ".join(SOURCES) + " | 평균 | 집단 가격 평균 | 길이 반영 평균 |",
+              "|---|---|---:|" + "---:|" * (len(SOURCES) + 3)]
     for m, v in sorted(record["methods"].items(), key=lambda kv: -kv[1]["dev_mean_gain"]):
         cells = " | ".join(f"{gains.loc[m, s]:+.3f}" if s in gains.columns else "–" for s in SOURCES)
         lines.append(f"| {m} | `{v['selected_setting']}` | {v['settings_tried']} | {cells} | {v['dev_mean_gain']:+.3f} | "
-                     f"{v['sensitivity_group_price']['dev_mean_gain']:+.3f} |")
+                     f"{v['sensitivity_group_price']['dev_mean_gain']:+.3f} | {v['sensitivity_length']['dev_mean_gain']:+.3f} |")
     if record.get("rt08"):
         lines += ["", "## RT-08 (A 분할, dev 평균 이득)", "", "| 기준 | RT-08(v2 재학습) | 운영 R0(v1) |", "|---|---:|---:|"]
         for basis in ("group", "representative"):

@@ -103,6 +103,24 @@ class SensitivityCostTest(unittest.TestCase):
         R, Cst, Fl = L.predicted_chain(P, 0.0, np.array([0.02, 0.06, 1.0]))
         self.assertAlmostEqual(Cst[0, 0], 0.08)
 
+    def test_per_question_costs_match_per_tier_costs_when_equal(self):
+        rng = np.random.default_rng(5)
+        P = rng.uniform(size=(50, 3))
+        start = rng.integers(0, 3, 50)
+        same = np.tile(L.SERVICE_COST, (50, 1))
+        np.testing.assert_allclose(L.outcomes(P, start, same)["cost"], L.outcomes(P, start)["cost"])
+        np.testing.assert_allclose(L.predicted_chain(P, 0.4, same)[1], L.predicted_chain(P, 0.4)[1])
+        np.testing.assert_array_equal(L.decide("one_shot", P, 0.3, cost=same), L.decide("one_shot", P, 0.3))
+        double = same * np.where(np.arange(50) < 25, 2.0, 1.0)[:, None]  # longer questions cost more
+        o = L.outcomes(P, start, double)["cost"]
+        np.testing.assert_allclose(o[:25], 2 * L.outcomes(P[:25], start[:25])["cost"])
+
+    def test_length_costs_scale_tier_prices_by_relative_length(self):
+        length = pd.Series([100.0, 300.0], index=["a", "b"])
+        np.testing.assert_allclose(L.length_costs(length, ["a", "b"], 200.0), [[0.1, 0.3, 0.5], [0.3, 0.9, 1.5]])
+        with self.assertRaises(SystemExit):
+            L.length_costs(length, ["a", "zz"], 200.0)
+
     def test_cost_targets_follow_the_price_vector(self):
         rng = np.random.default_rng(3)
         P = np.sort(rng.uniform(size=(300, 3)), axis=1)
