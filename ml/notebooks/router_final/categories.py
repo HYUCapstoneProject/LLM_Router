@@ -92,6 +92,23 @@ def markdown(data: pd.DataFrame, arena: pd.DataFrame) -> str:
          "00_prepare의 train·dev·test에서 v2 제외 문항, 영어가 아닌 평가 문항(dev·test), 집단 풀 확률이 빈 행을 뺀 "
          "**실제로 쓰는 행**이다. test는 문항 수만 세고 결과(필요 단계)는 읽지 않았다. 표의 숫자는 `categories.py composition`이 만든다.", ""]
     roles = ("train", "dev", "test")
+    # 0. needed tier (train, dev only; the test's is an outcome)
+    L += ["## 0. 필요 단계 비율 (train·dev)", "",
+          "필요 단계 = 집단 풀 확률이 .8 이상인 가장 싼 단계(계획서 2.2). test는 결과라 08에서 연다.", "",
+          "| 범위 | train low / medium / high | dev low / medium / high |", "|---|---|---|"]
+    def mix(frame):
+        v = frame.needed_tier.value_counts(normalize=True).reindex(["low", "medium", "high"]).fillna(0)
+        return " / ".join(f"{x:.1%}" for x in v)
+    tv = {r: data[data.role.eq(r)] for r in ("train", "dev")}
+    L.append("| 전체(행 그대로) | " + " | ".join(mix(tv[r]) for r in ("train", "dev")) + " |")
+    eq = []
+    for r in ("train", "dev"):
+        per = tv[r].groupby("source_dataset").needed_tier.value_counts(normalize=True).unstack().reindex(columns=["low", "medium", "high"]).fillna(0)
+        eq.append(" / ".join(f"{x:.1%}" for x in per.mean()))
+    L.append("| 전체(원천 같은 비중, 학습이 보는 비율) | " + " | ".join(eq) + " |")
+    for src in C.SOURCES:
+        L.append(f"| {src} | " + " | ".join(mix(tv[r][tv[r].source_dataset.eq(src)]) for r in ("train", "dev")) + " |")
+    L.append("")
     # 1. pooled by task type
     L += ["## 1. 과제 유형별 (원천 합계)", "", "| 과제 유형 | " + " | ".join(f"{r} 행 (비율)" for r in roles) + " | 들어 있는 원천 |",
           "|---|" + "---:|" * len(roles) + "---|"]

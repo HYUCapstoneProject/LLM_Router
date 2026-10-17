@@ -223,6 +223,8 @@ def load_truth(run_dir: Path, repo: Path, data_root: Path, lock: dict, rehearse:
     counts["a_rows_with_v1"] = frame[a & frame[[f"p_v1_{t}" for t in TIERS]].notna().all(axis=1)] \
         .groupby("source_dataset").size().to_dict()
     frame["needed"] = frame.needed_tier.map({t: k for k, t in enumerate(TIERS)}).astype(int)
+    counts["needed_tier_share"] = {s: g.needed_tier.value_counts(normalize=True).reindex(list(TIERS)).fillna(0).round(4).to_dict()
+                                   for s, g in frame.groupby("source_dataset")}
     cats = K.category_table(inputs, roles=(role,))
     frame = frame.join(cats[["category", "task_type"]], on="sample_id")
     if frame.category.isna().any():
@@ -743,7 +745,10 @@ def write_starts(cols: dict, frame: pd.DataFrame, path: Path) -> None:
 
 def summary_markdown(manifest: dict, mean_gain: pd.DataFrame, ks: pd.DataFrame, hyp: dict, t2: pd.DataFrame) -> str:
     head = "08 test 요약 (dev 리허설 — test가 아니다)" if manifest["rehearsal_on_dev"] else "08 test 요약"
+    share = manifest["counts"]["needed_tier_share"]
     lines = [f"# {head}", "", f"평가 행: {manifest['counts']['evaluated']}", "",
+             "필요 단계 비율(low / medium / high): " + "; ".join(
+                 f"{s} " + " / ".join(f"{share[s][t]:.1%}" for t in TIERS) for s in SOURCES if s in share), "",
              "## 평균 이득 (갈래 ①, 상향 고려 규칙, κ 격자·비용 수준 평균, 95% 구간)", "",
              "| 방법 | " + " | ".join(list(SOURCES) + ["macro"]) + " | 집단 가격 macro | 길이 반영 macro |",
              "|---|" + "---:|" * (len(SOURCES) + 3)]
