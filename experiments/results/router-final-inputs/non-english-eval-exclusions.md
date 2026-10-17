@@ -46,5 +46,5 @@ LLMRouterBench test는 4,260행에서 4,014행이 된다. dev에는 영어가 �
 ## 쓰는 곳
 
 - `ml/notebooks/router_final/lock.py`가 이 목록의 문항을 dev와 모든 보정 출력(`calibrated/*.parquet`)에서 뺀다. 그래서 08_test는 이 문항을 볼 수 없다.
-- `selection-lock.json`의 `english_only`에 파일 경로, SHA-256, 원천·역할별 건수, dev에서 뺀 행 수가 남는다.
+- `selection-lock.json`의 `exclusions.non_english`에 파일 경로, SHA-256, 원천·역할별 건수, dev에서 뺀 행 수가 남는다. 10-18부터 문서 제공형 제외 목록([document-grounded-eval-exclusions.md](document-grounded-eval-exclusions.md))도 같은 방식으로 함께 쓴다.
 - 목록의 id가 이번 실행의 점수에 없으면 lock이 멈춘다(다른 분할의 목록을 잘못 쓰는 일을 막는다).

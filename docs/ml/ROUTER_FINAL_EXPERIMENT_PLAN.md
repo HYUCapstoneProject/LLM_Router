@@ -90,6 +90,8 @@
 | SPROUT (19,458) | 50% | 15% | 35% |
 | RouterArena (8,379) | – | – | Bloom 라벨 일치 진단, 외부 데이터와 겹치는 700문항의 해결률 |
 
+평가 제외(10-17·10-18, 아래) 뒤 실제로 쓰는 행: A dev 3,480(D_dev 3,581에서 v2 제외 21과 문서 제공형 80을 뺌), A test는 위 수에서 문서 제공형 100을 더 뺌, LLMRouterBench test에서 영어가 아닌 246을 뺌, RouterArena 진단은 Context가 붙은 1,603을 뺀 6,797. 원천·카테고리별 수는 [데이터 구성](../../experiments/results/ev10-router-final-20261018/data-composition.md)에 있다.
+
 - **재분할:** LLMRouterBench·SPROUT의 기존 calibration 30% / test 70%는 test를 한 번도 열지 않았으므로 버리고 새로 나눈다. 중복 묶음·같은 질문 본문·같은 긴 지문 단위로 나눠, 한 묶음이 양쪽에 걸치지 않게 한다.
 - **학습에서 빼는 것:** RouterArena와 겹치는 700문항(test에 둔다), A test와 중복되는 문항, LLMRouterBench의 판정 선호 진단(arenahard 740, test에만 진단용으로 둔다).
 - **평가는 영어 문항만:** 서비스와 서비스 BGE는 영어만 받는다. 영어가 아닌 평가 문항 246건(모두 LLMRouterBench test의 arenahard 진단, 740건 중)을 [제외 목록](../../experiments/results/router-final-inputs/non-english-eval-exclusions.md)으로 빼고, 07b가 dev와 보정 출력에서 지운다. dev에는 해당 문항이 없다. 학습에는 영어 지시에 외국어 지문이 붙은 3건만 있어 다시 학습하지 않는다(사용자, 10-17).
@@ -199,7 +201,7 @@
 | `05a_routerdc` · `05b_routellm_retrained` | RouterDC(설정 2 × 체크포인트 2), RouteLLM-BERT 재학습본. 둘은 독립이라 다른 세션에서 동시에 돌린다 | T4 | 약 2~2.5시간 · 1~1.5시간 |
 | `06_routellm_released` | RouteLLM-BERT 공개본으로 dev·test·RouterArena 점수 계산 | T4 | 15분 |
 | `07a_score_ours` | 03·02의 ModernBERT 모델(R0-집단·R1-집단·R1-집단-A·RT-08)로 dev·test·RouterArena 점수 계산(03은 자기 검증 행에만 점수를 냈다) | T4 | 30분 |
-| `07b_lock` | 방법별 설정 선택, 원천별 어댑터 보정, ρ, 비용 목표, λ 표(1:3:5와 집단 가격·길이 반영 민감도), 결정 규칙, 영어 제외를 `selection-lock.json`으로 고정한다. test 결과는 읽지 않는다. **여기서 멈추고 사용자에게 lock 내용을 보고한다** | CPU | 10분 안팎 |
+| `07b_lock` | 방법별 설정 선택, 원천별 어댑터 보정, ρ, 비용 목표, λ 표(1:3:5와 집단 가격·길이 반영 민감도), 결정 규칙, 평가 제외(영어가 아닌 문항·문서 제공형)를 `selection-lock.json`으로 고정한다. test 결과는 읽지 않는다. **여기서 멈추고 사용자에게 lock 내용을 보고한다** | CPU | 10분 안팎 |
 | `08a_latency` | lock에서 고른 라우터마다 라우팅 지연 측정(CPU 주, T4 참고). 가중치를 남기지 않은 라우터는 같은 구조·데이터 크기로 다시 만들어 잰다 | T4 | 40분 |
 | `08_test` | 원천 4개의 test를 한 번씩 열어 두 갈래 평가(A test는 v1 병기)와 가설 판정. 라우팅 시간은 08a가 잰다. A test v1 채점값과 bootstrap 묶음 ID에 쓰는 원본 11개(87MB)는 Drive `inputs/test-data/`에 둔다 | CPU | 20~30분(로컬 dev 리허설 7분, 메모리 약 1GB) |
 | `09_seeds` | 판정 경계 근처 결과에만 seed 17·73 추가(잠근 설정 그대로) | T4 | 필요할 때 |
@@ -270,6 +272,10 @@
 | 원천마다 성능 수준이 크게 다른데 섞어도 되나? (10-16) | 학습 목표는 집단의 평균 성적이 아니라 질문마다 "이 집단이 풀 확률"이다. 수준 차이는 원천별 보정이 흡수한다 | 원천별 isotonic 어댑터와 원천별 보고(2.5), 원천별 같은 비중(2.4) |
 | 데이터가 모두 영어인가? 실험의 BGE가 서비스와 같은가? (10-17) | BGE는 서비스와 같은 모델·revision·CLS pooling·정규화·512토큰이다(시험 문장 cosine ≥ .999997). 평가에는 영어가 아닌 문항이 246건 있었고 모두 LLMRouterBench test의 arenahard 진단이다. 학습에는 영어 지시에 외국어 지문이 붙은 3건뿐이다 | 평가는 영어 문항만(2.4, 제외 목록), 학습은 그대로 |
 | 평가에서 뺀 문항도 요청은 영어인가? 번역 부탁인가? (10-17) | 아니다. 246건 중 245건은 요청 자체가 외국어이고(코드나 영어 지문이 붙어도 지시는 외국어), 1건은 영어 지시지만 아랍어 시를 다룬다. 번역 요청은 없다. 학습에 남은 3건은 지시가 영어이고, 그중 번역 요청은 RouterBench 1건뿐이다(나머지는 러시아어·히브리어 글을 다루는 HLE 문제) | 평가 제외 유지, 학습 유지([제외 목록](../../experiments/results/router-final-inputs/non-english-eval-exclusions.md)) |
+| lock이 무엇인가? 자세히 보여 달라 (10-18) | test를 열기 전 dev만으로 설정·보정·ρ·비교 지점·λ·결정 규칙·평가 제외를 고정한 파일이다. 상위 방법의 앞섬은 대부분 LLMRouterBench에서 나오고, κ = 0에서는 어떤 라우터도 모두 low 시작을 이기지 못한다 | [lock 보고서](../../experiments/results/ev10-router-final-20261018/lock-report.md), test 열기 전 최종 점검 |
+| 길이 반영 비용 민감도가 무엇인가? (10-18) | 질문 길이를 무시한 1:3:5 대신, 질문마다 입력 + 5 × 출력 토큰으로 비용을 매긴다. 사용자는 설정이 합리적이라 보았고, 근거를 남겨 나중에 점검하라고 했다 | 2.3 민감도 1과 점검 표, 07b·08 |
+| 08을 로컬 대신 Colab에서 하면 안 되나? (10-18) | 로컬이 필요했던 건 A test v1 채점과 bootstrap 묶음에 쓰는 원본 파일이 Drive에 없었기 때문이다. 원본 11개(87MB)를 Drive에 올리면 된다 | 08을 Colab CPU로(4.5) |
+| 데이터를 카테고리별로 보고 싶고, 결과도 카테고리별로 보겠다 (10-18) | 원천마다 카테고리 체계가 달라 공통 과제 유형 8개로 묶었다. 열린 대화·지시가 가장 많다(train 27%, test 41%). dev 리허설에서는 카테고리 안의 이득이 원천 전체보다 훨씬 작았다(이득의 상당 부분이 과제 구분에서 나온다는 뜻으로 보인다) | 데이터 구성 보고서, 08 `by-category.parquet`(기술 통계, 4.4) |
 | 학습과 평가에 RAG 데이터는 안 쓰는 게 확실한가? (10-18) | 외부 데이터의 문서 기반 질문 1,086건과 RouterBench RAG는 빠졌지만, xRouteBench SQuAD·BoolQ는 지문을 주고 묻는 형식인데도 A 분할 규약이 RAG로 보지 않아 남아 있었다(train 472, dev 80, test 100). 넓은 패턴으로 전체를 다시 훑었고 다른 데서 걸린 것(MMLU 인용문 문제, HellaSwag 단어, HLE·ArenaHard 설명)은 RAG가 아니다. RouterArena 1,603건은 Context가 붙어 있는데 라우터에는 질문만 들어갔다 | 평가에서 SQuAD·BoolQ 제외, RouterArena 진단에서 Context 문항 제외, 학습은 그대로(2.4) |
 | 전체 low/medium/high 비율은? (10-18) | 필요 단계 기준 train 54.7/26.5/18.8%, 원천 같은 비중으로는 61/24/15%. RouterBench가 가장 어렵고(high 26%) xRouteBench·SPROUT가 쉽다(low 71~76%). test는 08에서 연다 | [데이터 구성](../../experiments/results/ev10-router-final-20261018/data-composition.md) 0절 |
 | v2로 다시 학습한다면 RT-08도 한 번에 하면 되지 않나? (10-16) | 새 정의와 섞으면 채점 정정의 효과를 따로 볼 수 없다 | RT-08은 기존 정의만 따로 한 번, 나머지는 EV-10으로 통합(3절) |

@@ -143,7 +143,7 @@ python ml/notebooks/router_final/common_track.py run --run-dir <run001> --extern
 - **설정 선택:** 상향 고려 규칙의 (최종 해결 − κ × 실패 횟수)에서, 같은 dev 비용에서 고정 시작 단계(혼합 포함)가 낼 수 있는 가장 좋은 값을 뺀 "이득"을 원천·κ 격자·비용 수준에 걸쳐 평균하고, 가장 큰 설정을 고른다.
 - **평가 제외:** [문서 제공형 제외 목록](../../../experiments/results/router-final-inputs/document-grounded-eval-exclusions.md)의 xRouteBench SQuAD·BoolQ 180건(dev 80, test 100)과 [영어 제외 목록](../../../experiments/results/router-final-inputs/non-english-eval-exclusions.md)의 영어가 아닌 문항 246건(모두 LLMRouterBench test arenahard)을 dev와 모든 보정 출력에서 지운다. 08은 이 문항을 볼 수 없다. 목록의 id가 점수에 없으면 멈춘다.
 - **RT-08:** RT-08(v2 재학습)과 운영 R0(v1, 저장소의 512토큰 점수)를 A 분할에서 집단 기준과 대표 모델 기준 두 가지로 보정한다.
-- **출력:** `selection-lock.json`(선택 설정, ρ, 비용 목표, λ 표, 규칙, 의존 파일 SHA), `calibrated/<방법>.parquet`(dev·test 단계별 확률), `selection-table.parquet`(모든 설정의 dev 근거), `lock-summary.md`.
+- **출력:** `selection-lock.json`(선택 설정, ρ, 비용 목표, λ 표와 두 민감도의 λ 표, 규칙, 평가 제외 목록, 의존 파일 SHA), `calibrated/<방법>.parquet`(dev·test 단계별 확률), `selection-table.parquet`(모든 설정의 dev 근거), `lock-summary.md`.
 
 dev 점수 SHA는 각 단계의 manifest와 대조하며, 빠진 점수가 있으면 멈춘다(`--allow-missing`은 시험용). 07b가 끝나면 lock 요약을 보고하고 확인을 받은 뒤 08로 간다. 소스는 `router-final-source-lock.zip`이다(운영 R0 점수 파일과 영어 제외 목록 포함).
 
