@@ -1,0 +1,83 @@
+role,source_dataset,category,task_type,rows
+dev,llmrouterbench,aime,수학,7
+dev,llmrouterbench,gpqa,전문가 과학·난제,31
+dev,llmrouterbench,hle,전문가 과학·난제,213
+dev,llmrouterbench,livecodebench,코드,77
+dev,llmrouterbench,livemathbench,수학,15
+dev,llmrouterbench,mmlupro,지식 객관식,148
+dev,llmrouterbench,simpleqa,사실 회상,659
+dev,routerbench,code,코드,39
+dev,routerbench,commonsense,상식·추론,1147
+dev,routerbench,conversation,열린 대화·지시,8
+dev,routerbench,knowledge,지식 객관식,1237
+dev,routerbench,math,수학,670
+dev,sprout,Idavidrein/gpqa/gpqa_extended,전문가 과학·난제,61
+dev,sprout,openhermes/teknium,열린 대화·지시,2900
+dev,xroutebench,aime_2020_2024,수학,11
+dev,xroutebench,arc_challenge,상식·추론,45
+dev,xroutebench,boolq,독해,41
+dev,xroutebench,commonsense_qa,상식·추론,42
+dev,xroutebench,gsm8k,수학,47
+dev,xroutebench,hellaswag,상식·추론,40
+dev,xroutebench,human_eval,코드,13
+dev,xroutebench,math,수학,47
+dev,xroutebench,mbpp,코드,35
+dev,xroutebench,mmlu,지식 객관식,46
+dev,xroutebench,mmlu_pro,지식 객관식,7
+dev,xroutebench,openbook_qa,상식·추론,46
+dev,xroutebench,squad,독해,39
+test,llmrouterbench,aime,수학,18
+test,llmrouterbench,arenahard,열린 대화·지시,457
+test,llmrouterbench,gpqa,전문가 과학·난제,69
+test,llmrouterbench,hle,전문가 과학·난제,498
+test,llmrouterbench,livecodebench,코드,613
+test,llmrouterbench,livemathbench,수학,27
+test,llmrouterbench,mmlupro,지식 객관식,463
+test,llmrouterbench,simpleqa,사실 회상,1552
+test,routerbench,code,코드,44
+test,routerbench,commonsense,상식·추론,1277
+test,routerbench,conversation,열린 대화·지시,9
+test,routerbench,knowledge,지식 객관식,1370
+test,routerbench,math,수학,745
+test,sprout,Idavidrein/gpqa/gpqa_extended,전문가 과학·난제,135
+test,sprout,openhermes/teknium,열린 대화·지시,6756
+test,xroutebench,aime_2020_2024,수학,13
+test,xroutebench,arc_challenge,상식·추론,500
+test,xroutebench,boolq,독해,50
+test,xroutebench,commonsense_qa,상식·추론,50
+test,xroutebench,gsm8k,수학,500
+test,xroutebench,hellaswag,상식·추론,50
+test,xroutebench,human_eval,코드,16
+test,xroutebench,math,수학,500
+test,xroutebench,mbpp,코드,500
+test,xroutebench,mmlu,지식 객관식,500
+test,xroutebench,mmlu_pro,지식 객관식,500
+test,xroutebench,openbook_qa,상식·추론,500
+test,xroutebench,squad,독해,50
+train,llmrouterbench,aime,수학,12
+train,llmrouterbench,gpqa,전문가 과학·난제,98
+train,llmrouterbench,hle,전문가 과학·난제,662
+train,llmrouterbench,livecodebench,코드,248
+train,llmrouterbench,livemathbench,수학,42
+train,llmrouterbench,mmlupro,지식 객관식,544
+train,llmrouterbench,simpleqa,사실 회상,2114
+train,routerbench,code,코드,224
+train,routerbench,commonsense,상식·추론,6901
+train,routerbench,conversation,열린 대화·지시,39
+train,routerbench,knowledge,지식 객관식,7417
+train,routerbench,math,수학,4025
+train,sprout,Idavidrein/gpqa/gpqa_extended,전문가 과학·난제,145
+train,sprout,openhermes/teknium,열린 대화·지시,9461
+train,xroutebench,aime_2020_2024,수학,64
+train,xroutebench,arc_challenge,상식·추론,266
+train,xroutebench,boolq,독해,234
+train,xroutebench,commonsense_qa,상식·추론,234
+train,xroutebench,gsm8k,수학,263
+train,xroutebench,hellaswag,상식·추론,237
+train,xroutebench,human_eval,코드,77
+train,xroutebench,math,수학,264
+train,xroutebench,mbpp,코드,198
+train,xroutebench,mmlu,지식 객관식,265
+train,xroutebench,mmlu_pro,지식 객관식,34
+train,xroutebench,openbook_qa,상식·추론,267
+train,xroutebench,squad,독해,238

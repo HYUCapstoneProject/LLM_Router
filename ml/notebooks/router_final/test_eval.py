@@ -29,6 +29,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import categories as K  # noqa: E402
 import common_track as C  # noqa: E402
 import lock as L  # noqa: E402
 
@@ -222,6 +223,10 @@ def load_truth(run_dir: Path, repo: Path, data_root: Path, lock: dict, rehearse:
     counts["a_rows_with_v1"] = frame[a & frame[[f"p_v1_{t}" for t in TIERS]].notna().all(axis=1)] \
         .groupby("source_dataset").size().to_dict()
     frame["needed"] = frame.needed_tier.map({t: k for k, t in enumerate(TIERS)}).astype(int)
+    cats = K.category_table(inputs, roles=(role,))
+    frame = frame.join(cats[["category", "task_type"]], on="sample_id")
+    if frame.category.isna().any():
+        raise SystemExit("questions without a category")
     return {"frame": frame, "counts": counts, "role": role, "inputs": inputs,
             "test_sha256": manifest["outputs"][path.name]["sha256"],
             "input_sha256": {k: C.sha256_file(Path(v)) for k, v in files.items()}
@@ -441,6 +446,8 @@ def run(run_dir: Path, repo: Path, data_root: Path, output_dir: Path, rehearse: 
     diagnostics = diagnose(run_dir, rec, frame, role, iterations, t2)
     hypotheses = judge(summaries, t1, t2, ks, mean_gain, rt08, diagnostics, methods)
     write_starts(starts_cols, frame, output_dir / "test-starts.parquet")
+    by_cat = by_category(frame, starts_cols)
+    by_cat.to_parquet(output_dir / "by-category.parquet", index=False)
 
     outputs = {p.name: C.sha256_file(p) for p in sorted(output_dir.glob("*.parquet"))}
     (output_dir / "diagnostics.json").write_text(json.dumps(diagnostics, ensure_ascii=False, indent=1, default=float))
@@ -452,7 +459,13 @@ def run(run_dir: Path, repo: Path, data_root: Path, output_dir: Path, rehearse: 
                 "methods": methods, "references": list(REFERENCE), "outputs": outputs,
                 "seconds": round(time.time() - t0, 1)}
     (output_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1, default=float))
-    (output_dir / "test-summary.md").write_text(summary_markdown(manifest, mean_gain, ks, hypotheses, t2))
+    pooled = by_cat[by_cat.source.eq("all") & ~by_cat.method.astype(str).str.startswith("fixed_")].pivot_table(
+        index="method", columns="group", values="mean_gain")
+    pooled = pooled[[t for t in K.TYPES if t in pooled.columns]]
+    table = ["| 방법 | " + " | ".join(pooled.columns) + " |", "|---|" + "---:|" * len(pooled.columns)]
+    table += [f"| {m} | " + " | ".join("–" if np.isnan(v) else f"{v:+.3f}" for v in r) + " |" for m, r in pooled.iterrows()]
+    (output_dir / "test-summary.md").write_text(summary_markdown(manifest | {"by_category_table": table}, mean_gain, ks,
+                                                                 hypotheses, t2))
     return manifest
 
 
@@ -658,6 +671,59 @@ def pair_over_kappa(summaries: dict, t1: pd.DataFrame, a: str, b: str) -> dict:
     return res
 
 
+def by_category(frame: pd.DataFrame, starts: dict, minimum: int = 30) -> pd.DataFrame:
+    """Descriptive results per source category and shared task type (main basis, point estimates, not judged).
+
+    Same locked decisions as the whole-source results; the fixed-start envelope is rebuilt inside each category.
+    mean_gain: escalation-aware rule over the kappa grid and levels. tau .8: track-2 metrics and start shares.
+    Groups with fewer than `minimum` questions keep their counts but no gains."""
+    rows = []
+    for source in SOURCES:
+        part = frame[frame.source_dataset.eq(source)].reset_index(drop=True)
+        P = part[[f"p_{t}" for t in TIERS]].to_numpy(float)
+        needed = part.needed.to_numpy()
+        for level_name, column in (("category", "category"), ("task_type", "task_type")):
+            for group, idx in part.groupby(column).indices.items():
+                n = len(idx)
+                base = {"grouping": level_name, "source": source, "group": group, "rows": n,
+                        "task_type": part.task_type.iloc[idx[0]]}
+                if n < minimum:
+                    rows.append(base | {"method": None})
+                    continue
+                Pg = P[idx]
+                fixed = [L.outcomes(Pg, np.full(n, k)) for k in range(3)]
+                fc = np.array([f["cost"].mean() for f in fixed])
+                for name, by in starts.items():
+                    esc = [(k, st) for k, st in by.items() if k[0] == source and k[1] == "escalation"]
+                    if not esc:
+                        continue
+                    gains = []
+                    for (src, rule, tag, level), st in esc:
+                        kappa = float(tag[1:])
+                        o = L.outcomes(Pg, st[idx])
+                        fv = np.array([f["resolved"].mean() - kappa * f["fails"].mean() for f in fixed])
+                        env = envelope_batch(fc[None], fv[None], np.array([o["cost"].mean()]))[0]
+                        gains.append(o["resolved"].mean() - kappa * o["fails"].mean() - env)
+                    tau = by[(source, "tau", "t0.80", None)][idx]
+                    M = evaluate_track2(Pg, needed[idx], tau, L.SERVICE_COST).mean(axis=0)
+                    share = np.bincount(tau, minlength=3) / n
+                    rows.append(base | {"method": name, "mean_gain": float(np.mean(gains)),
+                                        **{f"tau_{k}": float(v) for k, v in zip(TRACK2, M)},
+                                        **{f"tau_start_{t}": float(v) for t, v in zip(TIERS, share)}})
+                for k, t in enumerate(TIERS):  # fixed-start reference rows
+                    M = evaluate_track2(Pg, needed[idx], np.full(n, k), L.SERVICE_COST).mean(axis=0)
+                    rows.append(base | {"method": f"fixed_{t}", **{f"tau_{key}": float(v) for key, v in zip(TRACK2, M)}})
+    out = pd.DataFrame(rows)
+    # pooled over sources per task type: row-weighted mean of the per-source values
+    typed = out[out.grouping.eq("task_type") & out.method.notna()]
+    num = [c for c in out.columns if c.startswith(("mean_gain", "tau_"))]
+    pooled = (typed.assign(**{c: typed[c] * typed.rows for c in num})
+              .groupby(["group", "method"])[num + ["rows"]].sum())
+    pooled[num] = pooled[num].div(pooled.rows, axis=0)
+    pooled = pooled.reset_index().assign(grouping="task_type", source="all", task_type=lambda d: d.group)
+    return pd.concat([out, pooled], ignore_index=True)
+
+
 def write_starts(cols: dict, frame: pd.DataFrame, path: Path) -> None:
     """Every router's start tier per evaluated question (main basis): escalation and one-shot per kappa/level, tau .8."""
     parts = []
@@ -697,6 +763,10 @@ def summary_markdown(manifest: dict, mean_gain: pd.DataFrame, ks: pd.DataFrame, 
         g = f"{gp.loc[(m, 'macro')].mean_gain:+.3f}" if (m, "macro") in gp.index else "–"
         n = f"{ln.loc[(m, 'macro')].mean_gain:+.3f}" if (m, "macro") in ln.index else "–"
         lines.append(f"| {m} | " + " | ".join(cells) + f" | {g} | {n} |")
+    lines += ["", "## 과제 유형별 평균 이득 (기술 통계, 판정 아님; 원천을 합칠 때 문항 수 가중)", ""]
+    bc = manifest.get("by_category_table")
+    if bc is not None:
+        lines += bc
     lines += ["", "## 가설", ""]
     for key in ("H1", "H2", "H3", "H4", "H5", "H6", "H7", "RT-08"):
         lines.append(f"- **{key}**: {hyp[key]['rule']}")

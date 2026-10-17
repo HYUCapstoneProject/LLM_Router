@@ -60,5 +60,14 @@ class RuleTest(unittest.TestCase):
         self.assertAlmostEqual(T.spearman(np.array([1.0, 2, 3, 4]), np.array([10.0, 20, 25, 100])), 1.0)
 
 
+class CategoryTest(unittest.TestCase):
+    def test_every_category_maps_to_a_listed_task_type(self):
+        import categories as K
+        self.assertTrue(set(K.TASK_TYPE.values()) <= set(K.TYPES))
+        self.assertEqual(len(K.TYPES), len(set(K.TYPES)))
+        sources = {s for s, _ in K.TASK_TYPE}
+        self.assertEqual(sources, set(L.SOURCES))
+
+
 if __name__ == "__main__":
     unittest.main()
