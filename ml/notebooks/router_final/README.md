@@ -14,7 +14,7 @@
 | `07a_score_ours` | 구현 | 03·02 ModernBERT 모델의 dev·test·RouterArena 점수 |
 | `07b_lock` | 구현 | 설정 선택·보정·결정 규칙 고정. 여기서 멈추고 보고 |
 | `08a_latency` | 구현 | 라우팅 지연(CPU 주, T4 참고). 07b 뒤 |
-| `08_test` | 구현 | 봉인한 test를 한 번 열어 두 갈래 평가와 가설 판정. **로컬 CPU**. 아래 참고 |
+| `08_test` | 구현 | 봉인한 test를 한 번 열어 두 갈래 평가와 가설 판정. Colab CPU. 아래 참고 |
 | `09_seeds` · `10_report` | 예정 | 계획서 4.5절 |
 
 ## 00_prepare
@@ -159,7 +159,7 @@ dev 점수 SHA는 각 단계의 manifest와 대조하며, 빠진 점수가 있�
 
 ## 08_test
 
-`test_eval.py`가 본체다. 07b lock에서 고정한 것만 쓰고 아무것도 고르지 않는다. A test의 v1 채점값을 원본 데이터에서 다시 만들기 때문에 00_prepare처럼 **로컬에서** 실행한다(`ml/data/raw`가 있는 checkout). CPU만 쓴다.
+`test_eval.py`가 본체다. 07b lock에서 고정한 것만 쓰고 아무것도 고르지 않는다. Colab CPU에서 돌리며 소스는 `router-final-source-test.zip`이다. A test의 v1 채점값은 원본 데이터에서 다시 만들고, bootstrap 묶음 ID는 원천 파일에서 읽는다. 이 원본 11개(87MB)를 저장소와 같은 경로로 Drive `inputs/test-data/`에 두었고(`test-data-manifest.json`에 SHA), 노트북이 실행 전에 대조한다. 로컬에서는 `--data-root`를 데이터가 있는 checkout으로 주면 된다. 읽은 입력 파일의 SHA는 출력 manifest의 `input_sha256`에 남는다.
 
 - **입력 확인:** lock이 시험 실행(빠진 점수)이 아닌지, 보정 파일·영어 제외 목록·00 test 출력의 SHA가 기록과 같은지 확인한다. 출력 폴더 `RUN/test`가 이미 있으면 멈춘다(test는 한 번 연다).
 - **평가 행:** test에서 v2 제외 문항, 영어가 아닌 246건, 집단 풀 확률이 비어 있는 행을 뺀다. 건수는 `manifest.json`의 `counts`에 남는다.

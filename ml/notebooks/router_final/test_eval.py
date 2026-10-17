@@ -142,6 +142,22 @@ def resolve_inputs(repo: Path, data_root: Path) -> tuple:
     return cfg, {k: (repo / v if (repo / v).exists() else data_root / v) for k, v in cfg["inputs"].items()}
 
 
+def used_files(inputs: dict, data_root: Path, role: str) -> dict:
+    """Every outcome or group file this step reads besides the run folder (their SHA-256 goes to the manifest)."""
+    files = {k: inputs[k] for k in (("a_dev",) if role == "dev" else ("a_test_routerbench", "a_test_xroutebench"))
+             + EXTERNAL + ("v1_data_config",)}
+    v1 = json.loads(Path(inputs["v1_data_config"]).read_text())
+    for key in ("labeled_path", "metadata_path", "model_tiers_path"):
+        files[f"v1_routerbench_{key}"] = data_root / v1["routerbench"][key]
+    x = v1["xroutebench"]
+    for key in ("train_file", "test_file", "candidates_file"):
+        files[f"v1_xroutebench_{key}"] = data_root / x["data_dir"] / x[key]
+    missing = [str(v) for v in files.values() if not Path(v).is_file()]
+    if missing:
+        raise SystemExit("missing input files (upload them under the data root): " + ", ".join(missing))
+    return files
+
+
 def group_ids(inputs: dict, role: str) -> pd.Series:
     """Bootstrap unit per question: the A split's duplicate group, the external re-split group."""
     parts = []
@@ -191,6 +207,7 @@ def load_truth(run_dir: Path, repo: Path, data_root: Path, lock: dict, rehearse:
     frame = frame[frame[[f"p_{t}" for t in TIERS]].notna().all(axis=1)].reset_index(drop=True)
     counts["evaluated"] = frame.groupby("source_dataset").size().to_dict()
     cfg, inputs = resolve_inputs(repo, data_root)
+    files = used_files(inputs, data_root, role)
     groups = json.loads((prepare_dir / "groups.json").read_text())
     gid = group_ids(inputs, role)
     if not frame.sample_id.isin(gid.index).all():
@@ -205,7 +222,9 @@ def load_truth(run_dir: Path, repo: Path, data_root: Path, lock: dict, rehearse:
         .groupby("source_dataset").size().to_dict()
     frame["needed"] = frame.needed_tier.map({t: k for k, t in enumerate(TIERS)}).astype(int)
     return {"frame": frame, "counts": counts, "role": role, "inputs": inputs,
-            "test_sha256": manifest["outputs"][path.name]["sha256"]}
+            "test_sha256": manifest["outputs"][path.name]["sha256"],
+            "input_sha256": {k: C.sha256_file(Path(v)) for k, v in files.items()}
+            | {"groups.json": C.sha256_file(prepare_dir / "groups.json")}}
 
 
 def calibrated(path: Path, frame: pd.DataFrame, role: str) -> pd.DataFrame:
@@ -422,6 +441,7 @@ def run(run_dir: Path, repo: Path, data_root: Path, output_dir: Path, rehearse: 
     (output_dir / "hypotheses.json").write_text(json.dumps(hypotheses, ensure_ascii=False, indent=1, default=float))
     manifest = {"experiment": "EV-10 08_test", "rehearsal_on_dev": rehearse, "test_outcomes_read": not rehearse,
                 "role_evaluated": role, "lock_sha256": lock["sha256"], "outcomes_sha256": truth["test_sha256"],
+                "input_sha256": truth["input_sha256"],
                 "counts": truth["counts"], "bootstrap": BOOT | {"iterations": iterations}, "margin": MARGIN,
                 "methods": methods, "references": list(REFERENCE), "outputs": outputs,
                 "seconds": round(time.time() - t0, 1)}
