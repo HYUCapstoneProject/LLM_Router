@@ -43,7 +43,7 @@
 | RT-05 | R0/R1/R2 학습 목표 비교 (통합 A)와 봉인 test | 09-24 | 완료 | D_dev nAUC R1 .863 > R2 .834 > R0 .166. test 품질 R1−R0 +.132(비용 +.40). R1 선정 | [보고서](results/routing-objectives-continual-v1-A-20260924/REPORT.md), [test](results/routing-objectives-continual-v1-A-20260924/sealed-tests/REPORT.md) |
 | RT-06 | G1 일반화: R1/R3 × natural/balanced | 09-25 | 완료 | selection은 R1-natural. 처음 보는 과제에서 R3가 품질·비용 우위. xRouteBench에서는 항상 low·medium이 네 방법을 모두 이김 | [보고서](results/routing-generalization-v1-20260925/report.md) |
 | RT-07 | 추론 길이 512 → 8,192 | 09-25 | 완료 | 성능 차이 미미(R0 RouterArena 45.48 → 45.39%). 09-26에 운영 8,192 채택 | [보고서](results/context-length-qualification-20260925/REPORT.md) |
-| RT-08 | v1 채점 오류의 영향: 기존 정의 R0의 v2 재학습 | – | 계획 | 기존 정의 R0(경계 .27/.64)를 A 분할 v2로 한 번 재학습해 운영 R0(v1)와 비교. 새 정의와 섞지 않아 채점 효과만 분리 | [최종 계획서 3절](../docs/ml/ROUTER_FINAL_EXPERIMENT_PLAN.md) |
+| RT-08 | v1 채점 오류의 영향: 기존 정의 R0의 v2 재학습 | 10-16~ | 진행 중(학습 완료, 평가는 EV-10 07b·08) | 기존 정의 R0(경계 .27/.64)를 A 분할 v2로 한 번 재학습해 운영 R0(v1)와 비교. 새 정의와 섞지 않아 채점 효과만 분리 | [최종 계획서 3절](../docs/ml/ROUTER_FINAL_EXPERIMENT_PLAN.md) |
 
 ### 2.3. 재학습 (RF)
 
@@ -67,7 +67,7 @@
 | EV-07 | 통일 기준 재평가 | – | 통합(10-16, EV-10) | 어댑터·손익분기점 평가 틀은 EV-10의 평가 방식(두 갈래)이 됨 | [최종 계획서 2.5절](../docs/ml/ROUTER_FINAL_EXPERIMENT_PLAN.md) |
 | EV-08 | 외부·세대 전이 | – | 통합(10-16, EV-10) | 외부 데이터의 일부를 학습에 쓰기로 해, 전이는 EV-10에서 "A만 학습한 버전 대 섞어 학습한 버전"으로 측정 | [최종 계획서 4절](../docs/ml/ROUTER_FINAL_EXPERIMENT_PLAN.md) |
 | EV-09 | RouterArena 해결률 실측 | – | 보류(10-13) | 층화 표본 약 1,000문항을 서비스 후보로 호출. API 비용 때문에 팀원과 협의한 뒤 결정 | [최종 계획서 5절](../docs/ml/ROUTER_FINAL_EXPERIMENT_PLAN.md) |
-| EV-10 | 통합 라우터 비교 (모델 집단 단계, 혼합 학습, 두 갈래 평가) | – | 계획 | 우리 R0-집단·R1-집단·R1-BGE와 논문 라우터 8종을 A 분할(v2)·LLMRouterBench·SPROUT train으로 학습해 원천 4개 test에서 비교. 비용은 서비스 가격 1:3:5. A만 학습한 R1-집단·kNN으로 새 세대 데이터 효과 측정 | [최종 계획서 4절](../docs/ml/ROUTER_FINAL_EXPERIMENT_PLAN.md) |
+| EV-10 | 통합 라우터 비교 (모델 집단 단계, 혼합 학습, 두 갈래 평가) | 10-16~ | 진행 중(10-17: 00~06 완료, 07a·07b 다음) | 우리 R0-집단·R1-집단·R1-BGE와 논문 라우터 8종을 A 분할(v2)·LLMRouterBench·SPROUT train으로 학습해 원천 4개 test에서 비교(영어 문항만). 비용은 서비스 가격 1:3:5, 집단 평균 데이터 가격은 민감도. A만 학습한 R1-집단·kNN으로 새 세대 데이터 효과 측정 | [최종 계획서 4절](../docs/ml/ROUTER_FINAL_EXPERIMENT_PLAN.md) |
 
 ### 2.5. 캐시 (CA)
 
@@ -119,8 +119,8 @@ DT-01 ─┬─ RT-04 ── RT-05 ──┬── EV-01, EV-02, EV-03
        │                   └── RF-01 ── RF-02 ── RF-03 ── RF-04
        ├─ RT-06 ── EV-02, EV-03
        └─ CA-05 (운영 R0 고정) ── CA-06(계획)
-DT-02 ─── EV-04 · EV-05 ── RT-08 · EV-10 (계획, EV-06·07·08 통합) ── EV-09(보류)
-DT-03 ─── EV-10 (계획)
+DT-02 ─── EV-04 · EV-05 ── RT-08 · EV-10 (진행 중, EV-06·07·08 통합) ── EV-09(보류)
+DT-03 ─── EV-10 (진행 중)
 8월 선행(팀원): RT-01~03, CA-01~04, CA-13
 팀원 캐시 후속(10-10~14): CA-05 ── CA-07·08 ── CA-09·10·11 ── CA-12 ── SY-03 (C4 운영 배포)
 ```

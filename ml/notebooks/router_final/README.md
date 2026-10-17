@@ -11,7 +11,10 @@
 | `04_common_track` | 구현 | 논문 라우터 공통 트랙과 R1-BGE. 아래 참고 |
 | `05a_routerdc` · `05b_routellm_retrained` | 구현 | 인코더까지 학습하는 논문 라우터. 아래 참고 |
 | `06_routellm_released` | 구현 | RouteLLM-BERT 공개본 점수 |
-| `07_lock` ~ `10_report` | 예정 | 계획서 4.5절 |
+| `07a_score_ours` | 구현 | 03·02 ModernBERT 모델의 dev·test·RouterArena 점수 |
+| `07b_lock` | 구현 | 설정 선택·보정·결정 규칙 고정. 여기서 멈추고 보고 |
+| `08a_latency` | 구현 | 라우팅 지연(CPU 주, T4 참고). 07b 뒤 |
+| `08_test` ~ `10_report` | 예정 | 계획서 4.5절 |
 
 ## 00_prepare
 
@@ -122,3 +125,33 @@ python ml/notebooks/router_final/common_track.py run --run-dir <run001> --extern
 - **속도·메모리만 바꾼 것:** gradient checkpointing, 묶음마다 전부 패딩인 열 제거, 동적 패딩, 옵티마이저 상태 없는 체크포인트. 결과는 같다.
 - **CPU 라우팅 시간:** 방법마다 dev 50문항을 CPU에서 한 문항씩 처리한 중앙값을 `cpu_ms_per_question`에 남긴다(08의 시간 비교용).
 - 세 노트북은 서로 독립이라 다른 Colab 세션에서 동시에 돌릴 수 있다. 소스는 `router-final-source-finetune.zip`이다.
+
+## 07a_score_ours · 07b_lock
+
+**07a** (`score_modernbert.py`, T4): 03 모델 셋(R0-집단·R1-집단·R1-집단-A)과 RT-08로 dev·test·RouterArena 질문 전체의 점수(logit)를 계산해 Drive `scores-modernbert/<모델>/`에 쓴다. 03은 자기 검증 행에만 점수를 냈고(R1-집단-A는 A 분할만) 02는 점수를 내지 않았기 때문이다. 학습과 같은 토큰화(512토큰)와 RT-05의 `_predict_logits`를 쓰며, 로컬 시험에서 03의 검증 점수와 차이는 2e-5 이하였다.
+
+**07b** (`lock.py`, CPU): dev 결과와 03~07a의 점수로 아래를 정해 Drive `lock/`에 쓴다. test 결과는 읽지 않는다.
+
+- **평가 모형:** 단계 t를 부르면 집단 풀 확률 p_t로 성공하고(집단에서 모델 하나를 무작위로 부름), 실패하면 다음 단계로 올라간다. 시작 단계마다 첫 시도 성공, 최종 해결, 기대 비용(서비스 비용 .2/.6/1.0), 실패 횟수를 정확히 계산한다.
+- **어댑터:** 원천·단계별 isotonic 회귀. 분류 출력(R0-집단, RT-08, 운영 R0)은 먼저 train의 "분류별 단계 성공률" 표를 곱하고, 점수 하나만 내는 방법(Hybrid LLM, RouteLLM)은 그 점수를 세 단계에 함께 쓴다. 설정 선택과 λ에는 dev 5분할 교차 보정을, test 적용에는 dev 전체로 맞춘 보정을 쓴다.
+- **ρ:** EV-05와 같은 식을 dev의 집단 풀 확률에 적용한 원천별 단계 간 실패 상관이다.
+- **비용 목표:** 원천마다 가장 싼·가장 비싼 고정 시작 단계의 기대 비용 사이 25·50·75% 지점이다(계획서 2.5, 10-17 확정). 상향이 반드시 따라와서 .25·.5는 대부분 원천에서 도달할 수 없기 때문이다.
+- **집단 가격 민감도:** 단계 비용을 Claude 1:3:5 대신 집단 모델의 평균 데이터 가격(`prepare/groups.json`, high = 1)으로 바꿔, 선택된 설정마다 비용 목표와 λ 표를 한 번 더 만든다(`sensitivity_group_price`). 설정 선택은 1:3:5로만 한다. groups.json의 모델 목록은 봉인된 00_prepare manifest와 대조한다.
+- **λ 표:** (원천, 규칙, κ, 비용 수준)마다 dev 기대 비용이 목표에 가장 가까운 λ다. 규칙은 상향 고려와 한 번에 고르기이고, 갈래 ②의 τ 규칙(τ = .8, 곡선 .5~.95)은 λ가 필요 없다.
+- **설정 선택:** 상향 고려 규칙의 (최종 해결 − κ × 실패 횟수)에서, 같은 dev 비용에서 고정 시작 단계(혼합 포함)가 낼 수 있는 가장 좋은 값을 뺀 "이득"을 원천·κ 격자·비용 수준에 걸쳐 평균하고, 가장 큰 설정을 고른다.
+- **영어만 평가:** [제외 목록](../../../experiments/results/router-final-inputs/non-english-eval-exclusions.md)의 영어가 아닌 문항 246건(모두 LLMRouterBench test arenahard)을 dev와 모든 보정 출력에서 지운다. 08은 이 문항을 볼 수 없다. 목록의 id가 점수에 없으면 멈춘다.
+- **RT-08:** RT-08(v2 재학습)과 운영 R0(v1, 저장소의 512토큰 점수)를 A 분할에서 집단 기준과 대표 모델 기준 두 가지로 보정한다.
+- **출력:** `selection-lock.json`(선택 설정, ρ, 비용 목표, λ 표, 규칙, 의존 파일 SHA), `calibrated/<방법>.parquet`(dev·test 단계별 확률), `selection-table.parquet`(모든 설정의 dev 근거), `lock-summary.md`.
+
+dev 점수 SHA는 각 단계의 manifest와 대조하며, 빠진 점수가 있으면 멈춘다(`--allow-missing`은 시험용). 07b가 끝나면 lock 요약을 보고하고 확인을 받은 뒤 08로 간다. 소스는 `router-final-source-lock.zip`이다(운영 R0 점수 파일과 영어 제외 목록 포함).
+
+## 08a_latency
+
+`routing_latency.py`가 07b lock에서 고른 라우터마다 **질문 원문 → 시작 단계** 시간을 잰다(계획서 2.5). 같은 Colab 세션에서 dev 200문항(원천마다 50, sample_id 해시로 고정)을 한 문항씩, 워밍업 20문항 뒤 측정하고 중앙값·p95를 `latency/latency-<cpu|cuda>.parquet`에 쓴다.
+
+- **나누어 재는 구간:** 인코더(BGE 또는 라우터 자체 인코더), 라우터 본체(이웃 검색·회귀·그래프·묶음 점수 등), 보정과 결정 규칙(isotonic 세 개 + 상향 고려 규칙, 모든 라우터 공통).
+- **BGE 라우터:** `total_with_bge`(BGE 포함)와 `added_given_bge`(서비스가 캐시용으로 BGE를 이미 계산했을 때 더해지는 부분)를 함께 남긴다.
+- **다시 만드는 라우터:** 지연은 구조와 데이터 크기로 정해지므로, 가중치를 남기지 않은 04 본체(같은 클래스·설정·학습 데이터 크기, 짧게 학습)와 05 인코더(같은 구조)는 다시 만들어 잰다. ModernBERT(03·RT-08)와 RouteLLM 공개본은 실제 가중치를 쓴다. 운영 R0의 8,192토큰 조건은 같은 구조의 RT-08 가중치로 따로 잰다.
+- **GraphRouter:** 원본 추론처럼 새 질문을 학습 그래프에 붙여 그래프 전체를 한 번 계산한다.
+- 로컬 시험(Mac CPU, 문항 12개): BGE-large 인코딩 약 300ms, ModernBERT R1-집단 약 130ms, BGE 라우터 본체는 MLP·SVM·MF·R1-BGE 1ms 미만, kNN 약 37ms, IRT 약 25ms, GraphRouter 공식 약 53ms·LLMRouter 판 약 141ms였다. 값은 장비에 따라 다르므로 Colab 한 세션의 값만 비교한다.
+- 소스는 `router-final-source-latency.zip`이다.
