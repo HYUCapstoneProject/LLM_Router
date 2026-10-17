@@ -67,12 +67,12 @@ def outcomes(P: np.ndarray, start: np.ndarray, cost: np.ndarray = SERVICE_COST) 
     return {"first": P[np.arange(n), start], "resolved": 1 - reach, "cost": spent, "fails": fails}
 
 
-def summary(P: np.ndarray, start: np.ndarray) -> dict:
-    return {k: float(v.mean()) for k, v in outcomes(P, start).items()}
+def summary(P: np.ndarray, start: np.ndarray, cost: np.ndarray = SERVICE_COST) -> dict:
+    return {k: float(v.mean()) for k, v in outcomes(P, start, cost).items()}
 
 
-def fixed_points(P: np.ndarray) -> list:
-    return [summary(P, np.full(len(P), s)) for s in range(3)]
+def fixed_points(P: np.ndarray, cost: np.ndarray = SERVICE_COST) -> list:
+    return [summary(P, np.full(len(P), s), cost) for s in range(3)]
 
 
 def envelope(points: list, kappa: float, x: float) -> float:
@@ -106,7 +106,7 @@ def estimate_rho(P: np.ndarray) -> float:
     return float(np.clip(num / den, 0.0, 1.0)) if den > 0 else 0.0
 
 
-def predicted_chain(Phat: np.ndarray, rho: float):
+def predicted_chain(Phat: np.ndarray, rho: float, cost: np.ndarray = SERVICE_COST):
     """Predicted resolution, cost and failed attempts for each start tier (EV-05 escalation-aware rule)."""
     n = len(Phat)
     R, Cst, Fl = np.zeros((n, 3)), np.zeros((n, 3)), np.zeros((n, 3))
@@ -117,14 +117,15 @@ def predicted_chain(Phat: np.ndarray, rho: float):
             prev = joint[-1]
             joint.append(rho * np.minimum(prev, f[:, k]) + (1 - rho) * prev * f[:, k])
         R[:, s] = 1 - joint[-1]
-        Cst[:, s] = SERVICE_COST[s] + sum(joint[k - 1] * SERVICE_COST[s + k] for k in range(1, f.shape[1]))
+        Cst[:, s] = cost[s] + sum(joint[k - 1] * cost[s + k] for k in range(1, f.shape[1]))
         Fl[:, s] = sum(joint)
     return R, Cst, Fl
 
 
-def decide(rule: str, Phat: np.ndarray, lam: float, kappa: float = 0.0, chain=None, tau: float = TAU) -> np.ndarray:
+def decide(rule: str, Phat: np.ndarray, lam: float, kappa: float = 0.0, chain=None, tau: float = TAU,
+           cost: np.ndarray = SERVICE_COST) -> np.ndarray:
     if rule == "one_shot":
-        return np.argmax(Phat - lam * SERVICE_COST, axis=1)
+        return np.argmax(Phat - lam * cost, axis=1)
     if rule == "escalation":
         R, Cst, Fl = chain
         return np.argmax(R - lam * Cst - kappa * Fl, axis=1)
@@ -134,23 +135,23 @@ def decide(rule: str, Phat: np.ndarray, lam: float, kappa: float = 0.0, chain=No
     raise ValueError(rule)
 
 
-def cost_targets(P: np.ndarray) -> list:
-    costs = [p["cost"] for p in fixed_points(P)]
+def cost_targets(P: np.ndarray, cost: np.ndarray = SERVICE_COST) -> list:
+    costs = [p["cost"] for p in fixed_points(P, cost)]
     lo, hi = min(costs), max(costs)
     return [lo + f * (hi - lo) for f in LEVELS]
 
 
-def lambda_table(P: np.ndarray, Phat: np.ndarray, rho: float, targets: list) -> dict:
+def lambda_table(P: np.ndarray, Phat: np.ndarray, rho: float, targets: list, cost: np.ndarray = SERVICE_COST) -> dict:
     """For each rule, kappa and cost target: the lambda whose dev decisions come closest to the target cost,
-    with the resulting dev cost, value and gain over the fixed-start envelope."""
-    points = fixed_points(P)
-    chain = predicted_chain(Phat, rho)
+    with the resulting dev cost, value and gain over the fixed-start envelope (all priced with `cost`)."""
+    points = fixed_points(P, cost)
+    chain = predicted_chain(Phat, rho, cost)
     out = {}
     for rule in RULES:
         kappas = KAPPAS if rule == "escalation" else [0.0]
         rows = []
         for kappa in kappas:
-            curve = [(lam, summary(P, decide(rule, Phat, lam, kappa, chain))) for lam in LAMBDAS]
+            curve = [(lam, summary(P, decide(rule, Phat, lam, kappa, chain, cost=cost), cost)) for lam in LAMBDAS]
             for level, target in zip(LEVELS, targets):
                 lam, res = min(curve, key=lambda item: (abs(item[1]["cost"] - target), item[0]))
                 rows.append({"kappa": float(kappa), "level": level, "target_cost": target, "lambda": float(lam),
@@ -238,6 +239,34 @@ def load_outcomes(run_dir: Path) -> dict:
     return {"dev": dev.reset_index(drop=True), "train": train.reset_index(drop=True), "blended": blended,
             "hashes": {"prepare_manifest": C.sha256_file(prepare_dir / "manifest.json"),
                        "ours_data_manifest": C.sha256_file(data_dir / "manifest.json")}}
+
+
+def group_prices(run_dir: Path) -> tuple:
+    """Sensitivity cost (plan 2.3): per source, the mean data price of each tier's group models, high = 1.
+
+    Calling a tier calls a random model of its group (plan 2.1), so the group mean is that call's expected price.
+    Model prices are 00_prepare's train means (SPROUT: the data authors' price table)."""
+    prepare_dir = run_dir / "prepare"
+    groups = json.loads((prepare_dir / "groups.json").read_text())
+    sealed = json.loads((prepare_dir / "manifest.json").read_text())["summary"]["groups"]
+    prices = {}
+    for source in SOURCES:
+        kept = pd.DataFrame(groups[source])
+        kept = kept[kept.kept.astype(bool)]
+        if {t: sorted(kept.loc[kept.tier.eq(t), "model"]) for t in TIERS} != {t: sorted(sealed[source][t]) for t in TIERS}:
+            raise SystemExit(f"groups.json does not match the sealed 00_prepare groups: {source}")
+        mean = kept.groupby("tier").cost.mean().reindex(list(TIERS)).to_numpy(float)
+        prices[source] = mean / mean[-1]
+    return prices, C.sha256_file(prepare_dir / "groups.json")
+
+
+def lambda_record(tables: dict) -> dict:
+    return {s: {rule: [{k: r[k] for k in ("kappa", "level", "lambda", "dev_cost")} for r in t[rule]] for rule in RULES}
+            for s, t in tables.items()}
+
+
+def mean_gain(tables: dict) -> float:
+    return float(np.mean([np.mean([r["dev_gain"] for r in t["escalation"]]) for t in tables.values()]))
 
 
 def english_exclusions(repo: Path) -> tuple:
@@ -354,10 +383,12 @@ def lock(run_dir: Path, repo: Path, output_dir: Path, allow_missing: bool) -> di
     group_cols, arm_cols = [f"p_{t}" for t in TIERS], [f"arm_success_v2_{t}" for t in TIERS]
     complete_dev = dev[dev[group_cols].notna().all(axis=1)]
 
-    rho, targets = {}, {}
+    prices, groups_sha = group_prices(run_dir)
+    rho, targets, price_targets = {}, {}, {}
     for source in SOURCES:
         P = complete_dev.loc[complete_dev.source_dataset.eq(source), group_cols].to_numpy(float)
         rho[source], targets[source] = estimate_rho(P), cost_targets(P)
+        price_targets[source] = cost_targets(P, prices[source])
     blended = data["blended"]
     label_tables = {"r0_group": {s: class_table(blended.loc[blended.source_dataset.eq(s), "difficulty_label"],
                                                 blended.loc[blended.source_dataset.eq(s), [f"success_{t}" for t in TIERS]].to_numpy(float),
@@ -382,10 +413,12 @@ def lock(run_dir: Path, repo: Path, output_dir: Path, allow_missing: bool) -> di
                 per_source[source] = table
                 for row in table["escalation"]:
                     selection_rows.append({"method": method, "setting": setting, "source": source, **row})
-            score = float(np.mean([np.mean([r["dev_gain"] for r in t["escalation"]]) for t in per_source.values()]))
-            evaluated.append((score, setting, path, frozen, per_source))
+            score = mean_gain(per_source)
+            evaluated.append((score, setting, path, frozen, per_source, oof))
             print(f"[lock] {method} {setting}: mean dev gain {score:+.4f}", flush=True)
-        score, setting, path, frozen, per_source = max(evaluated, key=lambda e: e[0])
+        score, setting, path, frozen, per_source, oof = max(evaluated, key=lambda e: e[0])
+        # sensitivity: the selected setting priced with the group mean data prices (selection stays on 1:3:5)
+        priced = {s: lambda_table(Y, Phat, rho[s], price_targets[s], prices[s]) for s, (d, X, Y, Phat) in oof.items()}
         out_path = output_dir / "calibrated" / f"{method}.parquet"
         frozen.to_parquet(out_path, index=False)
         methods[method] = {
@@ -393,8 +426,8 @@ def lock(run_dir: Path, repo: Path, output_dir: Path, allow_missing: bool) -> di
             "settings_tried": len(evaluated), "scores_file": str(path.relative_to(run_dir)),
             "scores_sha256": C.sha256_file(path), "calibrated_file": f"calibrated/{method}.parquet",
             "calibrated_sha256": C.sha256_file(out_path),
-            "lambda": {s: {rule: [{k: r[k] for k in ("kappa", "level", "lambda", "dev_cost")} for r in t[rule]]
-                           for rule in RULES} for s, t in per_source.items()}}
+            "lambda": lambda_record(per_source),
+            "sensitivity_group_price": {"dev_mean_gain": mean_gain(priced), "lambda": lambda_record(priced)}}
 
     # RT-08: retrained old-definition R0 (v2 labels) against the operational R0 (v1), A split, two bases
     rt08 = {}
@@ -422,9 +455,7 @@ def lock(run_dir: Path, repo: Path, output_dir: Path, allow_missing: bool) -> di
                 rt08[basis]["models"][name] = {
                     "label_column": label_col, "calibrated_file": f"calibrated/{name}-{basis}.parquet",
                     "calibrated_sha256": C.sha256_file(out_path),
-                    "dev_mean_gain": float(np.mean([np.mean([r["dev_gain"] for r in t["escalation"]]) for t in lam.values()])),
-                    "lambda": {s: {rule: [{k: r[k] for k in ("kappa", "level", "lambda", "dev_cost")} for r in t[rule]]
-                                   for rule in RULES} for s, t in lam.items()}}
+                    "dev_mean_gain": mean_gain(lam), "lambda": lambda_record(lam)}
         op = repo / OPERATIONAL_R0
         rt08["inputs"] = {"rt08_scores_sha256": C.sha256_file(files[("rt08", "default")]),
                           "operational_r0_scores": {p.name: C.sha256_file(p) for p in sorted(op.glob("*-512.parquet"))}}
@@ -442,6 +473,11 @@ def lock(run_dir: Path, repo: Path, output_dir: Path, allow_missing: bool) -> di
             "cost_levels": {"fractions": list(LEVELS), "definition": "fraction of each source's range between the cheapest "
                             "and the dearest fixed start tier (expected cost with escalation, dev)",
                             "targets": targets},
+            "sensitivity": {"group_price": {
+                "definition": "per source, mean data price of each tier's group models (00_prepare train means; SPROUT "
+                              "price table), high = 1; same adapters and selected settings, own cost targets and lambdas",
+                "tier_cost": {s: prices[s].tolist() for s in SOURCES}, "targets": price_targets,
+                "groups_sha256": groups_sha}},
             "rho": rho, "tau": TAU, "tau_curve": list(TAU_CURVE), "rules": list(RULES) + ["tau"],
             "adapter": "per source and tier isotonic regression on dev (increasing='auto'); class outputs are first "
                        "multiplied by the train table P(tier succeeds | class); single scores feed all three tiers",
@@ -469,20 +505,28 @@ def summary_markdown(record: dict, table: pd.DataFrame) -> str:
     ev, en = record["evaluation"], record["english_only"]
     lines += [f"**영어만 평가:** 영어가 아닌 문항 {en['rows']}건 제외(dev {en['dev_rows_removed']}건, "
               f"나머지 test). 목록: `{en['file']}`", ""]
-    lines += ["## 원천별 값", "", "| 원천 | dev 행 | ρ | 비용 목표(25/50/75%) |", "|---|---:|---:|---|"]
+    gp = ev["sensitivity"]["group_price"]
+    lines += ["## 원천별 값", "", "비용 목표는 원천마다 가장 싼·가장 비싼 고정 시작 단계의 기대 비용 사이 25/50/75% 지점이다. "
+              "주 기준은 Claude 가격 1:3:5(.2/.6/1.0), 민감도는 집단 모델의 평균 데이터 가격(high = 1)이다.", "",
+              "| 원천 | dev 행 | ρ | 비용 목표(1:3:5) | 집단 평균 가격 low/medium/high | 비용 목표(집단 가격) |",
+              "|---|---:|---:|---|---|---|"]
     for s in SOURCES:
         lines.append(f"| {s} | {record['inputs']['dev_rows'].get(s, 0)} | {ev['rho'][s]:.3f} | "
-                     + " / ".join(f"{c:.3f}" for c in ev["cost_levels"]["targets"][s]) + " |")
+                     + " / ".join(f"{c:.3f}" for c in ev["cost_levels"]["targets"][s]) + " | "
+                     + " / ".join(f"{c:.3f}" for c in gp["tier_cost"][s]) + " | "
+                     + " / ".join(f"{c:.3f}" for c in gp["targets"][s]) + " |")
     sel = {m: v["selected_setting"] for m, v in record["methods"].items()}
     chosen = table[table.apply(lambda r: sel.get(r["method"]) == r["setting"], axis=1)]
     gains = chosen.groupby(["method", "source"]).dev_gain.mean().unstack()
     lines += ["", "## 방법별 선택 설정과 dev 이득", "",
               "이득 = 상향 고려 규칙의 (최종 해결 − κ × 실패 횟수)에서 같은 dev 비용의 고정 시작 단계(혼합 포함) 값을 뺀 값. "
-              "κ 격자와 비용 수준 평균.", "",
-              "| 방법 | 선택 설정 | 시도 | " + " | ".join(SOURCES) + " | 평균 |", "|---|---|---:|" + "---:|" * (len(SOURCES) + 1)]
+              "κ 격자와 비용 수준 평균. 설정은 1:3:5 기준으로 고르고, 마지막 열은 같은 설정을 집단 평균 가격으로 계산한 값이다.", "",
+              "| 방법 | 선택 설정 | 시도 | " + " | ".join(SOURCES) + " | 평균 | 집단 가격 평균 |",
+              "|---|---|---:|" + "---:|" * (len(SOURCES) + 2)]
     for m, v in sorted(record["methods"].items(), key=lambda kv: -kv[1]["dev_mean_gain"]):
         cells = " | ".join(f"{gains.loc[m, s]:+.3f}" if s in gains.columns else "–" for s in SOURCES)
-        lines.append(f"| {m} | `{v['selected_setting']}` | {v['settings_tried']} | {cells} | {v['dev_mean_gain']:+.3f} |")
+        lines.append(f"| {m} | `{v['selected_setting']}` | {v['settings_tried']} | {cells} | {v['dev_mean_gain']:+.3f} | "
+                     f"{v['sensitivity_group_price']['dev_mean_gain']:+.3f} |")
     if record.get("rt08"):
         lines += ["", "## RT-08 (A 분할, dev 평균 이득)", "", "| 기준 | RT-08(v2 재학습) | 운영 R0(v1) |", "|---|---:|---:|"]
         for basis in ("group", "representative"):

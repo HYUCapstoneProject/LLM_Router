@@ -94,6 +94,47 @@ class CalibrationTest(unittest.TestCase):
         self.assertEqual(set(L.fold_of(ids)), set(range(L.FOLDS)))
 
 
+class SensitivityCostTest(unittest.TestCase):
+    def test_tier_cost_vector_prices_the_escalation_chain(self):
+        P = np.array([[0.0, 1.0, 1.0]])
+        start = np.zeros(1, int)
+        self.assertAlmostEqual(L.outcomes(P, start)["cost"][0], 0.2 + 0.6)
+        self.assertAlmostEqual(L.outcomes(P, start, np.array([0.02, 0.06, 1.0]))["cost"][0], 0.08)
+        R, Cst, Fl = L.predicted_chain(P, 0.0, np.array([0.02, 0.06, 1.0]))
+        self.assertAlmostEqual(Cst[0, 0], 0.08)
+
+    def test_cost_targets_follow_the_price_vector(self):
+        rng = np.random.default_rng(3)
+        P = np.sort(rng.uniform(size=(300, 3)), axis=1)
+        cheap = np.array([0.02, 0.06, 1.0])
+        lo = min(p["cost"] for p in L.fixed_points(P, cheap))
+        targets = L.cost_targets(P, cheap)
+        self.assertTrue(lo < targets[0] < targets[1] < targets[2] < 1.0)
+        self.assertLess(targets[0], L.cost_targets(P)[0])
+
+    def test_group_prices_are_member_means_with_high_one(self):
+        import tempfile
+        groups, sealed = {}, {}
+        for k, source in enumerate(L.SOURCES):
+            groups[source] = [{"model": "a", "cost": 1.0, "kept": True, "tier": "low"},
+                              {"model": "b", "cost": 3.0, "kept": True, "tier": "low"},
+                              {"model": "c", "cost": 4.0, "kept": True, "tier": "medium"},
+                              {"model": "d", "cost": 99.0, "kept": False, "tier": None},
+                              {"model": "e", "cost": 20.0, "kept": True, "tier": "high"}]
+            sealed[source] = {"low": ["a", "b"], "medium": ["c"], "high": ["e"]}
+        with tempfile.TemporaryDirectory() as tmp:
+            prep = Path(tmp) / "prepare"
+            prep.mkdir()
+            (prep / "groups.json").write_text(json.dumps(groups))
+            (prep / "manifest.json").write_text(json.dumps({"summary": {"groups": sealed}}))
+            prices, _ = L.group_prices(Path(tmp))
+            np.testing.assert_allclose(prices["sprout"], [0.1, 0.2, 1.0])
+            sealed["sprout"]["high"] = ["d"]
+            (prep / "manifest.json").write_text(json.dumps({"summary": {"groups": sealed}}))
+            with self.assertRaises(SystemExit):
+                L.group_prices(Path(tmp))
+
+
 class EnglishOnlyTest(unittest.TestCase):
     def test_exclusion_list_holds_ids_only(self):
         table = pd.read_csv(ROOT.parent / L.NON_ENGLISH)
