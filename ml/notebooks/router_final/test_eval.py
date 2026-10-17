@@ -3,8 +3,8 @@
 Nothing is chosen here. Settings, adapters (calibrated test probabilities), rho, cost targets and lambdas all come
 from <run>/lock/selection-lock.json. This step reads the test outcomes (00_prepare test.parquet, group pass
 probabilities under v2 grading) and, for the A split, rebuilds the v1 group probabilities from the raw data so the
-A test can also be reported under v1 grading (plan 2.5, H6). Questions in the English-only exclusion list are
-dropped, as in 07b.
+A test can also be reported under v1 grading (plan 2.5, H6). Questions in the evaluation exclusion lists
+(non-English, document-grounded QA) are dropped, as in 07b.
 
 Track 1 (cost-aware): for each router, rule (escalation-aware, one-shot), kappa and cost level, the router's test
 value (resolved - kappa x failed attempts) minus the best fixed start tier or mixture at the router's test cost
@@ -131,12 +131,13 @@ def load_lock(run_dir: Path, repo: Path) -> dict:
     for name, (rel, digest) in files.items():
         if C.sha256_file(lock_dir / rel) != digest:
             raise SystemExit(f"calibrated file changed since 07b: {rel}")
-    en = record["english_only"]
-    if C.sha256_file(repo / en["file"]) != en["sha256"]:
-        raise SystemExit("the English-only exclusion list changed since 07b")
+    excluded = set()
+    for name, en in record["exclusions"].items():
+        if C.sha256_file(repo / en["file"]) != en["sha256"]:
+            raise SystemExit(f"the evaluation exclusion list changed since 07b: {en['file']}")
+        excluded |= set(pd.read_csv(repo / en["file"]).sample_id)
     return {"record": record, "files": {k: lock_dir / v[0] for k, v in files.items()},
-            "sha256": C.sha256_file(lock_dir / "selection-lock.json"),
-            "excluded": set(pd.read_csv(repo / en["file"]).sample_id)}
+            "sha256": C.sha256_file(lock_dir / "selection-lock.json"), "excluded": excluded}
 
 
 def resolve_inputs(repo: Path, data_root: Path) -> tuple:
@@ -205,7 +206,7 @@ def load_truth(run_dir: Path, repo: Path, data_root: Path, lock: dict, rehearse:
     frame = frame[~frame.excluded_v2.fillna(False).astype(bool)]
     counts["after_v2_exclusions"] = frame.groupby("source_dataset").size().to_dict()
     frame = frame[~frame.sample_id.isin(lock["excluded"])]
-    counts["after_english_only"] = frame.groupby("source_dataset").size().to_dict()
+    counts["after_evaluation_exclusions"] = frame.groupby("source_dataset").size().to_dict()
     frame = frame[frame[[f"p_{t}" for t in TIERS]].notna().all(axis=1)].reset_index(drop=True)
     counts["evaluated"] = frame.groupby("source_dataset").size().to_dict()
     cfg, inputs = resolve_inputs(repo, data_root)
@@ -553,8 +554,13 @@ def diagnose(run_dir: Path, rec: dict, frame: pd.DataFrame, role: str, iteration
                 boot.append(spearman(x[idx], y[idx]))
         lo, hi = interval(np.array(boot))
         h3[source] = {"spearman": spearman(x, y), "lo": float(lo), "hi": float(hi), "n": int(len(rows))}
-    arena = pd.read_parquet(run_dir / "inputs" / "routerarena-full.parquet", columns=["Global Index", "Difficulty"])
+    arena = pd.read_parquet(run_dir / "inputs" / "routerarena-full.parquet", columns=["Global Index", "Difficulty", "Context"])
     arena["sample_id"] = "routerarena:" + arena["Global Index"].astype(str)
+    # routers saw the Question only; a question that comes with its own Context (passage, premise, code) is incomplete
+    with_context = arena.Context.fillna("").astype(str).str.strip().ne("")
+    out["routerarena_rows"] = {"all": int(len(arena)), "with_context_dropped": int(with_context.sum()),
+                               "used": int((~with_context).sum())}
+    arena = arena[~with_context]
     arena = arena[arena.sample_id.isin(irt.index)]
     arena = arena[np.isfinite(irt.loc[arena.sample_id].to_numpy(float))].reset_index(drop=True)
     x, y = irt.loc[arena.sample_id].to_numpy(float), arena.Difficulty.map(BLOOM).to_numpy(float)

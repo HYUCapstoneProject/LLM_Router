@@ -1,8 +1,9 @@
 """EV-10 07b_lock: calibrate every router on dev, pick one setting per method, and freeze the decision rules.
 
 Reads dev outcomes (00_prepare dev.parquet) and the dev/test/RouterArena scores written by 03-06 and 07a.
-Test outcomes are not read. Evaluation is English-only: the questions in NON_ENGLISH (sample ids, no text) are
-dropped from dev and from every calibrated output, so 08_test never sees them. Writes <output>/:
+Test outcomes are not read. Evaluation uses English questions without a provided document only: the questions in
+EXCLUSIONS (sample-id lists, no text) are dropped from dev and from every calibrated output, so 08_test never sees
+them. Writes <output>/:
 
   selection-lock.json      what 08_test may use: selected setting per method, adapters' inputs, rho, cost
                            targets, lambda tables, decision rules, SHA-256 of every file it depends on
@@ -49,6 +50,8 @@ KIND = {"knn": "per_tier", "knn_a": "per_tier", "mlp": "per_tier", "svm": "per_t
 OURS_03 = ("r0_group", "r1_group", "r1_group_a")
 OPERATIONAL_R0 = "experiments/results/context-length-qualification-20260925/r0/scores"
 NON_ENGLISH = "experiments/results/router-final-inputs/non-english-eval-exclusions.csv"  # see the .md beside it
+DOCUMENT_GROUNDED = "experiments/results/router-final-inputs/document-grounded-eval-exclusions.csv"  # same .md folder
+EXCLUSIONS = {"non_english": NON_ENGLISH, "document_grounded": DOCUMENT_GROUNDED}  # evaluation only, never training
 OUTPUT_WEIGHT = 5.0  # length cost: Claude output price / input price (Haiku 1/5, Sonnet 3/15, Opus 5/25 USD per 1M)
 
 
@@ -298,15 +301,24 @@ def mean_gain(tables: dict) -> float:
     return float(np.mean([np.mean([r["dev_gain"] for r in t["escalation"]]) for t in tables.values()]))
 
 
-def english_exclusions(repo: Path) -> tuple:
-    """Sample ids of the non-English evaluation questions (the service and its BGE encoder are English-only)."""
-    path = repo / NON_ENGLISH
+def exclusion_list(repo: Path, rel: str) -> tuple:
+    path = repo / rel
     table = pd.read_csv(path)
     if not table.sample_id.is_unique:
-        raise SystemExit(f"duplicate sample ids in {NON_ENGLISH}")
-    return set(table.sample_id), {"file": NON_ENGLISH, "sha256": C.sha256_file(path), "rows": int(len(table)),
+        raise SystemExit(f"duplicate sample ids in {rel}")
+    return set(table.sample_id), {"file": rel, "sha256": C.sha256_file(path), "rows": int(len(table)),
                                   "by_source_role": {f"{s}/{r}": int(n) for (s, r), n
                                                      in table.groupby(["source_dataset", "role"]).size().items()}}
+
+
+def evaluation_exclusions(repo: Path) -> tuple:
+    """Evaluation questions dropped by the data contract: non-English (the service and its BGE are English-only)
+    and document-grounded QA (RAG-type: a passage is given and the answer must come from it)."""
+    ids, records = set(), {}
+    for name, rel in EXCLUSIONS.items():
+        part, records[name] = exclusion_list(repo, rel)
+        ids |= part
+    return ids, records
 
 
 def check(path: Path, digest: str) -> None:
@@ -398,13 +410,14 @@ def lock(run_dir: Path, repo: Path, output_dir: Path, allow_missing: bool) -> di
     if output_dir.exists() and any(output_dir.iterdir()):
         raise SystemExit("output directory must be new and empty")
     data = load_outcomes(run_dir)
-    excluded, english = english_exclusions(repo)
+    excluded, exclusions = evaluation_exclusions(repo)
     dev = data["dev"]
-    english["dev_rows_removed"] = int(dev.sample_id.isin(excluded).sum())
+    for name, rel in EXCLUSIONS.items():
+        exclusions[name]["dev_rows_removed"] = int(dev.sample_id.isin(exclusion_list(repo, rel)[0]).sum())
     dev = dev[~dev.sample_id.isin(excluded)].reset_index(drop=True)
     seen = set()
 
-    def english_only(scores: pd.DataFrame) -> pd.DataFrame:
+    def evaluated_only(scores: pd.DataFrame) -> pd.DataFrame:
         seen.update(excluded.intersection(scores.sample_id))
         return scores[~scores.sample_id.isin(excluded)].reset_index(drop=True)
 
@@ -438,7 +451,7 @@ def lock(run_dir: Path, repo: Path, output_dir: Path, allow_missing: bool) -> di
     for method, settings in sorted(by_method.items()):
         evaluated = []
         for setting, path in settings:
-            scores = english_only(pd.read_parquet(path))
+            scores = evaluated_only(pd.read_parquet(path))
             oof, frozen = calibrate_method(method, scores, dev, group_cols, label_tables.get(method, {}), SOURCES)
             per_source = {}
             for source, (d, X, Y, Phat) in oof.items():
@@ -469,8 +482,8 @@ def lock(run_dir: Path, repo: Path, output_dir: Path, allow_missing: bool) -> di
     rt08 = {}
     if ("rt08", "default") in files:
         a_train = data["train"][data["train"].source_dataset.isin(A_SOURCES)]
-        candidates = {"rt08": (english_only(pd.read_parquet(files[("rt08", "default")])), "old_label_v2"),
-                      "r0_operational": (english_only(operational_r0(repo)), "old_label_v1")}
+        candidates = {"rt08": (evaluated_only(pd.read_parquet(files[("rt08", "default")])), "old_label_v2"),
+                      "r0_operational": (evaluated_only(operational_r0(repo)), "old_label_v1")}
         for basis, cols in (("group", group_cols), ("representative", arm_cols)):
             basis_dev = dev[dev[cols].notna().all(axis=1)]
             b_rho, b_targets = {}, {}
@@ -497,13 +510,13 @@ def lock(run_dir: Path, repo: Path, output_dir: Path, allow_missing: bool) -> di
                           "operational_r0_scores": {p.name: C.sha256_file(p) for p in sorted(op.glob("*-512.parquet"))}}
 
     if by_method and seen != excluded:  # every listed id must be a scored question of this run
-        raise SystemExit(f"{len(excluded - seen)} ids in {NON_ENGLISH} are not in the scores")
+        raise SystemExit(f"{len(excluded - seen)} excluded ids are not in the scores")
     table = pd.DataFrame(selection_rows)
     table.to_parquet(output_dir / "selection-table.parquet", index=False)
     lock_record = {
         "experiment": "EV-10 07b_lock", "test_outcomes_read": False, "missing_scores": missing,
         "inputs": data["hashes"] | {"dev_rows": complete_dev.groupby("source_dataset").size().to_dict()},
-        "english_only": english,
+        "exclusions": exclusions,
         "evaluation": {
             "tiers": list(TIERS), "service_cost": SERVICE_COST.tolist(), "kappa_grid": KAPPAS.tolist(),
             "cost_levels": {"fractions": list(LEVELS), "definition": "fraction of each source's range between the cheapest "
@@ -544,9 +557,11 @@ def summary_markdown(record: dict, table: pd.DataFrame) -> str:
     lines = ["# 07 lock 요약", "", "dev에서 정한 내용이다. test 결과는 읽지 않았다.", ""]
     if record["missing_scores"]:
         lines += [f"**빠진 점수:** {', '.join(record['missing_scores'])}", ""]
-    ev, en = record["evaluation"], record["english_only"]
-    lines += [f"**영어만 평가:** 영어가 아닌 문항 {en['rows']}건 제외(dev {en['dev_rows_removed']}건, "
-              f"나머지 test). 목록: `{en['file']}`", ""]
+    ev = record["evaluation"]
+    label = {"non_english": "영어가 아닌 문항", "document_grounded": "문서 제공형(RAG형) 문항"}
+    for name, en in record["exclusions"].items():
+        lines += [f"**평가 제외 — {label.get(name, name)}:** {en['rows']}건(dev {en['dev_rows_removed']}건, 나머지 test). "
+                  f"목록: `{en['file']}`", ""]
     gp, ln = ev["sensitivity"]["group_price"], ev["sensitivity"]["length"]
     lines += ["## 원천별 값", "", "비용 목표는 원천마다 가장 싼·가장 비싼 고정 시작 단계의 기대 비용 사이 25/50/75% 지점이다. "
               "주 기준은 Claude 가격 1:3:5(.2/.6/1.0), 민감도는 집단 모델의 평균 데이터 가격(high = 1)이다.", "",

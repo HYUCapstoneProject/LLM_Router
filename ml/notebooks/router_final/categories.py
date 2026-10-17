@@ -62,7 +62,8 @@ def composition(run_dir: Path, repo: Path, data_root: Path, output: Path) -> Non
     import test_eval as T
     cfg, inputs = T.resolve_inputs(repo, data_root)
     cats = category_table(inputs)
-    excluded = set(pd.read_csv(repo / "experiments/results/router-final-inputs/non-english-eval-exclusions.csv").sample_id)
+    import lock as L
+    excluded, _ = L.evaluation_exclusions(repo)
     manifest = json.loads((run_dir / "prepare/manifest.json").read_text())
     rows = []
     for role in ("train", "dev", "test"):
@@ -89,7 +90,8 @@ def composition(run_dir: Path, repo: Path, data_root: Path, output: Path) -> Non
 
 def markdown(data: pd.DataFrame, arena: pd.DataFrame) -> str:
     L = ["# EV-10 데이터 구성 — 카테고리별 분포", "",
-         "00_prepare의 train·dev·test에서 v2 제외 문항, 영어가 아닌 평가 문항(dev·test), 집단 풀 확률이 빈 행을 뺀 "
+         "00_prepare의 train·dev·test에서 v2 제외 문항, 평가 제외 문항(dev·test의 영어가 아닌 문항과 문서 제공형 SQuAD·BoolQ), "
+         "집단 풀 확률이 빈 행을 뺀 "
          "**실제로 쓰는 행**이다. test는 문항 수만 세고 결과(필요 단계)는 읽지 않았다. 표의 숫자는 `categories.py composition`이 만든다.", ""]
     roles = ("train", "dev", "test")
     # 0. needed tier (train, dev only; the test's is an outcome)

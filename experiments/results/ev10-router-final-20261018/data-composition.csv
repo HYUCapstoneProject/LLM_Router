@@ -15,7 +15,6 @@ dev,sprout,Idavidrein/gpqa/gpqa_extended,전문가 과학·난제,61
 dev,sprout,openhermes/teknium,열린 대화·지시,2900
 dev,xroutebench,aime_2020_2024,수학,11
 dev,xroutebench,arc_challenge,상식·추론,45
-dev,xroutebench,boolq,독해,41
 dev,xroutebench,commonsense_qa,상식·추론,42
 dev,xroutebench,gsm8k,수학,47
 dev,xroutebench,hellaswag,상식·추론,40
@@ -25,7 +24,6 @@ dev,xroutebench,mbpp,코드,35
 dev,xroutebench,mmlu,지식 객관식,46
 dev,xroutebench,mmlu_pro,지식 객관식,7
 dev,xroutebench,openbook_qa,상식·추론,46
-dev,xroutebench,squad,독해,39
 test,llmrouterbench,aime,수학,18
 test,llmrouterbench,arenahard,열린 대화·지시,457
 test,llmrouterbench,gpqa,전문가 과학·난제,69
@@ -43,7 +41,6 @@ test,sprout,Idavidrein/gpqa/gpqa_extended,전문가 과학·난제,135
 test,sprout,openhermes/teknium,열린 대화·지시,6756
 test,xroutebench,aime_2020_2024,수학,13
 test,xroutebench,arc_challenge,상식·추론,500
-test,xroutebench,boolq,독해,50
 test,xroutebench,commonsense_qa,상식·추론,50
 test,xroutebench,gsm8k,수학,500
 test,xroutebench,hellaswag,상식·추론,50
@@ -53,7 +50,6 @@ test,xroutebench,mbpp,코드,500
 test,xroutebench,mmlu,지식 객관식,500
 test,xroutebench,mmlu_pro,지식 객관식,500
 test,xroutebench,openbook_qa,상식·추론,500
-test,xroutebench,squad,독해,50
 train,llmrouterbench,aime,수학,12
 train,llmrouterbench,gpqa,전문가 과학·난제,98
 train,llmrouterbench,hle,전문가 과학·난제,662

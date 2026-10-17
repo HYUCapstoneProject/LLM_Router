@@ -141,7 +141,7 @@ python ml/notebooks/router_final/common_track.py run --run-dir <run001> --extern
 - **집단 가격 민감도:** 단계 비용을 Claude 1:3:5 대신 집단 모델의 평균 데이터 가격(`prepare/groups.json`, high = 1)으로 바꿔, 선택된 설정마다 비용 목표와 λ 표를 한 번 더 만든다(`sensitivity_group_price`). 설정 선택은 1:3:5로만 한다. groups.json의 모델 목록은 봉인된 00_prepare manifest와 대조한다.
 - **λ 표:** (원천, 규칙, κ, 비용 수준)마다 dev 기대 비용이 목표에 가장 가까운 λ다. 규칙은 상향 고려와 한 번에 고르기이고, 갈래 ②의 τ 규칙(τ = .8, 곡선 .5~.95)은 λ가 필요 없다.
 - **설정 선택:** 상향 고려 규칙의 (최종 해결 − κ × 실패 횟수)에서, 같은 dev 비용에서 고정 시작 단계(혼합 포함)가 낼 수 있는 가장 좋은 값을 뺀 "이득"을 원천·κ 격자·비용 수준에 걸쳐 평균하고, 가장 큰 설정을 고른다.
-- **영어만 평가:** [제외 목록](../../../experiments/results/router-final-inputs/non-english-eval-exclusions.md)의 영어가 아닌 문항 246건(모두 LLMRouterBench test arenahard)을 dev와 모든 보정 출력에서 지운다. 08은 이 문항을 볼 수 없다. 목록의 id가 점수에 없으면 멈춘다.
+- **평가 제외:** [문서 제공형 제외 목록](../../../experiments/results/router-final-inputs/document-grounded-eval-exclusions.md)의 xRouteBench SQuAD·BoolQ 180건(dev 80, test 100)과 [영어 제외 목록](../../../experiments/results/router-final-inputs/non-english-eval-exclusions.md)의 영어가 아닌 문항 246건(모두 LLMRouterBench test arenahard)을 dev와 모든 보정 출력에서 지운다. 08은 이 문항을 볼 수 없다. 목록의 id가 점수에 없으면 멈춘다.
 - **RT-08:** RT-08(v2 재학습)과 운영 R0(v1, 저장소의 512토큰 점수)를 A 분할에서 집단 기준과 대표 모델 기준 두 가지로 보정한다.
 - **출력:** `selection-lock.json`(선택 설정, ρ, 비용 목표, λ 표, 규칙, 의존 파일 SHA), `calibrated/<방법>.parquet`(dev·test 단계별 확률), `selection-table.parquet`(모든 설정의 dev 근거), `lock-summary.md`.
 
@@ -175,7 +175,7 @@ python ml/notebooks/router_final/length_inputs.py --run-dir <run001> --repo . --
 `test_eval.py`가 본체다. 07b lock에서 고정한 것만 쓰고 아무것도 고르지 않는다. Colab CPU에서 돌리며 소스는 `router-final-source-test.zip`이다. A test의 v1 채점값은 원본 데이터에서 다시 만들고, bootstrap 묶음 ID는 원천 파일에서 읽는다. 이 원본 11개(87MB)를 저장소와 같은 경로로 Drive `inputs/test-data/`에 두었고(`test-data-manifest.json`에 SHA), 노트북이 실행 전에 대조한다. 로컬에서는 `--data-root`를 데이터가 있는 checkout으로 주면 된다. 읽은 입력 파일의 SHA는 출력 manifest의 `input_sha256`에 남는다.
 
 - **입력 확인:** lock이 시험 실행(빠진 점수)이 아닌지, 보정 파일·영어 제외 목록·00 test 출력의 SHA가 기록과 같은지 확인한다. 출력 폴더 `RUN/test`가 이미 있으면 멈춘다(test는 한 번 연다).
-- **평가 행:** test에서 v2 제외 문항, 영어가 아닌 246건, 집단 풀 확률이 비어 있는 행을 뺀다. 건수는 `manifest.json`의 `counts`에 남는다.
+- **평가 행:** test에서 v2 제외 문항, 평가 제외 목록(영어가 아닌 246건, 문서 제공형 100건), 집단 풀 확률이 비어 있는 행을 뺀다. RouterArena 진단은 `Context`가 붙은 1,603건을 뺀다. 건수는 `manifest.json`의 `counts`에 남는다.
 - **갈래 ①:** 라우터 × 규칙(상향 고려, 한 번에 고르기) × κ 21개 × 비용 수준 3개마다 test 효용(최종 해결 − κ × 실패 횟수)에서 같은 test 비용의 고정 시작 단계(혼합 포함) 값을 뺀 이득. 기준은 Claude 1:3:5(주), 집단 평균 가격·길이 반영(민감도), A test v1 채점(점 추정). oracle(참 확률, λ를 test에서 맞춤)과 운영 R0(A 분할)는 참고용으로만 싣고 순위에 넣지 않는다.
 - **구간:** 질문 묶음 단위 paired bootstrap 10,000회(seed 42). 묶음은 A 분할이 `duplicate_group_id`, 외부 데이터가 `split_group_id`다. 한 원천 안에서는 모든 라우터·규칙·κ·수준이 같은 표본을 쓰고, 원천끼리는 따로 뽑는다. macro는 원천 4개의 평균이다.
 - **κ\*:** 이득 > .01이고 95% 구간 하한 > 0인 가장 작은 κ(`kappa-star.parquet`).

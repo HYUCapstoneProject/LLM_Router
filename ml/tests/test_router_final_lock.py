@@ -158,12 +158,17 @@ class EnglishOnlyTest(unittest.TestCase):
         table = pd.read_csv(ROOT.parent / L.NON_ENGLISH)
         self.assertEqual(list(table.columns),
                          ["sample_id", "source_dataset", "role", "source_family", "slice", "dominant_script"])
+        self.assertEqual(list(pd.read_csv(ROOT.parent / L.DOCUMENT_GROUNDED).columns),
+                         ["sample_id", "source_dataset", "role", "category", "reason"])
         self.assertTrue(table.sample_id.is_unique)
         self.assertTrue(table.role.isin(["dev", "test", "diagnostic"]).all())
-        ids, record = L.english_exclusions(ROOT.parent)
-        self.assertEqual(len(ids), record["rows"])
-        self.assertEqual(sum(record["by_source_role"].values()), len(ids))
-        self.assertIn("llmrouterbench/test", json.loads(json.dumps(record))["by_source_role"])
+        ids, records = L.evaluation_exclusions(ROOT.parent)
+        self.assertEqual(set(records), set(L.EXCLUSIONS))
+        self.assertEqual(len(ids), sum(r["rows"] for r in records.values()))  # the lists do not overlap
+        self.assertIn("llmrouterbench/test", json.loads(json.dumps(records))["non_english"]["by_source_role"])
+        self.assertEqual(set(records["document_grounded"]["by_source_role"]), {"xroutebench/dev", "xroutebench/test"})
+        rag = pd.read_csv(ROOT.parent / L.DOCUMENT_GROUNDED)
+        self.assertEqual(set(rag.category), {"squad", "boolq"})
 
     def test_duplicate_ids_are_refused(self):
         import tempfile
@@ -172,7 +177,7 @@ class EnglishOnlyTest(unittest.TestCase):
             path.parent.mkdir(parents=True)
             pd.DataFrame({"sample_id": ["a", "a"], "source_dataset": ["s", "s"], "role": ["test", "test"]}).to_csv(path, index=False)
             with self.assertRaises(SystemExit):
-                L.english_exclusions(Path(tmp))
+                L.exclusion_list(Path(tmp), L.NON_ENGLISH)
 
 
 if __name__ == "__main__":

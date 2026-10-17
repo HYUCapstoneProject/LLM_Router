@@ -24,8 +24,9 @@ def main():
     paths += sorted(q for q in HERE.iterdir() if q.suffix in {".py", ".json", ".txt"})
     # 07_lock compares RT-08 with the operational R0's recorded 512-token scores (committed results)
     paths += sorted((ROOT / "experiments/results/context-length-qualification-20260925/r0/scores").glob("*-512.parquet"))
-    # 07_lock drops the non-English evaluation questions (ids only)
-    paths += [ROOT / "experiments/results/router-final-inputs/non-english-eval-exclusions.csv"]
+    # 07_lock and 08_test drop the excluded evaluation questions (ids only)
+    paths += [ROOT / "experiments/results/router-final-inputs/non-english-eval-exclusions.csv",
+              ROOT / "experiments/results/router-final-inputs/document-grounded-eval-exclusions.csv"]
     a.output_dir.mkdir(parents=True, exist_ok=True)
     target = a.output_dir / "router-final-source.zip"
     records = {}
