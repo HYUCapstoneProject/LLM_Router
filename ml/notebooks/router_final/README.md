@@ -181,7 +181,8 @@ python ml/notebooks/router_final/length_inputs.py --run-dir <run001> --repo . --
 - **κ\*:** 이득 > .01이고 95% 구간 하한 > 0인 가장 작은 κ(`kappa-star.parquet`).
 - **갈래 ②:** τ .5~.95마다 필요 단계 정확도·첫 시도 성공·최종 해결·호출 수·비용. 고정 시작과 "필요 단계에서 시작"도 함께 싣는다. RouterArena와 겹치는 외부 test 문항은 `track2-arena-overlap.parquet`에 따로 낸다.
 - **가설:** H1~H7과 RT-08을 계획서 4.4·3절의 규칙대로 계산해 `hypotheses.json`에 쓴다. H3은 IRT-Router 난이도와 우리 필요 단계·RouterArena Bloom 라벨의 Spearman 상관이다. RouterArena에서는 R0-집단의 예측 단계와 Bloom 라벨의 일치도도 낸다.
+- **풀리는 정도별 층(기술 통계):** solvable(어느 집단이든 ≥ .8), beyond_partial(모두 .8 미만, 0은 아님), beyond_zero(모두 0)마다 같은 지표를 낸다(`by-stratum.parquet`). 필요 단계 정확도는 solvable 층에서만 센다(`needed_tier_accuracy_solvable`, H2).
 - **카테고리별(기술 통계, 판정 아님):** 원천별 카테고리와 공통 과제 유형(`categories.py` `TASK_TYPE`)마다 평균 이득(고정 시작 기준선을 그 카테고리 안에서 다시 만든다), τ = .8의 갈래 ② 지표와 시작 단계 비율. 30문항 미만 카테고리는 문항 수만 낸다. 원천을 합친 과제 유형은 문항 수 가중 평균이다(`by-category.parquet`).
-- **출력:** `track1.parquet`, `fixed-starts.parquet`, `mean-gain.parquet`, `kappa-star.parquet`, `track2.parquet`, `track2-arena-overlap.parquet`, `rt08.parquet`, `by-category.parquet`, `test-starts.parquet`(질문마다 각 라우터의 시작 단계), `hypotheses.json`, `diagnostics.json`, `manifest.json`, `test-summary.md`.
+- **출력:** `track1.parquet`, `fixed-starts.parquet`, `mean-gain.parquet`, `kappa-star.parquet`, `track2.parquet`, `track2-arena-overlap.parquet`, `rt08.parquet`, `by-category.parquet`, `by-stratum.parquet`, `test-starts.parquet`(질문마다 각 라우터의 시작 단계), `hypotheses.json`, `diagnostics.json`, `manifest.json`, `test-summary.md`.
 - **리허설:** `--rehearse-on-dev`는 같은 코드를 dev 결과로 돌려 다른 폴더에 쓴다. test는 읽지 않는다. dev에서 맞춘 보정을 dev에 쓴 값이라 낙관적이며 해석하지 않는다.
 - **주의(dev 리허설에서 확인):** LLMRouterBench는 1:3:5에서 고정 시작 비용이 low .97, high 1.0, medium 1.09로 거의 같다. 그런데 해결률과 실패 수는 크게 달라, 같은 비용 비교가 비용의 작은 차이에 크게 흔들리고 구간이 넓다. 그대로 보고하고 집단 가격 민감도(비용 범위가 넓다)를 함께 본다.

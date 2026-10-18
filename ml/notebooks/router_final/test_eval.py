@@ -41,6 +41,7 @@ BOOT = {"iterations": 10000, "seed": 42, "confidence": 0.95,
         "pairing": "same group draws for every router, rule, kappa and level of a source; sources resampled independently"}
 CHUNK = 500
 REFERENCE = ("oracle", "r0_operational")  # reported, never ranked
+STRATA = ("solvable", "beyond_partial", "beyond_zero")  # plan 2.5 (10-18): some group >= tau / all < tau / all 0
 BLOOM = {"easy": 0, "medium": 1, "hard": 2}
 
 
@@ -224,6 +225,10 @@ def load_truth(run_dir: Path, repo: Path, data_root: Path, lock: dict, rehearse:
     counts["a_rows_with_v1"] = frame[a & frame[[f"p_v1_{t}" for t in TIERS]].notna().all(axis=1)] \
         .groupby("source_dataset").size().to_dict()
     frame["needed"] = frame.needed_tier.map({t: k for k, t in enumerate(TIERS)}).astype(int)
+    best = frame[[f"p_{t}" for t in TIERS]].max(axis=1)
+    frame["stratum"] = np.where(best >= L.TAU, "solvable", np.where(best > 0, "beyond_partial", "beyond_zero"))
+    counts["strata"] = {s: g.stratum.value_counts().reindex(list(STRATA)).fillna(0).astype(int).to_dict()
+                        for s, g in frame.groupby("source_dataset")}
     counts["needed_tier_share"] = {s: g.needed_tier.value_counts(normalize=True).reindex(list(TIERS)).fillna(0).round(4).to_dict()
                                    for s, g in frame.groupby("source_dataset")}
     cats = K.category_table(inputs, roles=(role,))
@@ -331,6 +336,11 @@ def evaluate_track2(P: np.ndarray, needed: np.ndarray, starts: np.ndarray, cost:
 TRACK2 = ("needed_tier_accuracy", "first", "resolved", "calls", "cost")
 
 
+def solvable_accuracy(M: np.ndarray, solvable: np.ndarray) -> float:
+    """Needed-tier accuracy over the solvable stratum only: a question no group solves has no needed tier."""
+    return float(M[solvable, 0].mean()) if solvable.any() else float("nan")
+
+
 # ---------------------------------------------------------------------------------------------
 
 def run(run_dir: Path, repo: Path, data_root: Path, output_dir: Path, rehearse: bool, iterations: int) -> dict:
@@ -404,19 +414,22 @@ def run(run_dir: Path, repo: Path, data_root: Path, output_dir: Path, rehearse: 
             # track 2 on the main basis
             needed = rows.needed.to_numpy()
             in_arena = rows.arena_overlap.eq(True).to_numpy()
+            solvable = rows.stratum.eq("solvable").to_numpy()
             for tau in L.TAU_CURVE:
                 st = L.decide("tau", Phat, 0.0, tau=float(tau))
                 M = evaluate_track2(P, needed, st, L.SERVICE_COST)
                 rec2 = {"source": source, "method": name, "tau": float(tau),
-                        **{k: float(v) for k, v in zip(TRACK2, M.mean(axis=0))}}
+                        **{k: float(v) for k, v in zip(TRACK2, M.mean(axis=0))},
+                        "needed_tier_accuracy_solvable": solvable_accuracy(M, solvable)}
                 if abs(tau - L.TAU) < 1e-9:
                     starts_cols.setdefault(name, {})[(source, "tau", "t0.80", None)] = st
                     if in_arena.any():
                         overlap.append({"source": source, "method": name, "rows": int(in_arena.sum()),
                                         **{k: float(v) for k, v in zip(TRACK2, M[in_arena].mean(axis=0))}})
                     if name not in REFERENCE:
-                        B = draws.means(M[:, :2])
-                        for j, k in enumerate(TRACK2[:2]):
+                        B = draws.means(np.column_stack([M[:, 0] * solvable, M[:, 1], solvable]))
+                        B = np.column_stack([B[:, 0] / B[:, 2], B[:, 1]])  # solvable-only accuracy, first success
+                        for j, k in enumerate(("needed_tier_accuracy_solvable", "first")):
                             rec2[f"{k}_lo"], rec2[f"{k}_hi"] = (float(v) for v in interval(B[:, j]))
                         summaries[("track2", source, name)] = B
                 track2.append(rec2)
@@ -426,7 +439,8 @@ def run(run_dir: Path, repo: Path, data_root: Path, output_dir: Path, rehearse: 
         for label, st in [(f"fixed_{t}", np.full(len(rows), k)) for k, t in enumerate(TIERS)] + [("needed_tier", needed)]:
             M = evaluate_track2(P, needed, st, L.SERVICE_COST)
             track2.append({"source": source, "method": label, "tau": np.nan,
-                           **{k: float(v) for k, v in zip(TRACK2, M.mean(axis=0))}})
+                           **{k: float(v) for k, v in zip(TRACK2, M.mean(axis=0))},
+                           "needed_tier_accuracy_solvable": solvable_accuracy(M, solvable)})
             if in_arena.any():
                 overlap.append({"source": source, "method": label, "rows": int(in_arena.sum()),
                                 **{k: float(v) for k, v in zip(TRACK2, M[in_arena].mean(axis=0))}})
@@ -451,6 +465,8 @@ def run(run_dir: Path, repo: Path, data_root: Path, output_dir: Path, rehearse: 
     write_starts(starts_cols, frame, output_dir / "test-starts.parquet")
     by_cat = by_category(frame, starts_cols)
     by_cat.to_parquet(output_dir / "by-category.parquet", index=False)
+    by_str = by_category(frame, starts_cols, minimum=1, groupings=(("stratum", "stratum"),))
+    by_str.to_parquet(output_dir / "by-stratum.parquet", index=False)
 
     outputs = {p.name: C.sha256_file(p) for p in sorted(output_dir.glob("*.parquet"))}
     (output_dir / "diagnostics.json").write_text(json.dumps(diagnostics, ensure_ascii=False, indent=1, default=float))
@@ -467,8 +483,13 @@ def run(run_dir: Path, repo: Path, data_root: Path, output_dir: Path, rehearse: 
     pooled = pooled[[t for t in K.TYPES if t in pooled.columns]]
     table = ["| 방법 | " + " | ".join(pooled.columns) + " |", "|---|" + "---:|" * len(pooled.columns)]
     table += [f"| {m} | " + " | ".join("–" if np.isnan(v) else f"{v:+.3f}" for v in r) + " |" for m, r in pooled.iterrows()]
-    (output_dir / "test-summary.md").write_text(summary_markdown(manifest | {"by_category_table": table}, mean_gain, ks,
-                                                                 hypotheses, t2))
+    ps = by_str[by_str.source.eq("all") & ~by_str.method.astype(str).str.startswith("fixed_")].pivot_table(
+        index="method", columns="group", values="mean_gain")
+    ps = ps[[g for g in STRATA if g in ps.columns]]
+    stable = ["| 방법 | " + " | ".join(ps.columns) + " |", "|---|" + "---:|" * len(ps.columns)]
+    stable += [f"| {m} | " + " | ".join("–" if np.isnan(v) else f"{v:+.3f}" for v in r) + " |" for m, r in ps.iterrows()]
+    (output_dir / "test-summary.md").write_text(summary_markdown(
+        manifest | {"by_category_table": table, "by_stratum_table": stable}, mean_gain, ks, hypotheses, t2))
     return manifest
 
 
@@ -616,12 +637,13 @@ def judge(summaries: dict, t1, t2, ks, mean_gain, rt08, diagnostics, methods) ->
         a, b = summaries[("track2", source, "r0_group")], summaries[("track2", source, "r1_group")]
         pa = t2[t2.source.eq(source) & np.isclose(t2.tau, 0.8)].set_index("method")
         res = {}
-        for j, k in enumerate(("needed_tier_accuracy", "first")):
+        for j, k in enumerate(("needed_tier_accuracy_solvable", "first")):
             d = float(pa.loc["r0_group", k] - pa.loc["r1_group", k])
             lo, hi = interval(a[:, j] - b[:, j])
             res[k] = {"diff_r0_minus_r1": d, "lo": float(lo), "hi": float(hi), "within_0.02": bool(abs(d) <= 0.02)}
         h2[source] = res
-    out["H2"] = {"rule": "tau = .8: R0-group minus R1-group needed-tier accuracy and first-attempt success within +-.02",
+    out["H2"] = {"rule": "tau = .8: R0-group minus R1-group needed-tier accuracy (solvable stratum; a question no group "
+                         "solves has no needed tier, 10-18) and first-attempt success (all rows) within +-.02",
                  "result": h2}
     out["H3"] = {"rule": "Spearman of IRT-Router difficulty with our needed tier (positive) and with RouterArena's Bloom "
                          "label (weak)", "result": diagnostics["h3_irt_difficulty"]}
@@ -679,7 +701,8 @@ def pair_over_kappa(summaries: dict, t1: pd.DataFrame, a: str, b: str) -> dict:
     return res
 
 
-def by_category(frame: pd.DataFrame, starts: dict, minimum: int = 30) -> pd.DataFrame:
+def by_category(frame: pd.DataFrame, starts: dict, minimum: int = 30,
+                groupings=(("category", "category"), ("task_type", "task_type"))) -> pd.DataFrame:
     """Descriptive results per source category and shared task type (main basis, point estimates, not judged).
 
     Same locked decisions as the whole-source results; the fixed-start envelope is rebuilt inside each category.
@@ -690,7 +713,7 @@ def by_category(frame: pd.DataFrame, starts: dict, minimum: int = 30) -> pd.Data
         part = frame[frame.source_dataset.eq(source)].reset_index(drop=True)
         P = part[[f"p_{t}" for t in TIERS]].to_numpy(float)
         needed = part.needed.to_numpy()
-        for level_name, column in (("category", "category"), ("task_type", "task_type")):
+        for level_name, column in groupings:
             for group, idx in part.groupby(column).indices.items():
                 n = len(idx)
                 base = {"grouping": level_name, "source": source, "group": group, "rows": n,
@@ -715,20 +738,26 @@ def by_category(frame: pd.DataFrame, starts: dict, minimum: int = 30) -> pd.Data
                     tau = by[(source, "tau", "t0.80", None)][idx]
                     M = evaluate_track2(Pg, needed[idx], tau, L.SERVICE_COST).mean(axis=0)
                     share = np.bincount(tau, minlength=3) / n
+                    solv = part.stratum.iloc[idx].eq("solvable").to_numpy()
                     rows.append(base | {"method": name, "mean_gain": float(np.mean(gains)),
                                         **{f"tau_{k}": float(v) for k, v in zip(TRACK2, M)},
+                                        "tau_needed_tier_accuracy_solvable": solvable_accuracy(
+                                            evaluate_track2(Pg, needed[idx], tau, L.SERVICE_COST), solv),
                                         **{f"tau_start_{t}": float(v) for t, v in zip(TIERS, share)}})
                 for k, t in enumerate(TIERS):  # fixed-start reference rows
                     M = evaluate_track2(Pg, needed[idx], np.full(n, k), L.SERVICE_COST).mean(axis=0)
                     rows.append(base | {"method": f"fixed_{t}", **{f"tau_{key}": float(v) for key, v in zip(TRACK2, M)}})
     out = pd.DataFrame(rows)
-    # pooled over sources per task type: row-weighted mean of the per-source values
-    typed = out[out.grouping.eq("task_type") & out.method.notna()]
+    # pooled over sources (task type, stratum): row-weighted mean of the per-source values
+    pool_by = [g for g, _ in groupings if g != "category"]
+    if not pool_by:
+        return out
+    typed = out[out.grouping.isin(pool_by) & out.method.notna()]
     num = [c for c in out.columns if c.startswith(("mean_gain", "tau_"))]
     pooled = (typed.assign(**{c: typed[c] * typed.rows for c in num})
-              .groupby(["group", "method"])[num + ["rows"]].sum())
+              .groupby(["grouping", "group", "method"])[num + ["rows"]].sum())
     pooled[num] = pooled[num].div(pooled.rows, axis=0)
-    pooled = pooled.reset_index().assign(grouping="task_type", source="all", task_type=lambda d: d.group)
+    pooled = pooled.reset_index().assign(source="all", task_type=lambda d: d.group.where(d.grouping.eq("task_type")))
     return pd.concat([out, pooled], ignore_index=True)
 
 
@@ -774,6 +803,13 @@ def summary_markdown(manifest: dict, mean_gain: pd.DataFrame, ks: pd.DataFrame, 
         g = f"{gp.loc[(m, 'macro')].mean_gain:+.3f}" if (m, "macro") in gp.index else "–"
         n = f"{ln.loc[(m, 'macro')].mean_gain:+.3f}" if (m, "macro") in ln.index else "–"
         lines.append(f"| {m} | " + " | ".join(cells) + f" | {g} | {n} |")
+    strata = manifest["counts"]["strata"]
+    lines += ["", "## 풀리는 정도별 층 (10-18 사전 고정, 기술 통계)", "",
+              "solvable = 어느 집단이든 풀 확률 ≥ .8, beyond_partial = 모두 .8 미만이지만 0은 아님, beyond_zero = 모두 0.", "",
+              "| 원천 | " + " | ".join(STRATA) + " |", "|---|" + "---:|" * len(STRATA)]
+    lines += [f"| {s} | " + " | ".join(f"{strata[s][g]:,}" for g in STRATA) + " |" for s in SOURCES if s in strata]
+    lines += ["", "층별 평균 이득(층 안에서 고정 시작 기준선을 다시 만든다; 원천을 합칠 때 문항 수 가중):", ""]
+    lines += manifest.get("by_stratum_table", [])
     lines += ["", "## 과제 유형별 평균 이득 (기술 통계, 판정 아님; 원천을 합칠 때 문항 수 가중)", ""]
     bc = manifest.get("by_category_table")
     if bc is not None:
