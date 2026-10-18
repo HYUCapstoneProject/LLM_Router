@@ -196,3 +196,4 @@ python ml/notebooks/router_final/length_inputs.py --run-dir <run001> --repo . --
 
 `report.py`가 08(필수)·09·08a(있으면) 출력을 읽어 `results.md`, `tables/*.csv`, `figures/*.png`, `manifest.json`(입력·출력 SHA)을 만든다. 결과를 다시 계산하지 않는다. 그림 글자는 영어다(Colab에 한글 글꼴이 없다). 저장소에는 `experiments/results/ev10-router-final-20261018/report/`와 사람이 쓴 [REPORT.md](../../../experiments/results/ev10-router-final-20261018/REPORT.md)를 둔다.
 
+`arena_labels.py`(로컬 또는 CPU)는 RouterArena 난이도 라벨과 각 라우터 판정의 일치도(정확도·macro-F1·Cohen's κ·Spearman, 분야·세부 주제별, 혼동 행렬)를 `report/routerarena/`에 쓴다. 판정은 원래 출력(분류 모델), dev 단계 비율로 자르기, τ = .8 결정 세 가지이고 어느 것도 RouterArena 라벨로 맞추지 않는다.

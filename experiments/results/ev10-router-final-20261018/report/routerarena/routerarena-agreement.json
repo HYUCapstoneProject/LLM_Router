@@ -1,0 +1,34 @@
+{
+ "rows": {
+  "all": 8400,
+  "no_context": 6797
+ },
+ "label_mix_no_context": {
+  "easy": 3320,
+  "medium": 2095,
+  "hard": 1382
+ },
+ "adapter": "per tier isotonic fitted on the pooled dev of the four sources (evaluation exclusions dropped)",
+ "rule": "tau = .8 start tier read as easy/medium/hard; class models also by argmax",
+ "lock_sha256": "1d4672066b2b0669edc34f0ec2d313ca2b6f26406c985aaf2decdc1fe5ed140d",
+ "routerarena_sha256": "358a6bb4160320b5cb5b68d6d0a885c89b128b06d3dea267d77ed6daeebe4369",
+ "skipped": [
+  "avengers_pro",
+  "graphrouter",
+  "hybrid_llm",
+  "irt_router",
+  "knn",
+  "knn_a",
+  "mf",
+  "mlp",
+  "r0_group",
+  "r1_bge",
+  "r1_group",
+  "r1_group_a",
+  "routellm_released",
+  "routellm_retrained",
+  "routerdc",
+  "rt08",
+  "svm"
+ ]
+}

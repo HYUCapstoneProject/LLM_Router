@@ -206,7 +206,7 @@
 - **H4(재학습 − 공개본, 50% 수준 모든 κ에서 > .01):** routerbench 아님, xroutebench 아님, llmrouterbench 아님, sprout 아님
 - **H5 r1_group_vs_r1_group_a (seed 42):** routerbench -0.001, xroutebench -0.009, llmrouterbench +0.009, sprout +0.009 → 아님
 - **H5 knn_vs_knn_a (seed 42):** routerbench -0.002, xroutebench +0.004, llmrouterbench -0.007, sprout +0.016 → 아님
-- **H5 seed 반복(09):** 아직 없음
+- **H5 R1 (seed 42·17·73 평균, 09):** routerbench -0.001 [-0.005, +0.003], xroutebench -0.002 [-0.007, +0.002], llmrouterbench +0.004 [-0.008, +0.015], sprout +0.012 [+0.010, +0.014] → 아님
 - **H6(v1·v2 순위 Kendall τ):** routerbench 0.92, xroutebench 0.70
 - **H7:** κ\*가 없는(어떤 κ에서도 못 이기는) 라우터·원천·수준 비율 8.3%
 - **RT-08:** group/routerbench mixed; group/xroutebench mixed; representative/routerbench mixed; representative/xroutebench mixed
@@ -215,4 +215,45 @@ RouterArena: R0-집단 예측과 Bloom 라벨 일치 45.5%, Spearman 0.181 (Cont
 
 ## 8. 라우팅 지연 (08a)
 
-아직 없음(08a 실행 전).
+| router | stage | median_ms | p95_ms | mean_ms | setting | note | device |
+|---|---|---:|---:|---:|---|---|---|
+| bge_encoder | encoder | 783.1 | 2388.1 | 1080.7 | None | None | cpu |
+| decision_rule | decision | 0.4 | 0.8 | 0.5 | None | None | cpu |
+| knn | body | 159.5 | 232.1 | 173.3 | n_neighbors=40 | None | cpu |
+| knn | total_with_bge | 952.3 | 2556.4 | 1254.5 | n_neighbors=40 | None | cpu |
+| knn | added_given_bge | 159.9 | 232.6 | 173.8 | n_neighbors=40 | None | cpu |
+| knn_a | body | 101.5 | 157.7 | 109.2 | n_neighbors=50 | None | cpu |
+| knn_a | total_with_bge | 893.3 | 2488.6 | 1190.3 | n_neighbors=50 | None | cpu |
+| knn_a | added_given_bge | 102.0 | 158.5 | 109.7 | n_neighbors=50 | None | cpu |
+| mlp | body | 0.6 | 0.8 | 0.6 | hidden_layer_sizes=100-100 | None | cpu |
+| mlp | total_with_bge | 784.4 | 2389.1 | 1081.8 | hidden_layer_sizes=100-100 | None | cpu |
+| mlp | added_given_bge | 1.0 | 1.4 | 1.1 | hidden_layer_sizes=100-100 | None | cpu |
+| svm | body | 0.3 | 0.4 | 0.3 | default | None | cpu |
+| svm | total_with_bge | 784.0 | 2388.8 | 1081.5 | default | None | cpu |
+| svm | added_given_bge | 0.7 | 1.1 | 0.8 | default | None | cpu |
+| mf | body | 0.2 | 0.2 | 0.2 | epochs=5 | None | cpu |
+| mf | total_with_bge | 783.8 | 2388.7 | 1081.3 | epochs=5 | None | cpu |
+| mf | added_given_bge | 0.6 | 1.0 | 0.7 | epochs=5 | None | cpu |
+| hybrid_llm | body | 0.2 | 0.2 | 0.2 | router_mode=probabilistic | None | cpu |
+| hybrid_llm | total_with_bge | 783.8 | 2388.7 | 1081.3 | router_mode=probabilistic | None | cpu |
+| hybrid_llm | added_given_bge | 0.6 | 1.0 | 0.6 | router_mode=probabilistic | None | cpu |
+| irt_router | body | 0.3 | 0.4 | 0.3 | lamda=0.0 | None | cpu |
+| irt_router | total_with_bge | 784.0 | 2388.8 | 1081.4 | lamda=0.0 | None | cpu |
+| irt_router | added_given_bge | 0.7 | 1.1 | 0.8 | lamda=0.0 | None | cpu |
+| avengers_pro | body | 0.4 | 0.5 | 0.4 | n_clusters=25,performance_weight=0.45 | None | cpu |
+| avengers_pro | total_with_bge | 784.0 | 2388.9 | 1081.5 | n_clusters=25,performance_weight=0.45 | None | cpu |
+| avengers_pro | added_given_bge | 0.8 | 1.2 | 0.9 | n_clusters=25,performance_weight=0.45 | None | cpu |
+| r1_bge | body | 0.4 | 0.4 | 0.4 | hidden=1024,epochs=20,source_weight=on | None | cpu |
+| r1_bge | total_with_bge | 784.0 | 2388.9 | 1081.5 | hidden=1024,epochs=20,source_weight=on | None | cpu |
+| r1_bge | added_given_bge | 0.8 | 1.2 | 0.9 | hidden=1024,epochs=20,source_weight=on | None | cpu |
+| graphrouter | body | 96.2 | 315.6 | 107.4 | impl=official,label=success,epochs=1000,checkpoint=last | None | cpu |
+| graphrouter | total_with_bge | 920.4 | 2524.0 | 1188.6 | impl=official,label=success,epochs=1000,checkpoint=last | None | cpu |
+| graphrouter | added_given_bge | 96.7 | 316.1 | 107.9 | impl=official,label=success,epochs=1000,checkpoint=last | None | cpu |
+| r0_group | total | 253.2 | 1238.5 | 400.8 | default | trained weights, 512 tokens | cpu |
+| r1_group | total | 254.9 | 1306.5 | 412.1 | default | trained weights, 512 tokens | cpu |
+| r1_group_a | total | 244.8 | 1389.7 | 411.9 | default | trained weights, 512 tokens | cpu |
+| rt08 | total | 263.9 | 1104.5 | 418.2 | default | trained weights, 512 tokens | cpu |
+| r0_operational_8192 | total | 278.9 | 1070.3 | 439.6 | default | RT-08 weights (same architecture), 8192 tokens | cpu |
+| routellm_released | total | 203.6 | 890.7 | 305.4 | default | released weights | cpu |
+| routellm_retrained | total | 193.7 | 806.6 | 309.7 | checkpoint=best_dev_loss | same architecture as the retrained model (XLM-R base, 3 classes) | cpu |
+| routerdc | total | 417.5 | 1647.8 | 603.5 | config=llmrouter,checkpoint=final | same architecture as the trained RouterDC (mDeBERTa-v3-base + 3 tier embeddings) | cpu |
