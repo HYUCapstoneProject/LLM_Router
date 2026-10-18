@@ -1,6 +1,6 @@
 # 실험 목록과 코드
 
-기준일: 2026-10-16. 이 프로젝트에서 수행했거나 계획한 실험을 코드 하나로 부른다. 대화·문서·PR·보고서에서 실험을 가리킬 때는 이 코드를 쓴다.
+기준일: 2026-10-17. 이 프로젝트에서 수행했거나 계획한 실험을 코드 하나로 부른다. 대화·문서·PR·보고서에서 실험을 가리킬 때는 이 코드를 쓴다.
 
 ## 1. 코드 규칙
 
@@ -53,6 +53,7 @@
 | RF-02 | 재학습 효과 F0~F3 (상향 피드백) | 09-29~10-01 | 완료(결과 폴더 미반입) | F1~F3 첫 시도 품질 +.14~.19에 비용 +63~77%, 망각 미달, 미채택. 원본은 Drive | [계획서 13절](../docs/ml/RETRAINING_EFFECT_EXPERIMENT.md) |
 | RF-03 | F4 양방향 오류 교정 | 10-10 | 완료 | 원래 라벨 정확도 test .619 → .278, RouterArena .454 → .244. medium 쏠림 | [보고서](results/retraining-effect-f4-20261010/REPORT.md) |
 | RF-04 | F5 라벨 비율을 맞춘 오류 교정 | 10-10 | 완료 | 쏠림 해소(F5−F4 +.30)되었지만 F0 미달(test .580, RouterArena .444) | [보고서](results/retraining-effect-f5-20261010/REPORT.md) |
+| RF-05 | 재학습 개량: 분포 이동 + 부분 관측 피드백에서 갱신 방식 비교 | EV-10 뒤 | 계획 | A만 학습한 라우터에 새 세대(LLMRouterBench·SPROUT) stream을 흘려, 지금 방식·경계만 다시 맞추기·R1 방식(반사실 보정)·kNN 추가를 하향 탐색·그림자 하향 실행 조건과 비교. 새 LLM 호출 없음 | [최종 계획서 5절](../docs/ml/ROUTER_FINAL_EXPERIMENT_PLAN.md) |
 
 ### 2.4. 평가·분석 (EV)
 
@@ -66,7 +67,7 @@
 | EV-06 | 논문 라우터 비교 | – | 통합(10-16, EV-10) | 비교 대상(kNN 효용 라우터+MLP·SVM, MF, RouterDC, GraphRouter, Hybrid LLM, IRT-Router, RouteLLM-BERT 공개본·재학습본, Avengers-Pro)을 EV-10에서 비교. CARROT은 제외 | [최종 계획서 4절](../docs/ml/ROUTER_FINAL_EXPERIMENT_PLAN.md), [이전 계획서](../docs/ml/ROUTER_COMPARISON_EXPERIMENT.md) |
 | EV-07 | 통일 기준 재평가 | – | 통합(10-16, EV-10) | 어댑터·손익분기점 평가 틀은 EV-10의 평가 방식(두 갈래)이 됨 | [최종 계획서 2.5절](../docs/ml/ROUTER_FINAL_EXPERIMENT_PLAN.md) |
 | EV-08 | 외부·세대 전이 | – | 통합(10-16, EV-10) | 외부 데이터의 일부를 학습에 쓰기로 해, 전이는 EV-10에서 "A만 학습한 버전 대 섞어 학습한 버전"으로 측정 | [최종 계획서 4절](../docs/ml/ROUTER_FINAL_EXPERIMENT_PLAN.md) |
-| EV-09 | RouterArena 해결률 실측 | – | 보류(10-13) | 층화 표본 약 1,000문항을 서비스 후보로 호출. API 비용 때문에 팀원과 협의한 뒤 결정 | [최종 계획서 5절](../docs/ml/ROUTER_FINAL_EXPERIMENT_PLAN.md) |
+| EV-09 | RouterArena 해결률 실측 | – | 보류(10-13) | 층화 표본 약 1,000문항을 서비스 후보로 호출. API 비용 때문에 팀원과 협의한 뒤 결정 | [최종 계획서 7절](../docs/ml/ROUTER_FINAL_EXPERIMENT_PLAN.md) |
 | EV-10 | 통합 라우터 비교 (모델 집단 단계, 혼합 학습, 두 갈래 평가) | 10-16~ | 진행 중(10-18: 08 test 완료, [초안 보고서](results/ev10-router-final-20261018/REPORT.md). 09_seeds(H5)·08a 남음) | 우리 R0-집단·R1-집단·R1-BGE와 논문 라우터 8종을 A 분할(v2)·LLMRouterBench·SPROUT train으로 학습해 원천 4개 test에서 비교(영어 문항만, 문서 제공형 제외). 비용은 서비스 가격 1:3:5, 집단 평균 데이터 가격과 길이 반영은 민감도. A만 학습한 R1-집단·kNN으로 새 세대 데이터 효과 측정 | [최종 계획서 4절](../docs/ml/ROUTER_FINAL_EXPERIMENT_PLAN.md) |
 
 ### 2.5. 캐시 (CA)
@@ -116,11 +117,12 @@
 ```text
 DT-01 ─┬─ RT-04 ── RT-05 ──┬── EV-01, EV-02, EV-03
        │                   ├── RT-07 ── SY-01 ── SY-02
-       │                   └── RF-01 ── RF-02 ── RF-03 ── RF-04
+       │                   └── RF-01 ── RF-02 ── RF-03 ── RF-04 ── RF-05(계획, EV-10 뒤)
        ├─ RT-06 ── EV-02, EV-03
        └─ CA-05 (운영 R0 고정) ── CA-06(계획)
 DT-02 ─── EV-04 · EV-05 ── RT-08 · EV-10 (진행 중, EV-06·07·08 통합) ── EV-09(보류)
-DT-03 ─── EV-10 (진행 중)
+DT-03 ─── EV-10 (진행 중) ── RF-05(계획)
+이후: RF-05 → 실험 종료 → 종합 분석 · 최종 보고서 · 발표 자료 (최종 계획서 6절)
 8월 선행(팀원): RT-01~03, CA-01~04, CA-13
 팀원 캐시 후속(10-10~14): CA-05 ── CA-07·08 ── CA-09·10·11 ── CA-12 ── SY-03 (C4 운영 배포)
 ```
