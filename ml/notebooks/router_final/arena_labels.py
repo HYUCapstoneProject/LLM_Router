@@ -142,6 +142,71 @@ def run(run_dir: Path, repo: Path, output_dir: Path) -> None:
           [["router", "accuracy", "macro_f1", "cohen_kappa", "spearman", "predicted_share"]].round(3).to_string(index=False))
 
 
+NAMES = {"rt08": "RT-08", "r0_group": "R0-group", "r1_group": "R1-group", "r1_group_a": "R1-group-A", "r1_bge": "R1-BGE",
+         "knn": "kNN", "knn_a": "kNN-A", "svm": "SVM", "mlp": "MLP", "mf": "MF", "irt_router": "IRT-Router",
+         "routerdc": "RouterDC", "routellm_released": "RouteLLM (released)", "routellm_retrained": "RouteLLM (retrained)",
+         "hybrid_llm": "Hybrid LLM", "avengers_pro": "Avengers-Pro"}
+
+
+def label(name: str) -> str:
+    if name.startswith("baseline"):
+        return name
+    base, _, how = name.partition(" | ")
+    if base.endswith(" (argmax)"):
+        return NAMES.get(base[:-9], base) + " (own output)"
+    return NAMES.get(base, base) + (" (dev-share cut)" if how == "dev-share cut" else " (tau .8)")
+
+
+def figures(output_dir: Path) -> None:
+    """Overall accuracy with baselines, and accuracy by domain for the main routers (English text for Colab)."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    plt.rcParams.update({"font.size": 9, "axes.spines.top": False, "axes.spines.right": False})
+    ov = pd.read_csv(output_dir / "routerarena-agreement.csv")
+    ov = ov[ov.subset.eq("no_context") & ~ov.router.str.startswith("baseline") & ~ov.router.str.endswith("tau .8 decision")]
+    ov = ov.sort_values("accuracy")
+    base = pd.read_csv(output_dir / "routerarena-agreement.csv")
+    base = base[base.subset.eq("no_context")].set_index("router")
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5.4), sharey=True, gridspec_kw={"width_ratios": [3, 2]})
+    y = np.arange(len(ov))
+    colors = ["#e0582b" if r.endswith("(argmax)") else "#2a6fdb" for r in ov.router]
+    axes[0].barh(y, ov.accuracy, color=colors, height=0.7, zorder=2)
+    for name, ls in (("baseline: always easy", "-"), ("baseline: label-frequency guess", "--")):
+        axes[0].axvline(base.loc[name, "accuracy"], color="#333", ls=ls, lw=1, zorder=3)
+        axes[0].text(base.loc[name, "accuracy"], len(ov) - 0.3, " " + name.replace("baseline: ", ""), fontsize=7, va="bottom")
+    tau = base[base.index.str.endswith("tau .8 decision")].accuracy
+    axes[0].axvspan(tau.min(), tau.max(), color="#dddddd", lw=0, zorder=0)
+    axes[0].text(tau.mean(), -0.9, "tau .8 rule (all routers)", fontsize=7, ha="center")
+    axes[0].set_yticks(y, [label(r) for r in ov.router])
+    axes[0].set_xlabel("accuracy against RouterArena Difficulty (6,797 questions without context)")
+    axes[0].set_xlim(0.2, 0.55)
+    axes[1].barh(y, ov.cohen_kappa, color=colors, height=0.7)
+    axes[1].axvline(0, color="#333", lw=1)
+    axes[1].set_xlabel("Cohen's kappa (0 = chance agreement)")
+    fig.tight_layout()
+    fig.savefig(output_dir / "routerarena-accuracy.png", dpi=160)
+    plt.close(fig)
+    dom = pd.read_csv(output_dir / "routerarena-by-domain.csv")
+    pick = ["rt08 (argmax)", "r0_group (argmax)", "r1_group | dev-share cut", "r1_group_a | dev-share cut",
+            "knn | dev-share cut", "routellm_released | dev-share cut", "baseline: always easy"]
+    w = dom[dom.router.isin(pick)].pivot_table(index="domain", columns="router", values="accuracy")[pick]
+    mix = dom[dom.router.eq(pick[0])].set_index("domain").label_mix
+    fig, ax = plt.subplots(figsize=(11, 4.8))
+    im = ax.imshow(w.to_numpy(), cmap="viridis", vmin=0.1, vmax=0.65, aspect="auto")
+    ax.set_xticks(range(len(pick)), [label(r) for r in pick], rotation=20, ha="right")
+    ax.set_yticks(range(len(w)), [f"{d}  (labels e/m/h {mix[d]})" for d in w.index])
+    for i in range(w.shape[0]):
+        for j in range(w.shape[1]):
+            v = w.iat[i, j]
+            ax.text(j, i, f"{v:.2f}", ha="center", va="center", fontsize=8, color="white" if v < 0.4 else "black")
+    fig.colorbar(im, ax=ax, shrink=0.85, label="accuracy")
+    ax.set_title("Accuracy by RouterArena domain (questions without context)")
+    fig.tight_layout()
+    fig.savefig(output_dir / "routerarena-by-domain.png", dpi=160)
+    plt.close(fig)
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--run-dir", type=Path, required=True)
@@ -149,6 +214,7 @@ def main(argv=None):
     p.add_argument("--output-dir", type=Path, required=True)
     a = p.parse_args(argv)
     run(a.run_dir, a.repo, a.output_dir)
+    figures(a.output_dir)
 
 
 if __name__ == "__main__":

@@ -83,6 +83,10 @@
 
 RouterArena에는 문항마다 난이도 라벨(easy/medium/hard)이 하나 있고 모델별 풀이 기록은 없다. 그래서 비용·해결률 대신 **라우터의 3단계 판정이 이 라벨과 얼마나 맞는지**만 쟀다. 대상은 지문(Context)이 없는 6,797문항(라우터에는 질문만 넣었으므로)이고, 라벨 비율은 easy 49% / medium 31% / hard 20%다. 계산: `arena_labels.py`, 표: [report/routerarena/](report/routerarena/).
 
+![RouterArena accuracy](report/routerarena/routerarena-accuracy.png)
+
+주황 = 원래 출력, 파랑 = dev 비율로 자르기, 회색 띠 = τ = .8 결정의 범위. 실선 = 모두 easy, 점선 = 라벨 비율대로 무작위.
+
 판정을 만드는 방법은 세 가지다. 어느 것도 RouterArena 라벨로 맞추지 않았다.
 
 - **원래 출력:** 3단계를 직접 분류하는 모델(R0-집단, RT-08)의 가장 확률이 높은 단계.
@@ -122,6 +126,8 @@ GraphRouter는 RouterArena 점수를 계산하지 않아 빠졌다(04에서 진�
 | 예술·여가 | 552 | 48/36/16% | .582 | .442 | .428 | .558 | .335 | .534 | .480 |
 | 문학 | 317 | 29/17/54% | .341 | .448 | .577 | .372 | .271 | .205 | .287 |
 | 역사 | 700 | 53/25/21% | .524 | .504 | .469 | .527 | .441 | .513 | .534 |
+
+![RouterArena by domain](report/routerarena/routerarena-by-domain.png)
 
 (R0-집단·RT-08은 원래 출력, 나머지는 dev 비율로 자르기.) 세부 주제 28개는 [routerarena-by-category.csv](report/routerarena/routerarena-by-category.csv), 혼동 행렬은 [routerarena-confusion.md](report/routerarena/routerarena-confusion.md)에 있다.
 
