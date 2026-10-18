@@ -1,0 +1,325 @@
+router,domain,rows,accuracy,label_mix
+avengers_pro | tau .8 decision,"0 Computer science, information, and general works",1217,0.17091207888249796,55%/31%/15%
+avengers_pro | tau .8 decision,1 Philosophy and psychology,700,0.11714285714285715,58%/30%/12%
+avengers_pro | tau .8 decision,3 Social Science,565,0.18230088495575222,43%/39%/18%
+avengers_pro | tau .8 decision,4 Language,500,0.548,17%/18%/64%
+avengers_pro | tau .8 decision,5 Science,1312,0.1913109756097561,55%/32%/13%
+avengers_pro | tau .8 decision,6 Technology,934,0.2751605995717345,50%/38%/12%
+avengers_pro | tau .8 decision,7 Arts & recreation,552,0.20471014492753623,48%/36%/16%
+avengers_pro | tau .8 decision,8 Literature,317,0.5047318611987381,29%/17%/54%
+avengers_pro | tau .8 decision,9 History,700,0.23714285714285716,53%/25%/21%
+avengers_pro | dev-share cut,"0 Computer science, information, and general works",1217,0.38126540673788,55%/31%/15%
+avengers_pro | dev-share cut,1 Philosophy and psychology,700,0.28714285714285714,58%/30%/12%
+avengers_pro | dev-share cut,3 Social Science,565,0.2743362831858407,43%/39%/18%
+avengers_pro | dev-share cut,4 Language,500,0.316,17%/18%/64%
+avengers_pro | dev-share cut,5 Science,1312,0.39939024390243905,55%/32%/13%
+avengers_pro | dev-share cut,6 Technology,934,0.4068522483940043,50%/38%/12%
+avengers_pro | dev-share cut,7 Arts & recreation,552,0.35144927536231885,48%/36%/16%
+avengers_pro | dev-share cut,8 Literature,317,0.2996845425867508,29%/17%/54%
+avengers_pro | dev-share cut,9 History,700,0.35714285714285715,53%/25%/21%
+hybrid_llm | tau .8 decision,"0 Computer science, information, and general works",1217,0.21857025472473296,55%/31%/15%
+hybrid_llm | tau .8 decision,1 Philosophy and psychology,700,0.17142857142857143,58%/30%/12%
+hybrid_llm | tau .8 decision,3 Social Science,565,0.24424778761061947,43%/39%/18%
+hybrid_llm | tau .8 decision,4 Language,500,0.458,17%/18%/64%
+hybrid_llm | tau .8 decision,5 Science,1312,0.20960365853658536,55%/32%/13%
+hybrid_llm | tau .8 decision,6 Technology,934,0.23233404710920771,50%/38%/12%
+hybrid_llm | tau .8 decision,7 Arts & recreation,552,0.22644927536231885,48%/36%/16%
+hybrid_llm | tau .8 decision,8 Literature,317,0.4037854889589905,29%/17%/54%
+hybrid_llm | tau .8 decision,9 History,700,0.2257142857142857,53%/25%/21%
+hybrid_llm | dev-share cut,"0 Computer science, information, and general works",1217,0.42974527526705014,55%/31%/15%
+hybrid_llm | dev-share cut,1 Philosophy and psychology,700,0.3842857142857143,58%/30%/12%
+hybrid_llm | dev-share cut,3 Social Science,565,0.35752212389380533,43%/39%/18%
+hybrid_llm | dev-share cut,4 Language,500,0.32,17%/18%/64%
+hybrid_llm | dev-share cut,5 Science,1312,0.44740853658536583,55%/32%/13%
+hybrid_llm | dev-share cut,6 Technology,934,0.4346895074946467,50%/38%/12%
+hybrid_llm | dev-share cut,7 Arts & recreation,552,0.4003623188405797,48%/36%/16%
+hybrid_llm | dev-share cut,8 Literature,317,0.334384858044164,29%/17%/54%
+hybrid_llm | dev-share cut,9 History,700,0.4157142857142857,53%/25%/21%
+irt_router | tau .8 decision,"0 Computer science, information, and general works",1217,0.2530813475760066,55%/31%/15%
+irt_router | tau .8 decision,1 Philosophy and psychology,700,0.18142857142857144,58%/30%/12%
+irt_router | tau .8 decision,3 Social Science,565,0.26017699115044246,43%/39%/18%
+irt_router | tau .8 decision,4 Language,500,0.518,17%/18%/64%
+irt_router | tau .8 decision,5 Science,1312,0.2545731707317073,55%/32%/13%
+irt_router | tau .8 decision,6 Technology,934,0.23875802997858672,50%/38%/12%
+irt_router | tau .8 decision,7 Arts & recreation,552,0.23550724637681159,48%/36%/16%
+irt_router | tau .8 decision,8 Literature,317,0.5078864353312302,29%/17%/54%
+irt_router | tau .8 decision,9 History,700,0.2742857142857143,53%/25%/21%
+irt_router | dev-share cut,"0 Computer science, information, and general works",1217,0.5086277732128184,55%/31%/15%
+irt_router | dev-share cut,1 Philosophy and psychology,700,0.51,58%/30%/12%
+irt_router | dev-share cut,3 Social Science,565,0.44424778761061945,43%/39%/18%
+irt_router | dev-share cut,4 Language,500,0.258,17%/18%/64%
+irt_router | dev-share cut,5 Science,1312,0.4695121951219512,55%/32%/13%
+irt_router | dev-share cut,6 Technology,934,0.4603854389721627,50%/38%/12%
+irt_router | dev-share cut,7 Arts & recreation,552,0.41304347826086957,48%/36%/16%
+irt_router | dev-share cut,8 Literature,317,0.23974763406940064,29%/17%/54%
+irt_router | dev-share cut,9 History,700,0.44142857142857145,53%/25%/21%
+knn | tau .8 decision,"0 Computer science, information, and general works",1217,0.20460147904683648,55%/31%/15%
+knn | tau .8 decision,1 Philosophy and psychology,700,0.19,58%/30%/12%
+knn | tau .8 decision,3 Social Science,565,0.2247787610619469,43%/39%/18%
+knn | tau .8 decision,4 Language,500,0.472,17%/18%/64%
+knn | tau .8 decision,5 Science,1312,0.2461890243902439,55%/32%/13%
+knn | tau .8 decision,6 Technology,934,0.23019271948608136,50%/38%/12%
+knn | tau .8 decision,7 Arts & recreation,552,0.22826086956521738,48%/36%/16%
+knn | tau .8 decision,8 Literature,317,0.4605678233438486,29%/17%/54%
+knn | tau .8 decision,9 History,700,0.29,53%/25%/21%
+knn | dev-share cut,"0 Computer science, information, and general works",1217,0.36236647493837304,55%/31%/15%
+knn | dev-share cut,1 Philosophy and psychology,700,0.39714285714285713,58%/30%/12%
+knn | dev-share cut,3 Social Science,565,0.3911504424778761,43%/39%/18%
+knn | dev-share cut,4 Language,500,0.224,17%/18%/64%
+knn | dev-share cut,5 Science,1312,0.45426829268292684,55%/32%/13%
+knn | dev-share cut,6 Technology,934,0.4678800856531049,50%/38%/12%
+knn | dev-share cut,7 Arts & recreation,552,0.3351449275362319,48%/36%/16%
+knn | dev-share cut,8 Literature,317,0.27129337539432175,29%/17%/54%
+knn | dev-share cut,9 History,700,0.44142857142857145,53%/25%/21%
+knn_a | tau .8 decision,"0 Computer science, information, and general works",1217,0.16516023007395234,55%/31%/15%
+knn_a | tau .8 decision,1 Philosophy and psychology,700,0.15285714285714286,58%/30%/12%
+knn_a | tau .8 decision,3 Social Science,565,0.20176991150442478,43%/39%/18%
+knn_a | tau .8 decision,4 Language,500,0.484,17%/18%/64%
+knn_a | tau .8 decision,5 Science,1312,0.18445121951219512,55%/32%/13%
+knn_a | tau .8 decision,6 Technology,934,0.1809421841541756,50%/38%/12%
+knn_a | tau .8 decision,7 Arts & recreation,552,0.18840579710144928,48%/36%/16%
+knn_a | tau .8 decision,8 Literature,317,0.4227129337539432,29%/17%/54%
+knn_a | tau .8 decision,9 History,700,0.2885714285714286,53%/25%/21%
+knn_a | dev-share cut,"0 Computer science, information, and general works",1217,0.4133114215283484,55%/31%/15%
+knn_a | dev-share cut,1 Philosophy and psychology,700,0.4257142857142857,58%/30%/12%
+knn_a | dev-share cut,3 Social Science,565,0.3663716814159292,43%/39%/18%
+knn_a | dev-share cut,4 Language,500,0.214,17%/18%/64%
+knn_a | dev-share cut,5 Science,1312,0.46646341463414637,55%/32%/13%
+knn_a | dev-share cut,6 Technology,934,0.4625267665952891,50%/38%/12%
+knn_a | dev-share cut,7 Arts & recreation,552,0.4673913043478261,48%/36%/16%
+knn_a | dev-share cut,8 Literature,317,0.3186119873817035,29%/17%/54%
+knn_a | dev-share cut,9 History,700,0.5142857142857142,53%/25%/21%
+mf | tau .8 decision,"0 Computer science, information, and general works",1217,0.2563681183237469,55%/31%/15%
+mf | tau .8 decision,1 Philosophy and psychology,700,0.15285714285714286,58%/30%/12%
+mf | tau .8 decision,3 Social Science,565,0.2407079646017699,43%/39%/18%
+mf | tau .8 decision,4 Language,500,0.564,17%/18%/64%
+mf | tau .8 decision,5 Science,1312,0.2347560975609756,55%/32%/13%
+mf | tau .8 decision,6 Technology,934,0.18308351177730192,50%/38%/12%
+mf | tau .8 decision,7 Arts & recreation,552,0.21014492753623187,48%/36%/16%
+mf | tau .8 decision,8 Literature,317,0.5299684542586751,29%/17%/54%
+mf | tau .8 decision,9 History,700,0.23142857142857143,53%/25%/21%
+mf | dev-share cut,"0 Computer science, information, and general works",1217,0.5349219391947412,55%/31%/15%
+mf | dev-share cut,1 Philosophy and psychology,700,0.3914285714285714,58%/30%/12%
+mf | dev-share cut,3 Social Science,565,0.4584070796460177,43%/39%/18%
+mf | dev-share cut,4 Language,500,0.276,17%/18%/64%
+mf | dev-share cut,5 Science,1312,0.47560975609756095,55%/32%/13%
+mf | dev-share cut,6 Technology,934,0.47109207708779444,50%/38%/12%
+mf | dev-share cut,7 Arts & recreation,552,0.5018115942028986,48%/36%/16%
+mf | dev-share cut,8 Literature,317,0.35962145110410093,29%/17%/54%
+mf | dev-share cut,9 History,700,0.49142857142857144,53%/25%/21%
+mlp | tau .8 decision,"0 Computer science, information, and general works",1217,0.27855382087099423,55%/31%/15%
+mlp | tau .8 decision,1 Philosophy and psychology,700,0.29285714285714287,58%/30%/12%
+mlp | tau .8 decision,3 Social Science,565,0.2938053097345133,43%/39%/18%
+mlp | tau .8 decision,4 Language,500,0.356,17%/18%/64%
+mlp | tau .8 decision,5 Science,1312,0.31859756097560976,55%/32%/13%
+mlp | tau .8 decision,6 Technology,934,0.2955032119914347,50%/38%/12%
+mlp | tau .8 decision,7 Arts & recreation,552,0.30978260869565216,48%/36%/16%
+mlp | tau .8 decision,8 Literature,317,0.416403785488959,29%/17%/54%
+mlp | tau .8 decision,9 History,700,0.3242857142857143,53%/25%/21%
+mlp | dev-share cut,"0 Computer science, information, and general works",1217,0.43303204601479045,55%/31%/15%
+mlp | dev-share cut,1 Philosophy and psychology,700,0.48142857142857143,58%/30%/12%
+mlp | dev-share cut,3 Social Science,565,0.3911504424778761,43%/39%/18%
+mlp | dev-share cut,4 Language,500,0.252,17%/18%/64%
+mlp | dev-share cut,5 Science,1312,0.4580792682926829,55%/32%/13%
+mlp | dev-share cut,6 Technology,934,0.4421841541755889,50%/38%/12%
+mlp | dev-share cut,7 Arts & recreation,552,0.42934782608695654,48%/36%/16%
+mlp | dev-share cut,8 Literature,317,0.3438485804416404,29%/17%/54%
+mlp | dev-share cut,9 History,700,0.4657142857142857,53%/25%/21%
+r0_group | tau .8 decision,"0 Computer science, information, and general works",1217,0.2637633525061627,55%/31%/15%
+r0_group | tau .8 decision,1 Philosophy and psychology,700,0.18142857142857144,58%/30%/12%
+r0_group | tau .8 decision,3 Social Science,565,0.2743362831858407,43%/39%/18%
+r0_group | tau .8 decision,4 Language,500,0.564,17%/18%/64%
+r0_group | tau .8 decision,5 Science,1312,0.24695121951219512,55%/32%/13%
+r0_group | tau .8 decision,6 Technology,934,0.20556745182012848,50%/38%/12%
+r0_group | tau .8 decision,7 Arts & recreation,552,0.2898550724637681,48%/36%/16%
+r0_group | tau .8 decision,8 Literature,317,0.61198738170347,29%/17%/54%
+r0_group | tau .8 decision,9 History,700,0.26857142857142857,53%/25%/21%
+r0_group | dev-share cut,"0 Computer science, information, and general works",1217,0.45357436318816763,55%/31%/15%
+r0_group | dev-share cut,1 Philosophy and psychology,700,0.37285714285714283,58%/30%/12%
+r0_group | dev-share cut,3 Social Science,565,0.4424778761061947,43%/39%/18%
+r0_group | dev-share cut,4 Language,500,0.354,17%/18%/64%
+r0_group | dev-share cut,5 Science,1312,0.4794207317073171,55%/32%/13%
+r0_group | dev-share cut,6 Technology,934,0.43897216274089934,50%/38%/12%
+r0_group | dev-share cut,7 Arts & recreation,552,0.5018115942028986,48%/36%/16%
+r0_group | dev-share cut,8 Literature,317,0.5110410094637224,29%/17%/54%
+r0_group | dev-share cut,9 History,700,0.43714285714285717,53%/25%/21%
+r0_group (argmax),"0 Computer science, information, and general works",1217,0.5028759244042728,55%/31%/15%
+r0_group (argmax),1 Philosophy and psychology,700,0.4642857142857143,58%/30%/12%
+r0_group (argmax),3 Social Science,565,0.3911504424778761,43%/39%/18%
+r0_group (argmax),4 Language,500,0.296,17%/18%/64%
+r0_group (argmax),5 Science,1312,0.48628048780487804,55%/32%/13%
+r0_group (argmax),6 Technology,934,0.43683083511777304,50%/38%/12%
+r0_group (argmax),7 Arts & recreation,552,0.4420289855072464,48%/36%/16%
+r0_group (argmax),8 Literature,317,0.4479495268138801,29%/17%/54%
+r0_group (argmax),9 History,700,0.5042857142857143,53%/25%/21%
+r1_bge | tau .8 decision,"0 Computer science, information, and general works",1217,0.23336072308956451,55%/31%/15%
+r1_bge | tau .8 decision,1 Philosophy and psychology,700,0.16,58%/30%/12%
+r1_bge | tau .8 decision,3 Social Science,565,0.24601769911504426,43%/39%/18%
+r1_bge | tau .8 decision,4 Language,500,0.576,17%/18%/64%
+r1_bge | tau .8 decision,5 Science,1312,0.24161585365853658,55%/32%/13%
+r1_bge | tau .8 decision,6 Technology,934,0.20342612419700215,50%/38%/12%
+r1_bge | tau .8 decision,7 Arts & recreation,552,0.21195652173913043,48%/36%/16%
+r1_bge | tau .8 decision,8 Literature,317,0.5110410094637224,29%/17%/54%
+r1_bge | tau .8 decision,9 History,700,0.23714285714285716,53%/25%/21%
+r1_bge | dev-share cut,"0 Computer science, information, and general works",1217,0.4248151191454396,55%/31%/15%
+r1_bge | dev-share cut,1 Philosophy and psychology,700,0.37857142857142856,58%/30%/12%
+r1_bge | dev-share cut,3 Social Science,565,0.479646017699115,43%/39%/18%
+r1_bge | dev-share cut,4 Language,500,0.322,17%/18%/64%
+r1_bge | dev-share cut,5 Science,1312,0.4291158536585366,55%/32%/13%
+r1_bge | dev-share cut,6 Technology,934,0.4089935760171306,50%/38%/12%
+r1_bge | dev-share cut,7 Arts & recreation,552,0.38405797101449274,48%/36%/16%
+r1_bge | dev-share cut,8 Literature,317,0.41324921135646686,29%/17%/54%
+r1_bge | dev-share cut,9 History,700,0.3914285714285714,53%/25%/21%
+r1_group | tau .8 decision,"0 Computer science, information, and general works",1217,0.28019720624486444,55%/31%/15%
+r1_group | tau .8 decision,1 Philosophy and psychology,700,0.18571428571428572,58%/30%/12%
+r1_group | tau .8 decision,3 Social Science,565,0.29557522123893804,43%/39%/18%
+r1_group | tau .8 decision,4 Language,500,0.564,17%/18%/64%
+r1_group | tau .8 decision,5 Science,1312,0.3163109756097561,55%/32%/13%
+r1_group | tau .8 decision,6 Technology,934,0.215203426124197,50%/38%/12%
+r1_group | tau .8 decision,7 Arts & recreation,552,0.3061594202898551,48%/36%/16%
+r1_group | tau .8 decision,8 Literature,317,0.5772870662460567,29%/17%/54%
+r1_group | tau .8 decision,9 History,700,0.3485714285714286,53%/25%/21%
+r1_group | dev-share cut,"0 Computer science, information, and general works",1217,0.4018077239112572,55%/31%/15%
+r1_group | dev-share cut,1 Philosophy and psychology,700,0.34714285714285714,58%/30%/12%
+r1_group | dev-share cut,3 Social Science,565,0.3823008849557522,43%/39%/18%
+r1_group | dev-share cut,4 Language,500,0.348,17%/18%/64%
+r1_group | dev-share cut,5 Science,1312,0.4695121951219512,55%/32%/13%
+r1_group | dev-share cut,6 Technology,934,0.3265524625267666,50%/38%/12%
+r1_group | dev-share cut,7 Arts & recreation,552,0.427536231884058,48%/36%/16%
+r1_group | dev-share cut,8 Literature,317,0.5772870662460567,29%/17%/54%
+r1_group | dev-share cut,9 History,700,0.4685714285714286,53%/25%/21%
+r1_group_a | tau .8 decision,"0 Computer science, information, and general works",1217,0.18077239112571897,55%/31%/15%
+r1_group_a | tau .8 decision,1 Philosophy and psychology,700,0.12142857142857143,58%/30%/12%
+r1_group_a | tau .8 decision,3 Social Science,565,0.20353982300884957,43%/39%/18%
+r1_group_a | tau .8 decision,4 Language,500,0.664,17%/18%/64%
+r1_group_a | tau .8 decision,5 Science,1312,0.16920731707317074,55%/32%/13%
+r1_group_a | tau .8 decision,6 Technology,934,0.15203426124197003,50%/38%/12%
+r1_group_a | tau .8 decision,7 Arts & recreation,552,0.23550724637681159,48%/36%/16%
+r1_group_a | tau .8 decision,8 Literature,317,0.5362776025236593,29%/17%/54%
+r1_group_a | tau .8 decision,9 History,700,0.27285714285714285,53%/25%/21%
+r1_group_a | dev-share cut,"0 Computer science, information, and general works",1217,0.514379622021364,55%/31%/15%
+r1_group_a | dev-share cut,1 Philosophy and psychology,700,0.46,58%/30%/12%
+r1_group_a | dev-share cut,3 Social Science,565,0.40707964601769914,43%/39%/18%
+r1_group_a | dev-share cut,4 Language,500,0.19,17%/18%/64%
+r1_group_a | dev-share cut,5 Science,1312,0.47484756097560976,55%/32%/13%
+r1_group_a | dev-share cut,6 Technology,934,0.4421841541755889,50%/38%/12%
+r1_group_a | dev-share cut,7 Arts & recreation,552,0.5579710144927537,48%/36%/16%
+r1_group_a | dev-share cut,8 Literature,317,0.3722397476340694,29%/17%/54%
+r1_group_a | dev-share cut,9 History,700,0.5271428571428571,53%/25%/21%
+routellm_released | tau .8 decision,"0 Computer science, information, and general works",1217,0.22596548890714874,55%/31%/15%
+routellm_released | tau .8 decision,1 Philosophy and psychology,700,0.34714285714285714,58%/30%/12%
+routellm_released | tau .8 decision,3 Social Science,565,0.3185840707964602,43%/39%/18%
+routellm_released | tau .8 decision,4 Language,500,0.316,17%/18%/64%
+routellm_released | tau .8 decision,5 Science,1312,0.25990853658536583,55%/32%/13%
+routellm_released | tau .8 decision,6 Technology,934,0.2890792291220557,50%/38%/12%
+routellm_released | tau .8 decision,7 Arts & recreation,552,0.22282608695652173,48%/36%/16%
+routellm_released | tau .8 decision,8 Literature,317,0.40063091482649843,29%/17%/54%
+routellm_released | tau .8 decision,9 History,700,0.23142857142857143,53%/25%/21%
+routellm_released | dev-share cut,"0 Computer science, information, and general works",1217,0.5546425636811833,55%/31%/15%
+routellm_released | dev-share cut,1 Philosophy and psychology,700,0.5371428571428571,58%/30%/12%
+routellm_released | dev-share cut,3 Social Science,565,0.4814159292035398,43%/39%/18%
+routellm_released | dev-share cut,4 Language,500,0.096,17%/18%/64%
+routellm_released | dev-share cut,5 Science,1312,0.5480182926829268,55%/32%/13%
+routellm_released | dev-share cut,6 Technology,934,0.5182012847965739,50%/38%/12%
+routellm_released | dev-share cut,7 Arts & recreation,552,0.5344202898550725,48%/36%/16%
+routellm_released | dev-share cut,8 Literature,317,0.20504731861198738,29%/17%/54%
+routellm_released | dev-share cut,9 History,700,0.5128571428571429,53%/25%/21%
+routellm_retrained | tau .8 decision,"0 Computer science, information, and general works",1217,0.23171733771569433,55%/31%/15%
+routellm_retrained | tau .8 decision,1 Philosophy and psychology,700,0.15714285714285714,58%/30%/12%
+routellm_retrained | tau .8 decision,3 Social Science,565,0.2513274336283186,43%/39%/18%
+routellm_retrained | tau .8 decision,4 Language,500,0.608,17%/18%/64%
+routellm_retrained | tau .8 decision,5 Science,1312,0.2347560975609756,55%/32%/13%
+routellm_retrained | tau .8 decision,6 Technology,934,0.17880085653104924,50%/38%/12%
+routellm_retrained | tau .8 decision,7 Arts & recreation,552,0.25,48%/36%/16%
+routellm_retrained | tau .8 decision,8 Literature,317,0.5772870662460567,29%/17%/54%
+routellm_retrained | tau .8 decision,9 History,700,0.24,53%/25%/21%
+routellm_retrained | dev-share cut,"0 Computer science, information, and general works",1217,0.5094494658997535,55%/31%/15%
+routellm_retrained | dev-share cut,1 Philosophy and psychology,700,0.3628571428571429,58%/30%/12%
+routellm_retrained | dev-share cut,3 Social Science,565,0.46194690265486726,43%/39%/18%
+routellm_retrained | dev-share cut,4 Language,500,0.166,17%/18%/64%
+routellm_retrained | dev-share cut,5 Science,1312,0.47789634146341464,55%/32%/13%
+routellm_retrained | dev-share cut,6 Technology,934,0.4668094218415418,50%/38%/12%
+routellm_retrained | dev-share cut,7 Arts & recreation,552,0.5307971014492754,48%/36%/16%
+routellm_retrained | dev-share cut,8 Literature,317,0.3217665615141956,29%/17%/54%
+routellm_retrained | dev-share cut,9 History,700,0.4714285714285714,53%/25%/21%
+routerdc | tau .8 decision,"0 Computer science, information, and general works",1217,0.26787181594083814,55%/31%/15%
+routerdc | tau .8 decision,1 Philosophy and psychology,700,0.23,58%/30%/12%
+routerdc | tau .8 decision,3 Social Science,565,0.26017699115044246,43%/39%/18%
+routerdc | tau .8 decision,4 Language,500,0.174,17%/18%/64%
+routerdc | tau .8 decision,5 Science,1312,0.2339939024390244,55%/32%/13%
+routerdc | tau .8 decision,6 Technology,934,0.284796573875803,50%/38%/12%
+routerdc | tau .8 decision,7 Arts & recreation,552,0.3695652173913043,48%/36%/16%
+routerdc | tau .8 decision,8 Literature,317,0.24290220820189273,29%/17%/54%
+routerdc | tau .8 decision,9 History,700,0.29285714285714287,53%/25%/21%
+routerdc | dev-share cut,"0 Computer science, information, and general works",1217,0.5768282662284305,55%/31%/15%
+routerdc | dev-share cut,1 Philosophy and psychology,700,0.5642857142857143,58%/30%/12%
+routerdc | dev-share cut,3 Social Science,565,0.4407079646017699,43%/39%/18%
+routerdc | dev-share cut,4 Language,500,0.236,17%/18%/64%
+routerdc | dev-share cut,5 Science,1312,0.5213414634146342,55%/32%/13%
+routerdc | dev-share cut,6 Technology,934,0.4817987152034261,50%/38%/12%
+routerdc | dev-share cut,7 Arts & recreation,552,0.4601449275362319,48%/36%/16%
+routerdc | dev-share cut,8 Literature,317,0.2302839116719243,29%/17%/54%
+routerdc | dev-share cut,9 History,700,0.47714285714285715,53%/25%/21%
+rt08 | tau .8 decision,"0 Computer science, information, and general works",1217,0.18405916187345933,55%/31%/15%
+rt08 | tau .8 decision,1 Philosophy and psychology,700,0.13142857142857142,58%/30%/12%
+rt08 | tau .8 decision,3 Social Science,565,0.2336283185840708,43%/39%/18%
+rt08 | tau .8 decision,4 Language,500,0.638,17%/18%/64%
+rt08 | tau .8 decision,5 Science,1312,0.18216463414634146,55%/32%/13%
+rt08 | tau .8 decision,6 Technology,934,0.1734475374732334,50%/38%/12%
+rt08 | tau .8 decision,7 Arts & recreation,552,0.21014492753623187,48%/36%/16%
+rt08 | tau .8 decision,8 Literature,317,0.6340694006309149,29%/17%/54%
+rt08 | tau .8 decision,9 History,700,0.25857142857142856,53%/25%/21%
+rt08 | dev-share cut,"0 Computer science, information, and general works",1217,0.4905505341002465,55%/31%/15%
+rt08 | dev-share cut,1 Philosophy and psychology,700,0.49,58%/30%/12%
+rt08 | dev-share cut,3 Social Science,565,0.41415929203539825,43%/39%/18%
+rt08 | dev-share cut,4 Language,500,0.196,17%/18%/64%
+rt08 | dev-share cut,5 Science,1312,0.44359756097560976,55%/32%/13%
+rt08 | dev-share cut,6 Technology,934,0.39828693790149894,50%/38%/12%
+rt08 | dev-share cut,7 Arts & recreation,552,0.5634057971014492,48%/36%/16%
+rt08 | dev-share cut,8 Literature,317,0.38170347003154576,29%/17%/54%
+rt08 | dev-share cut,9 History,700,0.51,53%/25%/21%
+rt08 (argmax),"0 Computer science, information, and general works",1217,0.5792933442892358,55%/31%/15%
+rt08 (argmax),1 Philosophy and psychology,700,0.54,58%/30%/12%
+rt08 (argmax),3 Social Science,565,0.5097345132743363,43%/39%/18%
+rt08 (argmax),4 Language,500,0.158,17%/18%/64%
+rt08 (argmax),5 Science,1312,0.53125,55%/32%/13%
+rt08 (argmax),6 Technology,934,0.5074946466809421,50%/38%/12%
+rt08 (argmax),7 Arts & recreation,552,0.5815217391304348,48%/36%/16%
+rt08 (argmax),8 Literature,317,0.34069400630914826,29%/17%/54%
+rt08 (argmax),9 History,700,0.5242857142857142,53%/25%/21%
+svm | tau .8 decision,"0 Computer science, information, and general works",1217,0.23664749383730485,55%/31%/15%
+svm | tau .8 decision,1 Philosophy and psychology,700,0.17857142857142858,58%/30%/12%
+svm | tau .8 decision,3 Social Science,565,0.27079646017699116,43%/39%/18%
+svm | tau .8 decision,4 Language,500,0.4,17%/18%/64%
+svm | tau .8 decision,5 Science,1312,0.24161585365853658,55%/32%/13%
+svm | tau .8 decision,6 Technology,934,0.21306209850107066,50%/38%/12%
+svm | tau .8 decision,7 Arts & recreation,552,0.25181159420289856,48%/36%/16%
+svm | tau .8 decision,8 Literature,317,0.35646687697160884,29%/17%/54%
+svm | tau .8 decision,9 History,700,0.30428571428571427,53%/25%/21%
+svm | dev-share cut,"0 Computer science, information, and general works",1217,0.5036976170912079,55%/31%/15%
+svm | dev-share cut,1 Philosophy and psychology,700,0.4014285714285714,58%/30%/12%
+svm | dev-share cut,3 Social Science,565,0.45309734513274336,43%/39%/18%
+svm | dev-share cut,4 Language,500,0.32,17%/18%/64%
+svm | dev-share cut,5 Science,1312,0.4489329268292683,55%/32%/13%
+svm | dev-share cut,6 Technology,934,0.47644539614561027,50%/38%/12%
+svm | dev-share cut,7 Arts & recreation,552,0.4076086956521739,48%/36%/16%
+svm | dev-share cut,8 Literature,317,0.17665615141955837,29%/17%/54%
+svm | dev-share cut,9 History,700,0.42,53%/25%/21%
+baseline: always easy,"0 Computer science, information, and general works",1217,0.5464256368118324,55%/31%/15%
+baseline: always easy,1 Philosophy and psychology,700,0.5828571428571429,58%/30%/12%
+baseline: always easy,3 Social Science,565,0.4283185840707965,43%/39%/18%
+baseline: always easy,4 Language,500,0.174,17%/18%/64%
+baseline: always easy,5 Science,1312,0.5487804878048781,55%/32%/13%
+baseline: always easy,6 Technology,934,0.5010706638115632,50%/38%/12%
+baseline: always easy,7 Arts & recreation,552,0.48007246376811596,48%/36%/16%
+baseline: always easy,8 Literature,317,0.2870662460567823,29%/17%/54%
+baseline: always easy,9 History,700,0.5342857142857143,53%/25%/21%
+baseline: label-frequency guess,"0 Computer science, information, and general works",1217,0.39687756778964667,55%/31%/15%
+baseline: label-frequency guess,1 Philosophy and psychology,700,0.3871428571428571,58%/30%/12%
+baseline: label-frequency guess,3 Social Science,565,0.3185840707964602,43%/39%/18%
+baseline: label-frequency guess,4 Language,500,0.278,17%/18%/64%
+baseline: label-frequency guess,5 Science,1312,0.3856707317073171,55%/32%/13%
+baseline: label-frequency guess,6 Technology,934,0.3640256959314775,50%/38%/12%
+baseline: label-frequency guess,7 Arts & recreation,552,0.3822463768115942,48%/36%/16%
+baseline: label-frequency guess,8 Literature,317,0.35331230283911674,29%/17%/54%
+baseline: label-frequency guess,9 History,700,0.38857142857142857,53%/25%/21%

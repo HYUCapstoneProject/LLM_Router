@@ -1,0 +1,973 @@
+router,category,rows,accuracy,label_mix
+avengers_pro | tau .8 decision,"00 Computer science, knowledge, and systems",821,0.20097442143727162,48%/35%/18%
+avengers_pro | tau .8 decision,02 Library and information sciences,396,0.10858585858585859,69%/21%/9%
+avengers_pro | tau .8 decision,10 Philosophy,122,0.29508196721311475,30%/33%/37%
+avengers_pro | tau .8 decision,15 Psychology,187,0.13368983957219252,65%/26%/10%
+avengers_pro | tau .8 decision,16 Philosophical logic,108,0.046296296296296294,60%/35%/5%
+avengers_pro | tau .8 decision,17 Ethics,283,0.05653710247349823,65%/30%/5%
+avengers_pro | tau .8 decision,"30 Social sciences, sociology, and anthropology",55,0.5636363636363636,5%/33%/62%
+avengers_pro | tau .8 decision,33 Economics,352,0.11931818181818182,49%/39%/11%
+avengers_pro | tau .8 decision,34 Law,158,0.189873417721519,41%/40%/19%
+avengers_pro | tau .8 decision,40 Language,500,0.548,17%/18%/64%
+avengers_pro | tau .8 decision,50 Science,114,0.40350877192982454,26%/22%/52%
+avengers_pro | tau .8 decision,51 Mathematics,513,0.17348927875243664,41%/45%/14%
+avengers_pro | tau .8 decision,53 Physics,97,0.38144329896907214,45%/43%/11%
+avengers_pro | tau .8 decision,54 Chemistry,90,0.3,48%/38%/14%
+avengers_pro | tau .8 decision,55 Earth sciences and geology,330,0.12727272727272726,78%/18%/4%
+avengers_pro | tau .8 decision,57 Biology,143,0.06293706293706294,82%/12%/6%
+avengers_pro | tau .8 decision,59 Animals (Zoology),25,0.04,80%/20%/0%
+avengers_pro | tau .8 decision,61 Medicine and health,526,0.24524714828897337,54%/34%/13%
+avengers_pro | tau .8 decision,62 Engineering,335,0.36716417910447763,38%/50%/13%
+avengers_pro | tau .8 decision,65 Management and public relations,73,0.0684931506849315,82%/15%/3%
+avengers_pro | tau .8 decision,70 Arts,154,0.2857142857142857,38%/25%/36%
+avengers_pro | tau .8 decision,78 Music,240,0.24166666666666667,41%/48%/10%
+avengers_pro | tau .8 decision,"79 Sports, games and entertainment",158,0.06962025316455696,68%/28%/4%
+avengers_pro | tau .8 decision,"80 Literature, rhetoric and criticism",317,0.5047318611987381,29%/17%/54%
+avengers_pro | tau .8 decision,90 History,498,0.28112449799196787,45%/28%/27%
+avengers_pro | tau .8 decision,91 Geography,150,0.16666666666666666,73%/19%/8%
+avengers_pro | tau .8 decision,92 Biography and genealogy,52,0.019230769230769232,81%/17%/2%
+avengers_pro | dev-share cut,"00 Computer science, knowledge, and systems",821,0.3507917174177832,48%/35%/18%
+avengers_pro | dev-share cut,02 Library and information sciences,396,0.4444444444444444,69%/21%/9%
+avengers_pro | dev-share cut,10 Philosophy,122,0.3524590163934426,30%/33%/37%
+avengers_pro | dev-share cut,15 Psychology,187,0.37433155080213903,65%/26%/10%
+avengers_pro | dev-share cut,16 Philosophical logic,108,0.3425925925925926,60%/35%/5%
+avengers_pro | dev-share cut,17 Ethics,283,0.18021201413427562,65%/30%/5%
+avengers_pro | dev-share cut,"30 Social sciences, sociology, and anthropology",55,0.2909090909090909,5%/33%/62%
+avengers_pro | dev-share cut,33 Economics,352,0.30113636363636365,49%/39%/11%
+avengers_pro | dev-share cut,34 Law,158,0.2088607594936709,41%/40%/19%
+avengers_pro | dev-share cut,40 Language,500,0.316,17%/18%/64%
+avengers_pro | dev-share cut,50 Science,114,0.2543859649122807,26%/22%/52%
+avengers_pro | dev-share cut,51 Mathematics,513,0.33528265107212474,41%/45%/14%
+avengers_pro | dev-share cut,53 Physics,97,0.4845360824742268,45%/43%/11%
+avengers_pro | dev-share cut,54 Chemistry,90,0.4888888888888889,48%/38%/14%
+avengers_pro | dev-share cut,55 Earth sciences and geology,330,0.40606060606060607,78%/18%/4%
+avengers_pro | dev-share cut,57 Biology,143,0.6153846153846154,82%/12%/6%
+avengers_pro | dev-share cut,59 Animals (Zoology),25,0.4,80%/20%/0%
+avengers_pro | dev-share cut,61 Medicine and health,526,0.4923954372623574,54%/34%/13%
+avengers_pro | dev-share cut,62 Engineering,335,0.3074626865671642,38%/50%/13%
+avengers_pro | dev-share cut,65 Management and public relations,73,0.2465753424657534,82%/15%/3%
+avengers_pro | dev-share cut,70 Arts,154,0.2857142857142857,38%/25%/36%
+avengers_pro | dev-share cut,78 Music,240,0.44166666666666665,41%/48%/10%
+avengers_pro | dev-share cut,"79 Sports, games and entertainment",158,0.27848101265822783,68%/28%/4%
+avengers_pro | dev-share cut,"80 Literature, rhetoric and criticism",317,0.2996845425867508,29%/17%/54%
+avengers_pro | dev-share cut,90 History,498,0.3614457831325301,45%/28%/27%
+avengers_pro | dev-share cut,91 Geography,150,0.4,73%/19%/8%
+avengers_pro | dev-share cut,92 Biography and genealogy,52,0.19230769230769232,81%/17%/2%
+hybrid_llm | tau .8 decision,"00 Computer science, knowledge, and systems",821,0.2545676004872107,48%/35%/18%
+hybrid_llm | tau .8 decision,02 Library and information sciences,396,0.14393939393939395,69%/21%/9%
+hybrid_llm | tau .8 decision,10 Philosophy,122,0.36065573770491804,30%/33%/37%
+hybrid_llm | tau .8 decision,15 Psychology,187,0.13368983957219252,65%/26%/10%
+hybrid_llm | tau .8 decision,16 Philosophical logic,108,0.19444444444444445,60%/35%/5%
+hybrid_llm | tau .8 decision,17 Ethics,283,0.10600706713780919,65%/30%/5%
+hybrid_llm | tau .8 decision,"30 Social sciences, sociology, and anthropology",55,0.45454545454545453,5%/33%/62%
+hybrid_llm | tau .8 decision,33 Economics,352,0.21022727272727273,49%/39%/11%
+hybrid_llm | tau .8 decision,34 Law,158,0.2468354430379747,41%/40%/19%
+hybrid_llm | tau .8 decision,40 Language,500,0.458,17%/18%/64%
+hybrid_llm | tau .8 decision,50 Science,114,0.42105263157894735,26%/22%/52%
+hybrid_llm | tau .8 decision,51 Mathematics,513,0.2651072124756335,41%/45%/14%
+hybrid_llm | tau .8 decision,53 Physics,97,0.25773195876288657,45%/43%/11%
+hybrid_llm | tau .8 decision,54 Chemistry,90,0.23333333333333334,48%/38%/14%
+hybrid_llm | tau .8 decision,55 Earth sciences and geology,330,0.09393939393939393,78%/18%/4%
+hybrid_llm | tau .8 decision,57 Biology,143,0.08391608391608392,82%/12%/6%
+hybrid_llm | tau .8 decision,59 Animals (Zoology),25,0.08,80%/20%/0%
+hybrid_llm | tau .8 decision,61 Medicine and health,526,0.2300380228136882,54%/34%/13%
+hybrid_llm | tau .8 decision,62 Engineering,335,0.2656716417910448,38%/50%/13%
+hybrid_llm | tau .8 decision,65 Management and public relations,73,0.0958904109589041,82%/15%/3%
+hybrid_llm | tau .8 decision,70 Arts,154,0.3051948051948052,38%/25%/36%
+hybrid_llm | tau .8 decision,78 Music,240,0.24166666666666667,41%/48%/10%
+hybrid_llm | tau .8 decision,"79 Sports, games and entertainment",158,0.12658227848101267,68%/28%/4%
+hybrid_llm | tau .8 decision,"80 Literature, rhetoric and criticism",317,0.4037854889589905,29%/17%/54%
+hybrid_llm | tau .8 decision,90 History,498,0.2570281124497992,45%/28%/27%
+hybrid_llm | tau .8 decision,91 Geography,150,0.17333333333333334,73%/19%/8%
+hybrid_llm | tau .8 decision,92 Biography and genealogy,52,0.07692307692307693,81%/17%/2%
+hybrid_llm | dev-share cut,"00 Computer science, knowledge, and systems",821,0.3848964677222899,48%/35%/18%
+hybrid_llm | dev-share cut,02 Library and information sciences,396,0.5227272727272727,69%/21%/9%
+hybrid_llm | dev-share cut,10 Philosophy,122,0.32786885245901637,30%/33%/37%
+hybrid_llm | dev-share cut,15 Psychology,187,0.45989304812834225,65%/26%/10%
+hybrid_llm | dev-share cut,16 Philosophical logic,108,0.37962962962962965,60%/35%/5%
+hybrid_llm | dev-share cut,17 Ethics,283,0.36042402826855124,65%/30%/5%
+hybrid_llm | dev-share cut,"30 Social sciences, sociology, and anthropology",55,0.2909090909090909,5%/33%/62%
+hybrid_llm | dev-share cut,33 Economics,352,0.3835227272727273,49%/39%/11%
+hybrid_llm | dev-share cut,34 Law,158,0.3227848101265823,41%/40%/19%
+hybrid_llm | dev-share cut,40 Language,500,0.32,17%/18%/64%
+hybrid_llm | dev-share cut,50 Science,114,0.38596491228070173,26%/22%/52%
+hybrid_llm | dev-share cut,51 Mathematics,513,0.3567251461988304,41%/45%/14%
+hybrid_llm | dev-share cut,53 Physics,97,0.31958762886597936,45%/43%/11%
+hybrid_llm | dev-share cut,54 Chemistry,90,0.4,48%/38%/14%
+hybrid_llm | dev-share cut,55 Earth sciences and geology,330,0.6121212121212121,78%/18%/4%
+hybrid_llm | dev-share cut,57 Biology,143,0.5594405594405595,82%/12%/6%
+hybrid_llm | dev-share cut,59 Animals (Zoology),25,0.44,80%/20%/0%
+hybrid_llm | dev-share cut,61 Medicine and health,526,0.43346007604562736,54%/34%/13%
+hybrid_llm | dev-share cut,62 Engineering,335,0.4,38%/50%/13%
+hybrid_llm | dev-share cut,65 Management and public relations,73,0.6027397260273972,82%/15%/3%
+hybrid_llm | dev-share cut,70 Arts,154,0.44155844155844154,38%/25%/36%
+hybrid_llm | dev-share cut,78 Music,240,0.3333333333333333,41%/48%/10%
+hybrid_llm | dev-share cut,"79 Sports, games and entertainment",158,0.4620253164556962,68%/28%/4%
+hybrid_llm | dev-share cut,"80 Literature, rhetoric and criticism",317,0.334384858044164,29%/17%/54%
+hybrid_llm | dev-share cut,90 History,498,0.39156626506024095,45%/28%/27%
+hybrid_llm | dev-share cut,91 Geography,150,0.46,73%/19%/8%
+hybrid_llm | dev-share cut,92 Biography and genealogy,52,0.5192307692307693,81%/17%/2%
+irt_router | tau .8 decision,"00 Computer science, knowledge, and systems",821,0.26431181485992694,48%/35%/18%
+irt_router | tau .8 decision,02 Library and information sciences,396,0.2297979797979798,69%/21%/9%
+irt_router | tau .8 decision,10 Philosophy,122,0.28688524590163933,30%/33%/37%
+irt_router | tau .8 decision,15 Psychology,187,0.2192513368983957,65%/26%/10%
+irt_router | tau .8 decision,16 Philosophical logic,108,0.10185185185185185,60%/35%/5%
+irt_router | tau .8 decision,17 Ethics,283,0.1413427561837456,65%/30%/5%
+irt_router | tau .8 decision,"30 Social sciences, sociology, and anthropology",55,0.4909090909090909,5%/33%/62%
+irt_router | tau .8 decision,33 Economics,352,0.23295454545454544,49%/39%/11%
+irt_router | tau .8 decision,34 Law,158,0.24050632911392406,41%/40%/19%
+irt_router | tau .8 decision,40 Language,500,0.518,17%/18%/64%
+irt_router | tau .8 decision,50 Science,114,0.5087719298245614,26%/22%/52%
+irt_router | tau .8 decision,51 Mathematics,513,0.17543859649122806,41%/45%/14%
+irt_router | tau .8 decision,53 Physics,97,0.28865979381443296,45%/43%/11%
+irt_router | tau .8 decision,54 Chemistry,90,0.2111111111111111,48%/38%/14%
+irt_router | tau .8 decision,55 Earth sciences and geology,330,0.25757575757575757,78%/18%/4%
+irt_router | tau .8 decision,57 Biology,143,0.3706293706293706,82%/12%/6%
+irt_router | tau .8 decision,59 Animals (Zoology),25,0.04,80%/20%/0%
+irt_router | tau .8 decision,61 Medicine and health,526,0.2262357414448669,54%/34%/13%
+irt_router | tau .8 decision,62 Engineering,335,0.23582089552238805,38%/50%/13%
+irt_router | tau .8 decision,65 Management and public relations,73,0.3424657534246575,82%/15%/3%
+irt_router | tau .8 decision,70 Arts,154,0.37012987012987014,38%/25%/36%
+irt_router | tau .8 decision,78 Music,240,0.225,41%/48%/10%
+irt_router | tau .8 decision,"79 Sports, games and entertainment",158,0.12025316455696203,68%/28%/4%
+irt_router | tau .8 decision,"80 Literature, rhetoric and criticism",317,0.5078864353312302,29%/17%/54%
+irt_router | tau .8 decision,90 History,498,0.3192771084337349,45%/28%/27%
+irt_router | tau .8 decision,91 Geography,150,0.17333333333333334,73%/19%/8%
+irt_router | tau .8 decision,92 Biography and genealogy,52,0.1346153846153846,81%/17%/2%
+irt_router | dev-share cut,"00 Computer science, knowledge, and systems",821,0.49695493300852617,48%/35%/18%
+irt_router | dev-share cut,02 Library and information sciences,396,0.5328282828282829,69%/21%/9%
+irt_router | dev-share cut,10 Philosophy,122,0.3114754098360656,30%/33%/37%
+irt_router | dev-share cut,15 Psychology,187,0.5935828877005348,65%/26%/10%
+irt_router | dev-share cut,16 Philosophical logic,108,0.46296296296296297,60%/35%/5%
+irt_router | dev-share cut,17 Ethics,283,0.558303886925795,65%/30%/5%
+irt_router | dev-share cut,"30 Social sciences, sociology, and anthropology",55,0.18181818181818182,5%/33%/62%
+irt_router | dev-share cut,33 Economics,352,0.5340909090909091,49%/39%/11%
+irt_router | dev-share cut,34 Law,158,0.33544303797468356,41%/40%/19%
+irt_router | dev-share cut,40 Language,500,0.258,17%/18%/64%
+irt_router | dev-share cut,50 Science,114,0.3508771929824561,26%/22%/52%
+irt_router | dev-share cut,51 Mathematics,513,0.2962962962962963,41%/45%/14%
+irt_router | dev-share cut,53 Physics,97,0.41237113402061853,45%/43%/11%
+irt_router | dev-share cut,54 Chemistry,90,0.4666666666666667,48%/38%/14%
+irt_router | dev-share cut,55 Earth sciences and geology,330,0.6727272727272727,78%/18%/4%
+irt_router | dev-share cut,57 Biology,143,0.7412587412587412,82%/12%/6%
+irt_router | dev-share cut,59 Animals (Zoology),25,0.56,80%/20%/0%
+irt_router | dev-share cut,61 Medicine and health,526,0.4828897338403042,54%/34%/13%
+irt_router | dev-share cut,62 Engineering,335,0.373134328358209,38%/50%/13%
+irt_router | dev-share cut,65 Management and public relations,73,0.6986301369863014,82%/15%/3%
+irt_router | dev-share cut,70 Arts,154,0.3961038961038961,38%/25%/36%
+irt_router | dev-share cut,78 Music,240,0.4041666666666667,41%/48%/10%
+irt_router | dev-share cut,"79 Sports, games and entertainment",158,0.4430379746835443,68%/28%/4%
+irt_router | dev-share cut,"80 Literature, rhetoric and criticism",317,0.23974763406940064,29%/17%/54%
+irt_router | dev-share cut,90 History,498,0.41967871485943775,45%/28%/27%
+irt_router | dev-share cut,91 Geography,150,0.5533333333333333,73%/19%/8%
+irt_router | dev-share cut,92 Biography and genealogy,52,0.3269230769230769,81%/17%/2%
+knn | tau .8 decision,"00 Computer science, knowledge, and systems",821,0.2289890377588307,48%/35%/18%
+knn | tau .8 decision,02 Library and information sciences,396,0.15404040404040403,69%/21%/9%
+knn | tau .8 decision,10 Philosophy,122,0.27049180327868855,30%/33%/37%
+knn | tau .8 decision,15 Psychology,187,0.18181818181818182,65%/26%/10%
+knn | tau .8 decision,16 Philosophical logic,108,0.14814814814814814,60%/35%/5%
+knn | tau .8 decision,17 Ethics,283,0.17667844522968199,65%/30%/5%
+knn | tau .8 decision,"30 Social sciences, sociology, and anthropology",55,0.6181818181818182,5%/33%/62%
+knn | tau .8 decision,33 Economics,352,0.1590909090909091,49%/39%/11%
+knn | tau .8 decision,34 Law,158,0.23417721518987342,41%/40%/19%
+knn | tau .8 decision,40 Language,500,0.472,17%/18%/64%
+knn | tau .8 decision,50 Science,114,0.42105263157894735,26%/22%/52%
+knn | tau .8 decision,51 Mathematics,513,0.2378167641325536,41%/45%/14%
+knn | tau .8 decision,53 Physics,97,0.18556701030927836,45%/43%/11%
+knn | tau .8 decision,54 Chemistry,90,0.3111111111111111,48%/38%/14%
+knn | tau .8 decision,55 Earth sciences and geology,330,0.20606060606060606,78%/18%/4%
+knn | tau .8 decision,57 Biology,143,0.2517482517482518,82%/12%/6%
+knn | tau .8 decision,59 Animals (Zoology),25,0.12,80%/20%/0%
+knn | tau .8 decision,61 Medicine and health,526,0.27756653992395436,54%/34%/13%
+knn | tau .8 decision,62 Engineering,335,0.18208955223880596,38%/50%/13%
+knn | tau .8 decision,65 Management and public relations,73,0.1095890410958904,82%/15%/3%
+knn | tau .8 decision,70 Arts,154,0.33116883116883117,38%/25%/36%
+knn | tau .8 decision,78 Music,240,0.25416666666666665,41%/48%/10%
+knn | tau .8 decision,"79 Sports, games and entertainment",158,0.08860759493670886,68%/28%/4%
+knn | tau .8 decision,"80 Literature, rhetoric and criticism",317,0.4605678233438486,29%/17%/54%
+knn | tau .8 decision,90 History,498,0.321285140562249,45%/28%/27%
+knn | tau .8 decision,91 Geography,150,0.24,73%/19%/8%
+knn | tau .8 decision,92 Biography and genealogy,52,0.1346153846153846,81%/17%/2%
+knn | dev-share cut,"00 Computer science, knowledge, and systems",821,0.3276492082825822,48%/35%/18%
+knn | dev-share cut,02 Library and information sciences,396,0.43434343434343436,69%/21%/9%
+knn | dev-share cut,10 Philosophy,122,0.3442622950819672,30%/33%/37%
+knn | dev-share cut,15 Psychology,187,0.48128342245989303,65%/26%/10%
+knn | dev-share cut,16 Philosophical logic,108,0.2222222222222222,60%/35%/5%
+knn | dev-share cut,17 Ethics,283,0.43109540636042404,65%/30%/5%
+knn | dev-share cut,"30 Social sciences, sociology, and anthropology",55,0.12727272727272726,5%/33%/62%
+knn | dev-share cut,33 Economics,352,0.46875,49%/39%/11%
+knn | dev-share cut,34 Law,158,0.310126582278481,41%/40%/19%
+knn | dev-share cut,40 Language,500,0.224,17%/18%/64%
+knn | dev-share cut,50 Science,114,0.42105263157894735,26%/22%/52%
+knn | dev-share cut,51 Mathematics,513,0.25146198830409355,41%/45%/14%
+knn | dev-share cut,53 Physics,97,0.4845360824742268,45%/43%/11%
+knn | dev-share cut,54 Chemistry,90,0.5111111111111111,48%/38%/14%
+knn | dev-share cut,55 Earth sciences and geology,330,0.6424242424242425,78%/18%/4%
+knn | dev-share cut,57 Biology,143,0.6713286713286714,82%/12%/6%
+knn | dev-share cut,59 Animals (Zoology),25,0.72,80%/20%/0%
+knn | dev-share cut,61 Medicine and health,526,0.48859315589353614,54%/34%/13%
+knn | dev-share cut,62 Engineering,335,0.3940298507462687,38%/50%/13%
+knn | dev-share cut,65 Management and public relations,73,0.6575342465753424,82%/15%/3%
+knn | dev-share cut,70 Arts,154,0.33766233766233766,38%/25%/36%
+knn | dev-share cut,78 Music,240,0.31666666666666665,41%/48%/10%
+knn | dev-share cut,"79 Sports, games and entertainment",158,0.36075949367088606,68%/28%/4%
+knn | dev-share cut,"80 Literature, rhetoric and criticism",317,0.27129337539432175,29%/17%/54%
+knn | dev-share cut,90 History,498,0.4397590361445783,45%/28%/27%
+knn | dev-share cut,91 Geography,150,0.5133333333333333,73%/19%/8%
+knn | dev-share cut,92 Biography and genealogy,52,0.25,81%/17%/2%
+knn_a | tau .8 decision,"00 Computer science, knowledge, and systems",821,0.18270401948842874,48%/35%/18%
+knn_a | tau .8 decision,02 Library and information sciences,396,0.12878787878787878,69%/21%/9%
+knn_a | tau .8 decision,10 Philosophy,122,0.22950819672131148,30%/33%/37%
+knn_a | tau .8 decision,15 Psychology,187,0.18181818181818182,65%/26%/10%
+knn_a | tau .8 decision,16 Philosophical logic,108,0.05555555555555555,60%/35%/5%
+knn_a | tau .8 decision,17 Ethics,283,0.13780918727915195,65%/30%/5%
+knn_a | tau .8 decision,"30 Social sciences, sociology, and anthropology",55,0.6181818181818182,5%/33%/62%
+knn_a | tau .8 decision,33 Economics,352,0.13352272727272727,49%/39%/11%
+knn_a | tau .8 decision,34 Law,158,0.2088607594936709,41%/40%/19%
+knn_a | tau .8 decision,40 Language,500,0.484,17%/18%/64%
+knn_a | tau .8 decision,50 Science,114,0.45614035087719296,26%/22%/52%
+knn_a | tau .8 decision,51 Mathematics,513,0.18908382066276802,41%/45%/14%
+knn_a | tau .8 decision,53 Physics,97,0.20618556701030927,45%/43%/11%
+knn_a | tau .8 decision,54 Chemistry,90,0.15555555555555556,48%/38%/14%
+knn_a | tau .8 decision,55 Earth sciences and geology,330,0.13636363636363635,78%/18%/4%
+knn_a | tau .8 decision,57 Biology,143,0.08391608391608392,82%/12%/6%
+knn_a | tau .8 decision,59 Animals (Zoology),25,0.08,80%/20%/0%
+knn_a | tau .8 decision,61 Medicine and health,526,0.20722433460076045,54%/34%/13%
+knn_a | tau .8 decision,62 Engineering,335,0.1582089552238806,38%/50%/13%
+knn_a | tau .8 decision,65 Management and public relations,73,0.0958904109589041,82%/15%/3%
+knn_a | tau .8 decision,70 Arts,154,0.35714285714285715,38%/25%/36%
+knn_a | tau .8 decision,78 Music,240,0.1375,41%/48%/10%
+knn_a | tau .8 decision,"79 Sports, games and entertainment",158,0.10126582278481013,68%/28%/4%
+knn_a | tau .8 decision,"80 Literature, rhetoric and criticism",317,0.4227129337539432,29%/17%/54%
+knn_a | tau .8 decision,90 History,498,0.3373493975903614,45%/28%/27%
+knn_a | tau .8 decision,91 Geography,150,0.18666666666666668,73%/19%/8%
+knn_a | tau .8 decision,92 Biography and genealogy,52,0.11538461538461539,81%/17%/2%
+knn_a | dev-share cut,"00 Computer science, knowledge, and systems",821,0.3934226552984166,48%/35%/18%
+knn_a | dev-share cut,02 Library and information sciences,396,0.45454545454545453,69%/21%/9%
+knn_a | dev-share cut,10 Philosophy,122,0.3524590163934426,30%/33%/37%
+knn_a | dev-share cut,15 Psychology,187,0.5614973262032086,65%/26%/10%
+knn_a | dev-share cut,16 Philosophical logic,108,0.25925925925925924,60%/35%/5%
+knn_a | dev-share cut,17 Ethics,283,0.43109540636042404,65%/30%/5%
+knn_a | dev-share cut,"30 Social sciences, sociology, and anthropology",55,0.12727272727272726,5%/33%/62%
+knn_a | dev-share cut,33 Economics,352,0.4119318181818182,49%/39%/11%
+knn_a | dev-share cut,34 Law,158,0.34810126582278483,41%/40%/19%
+knn_a | dev-share cut,40 Language,500,0.214,17%/18%/64%
+knn_a | dev-share cut,50 Science,114,0.4473684210526316,26%/22%/52%
+knn_a | dev-share cut,51 Mathematics,513,0.25146198830409355,41%/45%/14%
+knn_a | dev-share cut,53 Physics,97,0.4536082474226804,45%/43%/11%
+knn_a | dev-share cut,54 Chemistry,90,0.4222222222222222,48%/38%/14%
+knn_a | dev-share cut,55 Earth sciences and geology,330,0.6878787878787879,78%/18%/4%
+knn_a | dev-share cut,57 Biology,143,0.7132867132867133,82%/12%/6%
+knn_a | dev-share cut,59 Animals (Zoology),25,0.84,80%/20%/0%
+knn_a | dev-share cut,61 Medicine and health,526,0.5076045627376425,54%/34%/13%
+knn_a | dev-share cut,62 Engineering,335,0.3253731343283582,38%/50%/13%
+knn_a | dev-share cut,65 Management and public relations,73,0.7671232876712328,82%/15%/3%
+knn_a | dev-share cut,70 Arts,154,0.42857142857142855,38%/25%/36%
+knn_a | dev-share cut,78 Music,240,0.4125,41%/48%/10%
+knn_a | dev-share cut,"79 Sports, games and entertainment",158,0.5886075949367089,68%/28%/4%
+knn_a | dev-share cut,"80 Literature, rhetoric and criticism",317,0.3186119873817035,29%/17%/54%
+knn_a | dev-share cut,90 History,498,0.4497991967871486,45%/28%/27%
+knn_a | dev-share cut,91 Geography,150,0.68,73%/19%/8%
+knn_a | dev-share cut,92 Biography and genealogy,52,0.6538461538461539,81%/17%/2%
+mf | tau .8 decision,"00 Computer science, knowledge, and systems",821,0.2545676004872107,48%/35%/18%
+mf | tau .8 decision,02 Library and information sciences,396,0.2601010101010101,69%/21%/9%
+mf | tau .8 decision,10 Philosophy,122,0.36885245901639346,30%/33%/37%
+mf | tau .8 decision,15 Psychology,187,0.1925133689839572,65%/26%/10%
+mf | tau .8 decision,16 Philosophical logic,108,0.07407407407407407,60%/35%/5%
+mf | tau .8 decision,17 Ethics,283,0.0636042402826855,65%/30%/5%
+mf | tau .8 decision,"30 Social sciences, sociology, and anthropology",55,0.5818181818181818,5%/33%/62%
+mf | tau .8 decision,33 Economics,352,0.20454545454545456,49%/39%/11%
+mf | tau .8 decision,34 Law,158,0.20253164556962025,41%/40%/19%
+mf | tau .8 decision,40 Language,500,0.564,17%/18%/64%
+mf | tau .8 decision,50 Science,114,0.4649122807017544,26%/22%/52%
+mf | tau .8 decision,51 Mathematics,513,0.23976608187134502,41%/45%/14%
+mf | tau .8 decision,53 Physics,97,0.15463917525773196,45%/43%/11%
+mf | tau .8 decision,54 Chemistry,90,0.24444444444444444,48%/38%/14%
+mf | tau .8 decision,55 Earth sciences and geology,330,0.16666666666666666,78%/18%/4%
+mf | tau .8 decision,57 Biology,143,0.27972027972027974,82%/12%/6%
+mf | tau .8 decision,59 Animals (Zoology),25,0.0,80%/20%/0%
+mf | tau .8 decision,61 Medicine and health,526,0.15399239543726237,54%/34%/13%
+mf | tau .8 decision,62 Engineering,335,0.2298507462686567,38%/50%/13%
+mf | tau .8 decision,65 Management and public relations,73,0.1780821917808219,82%/15%/3%
+mf | tau .8 decision,70 Arts,154,0.38311688311688313,38%/25%/36%
+mf | tau .8 decision,78 Music,240,0.19166666666666668,41%/48%/10%
+mf | tau .8 decision,"79 Sports, games and entertainment",158,0.06962025316455696,68%/28%/4%
+mf | tau .8 decision,"80 Literature, rhetoric and criticism",317,0.5299684542586751,29%/17%/54%
+mf | tau .8 decision,90 History,498,0.2931726907630522,45%/28%/27%
+mf | tau .8 decision,91 Geography,150,0.09333333333333334,73%/19%/8%
+mf | tau .8 decision,92 Biography and genealogy,52,0.038461538461538464,81%/17%/2%
+mf | dev-share cut,"00 Computer science, knowledge, and systems",821,0.4920828258221681,48%/35%/18%
+mf | dev-share cut,02 Library and information sciences,396,0.6237373737373737,69%/21%/9%
+mf | dev-share cut,10 Philosophy,122,0.3114754098360656,30%/33%/37%
+mf | dev-share cut,15 Psychology,187,0.6096256684491979,65%/26%/10%
+mf | dev-share cut,16 Philosophical logic,108,0.48148148148148145,60%/35%/5%
+mf | dev-share cut,17 Ethics,283,0.24734982332155478,65%/30%/5%
+mf | dev-share cut,"30 Social sciences, sociology, and anthropology",55,0.16363636363636364,5%/33%/62%
+mf | dev-share cut,33 Economics,352,0.5142045454545454,49%/39%/11%
+mf | dev-share cut,34 Law,158,0.43670886075949367,41%/40%/19%
+mf | dev-share cut,40 Language,500,0.276,17%/18%/64%
+mf | dev-share cut,50 Science,114,0.2894736842105263,26%/22%/52%
+mf | dev-share cut,51 Mathematics,513,0.32943469785575047,41%/45%/14%
+mf | dev-share cut,53 Physics,97,0.41237113402061853,45%/43%/11%
+mf | dev-share cut,54 Chemistry,90,0.45555555555555555,48%/38%/14%
+mf | dev-share cut,55 Earth sciences and geology,330,0.6878787878787879,78%/18%/4%
+mf | dev-share cut,57 Biology,143,0.7272727272727273,82%/12%/6%
+mf | dev-share cut,59 Animals (Zoology),25,0.4,80%/20%/0%
+mf | dev-share cut,61 Medicine and health,526,0.4866920152091255,54%/34%/13%
+mf | dev-share cut,62 Engineering,335,0.3850746268656716,38%/50%/13%
+mf | dev-share cut,65 Management and public relations,73,0.7534246575342466,82%/15%/3%
+mf | dev-share cut,70 Arts,154,0.4805194805194805,38%/25%/36%
+mf | dev-share cut,78 Music,240,0.5041666666666667,41%/48%/10%
+mf | dev-share cut,"79 Sports, games and entertainment",158,0.5189873417721519,68%/28%/4%
+mf | dev-share cut,"80 Literature, rhetoric and criticism",317,0.35962145110410093,29%/17%/54%
+mf | dev-share cut,90 History,498,0.463855421686747,45%/28%/27%
+mf | dev-share cut,91 Geography,150,0.58,73%/19%/8%
+mf | dev-share cut,92 Biography and genealogy,52,0.5,81%/17%/2%
+mlp | tau .8 decision,"00 Computer science, knowledge, and systems",821,0.2984165651644336,48%/35%/18%
+mlp | tau .8 decision,02 Library and information sciences,396,0.23737373737373738,69%/21%/9%
+mlp | tau .8 decision,10 Philosophy,122,0.3770491803278688,30%/33%/37%
+mlp | tau .8 decision,15 Psychology,187,0.3048128342245989,65%/26%/10%
+mlp | tau .8 decision,16 Philosophical logic,108,0.26851851851851855,60%/35%/5%
+mlp | tau .8 decision,17 Ethics,283,0.2579505300353357,65%/30%/5%
+mlp | tau .8 decision,"30 Social sciences, sociology, and anthropology",55,0.34545454545454546,5%/33%/62%
+mlp | tau .8 decision,33 Economics,352,0.2840909090909091,49%/39%/11%
+mlp | tau .8 decision,34 Law,158,0.2974683544303797,41%/40%/19%
+mlp | tau .8 decision,40 Language,500,0.356,17%/18%/64%
+mlp | tau .8 decision,50 Science,114,0.37719298245614036,26%/22%/52%
+mlp | tau .8 decision,51 Mathematics,513,0.30214424951267055,41%/45%/14%
+mlp | tau .8 decision,53 Physics,97,0.36082474226804123,45%/43%/11%
+mlp | tau .8 decision,54 Chemistry,90,0.3333333333333333,48%/38%/14%
+mlp | tau .8 decision,55 Earth sciences and geology,330,0.3181818181818182,78%/18%/4%
+mlp | tau .8 decision,57 Biology,143,0.3076923076923077,82%/12%/6%
+mlp | tau .8 decision,59 Animals (Zoology),25,0.24,80%/20%/0%
+mlp | tau .8 decision,61 Medicine and health,526,0.2889733840304182,54%/34%/13%
+mlp | tau .8 decision,62 Engineering,335,0.3044776119402985,38%/50%/13%
+mlp | tau .8 decision,65 Management and public relations,73,0.3013698630136986,82%/15%/3%
+mlp | tau .8 decision,70 Arts,154,0.36363636363636365,38%/25%/36%
+mlp | tau .8 decision,78 Music,240,0.325,41%/48%/10%
+mlp | tau .8 decision,"79 Sports, games and entertainment",158,0.23417721518987342,68%/28%/4%
+mlp | tau .8 decision,"80 Literature, rhetoric and criticism",317,0.416403785488959,29%/17%/54%
+mlp | tau .8 decision,90 History,498,0.3132530120481928,45%/28%/27%
+mlp | tau .8 decision,91 Geography,150,0.3466666666666667,73%/19%/8%
+mlp | tau .8 decision,92 Biography and genealogy,52,0.36538461538461536,81%/17%/2%
+mlp | dev-share cut,"00 Computer science, knowledge, and systems",821,0.44336175395858707,48%/35%/18%
+mlp | dev-share cut,02 Library and information sciences,396,0.4116161616161616,69%/21%/9%
+mlp | dev-share cut,10 Philosophy,122,0.38524590163934425,30%/33%/37%
+mlp | dev-share cut,15 Psychology,187,0.5240641711229946,65%/26%/10%
+mlp | dev-share cut,16 Philosophical logic,108,0.48148148148148145,60%/35%/5%
+mlp | dev-share cut,17 Ethics,283,0.49469964664310956,65%/30%/5%
+mlp | dev-share cut,"30 Social sciences, sociology, and anthropology",55,0.10909090909090909,5%/33%/62%
+mlp | dev-share cut,33 Economics,352,0.45738636363636365,49%/39%/11%
+mlp | dev-share cut,34 Law,158,0.34177215189873417,41%/40%/19%
+mlp | dev-share cut,40 Language,500,0.252,17%/18%/64%
+mlp | dev-share cut,50 Science,114,0.3684210526315789,26%/22%/52%
+mlp | dev-share cut,51 Mathematics,513,0.3586744639376218,41%/45%/14%
+mlp | dev-share cut,53 Physics,97,0.36082474226804123,45%/43%/11%
+mlp | dev-share cut,54 Chemistry,90,0.4111111111111111,48%/38%/14%
+mlp | dev-share cut,55 Earth sciences and geology,330,0.6303030303030303,78%/18%/4%
+mlp | dev-share cut,57 Biology,143,0.5734265734265734,82%/12%/6%
+mlp | dev-share cut,59 Animals (Zoology),25,0.52,80%/20%/0%
+mlp | dev-share cut,61 Medicine and health,526,0.45627376425855515,54%/34%/13%
+mlp | dev-share cut,62 Engineering,335,0.3850746268656716,38%/50%/13%
+mlp | dev-share cut,65 Management and public relations,73,0.6027397260273972,82%/15%/3%
+mlp | dev-share cut,70 Arts,154,0.38311688311688313,38%/25%/36%
+mlp | dev-share cut,78 Music,240,0.4666666666666667,41%/48%/10%
+mlp | dev-share cut,"79 Sports, games and entertainment",158,0.4177215189873418,68%/28%/4%
+mlp | dev-share cut,"80 Literature, rhetoric and criticism",317,0.3438485804416404,29%/17%/54%
+mlp | dev-share cut,90 History,498,0.43373493975903615,45%/28%/27%
+mlp | dev-share cut,91 Geography,150,0.5933333333333334,73%/19%/8%
+mlp | dev-share cut,92 Biography and genealogy,52,0.40384615384615385,81%/17%/2%
+r0_group | tau .8 decision,"00 Computer science, knowledge, and systems",821,0.3105968331303289,48%/35%/18%
+r0_group | tau .8 decision,02 Library and information sciences,396,0.16666666666666666,69%/21%/9%
+r0_group | tau .8 decision,10 Philosophy,122,0.3442622950819672,30%/33%/37%
+r0_group | tau .8 decision,15 Psychology,187,0.26737967914438504,65%/26%/10%
+r0_group | tau .8 decision,16 Philosophical logic,108,0.046296296296296294,60%/35%/5%
+r0_group | tau .8 decision,17 Ethics,283,0.10600706713780919,65%/30%/5%
+r0_group | tau .8 decision,"30 Social sciences, sociology, and anthropology",55,0.5272727272727272,5%/33%/62%
+r0_group | tau .8 decision,33 Economics,352,0.2585227272727273,49%/39%/11%
+r0_group | tau .8 decision,34 Law,158,0.22151898734177214,41%/40%/19%
+r0_group | tau .8 decision,40 Language,500,0.564,17%/18%/64%
+r0_group | tau .8 decision,50 Science,114,0.49122807017543857,26%/22%/52%
+r0_group | tau .8 decision,51 Mathematics,513,0.1949317738791423,41%/45%/14%
+r0_group | tau .8 decision,53 Physics,97,0.2268041237113402,45%/43%/11%
+r0_group | tau .8 decision,54 Chemistry,90,0.2111111111111111,48%/38%/14%
+r0_group | tau .8 decision,55 Earth sciences and geology,330,0.22727272727272727,78%/18%/4%
+r0_group | tau .8 decision,57 Biology,143,0.32167832167832167,82%/12%/6%
+r0_group | tau .8 decision,59 Animals (Zoology),25,0.24,80%/20%/0%
+r0_group | tau .8 decision,61 Medicine and health,526,0.17490494296577946,54%/34%/13%
+r0_group | tau .8 decision,62 Engineering,335,0.20597014925373133,38%/50%/13%
+r0_group | tau .8 decision,65 Management and public relations,73,0.4246575342465753,82%/15%/3%
+r0_group | tau .8 decision,70 Arts,154,0.42857142857142855,38%/25%/36%
+r0_group | tau .8 decision,78 Music,240,0.19583333333333333,41%/48%/10%
+r0_group | tau .8 decision,"79 Sports, games and entertainment",158,0.2974683544303797,68%/28%/4%
+r0_group | tau .8 decision,"80 Literature, rhetoric and criticism",317,0.61198738170347,29%/17%/54%
+r0_group | tau .8 decision,90 History,498,0.3092369477911647,45%/28%/27%
+r0_group | tau .8 decision,91 Geography,150,0.18,73%/19%/8%
+r0_group | tau .8 decision,92 Biography and genealogy,52,0.1346153846153846,81%/17%/2%
+r0_group | dev-share cut,"00 Computer science, knowledge, and systems",821,0.4482338611449452,48%/35%/18%
+r0_group | dev-share cut,02 Library and information sciences,396,0.46464646464646464,69%/21%/9%
+r0_group | dev-share cut,10 Philosophy,122,0.3770491803278688,30%/33%/37%
+r0_group | dev-share cut,15 Psychology,187,0.48128342245989303,65%/26%/10%
+r0_group | dev-share cut,16 Philosophical logic,108,0.3333333333333333,60%/35%/5%
+r0_group | dev-share cut,17 Ethics,283,0.31448763250883394,65%/30%/5%
+r0_group | dev-share cut,"30 Social sciences, sociology, and anthropology",55,0.23636363636363636,5%/33%/62%
+r0_group | dev-share cut,33 Economics,352,0.4971590909090909,49%/39%/11%
+r0_group | dev-share cut,34 Law,158,0.3924050632911392,41%/40%/19%
+r0_group | dev-share cut,40 Language,500,0.354,17%/18%/64%
+r0_group | dev-share cut,50 Science,114,0.2719298245614035,26%/22%/52%
+r0_group | dev-share cut,51 Mathematics,513,0.3840155945419103,41%/45%/14%
+r0_group | dev-share cut,53 Physics,97,0.44329896907216493,45%/43%/11%
+r0_group | dev-share cut,54 Chemistry,90,0.5111111111111111,48%/38%/14%
+r0_group | dev-share cut,55 Earth sciences and geology,330,0.5818181818181818,78%/18%/4%
+r0_group | dev-share cut,57 Biology,143,0.7342657342657343,82%/12%/6%
+r0_group | dev-share cut,59 Animals (Zoology),25,0.6,80%/20%/0%
+r0_group | dev-share cut,61 Medicine and health,526,0.39543726235741444,54%/34%/13%
+r0_group | dev-share cut,62 Engineering,335,0.45671641791044776,38%/50%/13%
+r0_group | dev-share cut,65 Management and public relations,73,0.6712328767123288,82%/15%/3%
+r0_group | dev-share cut,70 Arts,154,0.4675324675324675,38%/25%/36%
+r0_group | dev-share cut,78 Music,240,0.5375,41%/48%/10%
+r0_group | dev-share cut,"79 Sports, games and entertainment",158,0.4810126582278481,68%/28%/4%
+r0_group | dev-share cut,"80 Literature, rhetoric and criticism",317,0.5110410094637224,29%/17%/54%
+r0_group | dev-share cut,90 History,498,0.4036144578313253,45%/28%/27%
+r0_group | dev-share cut,91 Geography,150,0.5666666666666667,73%/19%/8%
+r0_group | dev-share cut,92 Biography and genealogy,52,0.38461538461538464,81%/17%/2%
+r0_group (argmax),"00 Computer science, knowledge, and systems",821,0.44336175395858707,48%/35%/18%
+r0_group (argmax),02 Library and information sciences,396,0.6262626262626263,69%/21%/9%
+r0_group (argmax),10 Philosophy,122,0.3524590163934426,30%/33%/37%
+r0_group (argmax),15 Psychology,187,0.5721925133689839,65%/26%/10%
+r0_group (argmax),16 Philosophical logic,108,0.49074074074074076,60%/35%/5%
+r0_group (argmax),17 Ethics,283,0.43109540636042404,65%/30%/5%
+r0_group (argmax),"30 Social sciences, sociology, and anthropology",55,0.09090909090909091,5%/33%/62%
+r0_group (argmax),33 Economics,352,0.44886363636363635,49%/39%/11%
+r0_group (argmax),34 Law,158,0.3670886075949367,41%/40%/19%
+r0_group (argmax),40 Language,500,0.296,17%/18%/64%
+r0_group (argmax),50 Science,114,0.2719298245614035,26%/22%/52%
+r0_group (argmax),51 Mathematics,513,0.33723196881091616,41%/45%/14%
+r0_group (argmax),53 Physics,97,0.44329896907216493,45%/43%/11%
+r0_group (argmax),54 Chemistry,90,0.4222222222222222,48%/38%/14%
+r0_group (argmax),55 Earth sciences and geology,330,0.6818181818181818,78%/18%/4%
+r0_group (argmax),57 Biology,143,0.7622377622377622,82%/12%/6%
+r0_group (argmax),59 Animals (Zoology),25,0.76,80%/20%/0%
+r0_group (argmax),61 Medicine and health,526,0.44106463878326996,54%/34%/13%
+r0_group (argmax),62 Engineering,335,0.3582089552238806,38%/50%/13%
+r0_group (argmax),65 Management and public relations,73,0.7671232876712328,82%/15%/3%
+r0_group (argmax),70 Arts,154,0.37662337662337664,38%/25%/36%
+r0_group (argmax),78 Music,240,0.4,41%/48%/10%
+r0_group (argmax),"79 Sports, games and entertainment",158,0.569620253164557,68%/28%/4%
+r0_group (argmax),"80 Literature, rhetoric and criticism",317,0.4479495268138801,29%/17%/54%
+r0_group (argmax),90 History,498,0.4678714859437751,45%/28%/27%
+r0_group (argmax),91 Geography,150,0.62,73%/19%/8%
+r0_group (argmax),92 Biography and genealogy,52,0.5192307692307693,81%/17%/2%
+r1_bge | tau .8 decision,"00 Computer science, knowledge, and systems",821,0.2582216808769793,48%/35%/18%
+r1_bge | tau .8 decision,02 Library and information sciences,396,0.18181818181818182,69%/21%/9%
+r1_bge | tau .8 decision,10 Philosophy,122,0.36065573770491804,30%/33%/37%
+r1_bge | tau .8 decision,15 Psychology,187,0.20855614973262032,65%/26%/10%
+r1_bge | tau .8 decision,16 Philosophical logic,108,0.05555555555555555,60%/35%/5%
+r1_bge | tau .8 decision,17 Ethics,283,0.0812720848056537,65%/30%/5%
+r1_bge | tau .8 decision,"30 Social sciences, sociology, and anthropology",55,0.45454545454545453,5%/33%/62%
+r1_bge | tau .8 decision,33 Economics,352,0.23295454545454544,49%/39%/11%
+r1_bge | tau .8 decision,34 Law,158,0.20253164556962025,41%/40%/19%
+r1_bge | tau .8 decision,40 Language,500,0.576,17%/18%/64%
+r1_bge | tau .8 decision,50 Science,114,0.45614035087719296,26%/22%/52%
+r1_bge | tau .8 decision,51 Mathematics,513,0.16764132553606237,41%/45%/14%
+r1_bge | tau .8 decision,53 Physics,97,0.25773195876288657,45%/43%/11%
+r1_bge | tau .8 decision,54 Chemistry,90,0.26666666666666666,48%/38%/14%
+r1_bge | tau .8 decision,55 Earth sciences and geology,330,0.23030303030303031,78%/18%/4%
+r1_bge | tau .8 decision,57 Biology,143,0.3706293706293706,82%/12%/6%
+r1_bge | tau .8 decision,59 Animals (Zoology),25,0.04,80%/20%/0%
+r1_bge | tau .8 decision,61 Medicine and health,526,0.20722433460076045,54%/34%/13%
+r1_bge | tau .8 decision,62 Engineering,335,0.19402985074626866,38%/50%/13%
+r1_bge | tau .8 decision,65 Management and public relations,73,0.2191780821917808,82%/15%/3%
+r1_bge | tau .8 decision,70 Arts,154,0.3181818181818182,38%/25%/36%
+r1_bge | tau .8 decision,78 Music,240,0.2125,41%/48%/10%
+r1_bge | tau .8 decision,"79 Sports, games and entertainment",158,0.10759493670886076,68%/28%/4%
+r1_bge | tau .8 decision,"80 Literature, rhetoric and criticism",317,0.5110410094637224,29%/17%/54%
+r1_bge | tau .8 decision,90 History,498,0.285140562248996,45%/28%/27%
+r1_bge | tau .8 decision,91 Geography,150,0.13333333333333333,73%/19%/8%
+r1_bge | tau .8 decision,92 Biography and genealogy,52,0.07692307692307693,81%/17%/2%
+r1_bge | dev-share cut,"00 Computer science, knowledge, and systems",821,0.4445797807551766,48%/35%/18%
+r1_bge | dev-share cut,02 Library and information sciences,396,0.3838383838383838,69%/21%/9%
+r1_bge | dev-share cut,10 Philosophy,122,0.30327868852459017,30%/33%/37%
+r1_bge | dev-share cut,15 Psychology,187,0.47593582887700536,65%/26%/10%
+r1_bge | dev-share cut,16 Philosophical logic,108,0.3148148148148148,60%/35%/5%
+r1_bge | dev-share cut,17 Ethics,283,0.3710247349823322,65%/30%/5%
+r1_bge | dev-share cut,"30 Social sciences, sociology, and anthropology",55,0.45454545454545453,5%/33%/62%
+r1_bge | dev-share cut,33 Economics,352,0.5511363636363636,49%/39%/11%
+r1_bge | dev-share cut,34 Law,158,0.3291139240506329,41%/40%/19%
+r1_bge | dev-share cut,40 Language,500,0.322,17%/18%/64%
+r1_bge | dev-share cut,50 Science,114,0.4298245614035088,26%/22%/52%
+r1_bge | dev-share cut,51 Mathematics,513,0.2787524366471735,41%/45%/14%
+r1_bge | dev-share cut,53 Physics,97,0.38144329896907214,45%/43%/11%
+r1_bge | dev-share cut,54 Chemistry,90,0.4444444444444444,48%/38%/14%
+r1_bge | dev-share cut,55 Earth sciences and geology,330,0.5666666666666667,78%/18%/4%
+r1_bge | dev-share cut,57 Biology,143,0.6713286713286714,82%/12%/6%
+r1_bge | dev-share cut,59 Animals (Zoology),25,0.44,80%/20%/0%
+r1_bge | dev-share cut,61 Medicine and health,526,0.38593155893536124,54%/34%/13%
+r1_bge | dev-share cut,62 Engineering,335,0.4,38%/50%/13%
+r1_bge | dev-share cut,65 Management and public relations,73,0.6164383561643836,82%/15%/3%
+r1_bge | dev-share cut,70 Arts,154,0.4675324675324675,38%/25%/36%
+r1_bge | dev-share cut,78 Music,240,0.3958333333333333,41%/48%/10%
+r1_bge | dev-share cut,"79 Sports, games and entertainment",158,0.2848101265822785,68%/28%/4%
+r1_bge | dev-share cut,"80 Literature, rhetoric and criticism",317,0.41324921135646686,29%/17%/54%
+r1_bge | dev-share cut,90 History,498,0.35542168674698793,45%/28%/27%
+r1_bge | dev-share cut,91 Geography,150,0.5333333333333333,73%/19%/8%
+r1_bge | dev-share cut,92 Biography and genealogy,52,0.3269230769230769,81%/17%/2%
+r1_group | tau .8 decision,"00 Computer science, knowledge, and systems",821,0.3276492082825822,48%/35%/18%
+r1_group | tau .8 decision,02 Library and information sciences,396,0.18181818181818182,69%/21%/9%
+r1_group | tau .8 decision,10 Philosophy,122,0.4098360655737705,30%/33%/37%
+r1_group | tau .8 decision,15 Psychology,187,0.24064171122994651,65%/26%/10%
+r1_group | tau .8 decision,16 Philosophical logic,108,0.07407407407407407,60%/35%/5%
+r1_group | tau .8 decision,17 Ethics,283,0.09540636042402827,65%/30%/5%
+r1_group | tau .8 decision,"30 Social sciences, sociology, and anthropology",55,0.5818181818181818,5%/33%/62%
+r1_group | tau .8 decision,33 Economics,352,0.29261363636363635,49%/39%/11%
+r1_group | tau .8 decision,34 Law,158,0.20253164556962025,41%/40%/19%
+r1_group | tau .8 decision,40 Language,500,0.564,17%/18%/64%
+r1_group | tau .8 decision,50 Science,114,0.5701754385964912,26%/22%/52%
+r1_group | tau .8 decision,51 Mathematics,513,0.23586744639376217,41%/45%/14%
+r1_group | tau .8 decision,53 Physics,97,0.29896907216494845,45%/43%/11%
+r1_group | tau .8 decision,54 Chemistry,90,0.3,48%/38%/14%
+r1_group | tau .8 decision,55 Earth sciences and geology,330,0.30303030303030304,78%/18%/4%
+r1_group | tau .8 decision,57 Biology,143,0.45454545454545453,82%/12%/6%
+r1_group | tau .8 decision,59 Animals (Zoology),25,0.32,80%/20%/0%
+r1_group | tau .8 decision,61 Medicine and health,526,0.19961977186311788,54%/34%/13%
+r1_group | tau .8 decision,62 Engineering,335,0.20298507462686566,38%/50%/13%
+r1_group | tau .8 decision,65 Management and public relations,73,0.3835616438356164,82%/15%/3%
+r1_group | tau .8 decision,70 Arts,154,0.4155844155844156,38%/25%/36%
+r1_group | tau .8 decision,78 Music,240,0.2791666666666667,41%/48%/10%
+r1_group | tau .8 decision,"79 Sports, games and entertainment",158,0.24050632911392406,68%/28%/4%
+r1_group | tau .8 decision,"80 Literature, rhetoric and criticism",317,0.5772870662460567,29%/17%/54%
+r1_group | tau .8 decision,90 History,498,0.3473895582329317,45%/28%/27%
+r1_group | tau .8 decision,91 Geography,150,0.37333333333333335,73%/19%/8%
+r1_group | tau .8 decision,92 Biography and genealogy,52,0.28846153846153844,81%/17%/2%
+r1_group | dev-share cut,"00 Computer science, knowledge, and systems",821,0.43118148599269185,48%/35%/18%
+r1_group | dev-share cut,02 Library and information sciences,396,0.3409090909090909,69%/21%/9%
+r1_group | dev-share cut,10 Philosophy,122,0.4262295081967213,30%/33%/37%
+r1_group | dev-share cut,15 Psychology,187,0.45454545454545453,65%/26%/10%
+r1_group | dev-share cut,16 Philosophical logic,108,0.14814814814814814,60%/35%/5%
+r1_group | dev-share cut,17 Ethics,283,0.31802120141342755,65%/30%/5%
+r1_group | dev-share cut,"30 Social sciences, sociology, and anthropology",55,0.38181818181818183,5%/33%/62%
+r1_group | dev-share cut,33 Economics,352,0.4318181818181818,49%/39%/11%
+r1_group | dev-share cut,34 Law,158,0.2721518987341772,41%/40%/19%
+r1_group | dev-share cut,40 Language,500,0.348,17%/18%/64%
+r1_group | dev-share cut,50 Science,114,0.543859649122807,26%/22%/52%
+r1_group | dev-share cut,51 Mathematics,513,0.3762183235867446,41%/45%/14%
+r1_group | dev-share cut,53 Physics,97,0.36082474226804123,45%/43%/11%
+r1_group | dev-share cut,54 Chemistry,90,0.45555555555555555,48%/38%/14%
+r1_group | dev-share cut,55 Earth sciences and geology,330,0.5393939393939394,78%/18%/4%
+r1_group | dev-share cut,57 Biology,143,0.6433566433566433,82%/12%/6%
+r1_group | dev-share cut,59 Animals (Zoology),25,0.6,80%/20%/0%
+r1_group | dev-share cut,61 Medicine and health,526,0.31368821292775667,54%/34%/13%
+r1_group | dev-share cut,62 Engineering,335,0.29850746268656714,38%/50%/13%
+r1_group | dev-share cut,65 Management and public relations,73,0.547945205479452,82%/15%/3%
+r1_group | dev-share cut,70 Arts,154,0.577922077922078,38%/25%/36%
+r1_group | dev-share cut,78 Music,240,0.3458333333333333,41%/48%/10%
+r1_group | dev-share cut,"79 Sports, games and entertainment",158,0.4050632911392405,68%/28%/4%
+r1_group | dev-share cut,"80 Literature, rhetoric and criticism",317,0.5772870662460567,29%/17%/54%
+r1_group | dev-share cut,90 History,498,0.4457831325301205,45%/28%/27%
+r1_group | dev-share cut,91 Geography,150,0.5733333333333334,73%/19%/8%
+r1_group | dev-share cut,92 Biography and genealogy,52,0.38461538461538464,81%/17%/2%
+r1_group_a | tau .8 decision,"00 Computer science, knowledge, and systems",821,0.20706455542021923,48%/35%/18%
+r1_group_a | tau .8 decision,02 Library and information sciences,396,0.12626262626262627,69%/21%/9%
+r1_group_a | tau .8 decision,10 Philosophy,122,0.3442622950819672,30%/33%/37%
+r1_group_a | tau .8 decision,15 Psychology,187,0.11229946524064172,65%/26%/10%
+r1_group_a | tau .8 decision,16 Philosophical logic,108,0.05555555555555555,60%/35%/5%
+r1_group_a | tau .8 decision,17 Ethics,283,0.05653710247349823,65%/30%/5%
+r1_group_a | tau .8 decision,"30 Social sciences, sociology, and anthropology",55,0.5272727272727272,5%/33%/62%
+r1_group_a | tau .8 decision,33 Economics,352,0.15625,49%/39%/11%
+r1_group_a | tau .8 decision,34 Law,158,0.1962025316455696,41%/40%/19%
+r1_group_a | tau .8 decision,40 Language,500,0.664,17%/18%/64%
+r1_group_a | tau .8 decision,50 Science,114,0.5350877192982456,26%/22%/52%
+r1_group_a | tau .8 decision,51 Mathematics,513,0.16374269005847952,41%/45%/14%
+r1_group_a | tau .8 decision,53 Physics,97,0.17525773195876287,45%/43%/11%
+r1_group_a | tau .8 decision,54 Chemistry,90,0.1,48%/38%/14%
+r1_group_a | tau .8 decision,55 Earth sciences and geology,330,0.11515151515151516,78%/18%/4%
+r1_group_a | tau .8 decision,57 Biology,143,0.06993006993006994,82%/12%/6%
+r1_group_a | tau .8 decision,59 Animals (Zoology),25,0.12,80%/20%/0%
+r1_group_a | tau .8 decision,61 Medicine and health,526,0.15399239543726237,54%/34%/13%
+r1_group_a | tau .8 decision,62 Engineering,335,0.14328358208955225,38%/50%/13%
+r1_group_a | tau .8 decision,65 Management and public relations,73,0.1780821917808219,82%/15%/3%
+r1_group_a | tau .8 decision,70 Arts,154,0.43506493506493504,38%/25%/36%
+r1_group_a | tau .8 decision,78 Music,240,0.14583333333333334,41%/48%/10%
+r1_group_a | tau .8 decision,"79 Sports, games and entertainment",158,0.17721518987341772,68%/28%/4%
+r1_group_a | tau .8 decision,"80 Literature, rhetoric and criticism",317,0.5362776025236593,29%/17%/54%
+r1_group_a | tau .8 decision,90 History,498,0.3152610441767068,45%/28%/27%
+r1_group_a | tau .8 decision,91 Geography,150,0.16666666666666666,73%/19%/8%
+r1_group_a | tau .8 decision,92 Biography and genealogy,52,0.17307692307692307,81%/17%/2%
+r1_group_a | dev-share cut,"00 Computer science, knowledge, and systems",821,0.5115712545676004,48%/35%/18%
+r1_group_a | dev-share cut,02 Library and information sciences,396,0.5202020202020202,69%/21%/9%
+r1_group_a | dev-share cut,10 Philosophy,122,0.38524590163934425,30%/33%/37%
+r1_group_a | dev-share cut,15 Psychology,187,0.5401069518716578,65%/26%/10%
+r1_group_a | dev-share cut,16 Philosophical logic,108,0.4074074074074074,60%/35%/5%
+r1_group_a | dev-share cut,17 Ethics,283,0.45936395759717313,65%/30%/5%
+r1_group_a | dev-share cut,"30 Social sciences, sociology, and anthropology",55,0.18181818181818182,5%/33%/62%
+r1_group_a | dev-share cut,33 Economics,352,0.46875,49%/39%/11%
+r1_group_a | dev-share cut,34 Law,158,0.34810126582278483,41%/40%/19%
+r1_group_a | dev-share cut,40 Language,500,0.19,17%/18%/64%
+r1_group_a | dev-share cut,50 Science,114,0.42105263157894735,26%/22%/52%
+r1_group_a | dev-share cut,51 Mathematics,513,0.31968810916179335,41%/45%/14%
+r1_group_a | dev-share cut,53 Physics,97,0.41237113402061853,45%/43%/11%
+r1_group_a | dev-share cut,54 Chemistry,90,0.4444444444444444,48%/38%/14%
+r1_group_a | dev-share cut,55 Earth sciences and geology,330,0.6727272727272727,78%/18%/4%
+r1_group_a | dev-share cut,57 Biology,143,0.6293706293706294,82%/12%/6%
+r1_group_a | dev-share cut,59 Animals (Zoology),25,0.76,80%/20%/0%
+r1_group_a | dev-share cut,61 Medicine and health,526,0.42585551330798477,54%/34%/13%
+r1_group_a | dev-share cut,62 Engineering,335,0.3850746268656716,38%/50%/13%
+r1_group_a | dev-share cut,65 Management and public relations,73,0.821917808219178,82%/15%/3%
+r1_group_a | dev-share cut,70 Arts,154,0.42857142857142855,38%/25%/36%
+r1_group_a | dev-share cut,78 Music,240,0.5791666666666667,41%/48%/10%
+r1_group_a | dev-share cut,"79 Sports, games and entertainment",158,0.6518987341772152,68%/28%/4%
+r1_group_a | dev-share cut,"80 Literature, rhetoric and criticism",317,0.3722397476340694,29%/17%/54%
+r1_group_a | dev-share cut,90 History,498,0.4457831325301205,45%/28%/27%
+r1_group_a | dev-share cut,91 Geography,150,0.7066666666666667,73%/19%/8%
+r1_group_a | dev-share cut,92 Biography and genealogy,52,0.7884615384615384,81%/17%/2%
+routellm_released | tau .8 decision,"00 Computer science, knowledge, and systems",821,0.23020706455542023,48%/35%/18%
+routellm_released | tau .8 decision,02 Library and information sciences,396,0.21717171717171718,69%/21%/9%
+routellm_released | tau .8 decision,10 Philosophy,122,0.2786885245901639,30%/33%/37%
+routellm_released | tau .8 decision,15 Psychology,187,0.3689839572192513,65%/26%/10%
+routellm_released | tau .8 decision,16 Philosophical logic,108,0.09259259259259259,60%/35%/5%
+routellm_released | tau .8 decision,17 Ethics,283,0.45936395759717313,65%/30%/5%
+routellm_released | tau .8 decision,"30 Social sciences, sociology, and anthropology",55,0.45454545454545453,5%/33%/62%
+routellm_released | tau .8 decision,33 Economics,352,0.26988636363636365,49%/39%/11%
+routellm_released | tau .8 decision,34 Law,158,0.379746835443038,41%/40%/19%
+routellm_released | tau .8 decision,40 Language,500,0.316,17%/18%/64%
+routellm_released | tau .8 decision,50 Science,114,0.5526315789473685,26%/22%/52%
+routellm_released | tau .8 decision,51 Mathematics,513,0.15204678362573099,41%/45%/14%
+routellm_released | tau .8 decision,53 Physics,97,0.27835051546391754,45%/43%/11%
+routellm_released | tau .8 decision,54 Chemistry,90,0.12222222222222222,48%/38%/14%
+routellm_released | tau .8 decision,55 Earth sciences and geology,330,0.33636363636363636,78%/18%/4%
+routellm_released | tau .8 decision,57 Biology,143,0.32867132867132864,82%/12%/6%
+routellm_released | tau .8 decision,59 Animals (Zoology),25,0.16,80%/20%/0%
+routellm_released | tau .8 decision,61 Medicine and health,526,0.3593155893536122,54%/34%/13%
+routellm_released | tau .8 decision,62 Engineering,335,0.14626865671641792,38%/50%/13%
+routellm_released | tau .8 decision,65 Management and public relations,73,0.4383561643835616,82%/15%/3%
+routellm_released | tau .8 decision,70 Arts,154,0.3116883116883117,38%/25%/36%
+routellm_released | tau .8 decision,78 Music,240,0.25833333333333336,41%/48%/10%
+routellm_released | tau .8 decision,"79 Sports, games and entertainment",158,0.08227848101265822,68%/28%/4%
+routellm_released | tau .8 decision,"80 Literature, rhetoric and criticism",317,0.40063091482649843,29%/17%/54%
+routellm_released | tau .8 decision,90 History,498,0.27710843373493976,45%/28%/27%
+routellm_released | tau .8 decision,91 Geography,150,0.13333333333333333,73%/19%/8%
+routellm_released | tau .8 decision,92 Biography and genealogy,52,0.07692307692307693,81%/17%/2%
+routellm_released | dev-share cut,"00 Computer science, knowledge, and systems",821,0.5261875761266748,48%/35%/18%
+routellm_released | dev-share cut,02 Library and information sciences,396,0.6136363636363636,69%/21%/9%
+routellm_released | dev-share cut,10 Philosophy,122,0.36885245901639346,30%/33%/37%
+routellm_released | dev-share cut,15 Psychology,187,0.6203208556149733,65%/26%/10%
+routellm_released | dev-share cut,16 Philosophical logic,108,0.2777777777777778,60%/35%/5%
+routellm_released | dev-share cut,17 Ethics,283,0.6537102473498233,65%/30%/5%
+routellm_released | dev-share cut,"30 Social sciences, sociology, and anthropology",55,0.07272727272727272,5%/33%/62%
+routellm_released | dev-share cut,33 Economics,352,0.5767045454545454,49%/39%/11%
+routellm_released | dev-share cut,34 Law,158,0.41139240506329117,41%/40%/19%
+routellm_released | dev-share cut,40 Language,500,0.096,17%/18%/64%
+routellm_released | dev-share cut,50 Science,114,0.2631578947368421,26%/22%/52%
+routellm_released | dev-share cut,51 Mathematics,513,0.39766081871345027,41%/45%/14%
+routellm_released | dev-share cut,53 Physics,97,0.5773195876288659,45%/43%/11%
+routellm_released | dev-share cut,54 Chemistry,90,0.5,48%/38%/14%
+routellm_released | dev-share cut,55 Earth sciences and geology,330,0.7787878787878788,78%/18%/4%
+routellm_released | dev-share cut,57 Biology,143,0.7482517482517482,82%/12%/6%
+routellm_released | dev-share cut,59 Animals (Zoology),25,0.8,80%/20%/0%
+routellm_released | dev-share cut,61 Medicine and health,526,0.5190114068441065,54%/34%/13%
+routellm_released | dev-share cut,62 Engineering,335,0.4537313432835821,38%/50%/13%
+routellm_released | dev-share cut,65 Management and public relations,73,0.8082191780821918,82%/15%/3%
+routellm_released | dev-share cut,70 Arts,154,0.38311688311688313,38%/25%/36%
+routellm_released | dev-share cut,78 Music,240,0.6583333333333333,41%/48%/10%
+routellm_released | dev-share cut,"79 Sports, games and entertainment",158,0.4936708860759494,68%/28%/4%
+routellm_released | dev-share cut,"80 Literature, rhetoric and criticism",317,0.20504731861198738,29%/17%/54%
+routellm_released | dev-share cut,90 History,498,0.44176706827309237,45%/28%/27%
+routellm_released | dev-share cut,91 Geography,150,0.6733333333333333,73%/19%/8%
+routellm_released | dev-share cut,92 Biography and genealogy,52,0.7307692307692307,81%/17%/2%
+routellm_retrained | tau .8 decision,"00 Computer science, knowledge, and systems",821,0.26552984165651644,48%/35%/18%
+routellm_retrained | tau .8 decision,02 Library and information sciences,396,0.16161616161616163,69%/21%/9%
+routellm_retrained | tau .8 decision,10 Philosophy,122,0.3442622950819672,30%/33%/37%
+routellm_retrained | tau .8 decision,15 Psychology,187,0.25668449197860965,65%/26%/10%
+routellm_retrained | tau .8 decision,16 Philosophical logic,108,0.046296296296296294,60%/35%/5%
+routellm_retrained | tau .8 decision,17 Ethics,283,0.053003533568904596,65%/30%/5%
+routellm_retrained | tau .8 decision,"30 Social sciences, sociology, and anthropology",55,0.4909090909090909,5%/33%/62%
+routellm_retrained | tau .8 decision,33 Economics,352,0.23011363636363635,49%/39%/11%
+routellm_retrained | tau .8 decision,34 Law,158,0.21518987341772153,41%/40%/19%
+routellm_retrained | tau .8 decision,40 Language,500,0.608,17%/18%/64%
+routellm_retrained | tau .8 decision,50 Science,114,0.5526315789473685,26%/22%/52%
+routellm_retrained | tau .8 decision,51 Mathematics,513,0.16374269005847952,41%/45%/14%
+routellm_retrained | tau .8 decision,53 Physics,97,0.16494845360824742,45%/43%/11%
+routellm_retrained | tau .8 decision,54 Chemistry,90,0.17777777777777778,48%/38%/14%
+routellm_retrained | tau .8 decision,55 Earth sciences and geology,330,0.22121212121212122,78%/18%/4%
+routellm_retrained | tau .8 decision,57 Biology,143,0.3916083916083916,82%/12%/6%
+routellm_retrained | tau .8 decision,59 Animals (Zoology),25,0.0,80%/20%/0%
+routellm_retrained | tau .8 decision,61 Medicine and health,526,0.17870722433460076,54%/34%/13%
+routellm_retrained | tau .8 decision,62 Engineering,335,0.14029850746268657,38%/50%/13%
+routellm_retrained | tau .8 decision,65 Management and public relations,73,0.3561643835616438,82%/15%/3%
+routellm_retrained | tau .8 decision,70 Arts,154,0.42207792207792205,38%/25%/36%
+routellm_retrained | tau .8 decision,78 Music,240,0.2375,41%/48%/10%
+routellm_retrained | tau .8 decision,"79 Sports, games and entertainment",158,0.10126582278481013,68%/28%/4%
+routellm_retrained | tau .8 decision,"80 Literature, rhetoric and criticism",317,0.5772870662460567,29%/17%/54%
+routellm_retrained | tau .8 decision,90 History,498,0.2931726907630522,45%/28%/27%
+routellm_retrained | tau .8 decision,91 Geography,150,0.12666666666666668,73%/19%/8%
+routellm_retrained | tau .8 decision,92 Biography and genealogy,52,0.057692307692307696,81%/17%/2%
+routellm_retrained | dev-share cut,"00 Computer science, knowledge, and systems",821,0.5322777101096224,48%/35%/18%
+routellm_retrained | dev-share cut,02 Library and information sciences,396,0.4621212121212121,69%/21%/9%
+routellm_retrained | dev-share cut,10 Philosophy,122,0.4016393442622951,30%/33%/37%
+routellm_retrained | dev-share cut,15 Psychology,187,0.5080213903743316,65%/26%/10%
+routellm_retrained | dev-share cut,16 Philosophical logic,108,0.3888888888888889,60%/35%/5%
+routellm_retrained | dev-share cut,17 Ethics,283,0.24028268551236748,65%/30%/5%
+routellm_retrained | dev-share cut,"30 Social sciences, sociology, and anthropology",55,0.23636363636363636,5%/33%/62%
+routellm_retrained | dev-share cut,33 Economics,352,0.5085227272727273,49%/39%/11%
+routellm_retrained | dev-share cut,34 Law,158,0.43670886075949367,41%/40%/19%
+routellm_retrained | dev-share cut,40 Language,500,0.166,17%/18%/64%
+routellm_retrained | dev-share cut,50 Science,114,0.23684210526315788,26%/22%/52%
+routellm_retrained | dev-share cut,51 Mathematics,513,0.38791423001949316,41%/45%/14%
+routellm_retrained | dev-share cut,53 Physics,97,0.422680412371134,45%/43%/11%
+routellm_retrained | dev-share cut,54 Chemistry,90,0.4888888888888889,48%/38%/14%
+routellm_retrained | dev-share cut,55 Earth sciences and geology,330,0.6090909090909091,78%/18%/4%
+routellm_retrained | dev-share cut,57 Biology,143,0.7132867132867133,82%/12%/6%
+routellm_retrained | dev-share cut,59 Animals (Zoology),25,0.52,80%/20%/0%
+routellm_retrained | dev-share cut,61 Medicine and health,526,0.4296577946768061,54%/34%/13%
+routellm_retrained | dev-share cut,62 Engineering,335,0.46567164179104475,38%/50%/13%
+routellm_retrained | dev-share cut,65 Management and public relations,73,0.7397260273972602,82%/15%/3%
+routellm_retrained | dev-share cut,70 Arts,154,0.3961038961038961,38%/25%/36%
+routellm_retrained | dev-share cut,78 Music,240,0.6166666666666667,41%/48%/10%
+routellm_retrained | dev-share cut,"79 Sports, games and entertainment",158,0.5316455696202531,68%/28%/4%
+routellm_retrained | dev-share cut,"80 Literature, rhetoric and criticism",317,0.3217665615141956,29%/17%/54%
+routellm_retrained | dev-share cut,90 History,498,0.41566265060240964,45%/28%/27%
+routellm_retrained | dev-share cut,91 Geography,150,0.62,73%/19%/8%
+routellm_retrained | dev-share cut,92 Biography and genealogy,52,0.5769230769230769,81%/17%/2%
+routerdc | tau .8 decision,"00 Computer science, knowledge, and systems",821,0.2984165651644336,48%/35%/18%
+routerdc | tau .8 decision,02 Library and information sciences,396,0.20454545454545456,69%/21%/9%
+routerdc | tau .8 decision,10 Philosophy,122,0.28688524590163933,30%/33%/37%
+routerdc | tau .8 decision,15 Psychology,187,0.20855614973262032,65%/26%/10%
+routerdc | tau .8 decision,16 Philosophical logic,108,0.26851851851851855,60%/35%/5%
+routerdc | tau .8 decision,17 Ethics,283,0.2049469964664311,65%/30%/5%
+routerdc | tau .8 decision,"30 Social sciences, sociology, and anthropology",55,0.32727272727272727,5%/33%/62%
+routerdc | tau .8 decision,33 Economics,352,0.2585227272727273,49%/39%/11%
+routerdc | tau .8 decision,34 Law,158,0.24050632911392406,41%/40%/19%
+routerdc | tau .8 decision,40 Language,500,0.174,17%/18%/64%
+routerdc | tau .8 decision,50 Science,114,0.23684210526315788,26%/22%/52%
+routerdc | tau .8 decision,51 Mathematics,513,0.253411306042885,41%/45%/14%
+routerdc | tau .8 decision,53 Physics,97,0.29896907216494845,45%/43%/11%
+routerdc | tau .8 decision,54 Chemistry,90,0.3,48%/38%/14%
+routerdc | tau .8 decision,55 Earth sciences and geology,330,0.20303030303030303,78%/18%/4%
+routerdc | tau .8 decision,57 Biology,143,0.14685314685314685,82%/12%/6%
+routerdc | tau .8 decision,59 Animals (Zoology),25,0.24,80%/20%/0%
+routerdc | tau .8 decision,61 Medicine and health,526,0.31368821292775667,54%/34%/13%
+routerdc | tau .8 decision,62 Engineering,335,0.25970149253731345,38%/50%/13%
+routerdc | tau .8 decision,65 Management and public relations,73,0.1917808219178082,82%/15%/3%
+routerdc | tau .8 decision,70 Arts,154,0.2857142857142857,38%/25%/36%
+routerdc | tau .8 decision,78 Music,240,0.45416666666666666,41%/48%/10%
+routerdc | tau .8 decision,"79 Sports, games and entertainment",158,0.3227848101265823,68%/28%/4%
+routerdc | tau .8 decision,"80 Literature, rhetoric and criticism",317,0.24290220820189273,29%/17%/54%
+routerdc | tau .8 decision,90 History,498,0.3092369477911647,45%/28%/27%
+routerdc | tau .8 decision,91 Geography,150,0.25333333333333335,73%/19%/8%
+routerdc | tau .8 decision,92 Biography and genealogy,52,0.25,81%/17%/2%
+routerdc | dev-share cut,"00 Computer science, knowledge, and systems",821,0.5188794153471377,48%/35%/18%
+routerdc | dev-share cut,02 Library and information sciences,396,0.696969696969697,69%/21%/9%
+routerdc | dev-share cut,10 Philosophy,122,0.27049180327868855,30%/33%/37%
+routerdc | dev-share cut,15 Psychology,187,0.6096256684491979,65%/26%/10%
+routerdc | dev-share cut,16 Philosophical logic,108,0.5648148148148148,60%/35%/5%
+routerdc | dev-share cut,17 Ethics,283,0.6607773851590106,65%/30%/5%
+routerdc | dev-share cut,"30 Social sciences, sociology, and anthropology",55,0.07272727272727272,5%/33%/62%
+routerdc | dev-share cut,33 Economics,352,0.4914772727272727,49%/39%/11%
+routerdc | dev-share cut,34 Law,158,0.45569620253164556,41%/40%/19%
+routerdc | dev-share cut,40 Language,500,0.236,17%/18%/64%
+routerdc | dev-share cut,50 Science,114,0.2543859649122807,26%/22%/52%
+routerdc | dev-share cut,51 Mathematics,513,0.3567251461988304,41%/45%/14%
+routerdc | dev-share cut,53 Physics,97,0.5154639175257731,45%/43%/11%
+routerdc | dev-share cut,54 Chemistry,90,0.3888888888888889,48%/38%/14%
+routerdc | dev-share cut,55 Earth sciences and geology,330,0.7757575757575758,78%/18%/4%
+routerdc | dev-share cut,57 Biology,143,0.7832167832167832,82%/12%/6%
+routerdc | dev-share cut,59 Animals (Zoology),25,0.76,80%/20%/0%
+routerdc | dev-share cut,61 Medicine and health,526,0.5038022813688213,54%/34%/13%
+routerdc | dev-share cut,62 Engineering,335,0.373134328358209,38%/50%/13%
+routerdc | dev-share cut,65 Management and public relations,73,0.821917808219178,82%/15%/3%
+routerdc | dev-share cut,70 Arts,154,0.35714285714285715,38%/25%/36%
+routerdc | dev-share cut,78 Music,240,0.425,41%/48%/10%
+routerdc | dev-share cut,"79 Sports, games and entertainment",158,0.6139240506329114,68%/28%/4%
+routerdc | dev-share cut,"80 Literature, rhetoric and criticism",317,0.2302839116719243,29%/17%/54%
+routerdc | dev-share cut,90 History,498,0.42771084337349397,45%/28%/27%
+routerdc | dev-share cut,91 Geography,150,0.6066666666666667,73%/19%/8%
+routerdc | dev-share cut,92 Biography and genealogy,52,0.5769230769230769,81%/17%/2%
+rt08 | tau .8 decision,"00 Computer science, knowledge, and systems",821,0.2241169305724726,48%/35%/18%
+rt08 | tau .8 decision,02 Library and information sciences,396,0.10101010101010101,69%/21%/9%
+rt08 | tau .8 decision,10 Philosophy,122,0.3524590163934426,30%/33%/37%
+rt08 | tau .8 decision,15 Psychology,187,0.1443850267379679,65%/26%/10%
+rt08 | tau .8 decision,16 Philosophical logic,108,0.05555555555555555,60%/35%/5%
+rt08 | tau .8 decision,17 Ethics,283,0.05653710247349823,65%/30%/5%
+rt08 | tau .8 decision,"30 Social sciences, sociology, and anthropology",55,0.6,5%/33%/62%
+rt08 | tau .8 decision,33 Economics,352,0.1846590909090909,49%/39%/11%
+rt08 | tau .8 decision,34 Law,158,0.21518987341772153,41%/40%/19%
+rt08 | tau .8 decision,40 Language,500,0.638,17%/18%/64%
+rt08 | tau .8 decision,50 Science,114,0.5263157894736842,26%/22%/52%
+rt08 | tau .8 decision,51 Mathematics,513,0.19103313840155944,41%/45%/14%
+rt08 | tau .8 decision,53 Physics,97,0.17525773195876287,45%/43%/11%
+rt08 | tau .8 decision,54 Chemistry,90,0.16666666666666666,48%/38%/14%
+rt08 | tau .8 decision,55 Earth sciences and geology,330,0.07575757575757576,78%/18%/4%
+rt08 | tau .8 decision,57 Biology,143,0.16083916083916083,82%/12%/6%
+rt08 | tau .8 decision,59 Animals (Zoology),25,0.04,80%/20%/0%
+rt08 | tau .8 decision,61 Medicine and health,526,0.14258555133079848,54%/34%/13%
+rt08 | tau .8 decision,62 Engineering,335,0.21194029850746268,38%/50%/13%
+rt08 | tau .8 decision,65 Management and public relations,73,0.2191780821917808,82%/15%/3%
+rt08 | tau .8 decision,70 Arts,154,0.4155844155844156,38%/25%/36%
+rt08 | tau .8 decision,78 Music,240,0.15416666666666667,41%/48%/10%
+rt08 | tau .8 decision,"79 Sports, games and entertainment",158,0.0949367088607595,68%/28%/4%
+rt08 | tau .8 decision,"80 Literature, rhetoric and criticism",317,0.6340694006309149,29%/17%/54%
+rt08 | tau .8 decision,90 History,498,0.30120481927710846,45%/28%/27%
+rt08 | tau .8 decision,91 Geography,150,0.15333333333333332,73%/19%/8%
+rt08 | tau .8 decision,92 Biography and genealogy,52,0.15384615384615385,81%/17%/2%
+rt08 | dev-share cut,"00 Computer science, knowledge, and systems",821,0.5079171741778319,48%/35%/18%
+rt08 | dev-share cut,02 Library and information sciences,396,0.45454545454545453,69%/21%/9%
+rt08 | dev-share cut,10 Philosophy,122,0.4016393442622951,30%/33%/37%
+rt08 | dev-share cut,15 Psychology,187,0.5080213903743316,65%/26%/10%
+rt08 | dev-share cut,16 Philosophical logic,108,0.2777777777777778,60%/35%/5%
+rt08 | dev-share cut,17 Ethics,283,0.5971731448763251,65%/30%/5%
+rt08 | dev-share cut,"30 Social sciences, sociology, and anthropology",55,0.16363636363636364,5%/33%/62%
+rt08 | dev-share cut,33 Economics,352,0.48011363636363635,49%/39%/11%
+rt08 | dev-share cut,34 Law,158,0.35443037974683544,41%/40%/19%
+rt08 | dev-share cut,40 Language,500,0.196,17%/18%/64%
+rt08 | dev-share cut,50 Science,114,0.45614035087719296,26%/22%/52%
+rt08 | dev-share cut,51 Mathematics,513,0.32943469785575047,41%/45%/14%
+rt08 | dev-share cut,53 Physics,97,0.32989690721649484,45%/43%/11%
+rt08 | dev-share cut,54 Chemistry,90,0.37777777777777777,48%/38%/14%
+rt08 | dev-share cut,55 Earth sciences and geology,330,0.593939393939394,78%/18%/4%
+rt08 | dev-share cut,57 Biology,143,0.5734265734265734,82%/12%/6%
+rt08 | dev-share cut,59 Animals (Zoology),25,0.68,80%/20%/0%
+rt08 | dev-share cut,61 Medicine and health,526,0.4049429657794677,54%/34%/13%
+rt08 | dev-share cut,62 Engineering,335,0.3492537313432836,38%/50%/13%
+rt08 | dev-share cut,65 Management and public relations,73,0.5753424657534246,82%/15%/3%
+rt08 | dev-share cut,70 Arts,154,0.5,38%/25%/36%
+rt08 | dev-share cut,78 Music,240,0.5416666666666666,41%/48%/10%
+rt08 | dev-share cut,"79 Sports, games and entertainment",158,0.6582278481012658,68%/28%/4%
+rt08 | dev-share cut,"80 Literature, rhetoric and criticism",317,0.38170347003154576,29%/17%/54%
+rt08 | dev-share cut,90 History,498,0.42971887550200805,45%/28%/27%
+rt08 | dev-share cut,91 Geography,150,0.7,73%/19%/8%
+rt08 | dev-share cut,92 Biography and genealogy,52,0.7307692307692307,81%/17%/2%
+rt08 (argmax),"00 Computer science, knowledge, and systems",821,0.5968331303288672,48%/35%/18%
+rt08 (argmax),02 Library and information sciences,396,0.5429292929292929,69%/21%/9%
+rt08 (argmax),10 Philosophy,122,0.3360655737704918,30%/33%/37%
+rt08 (argmax),15 Psychology,187,0.5935828877005348,65%/26%/10%
+rt08 (argmax),16 Philosophical logic,108,0.48148148148148145,60%/35%/5%
+rt08 (argmax),17 Ethics,283,0.6148409893992933,65%/30%/5%
+rt08 (argmax),"30 Social sciences, sociology, and anthropology",55,0.2,5%/33%/62%
+rt08 (argmax),33 Economics,352,0.5795454545454546,49%/39%/11%
+rt08 (argmax),34 Law,158,0.4620253164556962,41%/40%/19%
+rt08 (argmax),40 Language,500,0.158,17%/18%/64%
+rt08 (argmax),50 Science,114,0.35964912280701755,26%/22%/52%
+rt08 (argmax),51 Mathematics,513,0.4580896686159844,41%/45%/14%
+rt08 (argmax),53 Physics,97,0.5257731958762887,45%/43%/11%
+rt08 (argmax),54 Chemistry,90,0.43333333333333335,48%/38%/14%
+rt08 (argmax),55 Earth sciences and geology,330,0.6484848484848484,78%/18%/4%
+rt08 (argmax),57 Biology,143,0.6853146853146853,82%/12%/6%
+rt08 (argmax),59 Animals (Zoology),25,0.76,80%/20%/0%
+rt08 (argmax),61 Medicine and health,526,0.4391634980988593,54%/34%/13%
+rt08 (argmax),62 Engineering,335,0.591044776119403,38%/50%/13%
+rt08 (argmax),65 Management and public relations,73,0.6164383561643836,82%/15%/3%
+rt08 (argmax),70 Arts,154,0.42207792207792205,38%/25%/36%
+rt08 (argmax),78 Music,240,0.6291666666666667,41%/48%/10%
+rt08 (argmax),"79 Sports, games and entertainment",158,0.6645569620253164,68%/28%/4%
+rt08 (argmax),"80 Literature, rhetoric and criticism",317,0.34069400630914826,29%/17%/54%
+rt08 (argmax),90 History,498,0.44176706827309237,45%/28%/27%
+rt08 (argmax),91 Geography,150,0.7133333333333334,73%/19%/8%
+rt08 (argmax),92 Biography and genealogy,52,0.7692307692307693,81%/17%/2%
+svm | tau .8 decision,"00 Computer science, knowledge, and systems",821,0.23386114494518878,48%/35%/18%
+svm | tau .8 decision,02 Library and information sciences,396,0.24242424242424243,69%/21%/9%
+svm | tau .8 decision,10 Philosophy,122,0.26229508196721313,30%/33%/37%
+svm | tau .8 decision,15 Psychology,187,0.27807486631016043,65%/26%/10%
+svm | tau .8 decision,16 Philosophical logic,108,0.06481481481481481,60%/35%/5%
+svm | tau .8 decision,17 Ethics,283,0.12014134275618374,65%/30%/5%
+svm | tau .8 decision,"30 Social sciences, sociology, and anthropology",55,0.41818181818181815,5%/33%/62%
+svm | tau .8 decision,33 Economics,352,0.26704545454545453,49%/39%/11%
+svm | tau .8 decision,34 Law,158,0.22784810126582278,41%/40%/19%
+svm | tau .8 decision,40 Language,500,0.4,17%/18%/64%
+svm | tau .8 decision,50 Science,114,0.4824561403508772,26%/22%/52%
+svm | tau .8 decision,51 Mathematics,513,0.15204678362573099,41%/45%/14%
+svm | tau .8 decision,53 Physics,97,0.21649484536082475,45%/43%/11%
+svm | tau .8 decision,54 Chemistry,90,0.2111111111111111,48%/38%/14%
+svm | tau .8 decision,55 Earth sciences and geology,330,0.3,78%/18%/4%
+svm | tau .8 decision,57 Biology,143,0.3006993006993007,82%/12%/6%
+svm | tau .8 decision,59 Animals (Zoology),25,0.08,80%/20%/0%
+svm | tau .8 decision,61 Medicine and health,526,0.2262357414448669,54%/34%/13%
+svm | tau .8 decision,62 Engineering,335,0.1701492537313433,38%/50%/13%
+svm | tau .8 decision,65 Management and public relations,73,0.3150684931506849,82%/15%/3%
+svm | tau .8 decision,70 Arts,154,0.3246753246753247,38%/25%/36%
+svm | tau .8 decision,78 Music,240,0.24583333333333332,41%/48%/10%
+svm | tau .8 decision,"79 Sports, games and entertainment",158,0.189873417721519,68%/28%/4%
+svm | tau .8 decision,"80 Literature, rhetoric and criticism",317,0.35646687697160884,29%/17%/54%
+svm | tau .8 decision,90 History,498,0.3293172690763052,45%/28%/27%
+svm | tau .8 decision,91 Geography,150,0.26,73%/19%/8%
+svm | tau .8 decision,92 Biography and genealogy,52,0.19230769230769232,81%/17%/2%
+svm | dev-share cut,"00 Computer science, knowledge, and systems",821,0.5018270401948843,48%/35%/18%
+svm | dev-share cut,02 Library and information sciences,396,0.5075757575757576,69%/21%/9%
+svm | dev-share cut,10 Philosophy,122,0.2540983606557377,30%/33%/37%
+svm | dev-share cut,15 Psychology,187,0.5454545454545454,65%/26%/10%
+svm | dev-share cut,16 Philosophical logic,108,0.4722222222222222,60%/35%/5%
+svm | dev-share cut,17 Ethics,283,0.34275618374558303,65%/30%/5%
+svm | dev-share cut,"30 Social sciences, sociology, and anthropology",55,0.14545454545454545,5%/33%/62%
+svm | dev-share cut,33 Economics,352,0.5284090909090909,49%/39%/11%
+svm | dev-share cut,34 Law,158,0.3924050632911392,41%/40%/19%
+svm | dev-share cut,40 Language,500,0.32,17%/18%/64%
+svm | dev-share cut,50 Science,114,0.34210526315789475,26%/22%/52%
+svm | dev-share cut,51 Mathematics,513,0.28654970760233917,41%/45%/14%
+svm | dev-share cut,53 Physics,97,0.36082474226804123,45%/43%/11%
+svm | dev-share cut,54 Chemistry,90,0.43333333333333335,48%/38%/14%
+svm | dev-share cut,55 Earth sciences and geology,330,0.6696969696969697,78%/18%/4%
+svm | dev-share cut,57 Biology,143,0.6853146853146853,82%/12%/6%
+svm | dev-share cut,59 Animals (Zoology),25,0.4,80%/20%/0%
+svm | dev-share cut,61 Medicine and health,526,0.48859315589353614,54%/34%/13%
+svm | dev-share cut,62 Engineering,335,0.3970149253731343,38%/50%/13%
+svm | dev-share cut,65 Management and public relations,73,0.7534246575342466,82%/15%/3%
+svm | dev-share cut,70 Arts,154,0.34415584415584416,38%/25%/36%
+svm | dev-share cut,78 Music,240,0.4875,41%/48%/10%
+svm | dev-share cut,"79 Sports, games and entertainment",158,0.34810126582278483,68%/28%/4%
+svm | dev-share cut,"80 Literature, rhetoric and criticism",317,0.17665615141955837,29%/17%/54%
+svm | dev-share cut,90 History,498,0.41164658634538154,45%/28%/27%
+svm | dev-share cut,91 Geography,150,0.5133333333333333,73%/19%/8%
+svm | dev-share cut,92 Biography and genealogy,52,0.23076923076923078,81%/17%/2%
+baseline: always easy,"00 Computer science, knowledge, and systems",821,0.47503045066991473,48%/35%/18%
+baseline: always easy,02 Library and information sciences,396,0.6944444444444444,69%/21%/9%
+baseline: always easy,10 Philosophy,122,0.30327868852459017,30%/33%/37%
+baseline: always easy,15 Psychology,187,0.6470588235294118,65%/26%/10%
+baseline: always easy,16 Philosophical logic,108,0.6018518518518519,60%/35%/5%
+baseline: always easy,17 Ethics,283,0.6537102473498233,65%/30%/5%
+baseline: always easy,"30 Social sciences, sociology, and anthropology",55,0.05454545454545454,5%/33%/62%
+baseline: always easy,33 Economics,352,0.4943181818181818,49%/39%/11%
+baseline: always easy,34 Law,158,0.41139240506329117,41%/40%/19%
+baseline: always easy,40 Language,500,0.174,17%/18%/64%
+baseline: always easy,50 Science,114,0.2631578947368421,26%/22%/52%
+baseline: always easy,51 Mathematics,513,0.40545808966861596,41%/45%/14%
+baseline: always easy,53 Physics,97,0.4536082474226804,45%/43%/11%
+baseline: always easy,54 Chemistry,90,0.4777777777777778,48%/38%/14%
+baseline: always easy,55 Earth sciences and geology,330,0.7818181818181819,78%/18%/4%
+baseline: always easy,57 Biology,143,0.8181818181818182,82%/12%/6%
+baseline: always easy,59 Animals (Zoology),25,0.8,80%/20%/0%
+baseline: always easy,61 Medicine and health,526,0.5361216730038023,54%/34%/13%
+baseline: always easy,62 Engineering,335,0.3761194029850746,38%/50%/13%
+baseline: always easy,65 Management and public relations,73,0.821917808219178,82%/15%/3%
+baseline: always easy,70 Arts,154,0.38311688311688313,38%/25%/36%
+baseline: always easy,78 Music,240,0.4125,41%/48%/10%
+baseline: always easy,"79 Sports, games and entertainment",158,0.6772151898734177,68%/28%/4%
+baseline: always easy,"80 Literature, rhetoric and criticism",317,0.2870662460567823,29%/17%/54%
+baseline: always easy,90 History,498,0.44779116465863456,45%/28%/27%
+baseline: always easy,91 Geography,150,0.7266666666666667,73%/19%/8%
+baseline: always easy,92 Biography and genealogy,52,0.8076923076923077,81%/17%/2%
+baseline: label-frequency guess,"00 Computer science, knowledge, and systems",821,0.38246041412911086,48%/35%/18%
+baseline: label-frequency guess,02 Library and information sciences,396,0.42676767676767674,69%/21%/9%
+baseline: label-frequency guess,10 Philosophy,122,0.27049180327868855,30%/33%/37%
+baseline: label-frequency guess,15 Psychology,187,0.40641711229946526,65%/26%/10%
+baseline: label-frequency guess,16 Philosophical logic,108,0.46296296296296297,60%/35%/5%
+baseline: label-frequency guess,17 Ethics,283,0.3957597173144876,65%/30%/5%
+baseline: label-frequency guess,"30 Social sciences, sociology, and anthropology",55,0.32727272727272727,5%/33%/62%
+baseline: label-frequency guess,33 Economics,352,0.3465909090909091,49%/39%/11%
+baseline: label-frequency guess,34 Law,158,0.25316455696202533,41%/40%/19%
+baseline: label-frequency guess,40 Language,500,0.278,17%/18%/64%
+baseline: label-frequency guess,50 Science,114,0.24561403508771928,26%/22%/52%
+baseline: label-frequency guess,51 Mathematics,513,0.3586744639376218,41%/45%/14%
+baseline: label-frequency guess,53 Physics,97,0.4020618556701031,45%/43%/11%
+baseline: label-frequency guess,54 Chemistry,90,0.34444444444444444,48%/38%/14%
+baseline: label-frequency guess,55 Earth sciences and geology,330,0.46060606060606063,78%/18%/4%
+baseline: label-frequency guess,57 Biology,143,0.4125874125874126,82%/12%/6%
+baseline: label-frequency guess,59 Animals (Zoology),25,0.52,80%/20%/0%
+baseline: label-frequency guess,61 Medicine and health,526,0.3650190114068441,54%/34%/13%
+baseline: label-frequency guess,62 Engineering,335,0.33432835820895523,38%/50%/13%
+baseline: label-frequency guess,65 Management and public relations,73,0.4931506849315068,82%/15%/3%
+baseline: label-frequency guess,70 Arts,154,0.42857142857142855,38%/25%/36%
+baseline: label-frequency guess,78 Music,240,0.3416666666666667,41%/48%/10%
+baseline: label-frequency guess,"79 Sports, games and entertainment",158,0.3987341772151899,68%/28%/4%
+baseline: label-frequency guess,"80 Literature, rhetoric and criticism",317,0.35331230283911674,29%/17%/54%
+baseline: label-frequency guess,90 History,498,0.37349397590361444,45%/28%/27%
+baseline: label-frequency guess,91 Geography,150,0.43333333333333335,73%/19%/8%
+baseline: label-frequency guess,92 Biography and genealogy,52,0.40384615384615385,81%/17%/2%
