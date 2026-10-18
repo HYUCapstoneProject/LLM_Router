@@ -14,7 +14,8 @@
 | `07a_score_ours` | 구현 | 03·02 ModernBERT 모델의 dev·test·RouterArena 점수 |
 | `07b_lock` | 구현 | 설정 선택·보정·결정 규칙 고정. 여기서 멈추고 보고 |
 | `08a_latency` | 구현 | 라우팅 지연(CPU 주, T4 참고). 07b 뒤 |
-| `08_test` ~ `10_report` | 예정 | 계획서 4.5절 |
+| `08_test` | 구현 | 봉인한 test를 한 번 열어 두 갈래 평가와 가설 판정. Colab CPU. 아래 참고 |
+| `09_seeds` · `10_report` | 예정 | 계획서 4.5절 |
 
 ## 00_prepare
 
@@ -136,14 +137,27 @@ python ml/notebooks/router_final/common_track.py run --run-dir <run001> --extern
 - **어댑터:** 원천·단계별 isotonic 회귀. 분류 출력(R0-집단, RT-08, 운영 R0)은 먼저 train의 "분류별 단계 성공률" 표를 곱하고, 점수 하나만 내는 방법(Hybrid LLM, RouteLLM)은 그 점수를 세 단계에 함께 쓴다. 설정 선택과 λ에는 dev 5분할 교차 보정을, test 적용에는 dev 전체로 맞춘 보정을 쓴다.
 - **ρ:** EV-05와 같은 식을 dev의 집단 풀 확률에 적용한 원천별 단계 간 실패 상관이다.
 - **비용 목표:** 원천마다 가장 싼·가장 비싼 고정 시작 단계의 기대 비용 사이 25·50·75% 지점이다(계획서 2.5, 10-17 확정). 상향이 반드시 따라와서 .25·.5는 대부분 원천에서 도달할 수 없기 때문이다.
+- **길이 반영 민감도:** 질문마다 비용 = 단계 가격 × L / (원천 dev의 L 평균), L = 입력 토큰 + 5 × 출력 토큰 중앙값. 입력은 `length_inputs.py`(로컬, 원본 데이터 필요)가 만든 `run001/length-inputs/`이고, 07b가 SHA를 확인한다. 선택된 설정마다 이 비용의 비용 목표와 λ 표를 만든다(`sensitivity_length`). 설정의 이유와 나중에 점검할 것은 계획서 2.3에 있다.
 - **집단 가격 민감도:** 단계 비용을 Claude 1:3:5 대신 집단 모델의 평균 데이터 가격(`prepare/groups.json`, high = 1)으로 바꿔, 선택된 설정마다 비용 목표와 λ 표를 한 번 더 만든다(`sensitivity_group_price`). 설정 선택은 1:3:5로만 한다. groups.json의 모델 목록은 봉인된 00_prepare manifest와 대조한다.
 - **λ 표:** (원천, 규칙, κ, 비용 수준)마다 dev 기대 비용이 목표에 가장 가까운 λ다. 규칙은 상향 고려와 한 번에 고르기이고, 갈래 ②의 τ 규칙(τ = .8, 곡선 .5~.95)은 λ가 필요 없다.
 - **설정 선택:** 상향 고려 규칙의 (최종 해결 − κ × 실패 횟수)에서, 같은 dev 비용에서 고정 시작 단계(혼합 포함)가 낼 수 있는 가장 좋은 값을 뺀 "이득"을 원천·κ 격자·비용 수준에 걸쳐 평균하고, 가장 큰 설정을 고른다.
-- **영어만 평가:** [제외 목록](../../../experiments/results/router-final-inputs/non-english-eval-exclusions.md)의 영어가 아닌 문항 246건(모두 LLMRouterBench test arenahard)을 dev와 모든 보정 출력에서 지운다. 08은 이 문항을 볼 수 없다. 목록의 id가 점수에 없으면 멈춘다.
+- **평가 제외:** [문서 제공형 제외 목록](../../../experiments/results/router-final-inputs/document-grounded-eval-exclusions.md)의 xRouteBench SQuAD·BoolQ 180건(dev 80, test 100)과 [영어 제외 목록](../../../experiments/results/router-final-inputs/non-english-eval-exclusions.md)의 영어가 아닌 문항 246건(모두 LLMRouterBench test arenahard)을 dev와 모든 보정 출력에서 지운다. 08은 이 문항을 볼 수 없다. 목록의 id가 점수에 없으면 멈춘다.
 - **RT-08:** RT-08(v2 재학습)과 운영 R0(v1, 저장소의 512토큰 점수)를 A 분할에서 집단 기준과 대표 모델 기준 두 가지로 보정한다.
-- **출력:** `selection-lock.json`(선택 설정, ρ, 비용 목표, λ 표, 규칙, 의존 파일 SHA), `calibrated/<방법>.parquet`(dev·test 단계별 확률), `selection-table.parquet`(모든 설정의 dev 근거), `lock-summary.md`.
+- **출력:** `selection-lock.json`(선택 설정, ρ, 비용 목표, λ 표와 두 민감도의 λ 표, 규칙, 평가 제외 목록, 의존 파일 SHA), `calibrated/<방법>.parquet`(dev·test 단계별 확률), `selection-table.parquet`(모든 설정의 dev 근거), `lock-summary.md`.
 
 dev 점수 SHA는 각 단계의 manifest와 대조하며, 빠진 점수가 있으면 멈춘다(`--allow-missing`은 시험용). 07b가 끝나면 lock 요약을 보고하고 확인을 받은 뒤 08로 간다. 소스는 `router-final-source-lock.zip`이다(운영 R0 점수 파일과 영어 제외 목록 포함).
+
+## 데이터 구성 (카테고리별)
+
+`categories.py composition`(로컬)이 train·dev·test의 카테고리별 문항 수와 train·dev의 필요 단계 비율을 [data-composition.md](../../../experiments/results/ev10-router-final-20261018/data-composition.md)에 쓴다. test는 문항 수만 센다.
+
+## length_inputs (길이 반영 민감도 입력, 로컬)
+
+`length_inputs.py build`가 dev·test 문항마다 입력 토큰(라우터 토크나이저, 자르지 않음)과 출력 토큰 중앙값(그 질문에 답한 데이터 모델 전부)을 `run001/length-inputs/lengths.parquet`에 쓴다. 정답 여부는 쓰지 않는다. 출력 길이는 LLMRouterBench `completion_tokens`, SPROUT `num_output_tokens`, xRouteBench `output_tokens`이고, RouterBench는 답 원문을 같은 토크나이저로 센다. 원본 데이터가 있는 checkout에서 한 번 실행한다(약 30초).
+
+```
+python ml/notebooks/router_final/length_inputs.py --run-dir <run001> --repo . --output-dir <run001>/length-inputs
+```
 
 ## 08a_latency
 
@@ -155,3 +169,20 @@ dev 점수 SHA는 각 단계의 manifest와 대조하며, 빠진 점수가 있�
 - **GraphRouter:** 원본 추론처럼 새 질문을 학습 그래프에 붙여 그래프 전체를 한 번 계산한다.
 - 로컬 시험(Mac CPU, 문항 12개): BGE-large 인코딩 약 300ms, ModernBERT R1-집단 약 130ms, BGE 라우터 본체는 MLP·SVM·MF·R1-BGE 1ms 미만, kNN 약 37ms, IRT 약 25ms, GraphRouter 공식 약 53ms·LLMRouter 판 약 141ms였다. 값은 장비에 따라 다르므로 Colab 한 세션의 값만 비교한다.
 - 소스는 `router-final-source-latency.zip`이다.
+
+## 08_test
+
+`test_eval.py`가 본체다. 07b lock에서 고정한 것만 쓰고 아무것도 고르지 않는다. Colab CPU에서 돌리며 소스는 `router-final-source-test.zip`이다. A test의 v1 채점값은 원본 데이터에서 다시 만들고, bootstrap 묶음 ID는 원천 파일에서 읽는다. 이 원본 11개(87MB)를 저장소와 같은 경로로 Drive `inputs/test-data/`에 두었고(`test-data-manifest.json`에 SHA), 노트북이 실행 전에 대조한다. 로컬에서는 `--data-root`를 데이터가 있는 checkout으로 주면 된다. 읽은 입력 파일의 SHA는 출력 manifest의 `input_sha256`에 남는다.
+
+- **입력 확인:** lock이 시험 실행(빠진 점수)이 아닌지, 보정 파일·영어 제외 목록·00 test 출력의 SHA가 기록과 같은지 확인한다. 출력 폴더 `RUN/test`가 이미 있으면 멈춘다(test는 한 번 연다).
+- **평가 행:** test에서 v2 제외 문항, 평가 제외 목록(영어가 아닌 246건, 문서 제공형 100건), 집단 풀 확률이 비어 있는 행을 뺀다. RouterArena 진단은 `Context`가 붙은 1,603건을 뺀다. 건수는 `manifest.json`의 `counts`에 남는다.
+- **갈래 ①:** 라우터 × 규칙(상향 고려, 한 번에 고르기) × κ 21개 × 비용 수준 3개마다 test 효용(최종 해결 − κ × 실패 횟수)에서 같은 test 비용의 고정 시작 단계(혼합 포함) 값을 뺀 이득. 기준은 Claude 1:3:5(주), 집단 평균 가격·길이 반영(민감도), A test v1 채점(점 추정). oracle(참 확률, λ를 test에서 맞춤)과 운영 R0(A 분할)는 참고용으로만 싣고 순위에 넣지 않는다.
+- **구간:** 질문 묶음 단위 paired bootstrap 10,000회(seed 42). 묶음은 A 분할이 `duplicate_group_id`, 외부 데이터가 `split_group_id`다. 한 원천 안에서는 모든 라우터·규칙·κ·수준이 같은 표본을 쓰고, 원천끼리는 따로 뽑는다. macro는 원천 4개의 평균이다.
+- **κ\*:** 이득 > .01이고 95% 구간 하한 > 0인 가장 작은 κ(`kappa-star.parquet`).
+- **갈래 ②:** τ .5~.95마다 필요 단계 정확도·첫 시도 성공·최종 해결·호출 수·비용. 고정 시작과 "필요 단계에서 시작"도 함께 싣는다. RouterArena와 겹치는 외부 test 문항은 `track2-arena-overlap.parquet`에 따로 낸다.
+- **가설:** H1~H7과 RT-08을 계획서 4.4·3절의 규칙대로 계산해 `hypotheses.json`에 쓴다. H3은 IRT-Router 난이도와 우리 필요 단계·RouterArena Bloom 라벨의 Spearman 상관이다. RouterArena에서는 R0-집단의 예측 단계와 Bloom 라벨의 일치도도 낸다.
+- **풀리는 정도별 층(기술 통계):** solvable(어느 집단이든 ≥ .8), beyond_partial(모두 .8 미만, 0은 아님), beyond_zero(모두 0)마다 같은 지표를 낸다(`by-stratum.parquet`). 필요 단계 정확도는 solvable 층에서만 센다(`needed_tier_accuracy_solvable`, H2).
+- **카테고리별(기술 통계, 판정 아님):** 원천별 카테고리와 공통 과제 유형(`categories.py` `TASK_TYPE`)마다 평균 이득(고정 시작 기준선을 그 카테고리 안에서 다시 만든다), τ = .8의 갈래 ② 지표와 시작 단계 비율. 30문항 미만 카테고리는 문항 수만 낸다. 원천을 합친 과제 유형은 문항 수 가중 평균이다(`by-category.parquet`).
+- **출력:** `track1.parquet`, `fixed-starts.parquet`, `mean-gain.parquet`, `kappa-star.parquet`, `track2.parquet`, `track2-arena-overlap.parquet`, `rt08.parquet`, `by-category.parquet`, `by-stratum.parquet`, `test-starts.parquet`(질문마다 각 라우터의 시작 단계), `hypotheses.json`, `diagnostics.json`, `manifest.json`, `test-summary.md`.
+- **리허설:** `--rehearse-on-dev`는 같은 코드를 dev 결과로 돌려 다른 폴더에 쓴다. test는 읽지 않는다. dev에서 맞춘 보정을 dev에 쓴 값이라 낙관적이며 해석하지 않는다.
+- **주의(dev 리허설에서 확인):** LLMRouterBench는 1:3:5에서 고정 시작 비용이 low .97, high 1.0, medium 1.09로 거의 같다. 그런데 해결률과 실패 수는 크게 달라, 같은 비용 비교가 비용의 작은 차이에 크게 흔들리고 구간이 넓다. 그대로 보고하고 집단 가격 민감도(비용 범위가 넓다)를 함께 본다.

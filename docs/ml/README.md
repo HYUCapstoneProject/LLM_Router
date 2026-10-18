@@ -174,6 +174,7 @@ llm_candidates/train.parquet
 다음은 주 실험에서 제외하고 사유별 행 수를 기록한다.
 
 - RouterBench RAG/`needs_retrieval=true`; xRouteBench memory, timeseries, video, multimodal, personalized 구성.
+- (2026-10-18 EV-10) xRouteBench SQuAD·BoolQ는 지문을 주고 묻는 문서 제공형이라 EV-10 **평가**에서 뺀다(dev 80, test 100). A 분할 학습 데이터에는 남아 있다(472건). [최종 실험 계획서](ROUTER_FINAL_EXPERIMENT_PLAN.md) 2.4절.
 - 빈 질문, 파싱 불가, 범위 밖 performance, 중복 query/model 실행처럼 의미를 확정할 수 없는 행.
 - 정답·생성 응답·라벨·모델명·가격이 benchmark wrapper를 통해 입력에 노출된 행.
 - OpenHermes 등 질문별 동일 후보의 채점 결과가 없어 이 계약의 라벨·비용을 만들 수 없는 데이터.
