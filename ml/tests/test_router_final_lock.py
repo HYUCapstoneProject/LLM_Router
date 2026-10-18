@@ -103,6 +103,24 @@ class SensitivityCostTest(unittest.TestCase):
         R, Cst, Fl = L.predicted_chain(P, 0.0, np.array([0.02, 0.06, 1.0]))
         self.assertAlmostEqual(Cst[0, 0], 0.08)
 
+    def test_per_question_costs_match_per_tier_costs_when_equal(self):
+        rng = np.random.default_rng(5)
+        P = rng.uniform(size=(50, 3))
+        start = rng.integers(0, 3, 50)
+        same = np.tile(L.SERVICE_COST, (50, 1))
+        np.testing.assert_allclose(L.outcomes(P, start, same)["cost"], L.outcomes(P, start)["cost"])
+        np.testing.assert_allclose(L.predicted_chain(P, 0.4, same)[1], L.predicted_chain(P, 0.4)[1])
+        np.testing.assert_array_equal(L.decide("one_shot", P, 0.3, cost=same), L.decide("one_shot", P, 0.3))
+        double = same * np.where(np.arange(50) < 25, 2.0, 1.0)[:, None]  # longer questions cost more
+        o = L.outcomes(P, start, double)["cost"]
+        np.testing.assert_allclose(o[:25], 2 * L.outcomes(P[:25], start[:25])["cost"])
+
+    def test_length_costs_scale_tier_prices_by_relative_length(self):
+        length = pd.Series([100.0, 300.0], index=["a", "b"])
+        np.testing.assert_allclose(L.length_costs(length, ["a", "b"], 200.0), [[0.1, 0.3, 0.5], [0.3, 0.9, 1.5]])
+        with self.assertRaises(SystemExit):
+            L.length_costs(length, ["a", "zz"], 200.0)
+
     def test_cost_targets_follow_the_price_vector(self):
         rng = np.random.default_rng(3)
         P = np.sort(rng.uniform(size=(300, 3)), axis=1)
@@ -140,12 +158,17 @@ class EnglishOnlyTest(unittest.TestCase):
         table = pd.read_csv(ROOT.parent / L.NON_ENGLISH)
         self.assertEqual(list(table.columns),
                          ["sample_id", "source_dataset", "role", "source_family", "slice", "dominant_script"])
+        self.assertEqual(list(pd.read_csv(ROOT.parent / L.DOCUMENT_GROUNDED).columns),
+                         ["sample_id", "source_dataset", "role", "category", "reason"])
         self.assertTrue(table.sample_id.is_unique)
         self.assertTrue(table.role.isin(["dev", "test", "diagnostic"]).all())
-        ids, record = L.english_exclusions(ROOT.parent)
-        self.assertEqual(len(ids), record["rows"])
-        self.assertEqual(sum(record["by_source_role"].values()), len(ids))
-        self.assertIn("llmrouterbench/test", json.loads(json.dumps(record))["by_source_role"])
+        ids, records = L.evaluation_exclusions(ROOT.parent)
+        self.assertEqual(set(records), set(L.EXCLUSIONS))
+        self.assertEqual(len(ids), sum(r["rows"] for r in records.values()))  # the lists do not overlap
+        self.assertIn("llmrouterbench/test", json.loads(json.dumps(records))["non_english"]["by_source_role"])
+        self.assertEqual(set(records["document_grounded"]["by_source_role"]), {"xroutebench/dev", "xroutebench/test"})
+        rag = pd.read_csv(ROOT.parent / L.DOCUMENT_GROUNDED)
+        self.assertEqual(set(rag.category), {"squad", "boolq"})
 
     def test_duplicate_ids_are_refused(self):
         import tempfile
@@ -154,7 +177,7 @@ class EnglishOnlyTest(unittest.TestCase):
             path.parent.mkdir(parents=True)
             pd.DataFrame({"sample_id": ["a", "a"], "source_dataset": ["s", "s"], "role": ["test", "test"]}).to_csv(path, index=False)
             with self.assertRaises(SystemExit):
-                L.english_exclusions(Path(tmp))
+                L.exclusion_list(Path(tmp), L.NON_ENGLISH)
 
 
 if __name__ == "__main__":
