@@ -15,7 +15,8 @@
 | `07b_lock` | 구현 | 설정 선택·보정·결정 규칙 고정. 여기서 멈추고 보고 |
 | `08a_latency` | 구현 | 라우팅 지연(CPU 주, T4 참고). 07b 뒤 |
 | `08_test` | 구현 | 봉인한 test를 한 번 열어 두 갈래 평가와 가설 판정. Colab CPU. 아래 참고 |
-| `09_seeds` · `10_report` | 예정 | 계획서 4.5절 |
+| `09_seeds` | 구현 | H5만 seed 17·73 추가(R1-집단·R1-집단-A 재학습). Colab T4. 아래 참고 |
+| `10_report` | 구현 | 08·09·08a 출력으로 표·그림·결과 정리. CPU. 아래 참고 |
 
 ## 00_prepare
 
@@ -186,3 +187,12 @@ python ml/notebooks/router_final/length_inputs.py --run-dir <run001> --repo . --
 - **출력:** `track1.parquet`, `fixed-starts.parquet`, `mean-gain.parquet`, `kappa-star.parquet`, `track2.parquet`, `track2-arena-overlap.parquet`, `rt08.parquet`, `by-category.parquet`, `by-stratum.parquet`, `test-starts.parquet`(질문마다 각 라우터의 시작 단계), `hypotheses.json`, `diagnostics.json`, `manifest.json`, `test-summary.md`.
 - **리허설:** `--rehearse-on-dev`는 같은 코드를 dev 결과로 돌려 다른 폴더에 쓴다. test는 읽지 않는다. dev에서 맞춘 보정을 dev에 쓴 값이라 낙관적이며 해석하지 않는다.
 - **주의(dev 리허설에서 확인):** LLMRouterBench는 1:3:5에서 고정 시작 비용이 low .97, high 1.0, medium 1.09로 거의 같다. 그런데 해결률과 실패 수는 크게 달라, 같은 비용 비교가 비용의 작은 차이에 크게 흔들리고 구간이 넓다. 그대로 보고하고 집단 가격 민감도(비용 범위가 넓다)를 함께 본다.
+
+## 09_seeds (H5만)
+
+계획서 4.3절대로 판정 경계(±.01) 근처 결과에만 seed를 더한다. 08에서 경계에 걸린 것은 H5(R1-집단 − R1-집단-A, 외부 test +.009) 하나다. kNN은 무작위성이 없어 R1 두 모델만 seed 17·73으로 다시 학습한다(`ours.py train --seed`, 결과 `ours/models/seed<N>/`). 점수는 `score_modernbert.py --seed`(`scores-modernbert-seeds/seed<N>/`). `seeds.py`가 각 seed 모델을 07b와 같은 방식(같은 어댑터, 잠근 ρ·비용 목표, 자기 λ 표)으로 dev에서 보정하고, 08과 같은 bootstrap 표본으로 test를 평가해 세 seed 평균으로 H5를 다시 판정한다(`seeds/`). 설정은 다시 고르지 않는다. seed마다 T4 세션 하나(3~4시간)로 동시에 돌릴 수 있다.
+
+## 10_report
+
+`report.py`가 08(필수)·09·08a(있으면) 출력을 읽어 `results.md`, `tables/*.csv`, `figures/*.png`, `manifest.json`(입력·출력 SHA)을 만든다. 결과를 다시 계산하지 않는다. 그림 글자는 영어다(Colab에 한글 글꼴이 없다). 저장소에는 `experiments/results/ev10-router-final-20261018/report/`와 사람이 쓴 [REPORT.md](../../../experiments/results/ev10-router-final-20261018/REPORT.md)를 둔다.
+

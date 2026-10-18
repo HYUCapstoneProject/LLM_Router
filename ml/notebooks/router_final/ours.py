@@ -8,7 +8,7 @@ build (local, CPU): from 00_prepare train/dev, drop v2-excluded rows and rows mi
       Targets: difficulty_label = needed tier (low/medium/high -> easy/medium/hard) for R0-group;
       success_* = quality_* = group success probability (soft) for R1-group; decision and actual
       costs = the fixed service cost (.2/.6/1.0).
-train (Colab T4): the RT-05 trainer `train_objective` with the RT-05 experiment config, seed 42.
+train (Colab T4): the RT-05 trainer `train_objective` with the RT-05 experiment config, seed 42 (09_seeds: 17, 73).
       method ordinal = R0-group, pointwise = R1-group. Test rows are never read here.
 """
 from __future__ import annotations
@@ -127,7 +127,7 @@ def build(prepare_dir: Path, a_train: Path, a_dev: Path, output_dir: Path) -> di
     return manifest
 
 
-def train(root: Path, data_dir: Path, run: str, output_dir: Path, smoke: bool, device: str) -> dict:
+def train(root: Path, data_dir: Path, run: str, output_dir: Path, smoke: bool, device: str, seed: int = 42) -> dict:
     from llm_router_labeling.objective_comparison.training import train_objective
     manifest = json.loads((data_dir / "manifest.json").read_text())
     variant, method = RUNS[run]
@@ -141,7 +141,7 @@ def train(root: Path, data_dir: Path, run: str, output_dir: Path, smoke: bool, d
         method=method, training_path=folder / "train.parquet", validation_path=folder / "validation.parquet",
         outcome_manifest_path=folder / "outcome-manifest.json",
         experiment_config_path=root / "ml/config/routing_objective_continual_v1.json",
-        output_dir=output_dir, seed=42, device=device,
+        output_dir=output_dir, seed=seed, device=device,
         maximum_train_rows=64 if smoke else 0, maximum_validation_rows=64 if smoke else 0,
         maximum_train_steps=2 if smoke else 0,
     )
@@ -162,11 +162,12 @@ def main(argv=None):
     t.add_argument("--output-dir", type=Path, required=True)
     t.add_argument("--smoke", action="store_true")
     t.add_argument("--device", default="auto")
+    t.add_argument("--seed", type=int, default=42, help="42 for 03; 17 and 73 for 09_seeds")
     a = p.parse_args(argv)
     if a.command == "build":
         out = build(a.prepare_dir, a.a_train, a.a_dev, a.output_dir)
     else:
-        out = train(a.root, a.data_dir, a.run, a.output_dir, a.smoke, a.device)
+        out = train(a.root, a.data_dir, a.run, a.output_dir, a.smoke, a.device, a.seed)
     print(json.dumps(out, ensure_ascii=False, indent=1, default=str)[:4000])
 
 

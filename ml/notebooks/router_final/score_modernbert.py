@@ -32,6 +32,13 @@ MODELS = {  # name -> (model folder under the run, output class order)
     "r1_group_a": ("ours/models/r1_group_a/model", ("low", "medium", "high")),
     "rt08": ("rt08/model/full/final-model", ("easy", "medium", "hard")),
 }
+SEED_RUNS = ("r1_group", "r1_group_a")  # 09_seeds: H5 only (plan 4.3: seeds only near a decision boundary)
+
+
+def seed_models(seed: int) -> dict:
+    return {f"{base}_s{seed}": (f"ours/models/seed{seed}/{base}/model", MODELS[base][1]) for base in SEED_RUNS}
+
+
 MAX_LENGTH = 512  # routing_objective_continual_v1.json and modernbert_initial_v1_training.json
 BATCH = 32
 
@@ -41,7 +48,7 @@ def model_labels(model_dir: Path) -> tuple:
     return tuple(id2label[str(i)] for i in range(len(id2label)))
 
 
-def score(name: str, run_dir: Path, inputs: dict, output_dir: Path, device: str) -> dict:
+def score(name: str, run_dir: Path, inputs: dict, output_dir: Path, device: str, models: dict = MODELS) -> dict:
     import torch
     from transformers import AutoModelForSequenceClassification, AutoTokenizer
     from llm_router_labeling.objective_comparison.training import _predict_logits
@@ -49,7 +56,7 @@ def score(name: str, run_dir: Path, inputs: dict, output_dir: Path, device: str)
     if (folder / "_SUCCESS").exists():
         print(f"[{name}] done", flush=True)
         return json.loads((folder / "metrics.json").read_text())
-    rel, labels = MODELS[name]
+    rel, labels = models[name]
     model_dir = run_dir / rel
     if model_labels(model_dir) != labels:
         raise SystemExit(f"{name}: unexpected output classes {model_labels(model_dir)}")
@@ -92,15 +99,20 @@ def main(argv=None):
     p.add_argument("--models", nargs="+", choices=sorted(MODELS), default=list(MODELS))
     p.add_argument("--device", default="auto")
     p.add_argument("--smoke", action="store_true", help="40 scored rows per role")
+    p.add_argument("--seed", type=int, default=None, help="09_seeds: score ours/models/seed<N>/{r1_group,r1_group_a}")
     a = p.parse_args(argv)
     import torch
     device = ("cuda" if torch.cuda.is_available() else "cpu") if a.device == "auto" else a.device
     inputs = F.load_inputs(a.run_dir, a.smoke)
-    for m in a.models:
-        score(m, a.run_dir, inputs, a.output_dir, device)
+    models = MODELS if a.seed is None else {n: v for n, v in seed_models(a.seed).items() if (a.run_dir / v[0]).exists()}
+    if a.seed is not None:
+        print(f"[seed {a.seed}] models trained so far: {sorted(models)}", flush=True)
+    for m in (a.models if a.seed is None else list(models)):
+        score(m, a.run_dir, inputs, a.output_dir, device, models)
     out = {m: json.loads((a.output_dir / m / "metrics.json").read_text())["scores_sha256"]
-           for m in MODELS if (a.output_dir / m / "_SUCCESS").exists()}
-    manifest = {"experiment": "EV-10 07a_score_ours", "smoke": a.smoke, "inputs": inputs["hashes"], "outputs": out,
+           for m in models if (a.output_dir / m / "_SUCCESS").exists()}
+    manifest = {"experiment": "EV-10 07a_score_ours" if a.seed is None else f"EV-10 09_seeds scores (seed {a.seed})",
+                "seed": a.seed, "smoke": a.smoke, "inputs": inputs["hashes"], "outputs": out,
                 "scored_rows": inputs["scored"].groupby("role").size().to_dict()}
     (a.output_dir / "manifest.json").write_text(json.dumps(manifest, indent=2))
     print(json.dumps(manifest, indent=1))
