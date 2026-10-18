@@ -1,0 +1,32 @@
+{
+ "experiment": "EV-10 10_report",
+ "inputs": {
+  "test/by-category.parquet": "afee9ccb8a2324463dfd13c588bab1d454330e80182f20170897c0a423d04f8a",
+  "test/by-stratum.parquet": "6c5e8d12743e61e911cd3cad6418d142b67b243046357f03adb749d4d06a978c",
+  "test/fixed-starts.parquet": "0c433036510172d1babddbb649263eee7ba6fa44bf5d3a123ab9b78e206afecd",
+  "test/kappa-star.parquet": "3e9128c68d530c8e8efdbe869e04c0a134db0a327690ababc857d2a42bf7d9ce",
+  "test/mean-gain.parquet": "d090f1509740fd48bdc311fa15b58b7f671cd75babec9178555f6d088a0d55f4",
+  "test/rt08.parquet": "2654a3408487bb8b535c486d00d71cd981910ae25a6e873918ca88ce26f10aa0",
+  "test/test-starts.parquet": "00e9b8fd654c913700d94c6611d7fb4553b2f8249edda6334211c176b4c71168",
+  "test/track1.parquet": "e1e4b887e9daabf578311a7c7a45d6aa4efa1bd87b63fce5194f88bb50666b02",
+  "test/track2-arena-overlap.parquet": "90ef1b02fbbfc90a4ce86513e2c8a7fe2ab1026dedbca55306372b1d464b939d",
+  "test/track2.parquet": "5a204d91a1445c00ac28e18d63fa0e095a103a412897c8744ed917141f9e4a38"
+ },
+ "outputs": {
+  "figures/gain-by-kappa.png": "9b52059386fc3fda1237ec315276e11f21e3e4d9cb2cbfea131a844e1775ca81",
+  "figures/mean-gain.png": "91d83c64776d761d82606056f1f3f44df6c4a2f07cf267e16bd53eaea6bbe134",
+  "figures/strata.png": "7047ed47867daf187c1abb60a30f146d42498450385c0d154914512921ee2c53",
+  "figures/task-types.png": "ff1538f12f66f278f73a4b17d92978ec328aee781aef0f4ec178bc4ccc56886a",
+  "figures/tau-curves.png": "31eaa81bacd6e2844966daa0d5dfb07e2088c60a4eeb73ad9c6c6feaedda6ab3",
+  "results.md": "3c1312844f9806452d448b856d88d8e5b7c43cb347789ccb69dc5c49a8660b27",
+  "tables/fixed.csv": "05b6b2c2b0d141676e0de0223b9072dcd8f3bcdbf4d63ea49b38be4b997bcd71",
+  "tables/kappa_star_50.csv": "2d5059b45d7d9bc39ea3cbea194634088ccb6c2ae9146dc0d664dc44075a3233",
+  "tables/mean_gain.csv": "04c1b54b9a429acfddf9323001876774ef92eb35fb99cabe15112f45155607b0",
+  "tables/mean_gain_macro_ci.csv": "ca517876c02e5b0a70e60c3005263e8f1ebd4aa316598217df63c8e26f5785ec",
+  "tables/strata_counts.csv": "24c97cb5a16be2ae9b4954c2ee656e656dc4c5289d432ae852ec8fba2dc89a3e",
+  "tables/strata_gain.csv": "8832db7974e5b6647c4e009e29c6d27b1d8abe4eb27ea8b72fbc94e5bb691b34",
+  "tables/task_types.csv": "b44c93236117957f1d5cc02c018ecccf31ddb3ddf8675e3b1f4e852b4139fb72",
+  "tables/tau80.csv": "3ceb5fceda1bb2a956e6fe82c2d5d80a6955a30e072d85b515d8d17437c1b308",
+  "tables/tau80_first.csv": "4d8c8adff2743c7e99a95434b02648cb3b38db3d00bd2a5edad3f7ad74803e50"
+ }
+}
