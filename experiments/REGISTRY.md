@@ -53,7 +53,7 @@
 | RF-02 | 재학습 효과 F0~F3 (상향 피드백) | 09-29~10-01 | 완료(결과 폴더 미반입) | F1~F3 첫 시도 품질 +.14~.19에 비용 +63~77%, 망각 미달, 미채택. 원본은 Drive | [계획서 13절](../docs/ml/RETRAINING_EFFECT_EXPERIMENT.md) |
 | RF-03 | F4 양방향 오류 교정 | 10-10 | 완료 | 원래 라벨 정확도 test .619 → .278, RouterArena .454 → .244. medium 쏠림 | [보고서](results/retraining-effect-f4-20261010/REPORT.md) |
 | RF-04 | F5 라벨 비율을 맞춘 오류 교정 | 10-10 | 완료 | 쏠림 해소(F5−F4 +.30)되었지만 F0 미달(test .580, RouterArena .444) | [보고서](results/retraining-effect-f5-20261010/REPORT.md) |
-| RF-05 | 재학습 개량: 분포 이동 + 부분 관측 피드백에서 갱신 방식 비교 | EV-10 뒤 | 계획 | A만 학습한 라우터에 새 세대(LLMRouterBench·SPROUT) stream을 흘려, 지금 방식·경계만 다시 맞추기·R1 방식(반사실 보정)·kNN 추가를 하향 탐색·그림자 하향 실행 조건과 비교. 새 LLM 호출 없음 | [최종 계획서 5절](../docs/ml/ROUTER_FINAL_EXPERIMENT_PLAN.md) |
+| RF-05 | 재학습 개량: 분포 이동 + 부분 관측 피드백에서 갱신 방식 비교 | EV-10 뒤 | 계획(세부 10-18) | A만 학습한 라우터에 새 세대 stream을 원천별로 흘려(LLMRouterBench 강한 이동, SPROUT 약한 이동) 경계 갱신(U2)이 부분 관측 피드백으로 얼마나 되찾는지를 중심으로, 지금 방식·본체 갱신·kNN 추가와 하향 탐색·그림자 하향 실행 조건을 비교. dev 사전 분석: A 경계 그대로 −.080 → 다시 맞춘 경계 −.003(LLMRouterBench, R1-집단-A). 새 LLM 호출 없음 | [최종 계획서 5절](../docs/ml/ROUTER_FINAL_EXPERIMENT_PLAN.md), [사전 분석](results/rf05-planning-20261018/README.md) |
 
 ### 2.4. 평가·분석 (EV)
 
