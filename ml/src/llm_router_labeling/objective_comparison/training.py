@@ -207,7 +207,13 @@ def train_objective(
     maximum_train_rows: int = 0,
     maximum_validation_rows: int = 0,
     maximum_train_steps: int = 0,
+    initial_model_dir: Path | None = None,
 ) -> dict[str, Any]:
+    """Train one routing objective.
+
+    `initial_model_dir` starts from a saved low/medium/high classifier (weights only; the optimizer and
+    scheduler are new) instead of the pinned pretrained backbone (RF-06 warm starts).
+    """
     if method not in METHODS:
         raise ObjectiveTrainingError(f"method must be one of {METHODS}")
     config = _load_json(experiment_config_path)
@@ -227,16 +233,25 @@ def train_objective(
     resolved_device = _device(torch, device)
     backbone = config["backbone"]
     training = config["training"]
-    tokenizer = AutoTokenizer.from_pretrained(
-        backbone["model_id"], revision=backbone["revision"]
-    )
-    model = AutoModelForSequenceClassification.from_pretrained(
-        backbone["model_id"],
-        revision=backbone["revision"],
-        num_labels=3,
-        id2label={0: "low", 1: "medium", 2: "high"},
-        label2id={"low": 0, "medium": 1, "high": 2},
-    )
+    if initial_model_dir is None:
+        tokenizer = AutoTokenizer.from_pretrained(
+            backbone["model_id"], revision=backbone["revision"]
+        )
+        model = AutoModelForSequenceClassification.from_pretrained(
+            backbone["model_id"],
+            revision=backbone["revision"],
+            num_labels=3,
+            id2label={0: "low", 1: "medium", 2: "high"},
+            label2id={"low": 0, "medium": 1, "high": 2},
+        )
+    else:
+        tokenizer = AutoTokenizer.from_pretrained(initial_model_dir)
+        model = AutoModelForSequenceClassification.from_pretrained(initial_model_dir)
+        labels = [model.config.id2label[index] for index in range(model.config.num_labels)]
+        if labels != list(TIERS):
+            raise ObjectiveTrainingError(
+                f"initial model outputs {labels}, expected {list(TIERS)}"
+            )
     model.to(resolved_device)
     if resolved_device.startswith("cuda"):
         torch.cuda.reset_peak_memory_stats()
@@ -458,6 +473,11 @@ def train_objective(
         "maximum_train_rows": maximum_train_rows,
         "maximum_validation_rows": maximum_validation_rows,
         "maximum_train_steps": maximum_train_steps,
+        "initial_model_sha256": (
+            None
+            if initial_model_dir is None
+            else _sha256(Path(initial_model_dir) / "model.safetensors")
+        ),
         "model_artifact_size_bytes": int(sum(path.stat().st_size for path in model_files)),
         "model_artifacts": {
             str(path.relative_to(model_dir)): {

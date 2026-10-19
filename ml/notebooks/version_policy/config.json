@@ -1,0 +1,46 @@
+{
+  "experiment": "RF-06",
+  "experiment_version": "version-policy-efficiency-v1",
+  "plan_document": "docs/ml/VERSION_POLICY_EFFICIENCY_EXPERIMENT.md",
+  "inputs": {
+    "prepare_dir": "ml/artifacts/router-final-v1/prepare",
+    "a_train": "ml/artifacts/routing-objective-continual-v1/dataset/train.parquet",
+    "a_dev": "ml/artifacts/routing-objective-continual-v1/dataset/validation.parquet",
+    "a_test_routerbench": "ml/artifacts/frozen-evaluation-outcomes/continual-v1-20260924-28cbc342c510/test_routerbench.parquet",
+    "a_test_xroutebench": "ml/artifacts/frozen-evaluation-outcomes/continual-v1-20260924-28cbc342c510/test_xroutebench.parquet",
+    "llmrouterbench": "ml/artifacts/external-evaluation-v1/llmrouterbench.parquet",
+    "sprout": "ml/artifacts/external-evaluation-v1/sprout.parquet",
+    "non_english_exclusions": "experiments/results/router-final-inputs/non-english-eval-exclusions.csv",
+    "document_grounded_exclusions": "experiments/results/router-final-inputs/document-grounded-eval-exclusions.csv"
+  },
+  "objective_config": "ml/config/routing_objective_continual_v1.json",
+  "method": "ordinal",
+  "sample_weight": 1.0,
+  "plan_seed": 20261020,
+  "validation_rows_per_label": 16,
+  "pilot": {
+    "sizes": [1000, 2000, 4000, 8000, 16000],
+    "seed": 42,
+    "gap_closure": 0.5,
+    "minimum_stream_gain": 0.03
+  },
+  "stream": {
+    "rounds": 9,
+    "fixed_logger": "M0",
+    "reserve_safety": 0.9
+  },
+  "version_policy": {
+    "cycle_size": 3,
+    "history_replay_per_label": 32,
+    "base_rehearsal_per_label": 32
+  },
+  "seeds": [42],
+  "extra_seeds_near_boundary": [43, 44],
+  "service_cost": {"low": 0.2, "medium": 0.6, "high": 1.0},
+  "judgement": {
+    "margin": 0.01,
+    "bootstrap_iterations": 2000,
+    "bootstrap_seed": 42,
+    "confidence": 0.95
+  }
+}
