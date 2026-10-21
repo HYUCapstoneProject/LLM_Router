@@ -8,6 +8,8 @@
 
 2026-10-05 추가: [캐시 실험 C0~C3 run001](cache-experiment-v1-20261005/REPORT.md). exact 캐시는 잘못된 재사용 0이다. 의미 캐시(운영 C3 포함)는 D2 test에서 hit 중 45~50%가 다른 질문의 답이었다(LLM 판정 기준).
 
+2026-10-21 추가: 효용 U 대신 첫 시도 이득 G(학습 없이 저장 점수로 재평가) — [EV-10 라우터 비교](ev10-gain-20261021/REPORT.md), [R0~R3 비교](gain-metric-r0r3-20261021/REPORT.md). U 결과를 대체하지 않는 두 번째 관점이다.
+
 2026-09-25 추가: [R1/R3 natural·balanced 최종 평가](routing-generalization-v1-20260925/report.md), [R0~R3 통합 판단](routing-method-review-20260925/REVIEW.md), [Git·원본 보관 범위](ARTIFACT_STORAGE.md).
 
 현재 최종 설계에 따른 실행 기록은 [R0 초기 학습·복구](modernbert-initial-v1-20260924/REPORT.md), [R0/R1/R2 통합 A 비교](routing-objectives-continual-v1-A-20260924/REPORT.md), [비교 결과 해석](routing-objectives-continual-v1-A-20260924/ANALYSIS.md)에 있다. 세 방법을 같은 2,007 step·seed 42로 비교했으며 D_dev 비용–품질 nAUC는 R1 0.863179, R2 0.833874, R0 0.166115로 R1이 선정됐다. GCS·개인 Drive 보존을 검증했다. 공개 후보의 단일 seed 결과이며, [독립 test 7,202문항 평가](routing-objectives-continual-v1-A-20260924/sealed-tests/REPORT.md)도 완료했으며, R1/R2의 일부 source 비용 상한 초과를 기록했다. 실제 Claude 서비스 검증·운영 활성화는 별도다. 이후 실험은 [공통 보고서 형식](../templates/RUN_REPORT.md)으로 데이터·학습 조건, 비교·선정, 결과·해석, 파일 보존·게시 상태를 기록한다.
