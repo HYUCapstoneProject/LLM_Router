@@ -1,0 +1,29 @@
+{
+  "source": "/Users/yoocheolmin/Google Drive/내 드라이브/LLM_Router/retraining-gain-20261021",
+  "source_manifest_sha256": "11d1764bf1744d3211eb1811fa12c276622e8fc4d3be2ba35e15c2d6ac2b2716",
+  "source_sha256": {
+    "gain-summary.csv": "f80585427133f06f452591d16c3fe3c4d2a55d0b47edcc4f67891a8e851536cb",
+    "delta-vs-f0.csv": "3de8fce88c5ab5e29138b8b7d77e0f1e1bcae985605118e2fe9d366a26727832"
+  },
+  "selection": {
+    "set": "prequential",
+    "arms": [
+      "F0",
+      "F1",
+      "F2",
+      "F3"
+    ],
+    "n": 4473
+  },
+  "metric_recomputed": false,
+  "bootstrap": {
+    "draws": 2000,
+    "seed": 20261021,
+    "unit": "duplicate_group_id within source",
+    "paired": "shared resamples across arms and seeds"
+  },
+  "outputs": {
+    "fig5-10-feedback-gain.png": "7d1037b5119600e3a9e8b64b2c89f842d38efc10a687dd1e23e9faeddc663fe7",
+    "fig5-10-feedback-gain.svg": "346d96a02a57868551744f7827a5a1ce68ceec456019a80cfaba89c95ba871f5"
+  }
+}

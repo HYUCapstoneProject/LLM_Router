@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1080pt" height="907.2pt" viewBox="0 0 1080 907.2" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-21T17:27:13.339173</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 907.2 
+L 1080 907.2 
+L 1080 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 351 712.152 
+L 864 712.152 
+L 864 122.472 
+L 351 122.472 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <path d="M 351 712.152 
+L 351 122.472 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #e2e4e9; stroke-width: 0.9; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_2"/>
+     <g id="text_1">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #686d78" x="351" y="727.929344" transform="rotate(-0 351 727.929344)">+0.00</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_3">
+      <path d="M 447.792453 712.152 
+L 447.792453 122.472 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #e2e4e9; stroke-width: 0.9; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_4"/>
+     <g id="text_2">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #686d78" x="447.792453" y="727.929344" transform="rotate(-0 447.792453 727.929344)">+0.01</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_5">
+      <path d="M 544.584906 712.152 
+L 544.584906 122.472 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #e2e4e9; stroke-width: 0.9; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_6"/>
+     <g id="text_3">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #686d78" x="544.584906" y="727.929344" transform="rotate(-0 544.584906 727.929344)">+0.02</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_7">
+      <path d="M 641.377358 712.152 
+L 641.377358 122.472 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #e2e4e9; stroke-width: 0.9; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_8"/>
+     <g id="text_4">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #686d78" x="641.377358" y="727.929344" transform="rotate(-0 641.377358 727.929344)">+0.03</text>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_9">
+      <path d="M 738.169811 712.152 
+L 738.169811 122.472 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #e2e4e9; stroke-width: 0.9; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_10"/>
+     <g id="text_5">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #686d78" x="738.169811" y="727.929344" transform="rotate(-0 738.169811 727.929344)">+0.04</text>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_11">
+      <path d="M 834.962264 712.152 
+L 834.962264 122.472 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #e2e4e9; stroke-width: 0.9; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_12"/>
+     <g id="text_6">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #686d78" x="834.962264" y="727.929344" transform="rotate(-0 834.962264 727.929344)">+0.05</text>
+     </g>
+    </g>
+    <g id="text_7">
+     <text style="font-size: 13px; font-family: 'Pretendard'; text-anchor: middle; fill: #25272c" x="607.5" y="757.312156" transform="rotate(-0 607.5 757.312156)">같은 비용의 고정 시작 정책 대비 평균 효용 이득</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_13"/>
+     <g id="text_8">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end; fill: #25272c" x="337" y="150.939626" transform="rotate(-0 337 150.939626)">oracle (정답을 아는 상한)</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_14"/>
+     <g id="text_9">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end; fill: #25272c" x="337" y="187.019194" transform="rotate(-0 337 187.019194)">GraphRouter</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_15"/>
+     <g id="text_10">
+      <text style="font-weight: 700; font-size: 12px; font-family: 'Pretendard'; text-anchor: end; fill: #25272c" x="337" y="224.064388" transform="rotate(-0 337 224.064388)">후보별 성공 확률 예측 (가격대 묶음)</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_16"/>
+     <g id="text_11">
+      <text style="font-weight: 700; font-size: 12px; font-family: 'Pretendard'; fill: #25272c" transform="translate(235.3675 253.996769)">후보별 성공 확률 예측</text>
+      <text style="font-weight: 700; font-size: 12px; font-family: 'Pretendard'; fill: #25272c" transform="translate(201.8275 267.891644)">(가격대 묶음, 기존 데이터만)</text>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_17"/>
+     <g id="text_12">
+      <text style="font-weight: 700; font-size: 12px; font-family: 'Pretendard'; text-anchor: end; fill: #25272c" x="337" y="297.049462" transform="rotate(-0 337 297.049462)">난이도 분류 (가격대 묶음)</text>
+     </g>
+    </g>
+    <g id="ytick_6">
+     <g id="line2d_18"/>
+     <g id="text_13">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end; fill: #25272c" x="337" y="333.010906" transform="rotate(-0 337 333.010906)">kNN</text>
+     </g>
+    </g>
+    <g id="ytick_7">
+     <g id="line2d_19"/>
+     <g id="text_14">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end; fill: #25272c" x="337" y="370.015787" transform="rotate(-0 337 370.015787)">kNN (기존 데이터만)</text>
+     </g>
+    </g>
+    <g id="ytick_8">
+     <g id="line2d_20"/>
+     <g id="text_15">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end; fill: #25272c" x="337" y="406.036293" transform="rotate(-0 337 406.036293)">SVM</text>
+     </g>
+    </g>
+    <g id="ytick_9">
+     <g id="line2d_21"/>
+     <g id="text_16">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end; fill: #25272c" x="337" y="442.548986" transform="rotate(-0 337 442.548986)">RouterDC</text>
+     </g>
+    </g>
+    <g id="ytick_10">
+     <g id="line2d_22"/>
+     <g id="text_17">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end; fill: #25272c" x="337" y="479.06168" transform="rotate(-0 337 479.06168)">IRT-Router</text>
+     </g>
+    </g>
+    <g id="ytick_11">
+     <g id="line2d_23"/>
+     <g id="text_18">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end; fill: #25272c" x="337" y="515.574373" transform="rotate(-0 337 515.574373)">RouteLLM 재학습본</text>
+     </g>
+    </g>
+    <g id="ytick_12">
+     <g id="line2d_24"/>
+     <g id="text_19">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end; fill: #25272c" x="337" y="552.087067" transform="rotate(-0 337 552.087067)">RouteLLM 공개본</text>
+     </g>
+    </g>
+    <g id="ytick_13">
+     <g id="line2d_25"/>
+     <g id="text_20">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end; fill: #25272c" x="337" y="588.59976" transform="rotate(-0 337 588.59976)">MF</text>
+     </g>
+    </g>
+    <g id="ytick_14">
+     <g id="line2d_26"/>
+     <g id="text_21">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end; fill: #25272c" x="337" y="625.112454" transform="rotate(-0 337 625.112454)">MLP</text>
+     </g>
+    </g>
+    <g id="ytick_15">
+     <g id="line2d_27"/>
+     <g id="text_22">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end; fill: #25272c" x="337" y="661.625147" transform="rotate(-0 337 661.625147)">Avengers-Pro</text>
+     </g>
+    </g>
+    <g id="ytick_16">
+     <g id="line2d_28"/>
+     <g id="text_23">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end; fill: #25272c" x="337" y="698.272841" transform="rotate(-0 337 698.272841)">Hybrid LLM</text>
+     </g>
+    </g>
+   </g>
+   <g id="patch_3">
+    <path d="M 699.45283 164.461598 
+L 825.283019 164.461598 
+L 825.283019 273.999678 
+L 699.45283 273.999678 
+z
+" clip-path="url(#p22d72ce72c)" style="fill: #4c43c4; opacity: 0.06"/>
+   </g>
+   <g id="LineCollection_1">
+    <path d="M 351 146.205251 
+L 844.641509 146.205251 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke-dasharray: 3,4; stroke-dashoffset: 0; stroke: #b8bdc8"/>
+   </g>
+   <g id="LineCollection_2">
+    <path d="M 730.376578 182.717944 
+L 819.521223 182.717944 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #686d78; stroke-width: 1.7"/>
+   </g>
+   <g id="line2d_29">
+    <defs>
+     <path id="mc7d1de6fc5" d="M 0 3.75 
+C 0.994512 3.75 1.948425 3.354876 2.65165 2.65165 
+C 3.354876 1.948425 3.75 0.994512 3.75 0 
+C 3.75 -0.994512 3.354876 -1.948425 2.65165 -2.65165 
+C 1.948425 -3.354876 0.994512 -3.75 0 -3.75 
+C -0.994512 -3.75 -1.948425 -3.354876 -2.65165 -2.65165 
+C -3.354876 -1.948425 -3.75 -0.994512 -3.75 0 
+C -3.75 0.994512 -3.354876 1.948425 -2.65165 2.65165 
+C -1.948425 3.354876 -0.994512 3.75 0 3.75 
+z
+" style="stroke: #686d78"/>
+    </defs>
+    <g clip-path="url(#p22d72ce72c)">
+     <use xlink:href="#mc7d1de6fc5" x="773.661485" y="182.717944" style="fill: #686d78; stroke: #686d78"/>
+    </g>
+   </g>
+   <g id="LineCollection_3">
+    <path d="M 722.578803 219.230638 
+L 805.204189 219.230638 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #4c43c4; stroke-width: 1.7"/>
+   </g>
+   <g id="line2d_30">
+    <defs>
+     <path id="mc096663e10" d="M 0 3.75 
+C 0.994512 3.75 1.948425 3.354876 2.65165 2.65165 
+C 3.354876 1.948425 3.75 0.994512 3.75 0 
+C 3.75 -0.994512 3.354876 -1.948425 2.65165 -2.65165 
+C 1.948425 -3.354876 0.994512 -3.75 0 -3.75 
+C -0.994512 -3.75 -1.948425 -3.354876 -2.65165 -2.65165 
+C -3.354876 -1.948425 -3.75 -0.994512 -3.75 0 
+C -3.75 0.994512 -3.354876 1.948425 -2.65165 2.65165 
+C -1.948425 3.354876 -0.994512 3.75 0 3.75 
+z
+" style="stroke: #4c43c4"/>
+    </defs>
+    <g clip-path="url(#p22d72ce72c)">
+     <use xlink:href="#mc096663e10" x="763.409755" y="219.230638" style="fill: #4c43c4; stroke: #4c43c4"/>
+    </g>
+   </g>
+   <g id="LineCollection_4">
+    <path d="M 704.128637 255.743331 
+L 785.83248 255.743331 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #4c43c4; stroke-width: 1.7"/>
+   </g>
+   <g id="line2d_31">
+    <g clip-path="url(#p22d72ce72c)">
+     <use xlink:href="#mc096663e10" x="745.009698" y="255.743331" style="fill: #4c43c4; stroke: #4c43c4"/>
+    </g>
+   </g>
+   <g id="LineCollection_5">
+    <path d="M 675.084118 292.256025 
+L 745.100204 292.256025 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #4c43c4; stroke-width: 1.7"/>
+   </g>
+   <g id="line2d_32">
+    <g clip-path="url(#p22d72ce72c)">
+     <use xlink:href="#mc096663e10" x="709.507364" y="292.256025" style="fill: #4c43c4; stroke: #4c43c4"/>
+    </g>
+   </g>
+   <g id="LineCollection_6">
+    <path d="M 668.846562 328.768718 
+L 744.525129 328.768718 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #686d78; stroke-width: 1.7"/>
+   </g>
+   <g id="line2d_33">
+    <g clip-path="url(#p22d72ce72c)">
+     <use xlink:href="#mc7d1de6fc5" x="706.904835" y="328.768718" style="fill: #686d78; stroke: #686d78"/>
+    </g>
+   </g>
+   <g id="LineCollection_7">
+    <path d="M 636.461433 365.281412 
+L 724.888611 365.281412 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #686d78; stroke-width: 1.7"/>
+   </g>
+   <g id="line2d_34">
+    <g clip-path="url(#p22d72ce72c)">
+     <use xlink:href="#mc7d1de6fc5" x="679.600532" y="365.281412" style="fill: #686d78; stroke: #686d78"/>
+    </g>
+   </g>
+   <g id="LineCollection_8">
+    <path d="M 624.89626 401.794105 
+L 700.580715 401.794105 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #686d78; stroke-width: 1.7"/>
+   </g>
+   <g id="line2d_35">
+    <g clip-path="url(#p22d72ce72c)">
+     <use xlink:href="#mc7d1de6fc5" x="662.676347" y="401.794105" style="fill: #686d78; stroke: #686d78"/>
+    </g>
+   </g>
+   <g id="LineCollection_9">
+    <path d="M 617.758046 438.306799 
+L 708.012985 438.306799 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #686d78; stroke-width: 1.7"/>
+   </g>
+   <g id="line2d_36">
+    <g clip-path="url(#p22d72ce72c)">
+     <use xlink:href="#mc7d1de6fc5" x="662.017389" y="438.306799" style="fill: #686d78; stroke: #686d78"/>
+    </g>
+   </g>
+   <g id="LineCollection_10">
+    <path d="M 607.899211 474.819492 
+L 677.262242 474.819492 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #686d78; stroke-width: 1.7"/>
+   </g>
+   <g id="line2d_37">
+    <g clip-path="url(#p22d72ce72c)">
+     <use xlink:href="#mc7d1de6fc5" x="642.84465" y="474.819492" style="fill: #686d78; stroke: #686d78"/>
+    </g>
+   </g>
+   <g id="LineCollection_11">
+    <path d="M 595.74168 511.332186 
+L 658.783451 511.332186 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #686d78; stroke-width: 1.7"/>
+   </g>
+   <g id="line2d_38">
+    <g clip-path="url(#p22d72ce72c)">
+     <use xlink:href="#mc7d1de6fc5" x="628.024488" y="511.332186" style="fill: #686d78; stroke: #686d78"/>
+    </g>
+   </g>
+   <g id="LineCollection_12">
+    <path d="M 550.520586 547.844879 
+L 621.423567 547.844879 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #686d78; stroke-width: 1.7"/>
+   </g>
+   <g id="line2d_39">
+    <g clip-path="url(#p22d72ce72c)">
+     <use xlink:href="#mc7d1de6fc5" x="586.77823" y="547.844879" style="fill: #686d78; stroke: #686d78"/>
+    </g>
+   </g>
+   <g id="LineCollection_13">
+    <path d="M 492.626541 584.357573 
+L 540.087624 584.357573 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #686d78; stroke-width: 1.7"/>
+   </g>
+   <g id="line2d_40">
+    <g clip-path="url(#p22d72ce72c)">
+     <use xlink:href="#mc7d1de6fc5" x="516.921333" y="584.357573" style="fill: #686d78; stroke: #686d78"/>
+    </g>
+   </g>
+   <g id="LineCollection_14">
+    <path d="M 440.173515 620.870266 
+L 523.480267 620.870266 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #686d78; stroke-width: 1.7"/>
+   </g>
+   <g id="line2d_41">
+    <g clip-path="url(#p22d72ce72c)">
+     <use xlink:href="#mc7d1de6fc5" x="479.649179" y="620.870266" style="fill: #686d78; stroke: #686d78"/>
+    </g>
+   </g>
+   <g id="LineCollection_15">
+    <path d="M 443.894868 657.38296 
+L 505.907423 657.38296 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #686d78; stroke-width: 1.7"/>
+   </g>
+   <g id="line2d_42">
+    <g clip-path="url(#p22d72ce72c)">
+     <use xlink:href="#mc7d1de6fc5" x="474.957129" y="657.38296" style="fill: #686d78; stroke: #686d78"/>
+    </g>
+   </g>
+   <g id="LineCollection_16">
+    <path d="M 391.576107 693.895653 
+L 478.922607 693.895653 
+" clip-path="url(#p22d72ce72c)" style="fill: none; stroke: #686d78; stroke-width: 1.7"/>
+   </g>
+   <g id="line2d_43">
+    <g clip-path="url(#p22d72ce72c)">
+     <use xlink:href="#mc7d1de6fc5" x="436.086992" y="693.895653" style="fill: #686d78; stroke: #686d78"/>
+    </g>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: start; fill: #686d78" x="873.679245" y="149.767751" transform="rotate(-0 873.679245 149.767751)">+0.262 (축 밖)</text>
+   </g>
+   <g id="text_25">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: start; fill: #686d78" x="828.232544" y="185.637866" transform="rotate(-0 828.232544 185.637866)">+0.044</text>
+   </g>
+   <g id="text_26">
+    <text style="font-weight: 700; font-size: 11.5px; font-family: 'Pretendard'; text-anchor: start; fill: #4c43c4" x="813.91551" y="222.15056" transform="rotate(-0 813.91551 222.15056)">+0.043</text>
+   </g>
+   <g id="text_27">
+    <text style="font-weight: 700; font-size: 11.5px; font-family: 'Pretendard'; text-anchor: start; fill: #4c43c4" x="794.543801" y="258.663253" transform="rotate(-0 794.543801 258.663253)">+0.041</text>
+   </g>
+   <g id="text_28">
+    <text style="font-weight: 700; font-size: 11.5px; font-family: 'Pretendard'; text-anchor: start; fill: #4c43c4" x="753.811525" y="295.175947" transform="rotate(-0 753.811525 295.175947)">+0.037</text>
+   </g>
+   <g id="text_29">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: start; fill: #686d78" x="753.23645" y="331.68864" transform="rotate(-0 753.23645 331.68864)">+0.037</text>
+   </g>
+   <g id="text_30">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: start; fill: #686d78" x="733.599931" y="368.201334" transform="rotate(-0 733.599931 368.201334)">+0.034</text>
+   </g>
+   <g id="text_31">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: start; fill: #686d78" x="709.292036" y="404.714027" transform="rotate(-0 709.292036 404.714027)">+0.032</text>
+   </g>
+   <g id="text_32">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: start; fill: #686d78" x="716.724306" y="441.226721" transform="rotate(-0 716.724306 441.226721)">+0.032</text>
+   </g>
+   <g id="text_33">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: start; fill: #686d78" x="685.973563" y="477.739414" transform="rotate(-0 685.973563 477.739414)">+0.030</text>
+   </g>
+   <g id="text_34">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: start; fill: #686d78" x="667.494772" y="514.252108" transform="rotate(-0 667.494772 514.252108)">+0.029</text>
+   </g>
+   <g id="text_35">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: start; fill: #686d78" x="630.134888" y="550.764801" transform="rotate(-0 630.134888 550.764801)">+0.024</text>
+   </g>
+   <g id="text_36">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: start; fill: #686d78" x="548.798945" y="587.277495" transform="rotate(-0 548.798945 587.277495)">+0.017</text>
+   </g>
+   <g id="text_37">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: start; fill: #686d78" x="532.191588" y="623.790188" transform="rotate(-0 532.191588 623.790188)">+0.013</text>
+   </g>
+   <g id="text_38">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: start; fill: #686d78" x="514.618744" y="660.302882" transform="rotate(-0 514.618744 660.302882)">+0.013</text>
+   </g>
+   <g id="text_39">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: start; fill: #686d78" x="487.633927" y="696.815575" transform="rotate(-0 487.633927 696.815575)">+0.009</text>
+   </g>
+   <g id="text_40">
+    <text style="font-size: 12px; font-family: 'Pretendard'; fill: #4c43c4" transform="translate(905.04 221.597239)">상위 3개 방법의</text>
+    <text style="font-size: 12px; font-family: 'Pretendard'; fill: #4c43c4" transform="translate(905.04 237.562864)">95% 신뢰구간이 겹침</text>
+   </g>
+  </g>
+  <g id="text_41">
+   <text style="font-weight: 700; font-size: 22px; font-family: 'Pretendard'; text-anchor: start; fill: #25272c" x="48.6" y="56.378688" transform="rotate(-0 48.6 56.378688)">상위권 라우터의 평균 효용 이득은 +0.04 수준이다</text>
+  </g>
+  <g id="text_42">
+   <text style="font-size: 13px; font-family: 'Pretendard'; text-anchor: start; fill: #686d78" x="48.6" y="87.210606" transform="rotate(-0 48.6 87.210606)">원천 4개 평균 · 실패 비용 가중치 κ 21개 × 비용 수준 3개 평균 · 논문 라우터 비교</text>
+  </g>
+  <g id="text_43">
+   <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: start; fill: #686d78" x="351" y="827.3664" transform="rotate(-0 351 827.3664)">선 = 95% 신뢰구간 (질문 묶음 bootstrap 10,000회)</text>
+  </g>
+  <g id="text_44">
+   <text style="font-size: 10px; font-family: 'Pretendard'; text-anchor: start; fill: #686d78" x="351" y="852.768" transform="rotate(-0 351 852.768)">가격대 묶음: 모델을 원천별 가격대 집단으로 묶음   |   기존 데이터만: RouterBench·xRouteBench로만 학습</text>
+  </g>
+  <g id="legend_1">
+   <g id="line2d_44">
+    <defs>
+     <path id="m202f730894" d="M 0 4 
+C 1.060812 4 2.078319 3.578535 2.828427 2.828427 
+C 3.578535 2.078319 4 1.060812 4 0 
+C 4 -1.060812 3.578535 -2.078319 2.828427 -2.828427 
+C 2.078319 -3.578535 1.060812 -4 0 -4 
+C -1.060812 -4 -2.078319 -3.578535 -2.828427 -2.828427 
+C -3.578535 -2.078319 -4 -1.060812 -4 0 
+C -4 1.060812 -3.578535 2.078319 -2.828427 2.828427 
+C -2.078319 3.578535 -1.060812 4 0 4 
+z
+" style="stroke: #4c43c4"/>
+    </defs>
+    <g>
+     <use xlink:href="#m202f730894" x="368.4" y="791.831775" style="fill: #4c43c4; stroke: #4c43c4"/>
+    </g>
+   </g>
+   <g id="text_45">
+    <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: start" x="390" y="796.031775" transform="rotate(-0 390 796.031775)">본 프로젝트</text>
+   </g>
+   <g id="line2d_45">
+    <defs>
+     <path id="m98028b642f" d="M 0 4 
+C 1.060812 4 2.078319 3.578535 2.828427 2.828427 
+C 3.578535 2.078319 4 1.060812 4 0 
+C 4 -1.060812 3.578535 -2.078319 2.828427 -2.828427 
+C 2.078319 -3.578535 1.060812 -4 0 -4 
+C -1.060812 -4 -2.078319 -3.578535 -2.828427 -2.828427 
+C -3.578535 -2.078319 -4 -1.060812 -4 0 
+C -4 1.060812 -3.578535 2.078319 -2.828427 2.828427 
+C -2.078319 3.578535 -1.060812 4 0 4 
+z
+" style="stroke: #686d78"/>
+    </defs>
+    <g>
+     <use xlink:href="#m98028b642f" x="480.864375" y="791.831775" style="fill: #686d78; stroke: #686d78"/>
+    </g>
+   </g>
+   <g id="text_46">
+    <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: start" x="502.464375" y="796.031775" transform="rotate(-0 502.464375 796.031775)">논문 라우터</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p22d72ce72c">
+   <rect x="351" y="122.472" width="513" height="589.68"/>
+  </clipPath>
+ </defs>
+</svg>

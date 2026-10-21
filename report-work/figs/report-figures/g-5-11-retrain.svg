@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1080pt" height="446.4pt" viewBox="0 0 1080 446.4" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-21T23:08:43.659083</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 446.4 
+L 1080 446.4 
+L 1080 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 43.2 357.12 
+L 336.342857 357.12 
+L 336.342857 107.136 
+L 43.2 107.136 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1"/>
+     <g id="text_1">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle" x="78.732468" y="372.897344" transform="rotate(-0 78.732468 372.897344)">재학습 안 함</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_2"/>
+     <g id="text_2">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle" x="152.758442" y="372.897344" transform="rotate(-0 152.758442 372.897344)">새 피드백만</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_3"/>
+     <g id="text_3">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle" x="226.784416" y="372.897344" transform="rotate(-0 226.784416 372.897344)">과거 데이터 섞기</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_4"/>
+     <g id="text_4">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle" x="300.81039" y="373.822031" transform="rotate(-0 300.81039 373.822031)">easy 보충</text>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2"/>
+   <g id="patch_3">
+    <path d="M 43.2 357.12 
+L 336.342857 357.12 
+" style="fill: none; stroke: #b8bdc8; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 56.524675 357.12 
+L 100.94026 357.12 
+L 100.94026 165.486857 
+L 56.524675 165.486857 
+z
+" clip-path="url(#p6325d8d2ae)" style="fill: #4c43c4"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 130.550649 357.12 
+L 174.966234 357.12 
+L 174.966234 357.12 
+L 130.550649 357.12 
+z
+" clip-path="url(#p6325d8d2ae)" style="fill: #686d78"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 204.576623 357.12 
+L 248.992208 357.12 
+L 248.992208 354.888 
+L 204.576623 354.888 
+z
+" clip-path="url(#p6325d8d2ae)" style="fill: #686d78"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 278.602597 357.12 
+L 323.018182 357.12 
+L 323.018182 278.362286 
+L 278.602597 278.362286 
+z
+" clip-path="url(#p6325d8d2ae)" style="fill: #686d78"/>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 11.5px; font-family: 'Pretendard'; text-anchor: middle; fill: #25272c" x="78.732468" y="161.022857" transform="rotate(-0 78.732468 161.022857)">60.1%</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: middle; fill: #25272c" x="152.758442" y="352.656" transform="rotate(-0 152.758442 352.656)">0.0%</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: middle; fill: #25272c" x="226.784416" y="350.424" transform="rotate(-0 226.784416 350.424)">0.7%</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: middle; fill: #25272c" x="300.81039" y="273.898286" transform="rotate(-0 300.81039 273.898286)">24.7%</text>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'Pretendard'; text-anchor: start; fill: #25272c" x="43.2" y="95.136" transform="rotate(-0 43.2 95.136)">easy로 보낸 비율</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_8">
+    <path d="M 409.628571 357.12 
+L 702.771429 357.12 
+L 702.771429 107.136 
+L 409.628571 107.136 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_3">
+    <g id="xtick_5">
+     <g id="line2d_5"/>
+     <g id="text_10">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle" x="445.161039" y="372.897344" transform="rotate(-0 445.161039 372.897344)">재학습 안 함</text>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_6"/>
+     <g id="text_11">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle" x="519.187013" y="372.897344" transform="rotate(-0 519.187013 372.897344)">새 피드백만</text>
+     </g>
+    </g>
+    <g id="xtick_7">
+     <g id="line2d_7"/>
+     <g id="text_12">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle" x="593.212987" y="372.897344" transform="rotate(-0 593.212987 372.897344)">과거 데이터 섞기</text>
+     </g>
+    </g>
+    <g id="xtick_8">
+     <g id="line2d_8"/>
+     <g id="text_13">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle" x="667.238961" y="373.822031" transform="rotate(-0 667.238961 373.822031)">easy 보충</text>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_4"/>
+   <g id="patch_9">
+    <path d="M 409.628571 357.12 
+L 702.771429 357.12 
+" style="fill: none; stroke: #b8bdc8; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 422.953247 357.12 
+L 467.368831 357.12 
+L 467.368831 245.52 
+L 422.953247 245.52 
+z
+" clip-path="url(#p8f08436200)" style="fill: #4c43c4"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 496.979221 357.12 
+L 541.394805 357.12 
+L 541.394805 159.588 
+L 496.979221 159.588 
+z
+" clip-path="url(#p8f08436200)" style="fill: #686d78"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 571.005195 357.12 
+L 615.420779 357.12 
+L 615.420779 161.82 
+L 571.005195 161.82 
+z
+" clip-path="url(#p8f08436200)" style="fill: #686d78"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 645.031169 357.12 
+L 689.446753 357.12 
+L 689.446753 175.212 
+L 645.031169 175.212 
+z
+" clip-path="url(#p8f08436200)" style="fill: #686d78"/>
+   </g>
+   <g id="text_14">
+    <text style="font-weight: 700; font-size: 11.5px; font-family: 'Pretendard'; text-anchor: middle; fill: #25272c" x="445.161039" y="241.056" transform="rotate(-0 445.161039 241.056)">1.00</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: middle; fill: #25272c" x="519.187013" y="155.124" transform="rotate(-0 519.187013 155.124)">1.77</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: middle; fill: #25272c" x="593.212987" y="157.356" transform="rotate(-0 593.212987 157.356)">1.75</text>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: middle; fill: #25272c" x="667.238961" y="170.748" transform="rotate(-0 667.238961 170.748)">1.63</text>
+   </g>
+   <g id="text_18">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'Pretendard'; text-anchor: start; fill: #25272c" x="409.628571" y="95.136" transform="rotate(-0 409.628571 95.136)">질문당 비용 (재학습 안 함 = 1)</text>
+   </g>
+  </g>
+  <g id="axes_3">
+   <g id="patch_14">
+    <path d="M 776.057143 357.12 
+L 1069.2 357.12 
+L 1069.2 107.136 
+L 776.057143 107.136 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_5">
+    <g id="xtick_9">
+     <g id="line2d_9"/>
+     <g id="text_19">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle" x="811.58961" y="372.897344" transform="rotate(-0 811.58961 372.897344)">재학습 안 함</text>
+     </g>
+    </g>
+    <g id="xtick_10">
+     <g id="line2d_10"/>
+     <g id="text_20">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle" x="885.615584" y="372.897344" transform="rotate(-0 885.615584 372.897344)">새 피드백만</text>
+     </g>
+    </g>
+    <g id="xtick_11">
+     <g id="line2d_11"/>
+     <g id="text_21">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle" x="959.641558" y="372.897344" transform="rotate(-0 959.641558 372.897344)">과거 데이터 섞기</text>
+     </g>
+    </g>
+    <g id="xtick_12">
+     <g id="line2d_12"/>
+     <g id="text_22">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle" x="1033.667532" y="373.822031" transform="rotate(-0 1033.667532 373.822031)">easy 보충</text>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_6"/>
+   <g id="patch_15">
+    <path d="M 776.057143 357.12 
+L 1069.2 357.12 
+" style="fill: none; stroke: #b8bdc8; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 789.381818 357.12 
+L 833.797403 357.12 
+L 833.797403 224.9856 
+L 789.381818 224.9856 
+z
+" clip-path="url(#p54113fadc4)" style="fill: #4c43c4"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 863.407792 357.12 
+L 907.823377 357.12 
+L 907.823377 180.3456 
+L 863.407792 180.3456 
+z
+" clip-path="url(#p54113fadc4)" style="fill: #686d78"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 937.433766 357.12 
+L 981.849351 357.12 
+L 981.849351 181.2384 
+L 937.433766 181.2384 
+z
+" clip-path="url(#p54113fadc4)" style="fill: #686d78"/>
+   </g>
+   <g id="patch_19">
+    <path d="M 1011.45974 357.12 
+L 1055.875325 357.12 
+L 1055.875325 190.6128 
+L 1011.45974 190.6128 
+z
+" clip-path="url(#p54113fadc4)" style="fill: #686d78"/>
+   </g>
+   <g id="text_23">
+    <text style="font-weight: 700; font-size: 11.5px; font-family: 'Pretendard'; text-anchor: middle; fill: #25272c" x="811.58961" y="220.5216" transform="rotate(-0 811.58961 220.5216)">59.2%</text>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: middle; fill: #25272c" x="885.615584" y="175.8816" transform="rotate(-0 885.615584 175.8816)">79.2%</text>
+   </g>
+   <g id="text_25">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: middle; fill: #25272c" x="959.641558" y="176.7744" transform="rotate(-0 959.641558 176.7744)">78.8%</text>
+   </g>
+   <g id="text_26">
+    <text style="font-size: 11.5px; font-family: 'Pretendard'; text-anchor: middle; fill: #25272c" x="1033.667532" y="186.1488" transform="rotate(-0 1033.667532 186.1488)">74.6%</text>
+   </g>
+   <g id="text_27">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'Pretendard'; text-anchor: start; fill: #25272c" x="776.057143" y="95.136" transform="rotate(-0 776.057143 95.136)">첫 시도 해결률</text>
+   </g>
+  </g>
+  <g id="text_28">
+   <text style="font-weight: 700; font-size: 19px; font-family: 'Pretendard'; text-anchor: start; fill: #25272c" x="43.2" y="35.35925" transform="rotate(-0 43.2 35.35925)">피드백으로 재학습하면 easy가 사라지고 비용이 63~77% 늘었다</text>
+  </g>
+  <g id="text_29">
+   <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: start; fill: #686d78" x="43.2" y="57.588375" transform="rotate(-0 43.2 57.588375)">피드백 시뮬레이션 6구간 · 구간마다 다음 구간 질문으로 평가</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p6325d8d2ae">
+   <rect x="43.2" y="107.136" width="293.142857" height="249.984"/>
+  </clipPath>
+  <clipPath id="p8f08436200">
+   <rect x="409.628571" y="107.136" width="293.142857" height="249.984"/>
+  </clipPath>
+  <clipPath id="p54113fadc4">
+   <rect x="776.057143" y="107.136" width="293.142857" height="249.984"/>
+  </clipPath>
+ </defs>
+</svg>

@@ -1,0 +1,366 @@
+{
+  "experiment": "RF-06",
+  "experiment_version": "version-policy-efficiency-v1",
+  "smoke": false,
+  "data_manifest_sha256": "0bb63a772b6b74f16966c3a9d9a9e5fd9ae9619fe0c96b83dbec2148ed80f1b3",
+  "config": {
+    "experiment": "RF-06",
+    "experiment_version": "version-policy-efficiency-v1",
+    "plan_document": "docs/ml/VERSION_POLICY_EFFICIENCY_EXPERIMENT.md",
+    "inputs": {
+      "prepare_dir": "ml/artifacts/router-final-v1/prepare",
+      "a_train": "ml/artifacts/routing-objective-continual-v1/dataset/train.parquet",
+      "a_dev": "ml/artifacts/routing-objective-continual-v1/dataset/validation.parquet",
+      "a_test_routerbench": "ml/artifacts/frozen-evaluation-outcomes/continual-v1-20260924-28cbc342c510/test_routerbench.parquet",
+      "a_test_xroutebench": "ml/artifacts/frozen-evaluation-outcomes/continual-v1-20260924-28cbc342c510/test_xroutebench.parquet",
+      "llmrouterbench": "ml/artifacts/external-evaluation-v1/llmrouterbench.parquet",
+      "sprout": "ml/artifacts/external-evaluation-v1/sprout.parquet",
+      "non_english_exclusions": "experiments/results/router-final-inputs/non-english-eval-exclusions.csv",
+      "document_grounded_exclusions": "experiments/results/router-final-inputs/document-grounded-eval-exclusions.csv"
+    },
+    "objective_config": "ml/config/routing_objective_continual_v1.json",
+    "method": "ordinal",
+    "sample_weight": 1.0,
+    "plan_seed": 20261020,
+    "validation_rows_per_label": 16,
+    "pilot": {
+      "sizes": [
+        1000,
+        2000,
+        4000,
+        8000,
+        16000
+      ],
+      "seed": 42,
+      "gap_closure": 0.5,
+      "minimum_stream_gain": 0.03
+    },
+    "stream": {
+      "rounds": 9,
+      "fixed_logger": "M0",
+      "reserve_safety": 0.9
+    },
+    "version_policy": {
+      "cycle_size": 3,
+      "history_replay_per_label": 32,
+      "base_rehearsal_per_label": 32
+    },
+    "seeds": [
+      42
+    ],
+    "extra_seeds_near_boundary": [
+      43,
+      44
+    ],
+    "service_cost": {
+      "low": 0.2,
+      "medium": 0.6,
+      "high": 1.0
+    },
+    "judgement": {
+      "margin": 0.01,
+      "bootstrap_iterations": 2000,
+      "bootstrap_seed": 42,
+      "confidence": 0.95
+    }
+  },
+  "pilot_curve": {
+    "1000": 0.34705745541991206,
+    "2000": 0.36914205377737075,
+    "4000": 0.37876177425839014,
+    "8000": 0.4009798897409255,
+    "16000": 0.4020310240882789
+  },
+  "always_easy": 0.24859047292099884,
+  "selection": {
+    "n0": 1000,
+    "n_max": 16000,
+    "target": 0.32531074850463887,
+    "stream_rows": 15000,
+    "pilot_gain": 0.054973568668366835,
+    "ok": true,
+    "stream_rows_capped": 14644.544855750231,
+    "pilot_gain_capped": 0.05493949907273199
+  },
+  "pilot_receipts": {
+    "1000": {
+      "actual_rows": 999,
+      "optimizer_steps": 96,
+      "fit_seconds": 75.62470466199989
+    },
+    "2000": {
+      "actual_rows": 2001,
+      "optimizer_steps": 189,
+      "fit_seconds": 143.41072575300018
+    },
+    "4000": {
+      "actual_rows": 4000,
+      "optimizer_steps": 375,
+      "fit_seconds": 270.03443652099986
+    },
+    "8000": {
+      "actual_rows": 8000,
+      "optimizer_steps": 750,
+      "fit_seconds": 532.7489401229998
+    },
+    "16000": {
+      "actual_rows": 16000,
+      "optimizer_steps": 1500,
+      "fit_seconds": 1074.1020940479998
+    }
+  },
+  "label_ratio": {
+    "easy": 0.547791072907445,
+    "medium": 0.2617871319644744,
+    "hard": 0.19042179512808063
+  },
+  "batch_rows_per_probe_row_dev": 0.7614280068502174,
+  "fill_rows_per_probe_row_dev": {
+    "easy": 0.3244631800816757,
+    "medium": 0.0,
+    "hard": 0.0017125543406665787
+  },
+  "window_rows": 2137,
+  "window_capped": true,
+  "rows": {
+    "seed": 999,
+    "probe": 19233,
+    "reserve": 14785,
+    "reserve_left": {
+      "easy": 1295,
+      "hard": 2791,
+      "medium": 3560
+    },
+    "batches": 16043
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "window_rows": 2140,
+      "wrong": 961,
+      "fill": 814,
+      "batch_rows": 1775,
+      "wrong_by_label": {
+        "easy": 197,
+        "medium": 426,
+        "hard": 338
+      },
+      "batch_by_label": {
+        "easy": 972,
+        "medium": 465,
+        "hard": 338
+      },
+      "batch_by_source": {
+        "routerbench": 972,
+        "sprout": 444,
+        "llmrouterbench": 228,
+        "xroutebench": 131
+      }
+    },
+    {
+      "round": 2,
+      "window_rows": 2136,
+      "wrong": 977,
+      "fill": 798,
+      "batch_rows": 1775,
+      "wrong_by_label": {
+        "easy": 212,
+        "medium": 427,
+        "hard": 338
+      },
+      "batch_by_label": {
+        "easy": 972,
+        "medium": 465,
+        "hard": 338
+      },
+      "batch_by_source": {
+        "routerbench": 982,
+        "sprout": 432,
+        "llmrouterbench": 236,
+        "xroutebench": 125
+      }
+    },
+    {
+      "round": 3,
+      "window_rows": 2137,
+      "wrong": 962,
+      "fill": 860,
+      "batch_rows": 1822,
+      "wrong_by_label": {
+        "easy": 194,
+        "medium": 421,
+        "hard": 347
+      },
+      "batch_by_label": {
+        "easy": 998,
+        "medium": 477,
+        "hard": 347
+      },
+      "batch_by_source": {
+        "routerbench": 992,
+        "sprout": 463,
+        "llmrouterbench": 244,
+        "xroutebench": 123
+      }
+    },
+    {
+      "round": 4,
+      "window_rows": 2136,
+      "wrong": 971,
+      "fill": 714,
+      "batch_rows": 1685,
+      "wrong_by_label": {
+        "easy": 213,
+        "medium": 437,
+        "hard": 321
+      },
+      "batch_by_label": {
+        "easy": 923,
+        "medium": 441,
+        "hard": 321
+      },
+      "batch_by_source": {
+        "routerbench": 947,
+        "sprout": 386,
+        "llmrouterbench": 216,
+        "xroutebench": 136
+      }
+    },
+    {
+      "round": 5,
+      "window_rows": 2139,
+      "wrong": 992,
+      "fill": 742,
+      "batch_rows": 1734,
+      "wrong_by_label": {
+        "easy": 209,
+        "medium": 454,
+        "hard": 329
+      },
+      "batch_by_label": {
+        "easy": 950,
+        "medium": 454,
+        "hard": 330
+      },
+      "batch_by_source": {
+        "routerbench": 974,
+        "sprout": 421,
+        "llmrouterbench": 217,
+        "xroutebench": 122
+      }
+    },
+    {
+      "round": 6,
+      "window_rows": 2136,
+      "wrong": 998,
+      "fill": 729,
+      "batch_rows": 1727,
+      "wrong_by_label": {
+        "easy": 228,
+        "medium": 441,
+        "hard": 329
+      },
+      "batch_by_label": {
+        "easy": 946,
+        "medium": 452,
+        "hard": 329
+      },
+      "batch_by_source": {
+        "routerbench": 974,
+        "sprout": 403,
+        "llmrouterbench": 223,
+        "xroutebench": 127
+      }
+    },
+    {
+      "round": 7,
+      "window_rows": 2137,
+      "wrong": 991,
+      "fill": 789,
+      "batch_rows": 1780,
+      "wrong_by_label": {
+        "easy": 203,
+        "medium": 449,
+        "hard": 339
+      },
+      "batch_by_label": {
+        "easy": 975,
+        "medium": 466,
+        "hard": 339
+      },
+      "batch_by_source": {
+        "routerbench": 944,
+        "sprout": 490,
+        "llmrouterbench": 211,
+        "xroutebench": 135
+      }
+    },
+    {
+      "round": 8,
+      "window_rows": 2136,
+      "wrong": 1043,
+      "fill": 885,
+      "batch_rows": 1928,
+      "wrong_by_label": {
+        "easy": 236,
+        "medium": 440,
+        "hard": 367
+      },
+      "batch_by_label": {
+        "easy": 1056,
+        "medium": 505,
+        "hard": 367
+      },
+      "batch_by_source": {
+        "routerbench": 1068,
+        "sprout": 499,
+        "llmrouterbench": 231,
+        "xroutebench": 130
+      }
+    },
+    {
+      "round": 9,
+      "window_rows": 2136,
+      "wrong": 1009,
+      "fill": 808,
+      "batch_rows": 1817,
+      "wrong_by_label": {
+        "easy": 208,
+        "medium": 455,
+        "hard": 346
+      },
+      "batch_by_label": {
+        "easy": 995,
+        "medium": 476,
+        "hard": 346
+      },
+      "batch_by_source": {
+        "routerbench": 1004,
+        "sprout": 445,
+        "llmrouterbench": 234,
+        "xroutebench": 134
+      }
+    }
+  ],
+  "m0_model_sha256": "b9126bc0401b76ea5afc70b86f72ebacf5963b73935cf3e83a364e48ad174eab",
+  "versions": {
+    "1": "1.1",
+    "2": "1.2",
+    "3": "2.0",
+    "4": "2.1",
+    "5": "2.2",
+    "6": "3.0",
+    "7": "3.1",
+    "8": "3.2",
+    "9": "4.0"
+  },
+  "files": {
+    "batches.parquet": "f24070900b33a540b481939f1f5a549402f2afb38c1f7b069a9228efe01638dc",
+    "m0-dev-scores.parquet": "2c0fd9c5424c5c41f2819254c27c963fd1cd35acd6d284c670ba58f573220a68",
+    "m0-probe-scores.parquet": "b3e6a1d0d243cebfe300c57804cf1d1382fb62cc5f2d4ae5fa0ecce88c40a045",
+    "m0-test-scores.parquet": "5c2bfa6fdaf71fddbebd33c8b93ad2192a6e690fe9ee6e5a9546e31be8da60fa",
+    "probe.parquet": "902126dbb773fa37362c469c1943ce3c6ad52516b9d0e1d2c8be1e77254d468c",
+    "seed.parquet": "0b8b6170cfd98b17a29057eed60e23908bc2000c1c3bd4d1c53b14fd9b276a27",
+    "validation.parquet": "8594dc57d32165c26590a07790d1e41b7a25151bf24fb7f2e21a7b3a89362a00"
+  }
+}

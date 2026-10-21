@@ -1,0 +1,304 @@
+{
+  "verified_file_hashes": 64,
+  "code_archive_sha256": "420c6228e3508448ae336936dd64cb48fdcf347060154e0d1b2693cd9762b2dc",
+  "plan_sha256": "498896aefc39aa3f31a80cc9afd96bc39c0ebf7b7bbc9f8c8a778a8961cbdd39",
+  "split_overlap": {
+    "pool-dev": {
+      "sample_id": 0,
+      "group_id": 0,
+      "exact_normalized_text": 0
+    },
+    "pool-test": {
+      "sample_id": 0,
+      "group_id": 0,
+      "exact_normalized_text": 0
+    },
+    "dev-test": {
+      "sample_id": 0,
+      "group_id": 0,
+      "exact_normalized_text": 0
+    }
+  },
+  "training_receipts": [
+    {
+      "arm": "p1",
+      "round": 1,
+      "anchor_round": 0,
+      "rows": 1871,
+      "verified": true
+    },
+    {
+      "arm": "p1",
+      "round": 2,
+      "anchor_round": 0,
+      "rows": 3646,
+      "verified": true
+    },
+    {
+      "arm": "p1",
+      "round": 3,
+      "anchor_round": 0,
+      "rows": 5468,
+      "verified": true
+    },
+    {
+      "arm": "p1",
+      "round": 4,
+      "anchor_round": 3,
+      "rows": 1877,
+      "verified": true
+    },
+    {
+      "arm": "p1",
+      "round": 5,
+      "anchor_round": 3,
+      "rows": 3611,
+      "verified": true
+    },
+    {
+      "arm": "p1",
+      "round": 6,
+      "anchor_round": 3,
+      "rows": 5338,
+      "verified": true
+    },
+    {
+      "arm": "p1",
+      "round": 7,
+      "anchor_round": 6,
+      "rows": 1972,
+      "verified": true
+    },
+    {
+      "arm": "p1",
+      "round": 8,
+      "anchor_round": 6,
+      "rows": 3900,
+      "verified": true
+    },
+    {
+      "arm": "p1",
+      "round": 9,
+      "anchor_round": 6,
+      "rows": 5717,
+      "verified": true
+    },
+    {
+      "arm": "p2",
+      "round": 1,
+      "anchor_round": 0,
+      "rows": 2774,
+      "verified": true
+    },
+    {
+      "arm": "p2",
+      "round": 2,
+      "anchor_round": 0,
+      "rows": 4549,
+      "verified": true
+    },
+    {
+      "arm": "p2",
+      "round": 3,
+      "anchor_round": 0,
+      "rows": 6371,
+      "verified": true
+    },
+    {
+      "arm": "p2",
+      "round": 4,
+      "anchor_round": 0,
+      "rows": 8056,
+      "verified": true
+    },
+    {
+      "arm": "p2",
+      "round": 5,
+      "anchor_round": 0,
+      "rows": 9790,
+      "verified": true
+    },
+    {
+      "arm": "p2",
+      "round": 6,
+      "anchor_round": 0,
+      "rows": 11517,
+      "verified": true
+    },
+    {
+      "arm": "p2",
+      "round": 7,
+      "anchor_round": 0,
+      "rows": 13297,
+      "verified": true
+    },
+    {
+      "arm": "p2",
+      "round": 8,
+      "anchor_round": 0,
+      "rows": 15225,
+      "verified": true
+    },
+    {
+      "arm": "p2",
+      "round": 9,
+      "anchor_round": 0,
+      "rows": 17042,
+      "verified": true
+    }
+  ],
+  "model_weights_rehashed": false,
+  "weight_chain_check": "Receipt SHA chain only; model weights were not downloaded.",
+  "source": "Google Drive MyDrive/LLM_Router/version-policy/runs/run001",
+  "seed": 42,
+  "bootstrap_intervals_reproduced": {
+    "p1-p2": [
+      0.002583805110699335,
+      0.01987913871706591
+    ],
+    "p1-p0": [
+      0.06247973559707268,
+      0.08412531565896213
+    ],
+    "p2-p0": [
+      0.05155397064163295,
+      0.07332015865458204
+    ]
+  },
+  "metrics": {
+    "p0": {
+      "source_macro_f1": 0.3442460387089061,
+      "accuracy": 0.6027629939984147,
+      "class_f1": {
+        "easy": 0.7524435061380874,
+        "medium": 0.24466137888956682,
+        "hard": 0.13855799373040753
+      },
+      "class_recall": {
+        "easy": 0.8813885326982964,
+        "medium": 0.18888365520489872,
+        "hard": 0.08847077662129704
+      },
+      "predicted_share": {
+        "easy": 0.8300305741139169,
+        "medium": 0.1307892650888914,
+        "hard": 0.039180160797191714
+      },
+      "confusion_rows_true_columns_pred": [
+        [
+          9623,
+          1013,
+          282
+        ],
+        [
+          3255,
+          802,
+          189
+        ],
+        [
+          1782,
+          495,
+          221
+        ]
+      ]
+    },
+    "p1": {
+      "source_macro_f1": 0.4180427272837096,
+      "accuracy": 0.5873060808515457,
+      "class_f1": {
+        "easy": 0.7392068935197398,
+        "medium": 0.35085995085995086,
+        "hard": 0.24245155475439387
+      },
+      "class_recall": {
+        "easy": 0.7700128228613299,
+        "medium": 0.3363165332077249,
+        "hard": 0.2153722978382706
+      },
+      "predicted_share": {
+        "easy": 0.6696863322387046,
+        "medium": 0.22047333257841695,
+        "hard": 0.1098403351828785
+      },
+      "confusion_rows_true_columns_pred": [
+        [
+          8407,
+          1770,
+          741
+        ],
+        [
+          2157,
+          1428,
+          661
+        ],
+        [
+          1264,
+          696,
+          538
+        ]
+      ]
+    },
+    "p2": {
+      "source_macro_f1": 0.4068760967369806,
+      "accuracy": 0.6113690408787227,
+      "class_f1": {
+        "easy": 0.7561168113654302,
+        "medium": 0.3508166246182446,
+        "hard": 0.2021505376344086
+      },
+      "class_recall": {
+        "easy": 0.833577578311046,
+        "medium": 0.31111634479510125,
+        "hard": 0.15052041633306645
+      },
+      "predicted_share": {
+        "easy": 0.7448193862529725,
+        "medium": 0.1859925263277092,
+        "hard": 0.06918808741931831
+      },
+      "confusion_rows_true_columns_pred": [
+        [
+          9101,
+          1371,
+          446
+        ],
+        [
+          2525,
+          1321,
+          400
+        ],
+        [
+          1529,
+          593,
+          376
+        ]
+      ]
+    }
+  },
+  "compute": {
+    "p1": {
+      "optimizer_steps": 3138,
+      "fit_seconds": 2195.2203618720005,
+      "score_seconds": 1183.233758687973,
+      "planned_samples": 100200,
+      "tokens": 10127718
+    },
+    "p2": {
+      "optimizer_steps": 8319,
+      "fit_seconds": 6094.433506382,
+      "score_seconds": 1416.5324852466583,
+      "planned_samples": 265863,
+      "tokens": 26863947
+    },
+    "fit_saving_pct": 63.97991118332493,
+    "step_saving_pct": 62.27912008654886,
+    "pilot_fit_seconds": 2095.9209011069997
+  },
+  "prequential_window_mean": {
+    "p0": 0.3422476223602035,
+    "p1": 0.37332314811241296,
+    "p2": 0.3833794322209637
+  },
+  "actual_total_unique_training_rows": 17042,
+  "pilot_largest_training_rows": 16000
+}
