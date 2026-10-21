@@ -18,6 +18,7 @@
 | `09_seeds` | 구현 | H5만 seed 17·73 추가(R1-집단·R1-집단-A 재학습). Colab T4. 아래 참고 |
 | `10_report` | 구현 | 08·09·08a 출력으로 표·그림·결과 정리. CPU. 아래 참고 |
 | `11_gain` | 구현 | 효용 U 대신 첫 시도 이득 G로 재평가(학습 없음). CPU. 아래 참고 |
+| `11b_gain_tasks` | 구현 | 11_gain의 G를 과제 유형별로(08의 U 과제 유형 표와 같은 방식, 기술 통계). CPU |
 
 ## 00_prepare
 
@@ -213,3 +214,7 @@ python ml/notebooks/router_final/length_inputs.py --run-dir <run001> --repo . --
 python ml/notebooks/router_final/gain_eval.py lock --run-dir <run001> --repo . --output-dir <run001>/gain-lock
 python ml/notebooks/router_final/gain_eval.py test --run-dir <run001> --repo . --data-root <원본 데이터 checkout> --output-dir <run001>/gain-test
 ```
+
+## 11b_gain_tasks (과제 유형별 G)
+
+`gain_tasks.py`가 본체다. 11_gain의 gain lock만 쓰고 아무것도 고르지 않는다(τ = .8 규칙과 한 번에 고르기 세 수준, 기본 가격 1:3:5). 08의 `by_category`처럼 원천 × 과제 유형 칸마다 고정 시작 기준선을 다시 만들고 30문항 미만 칸은 빼며, 원천을 합칠 때는 행 수로 가중 평균한다. 구간은 칸 안 질문 묶음 bootstrap(10,000회, stream 1000 + 10 × 원천 + 과제)을 같은 가중치로 합친 것이고, 주요 라우터 쌍 차이도 낸다. 기술 통계로만 쓴다. 노트북은 11_gain과 같은 기반 소스 묶음에 Drive `code/gain_eval.py`와 `code/gain_tasks.py`(둘 다 SHA-256 확인)를 더한다. 출력 `<run>/gain-test-tasks/`: `by-task.parquet`, `by-task-pairs.parquet`, `by-task-summary.md`, `manifest.json`.

@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "notebooks/router_final"))
 import common_track as C  # noqa: E402
 import gain_eval as G  # noqa: E402
+import gain_tasks as GT  # noqa: E402
 import lock as L  # noqa: E402
 import test_eval as T  # noqa: E402
 
@@ -153,6 +154,8 @@ class PipelineTest(unittest.TestCase):
             length = pd.Series(rng.uniform(50, 150, len(ids)), index=ids.to_numpy())
             frame = test.assign(needed=test.needed_tier.map({t: k for k, t in enumerate(L.TIERS)}),
                                 group_id=test.source_dataset + ":" + (test.index // 2).astype(str))
+            pos = frame.groupby("source_dataset").cumcount()
+            frame["task_type"] = np.where(pos < 40, "수학", np.where(pos < 80, "코드", "독해"))  # 독해: 10 rows, left out
             best = frame[[f"p_{t}" for t in L.TIERS]].max(axis=1)
             frame["stratum"] = np.where(best >= 0.8, "solvable", np.where(best > 0, "beyond_partial", "beyond_zero"))
             truth = {"frame": frame, "counts": {"evaluated": frame.groupby("source_dataset").size().to_dict()},
@@ -172,6 +175,21 @@ class PipelineTest(unittest.TestCase):
                 man = G.evaluate(run, repo, repo, run / "gain-test", rehearse=False, iterations=200)
                 with self.assertRaises(SystemExit):  # opened once
                     G.evaluate(run, repo, repo, run / "gain-test", rehearse=False, iterations=200)
+                tman = GT.evaluate(run, repo, repo, run / "gain-test-tasks", rehearse=False, iterations=200)
+            tasks = pd.read_parquet(run / "gain-test-tasks" / "by-task.parquet")
+            done = tasks[tasks.method.notna()]
+            self.assertEqual(set(done.task_type), {"수학", "코드"})
+            self.assertEqual(set(tasks[tasks.method.isna()].task_type), {"독해"})
+            self.assertNotIn("r1_bge", set(done.method))
+            self.assertTrue((done.G_lo <= done.G + 1e-6).all() and (done.G <= done.G_hi + 1e-6).all())
+            pooled = done[done.source.eq("all")].set_index(["task_type", "method", "rule", "param"])
+            per = done[done.source.ne("all")]
+            for key, part in per.groupby(["task_type", "method", "rule", "param"]):
+                self.assertAlmostEqual(pooled.loc[key, "G"], np.average(part.G, weights=part.rows), places=9)
+            self.assertEqual(pooled.loc[("수학", "knn", "tau", L.TAU), "rows"], 40 * len(L.SOURCES))
+            self.assertTrue(len(pd.read_parquet(run / "gain-test-tasks" / "by-task-pairs.parquet")))
+            self.assertIn("| 수학 (", (run / "gain-test-tasks" / "by-task-summary.md").read_text())
+            self.assertEqual(tman["omitted"], ["r1_bge"])
             out = run / "gain-test"
             macro = pd.read_parquet(out / "gain-macro.parquet")
             main = macro[macro.basis.eq("main") & macro.scope.eq("macro") & macro.rule.eq("tau")
