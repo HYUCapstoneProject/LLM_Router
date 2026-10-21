@@ -552,7 +552,7 @@ class RetrainingEffectContracts(unittest.TestCase):
 
     def test_notebook_code_and_clean_outputs(self):
         notebooks = sorted(HELPER.parent.glob("*.ipynb"))
-        self.assertEqual(len(notebooks), 13)
+        self.assertEqual(len(notebooks), 15)
         for path in notebooks:
             notebook = experiment.read(path)
             self.assertEqual(notebook["nbformat"], 4)
