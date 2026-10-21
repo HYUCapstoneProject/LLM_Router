@@ -4,7 +4,7 @@
 
 - `g-focus.csv`: 08 U 그림과 같은 6개 라우터의 G 점추정(by-task-summary.md에서 옮김)
 - `task-types-u-vs-g.png`: U(08 `report/tables/task_types.csv`)와 G 나란히
-- `task-types-g.png`: G만 그린 그림(보고서용)
+- `g-all.csv`, `task-types-g.png`: 라우터 15종 전체의 G(11_gain 순위 순서, 보고서용 그림)
 
 ## 전체 라우터 G (τ = .8)
 
