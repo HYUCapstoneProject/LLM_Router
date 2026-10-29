@@ -1,0 +1,3185 @@
+{
+  "experiment": "EV-10 R2/R3 model-group extension, frozen baseline G",
+  "test_outcomes_read": false,
+  "missing_scores": [],
+  "base_lock_sha256": "1d4672066b2b0669edc34f0ec2d313ca2b6f26406c985aaf2decdc1fe5ed140d",
+  "inputs": {
+    "prepare_manifest": "e0e1e5ca6dd32e7fba5ff512e9759e4ae7a31af838fb674ac8bf119aa05d1193",
+    "ours_data_manifest": "de7fda1a6443cf4c05073681034e3c974158f2e45aa4cfd431f3b5d1160f28dc",
+    "dev_rows": {
+      "llmrouterbench": 1150,
+      "routerbench": 3101,
+      "sprout": 2961,
+      "xroutebench": 379
+    }
+  },
+  "exclusions": {
+    "non_english": {
+      "file": "experiments/results/router-final-inputs/non-english-eval-exclusions.csv",
+      "sha256": "6fa51e57ff2bc03938be454ebb8bf5864a6db21b2400f821b9164418fc996ca3",
+      "rows": 246,
+      "by_source_role": {
+        "llmrouterbench/test": 246
+      }
+    },
+    "document_grounded": {
+      "file": "experiments/results/router-final-inputs/document-grounded-eval-exclusions.csv",
+      "sha256": "870aab5c6356e7418cb5cb6f0bae39c40dee87ba0f5fd203291e51acbc108315",
+      "rows": 180,
+      "by_source_role": {
+        "xroutebench/dev": 80,
+        "xroutebench/test": 100
+      }
+    }
+  },
+  "evaluation": {
+    "metric": "G = A - H(C); A = expected first-attempt success (group pass probability of the start tier), C = mean first-attempt price, H = best fixed start tier or mixture with first-attempt cost <= C",
+    "service_cost": [
+      0.2,
+      0.6,
+      1.0
+    ],
+    "tau": 0.8,
+    "tau_curve": [
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.8,
+      0.85,
+      0.9,
+      0.95
+    ],
+    "cost_levels": {
+      "fractions": [
+        0.25,
+        0.5,
+        0.75
+      ],
+      "targets": {
+        "routerbench": [
+          0.40000000000000097,
+          0.6000000000000006,
+          0.8000000000000003
+        ],
+        "xroutebench": [
+          0.4000000000000011,
+          0.6000000000000008,
+          0.8000000000000004
+        ],
+        "llmrouterbench": [
+          0.399999999999997,
+          0.5999999999999981,
+          0.799999999999999
+        ],
+        "sprout": [
+          0.3999999999999994,
+          0.5999999999999996,
+          0.7999999999999998
+        ]
+      },
+      "definition": "fraction of each source's range between the cheapest and the dearest fixed start tier, first attempt only (dev)"
+    },
+    "selection": "07b adapters (5-fold cross-fitted on dev); setting score = dev G of the tau rule (tau = .8), mean over the four sources",
+    "lambda": "one-shot rule argmax(p_hat - lambda x price); per source and level the lambda whose dev first-attempt cost is closest to the target (07b grid)",
+    "lambda_grid": [
+      0.0,
+      0.001,
+      100.0,
+      241
+    ]
+  },
+  "methods": {
+    "avengers_pro": {
+      "selected_setting": "n_clusters=64,performance_weight=0.7",
+      "selected_setting_07b": "n_clusters=25,performance_weight=0.45",
+      "changed_from_07b": true,
+      "kind": "per_tier",
+      "dev_mean_G": 0.003874861229110904,
+      "settings_tried": 4,
+      "scores_file": "common/avengers_pro/n_clusters=64,performance_weight=0.7/scores.parquet",
+      "scores_sha256": "a1dff14f591af0b6638b67bfd9bdf13aa1e50e383ecd2cda4d04a4570720e42d",
+      "calibrated_file": "calibrated/avengers_pro.parquet",
+      "calibrated_sha256": "9e31e6acf45385cd9dae43e4503a5c85874a3b5511aa9caba643a52e8d95fc68",
+      "max_diff_vs_07b_calibration": null,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.45384103992113345,
+            "dev_A": 0.6189938729442116,
+            "dev_C": 0.3531118993872944,
+            "dev_H": 0.6194606373140544,
+            "dev_G": -0.00046676436984283143,
+            "dev_start_low": 0.6326991293131248,
+            "dev_start_medium": 0.35182199290551436,
+            "dev_start_high": 0.015478877781360851
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.4121570771415609,
+            "dev_A": 0.7473395678813286,
+            "dev_C": 0.6439858110287005,
+            "dev_H": 0.7426967260771805,
+            "dev_G": 0.00464284180414809,
+            "dev_start_low": 0.26088358594001937,
+            "dev_start_medium": 0.36826830054821025,
+            "dev_start_high": 0.3708481135117704
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.3743016635679198,
+            "dev_A": 0.8207029990325702,
+            "dev_C": 0.8083198968074813,
+            "dev_H": 0.8078792238223866,
+            "dev_G": 0.012823775210183519,
+            "dev_start_low": 0.06223798774588842,
+            "dev_start_medium": 0.3547242824895195,
+            "dev_start_high": 0.5830377297645921
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.3743016635679198,
+            "dev_A": 0.7269129287598944,
+            "dev_C": 0.39736147757255935,
+            "dev_H": 0.734271551994208,
+            "dev_G": -0.007358623234313577,
+            "dev_start_low": 0.5065963060686016,
+            "dev_start_medium": 0.49340369393139843,
+            "dev_start_high": 0.0
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.0,
+            "dev_A": 0.741424802110818,
+            "dev_C": 0.5271767810026384,
+            "dev_H": 0.7616731991562303,
+            "dev_G": -0.02024839704541237,
+            "dev_start_low": 0.35092348284960423,
+            "dev_start_medium": 0.48021108179419525,
+            "dev_start_high": 0.16886543535620052
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.741424802110818,
+            "dev_C": 0.5271767810026384,
+            "dev_H": 0.7616731991562303,
+            "dev_G": -0.02024839704541237,
+            "dev_start_low": 0.35092348284960423,
+            "dev_start_medium": 0.48021108179419525,
+            "dev_start_high": 0.16886543535620052
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.23121538919078338,
+            "dev_A": 0.45246376811594197,
+            "dev_C": 0.4013913043478261,
+            "dev_H": 0.4611901701323241,
+            "dev_G": -0.00872640201638214,
+            "dev_start_low": 0.548695652173913,
+            "dev_start_medium": 0.3991304347826087,
+            "dev_start_high": 0.05217391304347826
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.18172481103893612,
+            "dev_A": 0.48695652173913045,
+            "dev_C": 0.5860869565217391,
+            "dev_H": 0.5037504725897892,
+            "dev_G": -0.016793950850658768,
+            "dev_start_low": 0.24347826086956523,
+            "dev_start_medium": 0.5478260869565217,
+            "dev_start_high": 0.20869565217391303
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.08822805282869021,
+            "dev_A": 0.5244927536231885,
+            "dev_C": 0.8146086956521739,
+            "dev_H": 0.5342491493383735,
+            "dev_G": -0.009756395715185051,
+            "dev_start_low": 0.08521739130434783,
+            "dev_start_medium": 0.29304347826086957,
+            "dev_start_high": 0.6217391304347826
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.30870221735358805,
+            "dev_A": 0.855409208600698,
+            "dev_C": 0.41087470449172575,
+            "dev_H": 0.8418391546101454,
+            "dev_G": 0.013570053990552666,
+            "dev_start_low": 0.4728132387706856,
+            "dev_start_medium": 0.5271867612293144,
+            "dev_start_high": 0.0
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.11779577318070593,
+            "dev_A": 0.8946639648767308,
+            "dev_C": 0.6152651131374536,
+            "dev_H": 0.882297390562284,
+            "dev_G": 0.012366574314446876,
+            "dev_start_low": 0.3302938196555218,
+            "dev_start_medium": 0.3012495778453225,
+            "dev_start_high": 0.3684566024991557
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.00873821234428559,
+            "dev_A": 0.9083755488010806,
+            "dev_C": 0.799662276258021,
+            "dev_H": 0.9014003388186939,
+            "dev_G": 0.006975209982386765,
+            "dev_start_low": 0.20972644376899696,
+            "dev_start_medium": 0.08139142181695373,
+            "dev_start_high": 0.7088821344140493
+          }
+        ]
+      }
+    },
+    "graphrouter": {
+      "selected_setting": "impl=official,label=success,epochs=100,checkpoint=last",
+      "selected_setting_07b": "impl=official,label=success,epochs=1000,checkpoint=last",
+      "changed_from_07b": true,
+      "kind": "per_tier",
+      "dev_mean_G": 0.01923808258434359,
+      "settings_tried": 4,
+      "scores_file": "common/graphrouter/impl=official,label=success,epochs=100,checkpoint=last/scores.parquet",
+      "scores_sha256": "82041755ee52a64db21058092ed3ae066134c0cf70651ca1d4859ba5cc456042",
+      "calibrated_file": "calibrated/graphrouter.parquet",
+      "calibrated_sha256": "730a51350614734480e83b3ab82431b593d73e6c1da451debc09bb3693b1d50b",
+      "max_diff_vs_07b_calibration": null,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.49974075647365795,
+            "dev_A": 0.6514027732989358,
+            "dev_C": 0.38523057078361816,
+            "dev_H": 0.6332231928180431,
+            "dev_G": 0.018179580480892743,
+            "dev_start_low": 0.6291518864882296,
+            "dev_start_medium": 0.2786198000644953,
+            "dev_start_high": 0.09222831344727507
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.45384103992113345,
+            "dev_A": 0.7692679780715899,
+            "dev_C": 0.6344405030635277,
+            "dev_H": 0.7389106155331104,
+            "dev_G": 0.030357362538479427,
+            "dev_start_low": 0.27249274427604,
+            "dev_start_medium": 0.3689132537891003,
+            "dev_start_high": 0.35859400193485974
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.33992315823220004,
+            "dev_A": 0.8382779748468236,
+            "dev_C": 0.7972267010641728,
+            "dev_H": 0.8034791494063053,
+            "dev_G": 0.03479882544051838,
+            "dev_start_low": 0.0709448564979039,
+            "dev_start_medium": 0.3650435343437601,
+            "dev_start_high": 0.564011609158336
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.16503392239477968,
+            "dev_A": 0.7434036939313984,
+            "dev_C": 0.4121372031662269,
+            "dev_H": 0.7373904386630561,
+            "dev_G": 0.006013255268342288,
+            "dev_start_low": 0.49340369393139843,
+            "dev_start_medium": 0.48284960422163586,
+            "dev_start_high": 0.023746701846965697
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.10194553300259765,
+            "dev_A": 0.7697889182058048,
+            "dev_C": 0.6042216358839049,
+            "dev_H": 0.7770448548812665,
+            "dev_G": -0.0072559366754617605,
+            "dev_start_low": 0.06068601583113457,
+            "dev_start_medium": 0.8680738786279684,
+            "dev_start_high": 0.0712401055408971
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.7889182058047494,
+            "dev_C": 0.7287598944591028,
+            "dev_H": 0.7770448548812665,
+            "dev_G": 0.01187335092348285,
+            "dev_start_low": 0.010554089709762533,
+            "dev_start_medium": 0.6569920844327177,
+            "dev_start_high": 0.3324538258575198
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.25459961382653484,
+            "dev_A": 0.4571014492753623,
+            "dev_C": 0.3996521739130435,
+            "dev_H": 0.46078941398865686,
+            "dev_G": -0.003687964713294578,
+            "dev_start_low": 0.5191304347826087,
+            "dev_start_medium": 0.46260869565217394,
+            "dev_start_high": 0.018260869565217393
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.17317840039163607,
+            "dev_A": 0.495072463768116,
+            "dev_C": 0.602086956521739,
+            "dev_H": 0.5072219281663499,
+            "dev_G": -0.012149464398233945,
+            "dev_start_low": 0.2,
+            "dev_start_medium": 0.5947826086956521,
+            "dev_start_high": 0.20521739130434782
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.08822805282869021,
+            "dev_A": 0.520144927536232,
+            "dev_C": 0.8027826086956522,
+            "dev_H": 0.5327451795841202,
+            "dev_G": -0.012600252047888172,
+            "dev_start_low": 0.07652173913043478,
+            "dev_start_medium": 0.34,
+            "dev_start_high": 0.5834782608695652
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.25459961382653484,
+            "dev_A": 0.87123719464145,
+            "dev_C": 0.4066869300911855,
+            "dev_H": 0.8409783107448535,
+            "dev_G": 0.030258883896596478,
+            "dev_start_low": 0.5309017223910841,
+            "dev_start_medium": 0.4214792299898683,
+            "dev_start_high": 0.047619047619047616
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.11225590746637126,
+            "dev_A": 0.9075424969041991,
+            "dev_C": 0.6059439378588315,
+            "dev_H": 0.8813317470240478,
+            "dev_G": 0.026210749880151263,
+            "dev_start_low": 0.39209726443769,
+            "dev_start_medium": 0.20094562647754138,
+            "dev_start_high": 0.4069571090847687
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.020796566148655812,
+            "dev_A": 0.918743667679838,
+            "dev_C": 0.793583248902398,
+            "dev_H": 0.9007705712937573,
+            "dev_G": 0.01797309638608069,
+            "dev_start_low": 0.21411685241472475,
+            "dev_start_medium": 0.0878081729145559,
+            "dev_start_high": 0.6980749746707193
+          }
+        ]
+      }
+    },
+    "hybrid_llm": {
+      "selected_setting": "router_mode=deterministic",
+      "selected_setting_07b": "router_mode=probabilistic",
+      "changed_from_07b": true,
+      "kind": "single",
+      "dev_mean_G": 0.006636472544638977,
+      "settings_tried": 3,
+      "scores_file": "common/hybrid_llm/router_mode=deterministic/scores.parquet",
+      "scores_sha256": "df8120de0d7bb367d68e58d6c1d72e55eb3df4e53ec5321da7e3941f17790eb7",
+      "calibrated_file": "calibrated/hybrid_llm.parquet",
+      "calibrated_sha256": "050b79c233b1dc1230bbe424738ca8b5de2bb973fac1d9b4e0d06b7ef79ab6f5",
+      "max_diff_vs_07b_calibration": null,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.4762382435388603,
+            "dev_A": 0.6520477265398259,
+            "dev_C": 0.4069009996775234,
+            "dev_H": 0.6425087724351921,
+            "dev_G": 0.00953895410463379,
+            "dev_start_low": 0.7117059013221542,
+            "dev_start_medium": 0.05933569816188326,
+            "dev_start_high": 0.22895840051596258
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.4324971635754168,
+            "dev_A": 0.7220251531763947,
+            "dev_C": 0.5620767494356659,
+            "dev_H": 0.709000155050848,
+            "dev_G": 0.013024998125546694,
+            "dev_start_low": 0.45985166075459527,
+            "dev_start_medium": 0.17510480490164462,
+            "dev_start_high": 0.3650435343437601
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.3743016635679198,
+            "dev_A": 0.8210254756530152,
+            "dev_C": 0.8056110931957432,
+            "dev_H": 0.8068047870463667,
+            "dev_G": 0.01422068860664849,
+            "dev_start_low": 0.048049016446307644,
+            "dev_start_medium": 0.38987423411802646,
+            "dev_start_high": 0.5620767494356659
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.2001037512041927,
+            "dev_A": 0.7321899736147758,
+            "dev_C": 0.43641160949868085,
+            "dev_H": 0.7425143239047352,
+            "dev_G": -0.010324350289959372,
+            "dev_start_low": 0.40897097625329815,
+            "dev_start_medium": 0.5910290237467019,
+            "dev_start_high": 0.0
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.08822805282869021,
+            "dev_A": 0.7744063324538258,
+            "dev_C": 0.5957783641160949,
+            "dev_H": 0.7761537444044535,
+            "dev_G": -0.0017474119506276642,
+            "dev_start_low": 0.010554089709762533,
+            "dev_start_medium": 0.9894459102902374,
+            "dev_start_high": 0.0
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.7671503957783641,
+            "dev_C": 0.6907651715039577,
+            "dev_H": 0.7770448548812665,
+            "dev_G": -0.009894459102902431,
+            "dev_start_low": 0.0,
+            "dev_start_medium": 0.7730870712401056,
+            "dev_start_high": 0.22691292875989447
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.23121538919078338,
+            "dev_A": 0.4434782608695652,
+            "dev_C": 0.3721739130434783,
+            "dev_H": 0.4544574669187138,
+            "dev_G": -0.010979206049148593,
+            "dev_start_low": 0.5991304347826087,
+            "dev_start_medium": 0.37130434782608696,
+            "dev_start_high": 0.029565217391304348
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.18172481103893612,
+            "dev_A": 0.4992753623188406,
+            "dev_C": 0.6003478260869565,
+            "dev_H": 0.5070007561436657,
+            "dev_G": -0.007725393824825066,
+            "dev_start_low": 0.16,
+            "dev_start_medium": 0.6791304347826087,
+            "dev_start_high": 0.1608695652173913
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.10697657836811518,
+            "dev_A": 0.5207246376811595,
+            "dev_C": 0.7951304347826086,
+            "dev_H": 0.5317720226843091,
+            "dev_G": -0.011047385003149612,
+            "dev_start_low": 0.03826086956521739,
+            "dev_start_medium": 0.4356521739130435,
+            "dev_start_high": 0.5260869565217391
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.18172481103893612,
+            "dev_A": 0.8701114488348531,
+            "dev_C": 0.40006754474839595,
+            "dev_H": 0.8396176220545536,
+            "dev_G": 0.03049382678029955,
+            "dev_start_low": 0.6399864910503208,
+            "dev_start_medium": 0.2198581560283688,
+            "dev_start_high": 0.14015535292131037
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.07635635497382513,
+            "dev_A": 0.896375098502758,
+            "dev_C": 0.5989192840256671,
+            "dev_H": 0.8804938210774425,
+            "dev_G": 0.015881277425315532,
+            "dev_start_low": 0.46538331644714626,
+            "dev_start_medium": 0.07193515704154002,
+            "dev_start_high": 0.4626815265113137
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.05450064896286243,
+            "dev_A": 0.913272543059777,
+            "dev_C": 0.8188449848024316,
+            "dev_H": 0.9033876052307159,
+            "dev_G": 0.00988493782906108,
+            "dev_start_low": 0.0016886187098953055,
+            "dev_start_medium": 0.4495103005741304,
+            "dev_start_high": 0.5488010807159743
+          }
+        ]
+      }
+    },
+    "irt_router": {
+      "selected_setting": "lamda=0.3",
+      "selected_setting_07b": "lamda=0.0",
+      "changed_from_07b": true,
+      "kind": "per_tier",
+      "dev_mean_G": 0.01716600654432368,
+      "settings_tried": 3,
+      "scores_file": "common/irt_router/lamda=0.3/scores.parquet",
+      "scores_sha256": "0e2e5265487ce9ff5f98f97d658e1ef1e0e25a473d5a8d76f34c2cce8ee0eba4",
+      "calibrated_file": "calibrated/irt_router.parquet",
+      "calibrated_sha256": "6fb8a816e05d461a103fc8f621fadfa034069abc6788750b9e678931d23bbbc9",
+      "max_diff_vs_07b_calibration": null,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.5244031261014964,
+            "dev_A": 0.6649467913576266,
+            "dev_C": 0.39297000967429857,
+            "dev_H": 0.6365394712527391,
+            "dev_G": 0.028407320104887446,
+            "dev_start_low": 0.6949371170590132,
+            "dev_start_medium": 0.12770074169622703,
+            "dev_start_high": 0.17736214124475974
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.4324971635754168,
+            "dev_A": 0.7584650112866818,
+            "dev_C": 0.5865849725894872,
+            "dev_H": 0.7195017034273855,
+            "dev_G": 0.03896330785929625,
+            "dev_start_low": 0.3534343760077394,
+            "dev_start_medium": 0.326668816510803,
+            "dev_start_high": 0.3198968074814576
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.32393677265187837,
+            "dev_A": 0.8347307320219284,
+            "dev_C": 0.7941309255079005,
+            "dev_H": 0.8022512216622825,
+            "dev_G": 0.03247951035964591,
+            "dev_start_low": 0.06062560464366334,
+            "dev_start_medium": 0.3934214769429216,
+            "dev_start_high": 0.545952918413415
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.20997893671225115,
+            "dev_A": 0.7401055408970977,
+            "dev_C": 0.40474934036939325,
+            "dev_H": 0.7358309953286322,
+            "dev_G": 0.004274545568465515,
+            "dev_start_low": 0.5382585751978892,
+            "dev_start_medium": 0.41160949868073876,
+            "dev_start_high": 0.05013192612137203
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.11225590746637126,
+            "dev_A": 0.7763852242744064,
+            "dev_C": 0.5978891820580475,
+            "dev_H": 0.7765992996428605,
+            "dev_G": -0.00021407536845408082,
+            "dev_start_low": 0.11609498680738786,
+            "dev_start_medium": 0.7730870712401056,
+            "dev_start_high": 0.11081794195250659
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.783641160949868,
+            "dev_C": 0.6781002638522428,
+            "dev_H": 0.7770448548812665,
+            "dev_G": 0.00659630606860151,
+            "dev_start_low": 0.08179419525065963,
+            "dev_start_medium": 0.6411609498680739,
+            "dev_start_high": 0.2770448548812665
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.26716418796213626,
+            "dev_A": 0.4376811594202898,
+            "dev_C": 0.3572173913043479,
+            "dev_H": 0.4510109640831752,
+            "dev_G": -0.013329804662885414,
+            "dev_start_low": 0.7165217391304348,
+            "dev_start_medium": 0.17391304347826086,
+            "dev_start_high": 0.10956521739130434
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.24262594419955466,
+            "dev_A": 0.48855072463768107,
+            "dev_C": 0.5826086956521739,
+            "dev_H": 0.5029489603024546,
+            "dev_G": -0.014398235664773551,
+            "dev_start_low": 0.3382608695652174,
+            "dev_start_medium": 0.36695652173913046,
+            "dev_start_high": 0.29478260869565215
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.08822805282869021,
+            "dev_A": 0.5443478260869565,
+            "dev_C": 0.7982608695652174,
+            "dev_H": 0.5321701323251409,
+            "dev_G": 0.012177693761815656,
+            "dev_start_low": 0.014782608695652174,
+            "dev_start_medium": 0.4747826086956522,
+            "dev_start_high": 0.5104347826086957
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.24262594419955466,
+            "dev_A": 0.8713722841382415,
+            "dev_C": 0.40209388720027023,
+            "dev_H": 0.8400341594087269,
+            "dev_G": 0.03133812472951458,
+            "dev_start_low": 0.6349206349206349,
+            "dev_start_medium": 0.22492401215805471,
+            "dev_start_high": 0.14015535292131037
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.07635635497382513,
+            "dev_A": 0.907868963188112,
+            "dev_C": 0.6008105369807497,
+            "dev_H": 0.8807999433363236,
+            "dev_G": 0.027069019851788445,
+            "dev_start_low": 0.41168524147247554,
+            "dev_start_medium": 0.1746031746031746,
+            "dev_start_high": 0.41371158392434987
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.012846552938231318,
+            "dev_A": 0.9167173252279636,
+            "dev_C": 0.8118203309692671,
+            "dev_H": 0.902659873868567,
+            "dev_G": 0.014057451359396511,
+            "dev_start_low": 0.16987504221546776,
+            "dev_start_medium": 0.13069908814589665,
+            "dev_start_high": 0.6994258696386356
+          }
+        ]
+      }
+    },
+    "knn": {
+      "selected_setting": "n_neighbors=40",
+      "selected_setting_07b": "n_neighbors=40",
+      "changed_from_07b": false,
+      "kind": "per_tier",
+      "dev_mean_G": 0.02044957030449271,
+      "settings_tried": 4,
+      "scores_file": "common/knn/n_neighbors=40/scores.parquet",
+      "scores_sha256": "a71381e88add89141ec40b049cd7814483df30c93a63b9044be06293b365cc12",
+      "calibrated_file": "calibrated/knn.parquet",
+      "calibrated_sha256": "a17d69f19d20998cb89fc4da2111b860dd59647bedb3b7470a65c04a62589df6",
+      "max_diff_vs_07b_calibration": 0.0,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.5244031261014964,
+            "dev_A": 0.6789745243469848,
+            "dev_C": 0.4223798774588843,
+            "dev_H": 0.6491413293045842,
+            "dev_G": 0.029833195042400562,
+            "dev_start_low": 0.5794904869396968,
+            "dev_start_medium": 0.28506933247339566,
+            "dev_start_high": 0.13544018058690746
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.4324971635754168,
+            "dev_A": 0.7558851983231216,
+            "dev_C": 0.5850370848113512,
+            "dev_H": 0.7188384477404464,
+            "dev_G": 0.03704675058267526,
+            "dev_start_low": 0.3237665269267978,
+            "dev_start_medium": 0.38987423411802646,
+            "dev_start_high": 0.28635923895517573
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.28034882793694427,
+            "dev_A": 0.8344082554014834,
+            "dev_C": 0.800967429861335,
+            "dev_H": 0.8049628954303327,
+            "dev_G": 0.02944535997115072,
+            "dev_start_low": 0.06578523057078361,
+            "dev_start_medium": 0.36601096420509516,
+            "dev_start_high": 0.5682038052241213
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.25459961382653484,
+            "dev_A": 0.7434036939313984,
+            "dev_C": 0.3973614775725594,
+            "dev_H": 0.734271551994208,
+            "dev_G": 0.009132141937190363,
+            "dev_start_low": 0.5725593667546174,
+            "dev_start_medium": 0.36147757255936674,
+            "dev_start_high": 0.06596306068601583
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.0801245660420736,
+            "dev_A": 0.7777044854881267,
+            "dev_C": 0.5947229551451187,
+            "dev_H": 0.7759309667852501,
+            "dev_G": 0.0017735187028765642,
+            "dev_start_low": 0.21108179419525067,
+            "dev_start_medium": 0.5910290237467019,
+            "dev_start_high": 0.19788918205804748
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.7823218997361477,
+            "dev_C": 0.6802110817941951,
+            "dev_H": 0.7770448548812665,
+            "dev_G": 0.00527704485488123,
+            "dev_start_low": 0.08970976253298153,
+            "dev_start_medium": 0.6200527704485488,
+            "dev_start_high": 0.29023746701846964
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.2941841342027374,
+            "dev_A": 0.4557971014492753,
+            "dev_C": 0.392,
+            "dev_H": 0.4590260869565208,
+            "dev_G": -0.0032289855072454854,
+            "dev_start_low": 0.6121739130434782,
+            "dev_start_medium": 0.2956521739130435,
+            "dev_start_high": 0.09217391304347826
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.2001037512041927,
+            "dev_A": 0.4994202898550724,
+            "dev_C": 0.5933913043478262,
+            "dev_H": 0.5054336483931918,
+            "dev_G": -0.006013358538119407,
+            "dev_start_low": 0.28956521739130436,
+            "dev_start_medium": 0.4373913043478261,
+            "dev_start_high": 0.27304347826086955
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.060012632497358914,
+            "dev_A": 0.5281159420289855,
+            "dev_C": 0.800695652173913,
+            "dev_H": 0.532479773156899,
+            "dev_G": -0.004363831127913498,
+            "dev_start_low": 0.04521739130434783,
+            "dev_start_medium": 0.4078260869565217,
+            "dev_start_high": 0.5469565217391305
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.24262594419955466,
+            "dev_A": 0.8766858043453789,
+            "dev_C": 0.39817629179331315,
+            "dev_H": 0.8392288538573249,
+            "dev_G": 0.037456950488053975,
+            "dev_start_low": 0.6281661600810537,
+            "dev_start_medium": 0.24822695035460993,
+            "dev_start_high": 0.12360688956433637
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.06608207659540324,
+            "dev_A": 0.9090622537431049,
+            "dev_C": 0.5995947315096252,
+            "dev_H": 0.880632666862167,
+            "dev_G": 0.028429586880937885,
+            "dev_start_low": 0.403242147922999,
+            "dev_start_medium": 0.1945288753799392,
+            "dev_start_high": 0.4022289766970618
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.0044517991770131726,
+            "dev_A": 0.9169087020150849,
+            "dev_C": 0.7997973657548125,
+            "dev_H": 0.9014143336525813,
+            "dev_G": 0.015494368362503619,
+            "dev_start_low": 0.2006079027355623,
+            "dev_start_medium": 0.09929078014184398,
+            "dev_start_high": 0.7001013171225937
+          }
+        ]
+      }
+    },
+    "knn_a": {
+      "selected_setting": "n_neighbors=40",
+      "selected_setting_07b": "n_neighbors=50",
+      "changed_from_07b": true,
+      "kind": "per_tier",
+      "dev_mean_G": 0.015266915673046305,
+      "settings_tried": 4,
+      "scores_file": "common/knn_a/n_neighbors=40/scores.parquet",
+      "scores_sha256": "064e76ff819f595c8494d88a6ad578ff81aab88e0d31cb311881bb8d5dc28575",
+      "calibrated_file": "calibrated/knn_a.parquet",
+      "calibrated_sha256": "0c3719c18888c459c2e552edbf7296fbda6b484c7d582f59618040abf3d8bcc9",
+      "max_diff_vs_07b_calibration": null,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.5244031261014964,
+            "dev_A": 0.6754272815220896,
+            "dev_C": 0.4210899709771042,
+            "dev_H": 0.6485886162321348,
+            "dev_G": 0.02683866528995482,
+            "dev_start_low": 0.5701386649467913,
+            "dev_start_medium": 0.30699774266365687,
+            "dev_start_high": 0.12286359238955176
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.4324971635754168,
+            "dev_A": 0.7500806191551113,
+            "dev_C": 0.5849080941631731,
+            "dev_H": 0.7187831764332013,
+            "dev_G": 0.03129744272190993,
+            "dev_start_low": 0.31022250886810704,
+            "dev_start_medium": 0.41728474685585293,
+            "dev_start_high": 0.27249274427604
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.28034882793694427,
+            "dev_A": 0.836504353434376,
+            "dev_C": 0.8089648500483713,
+            "dev_H": 0.8081350421023913,
+            "dev_G": 0.028369311331984726,
+            "dev_start_low": 0.05772331505965817,
+            "dev_start_medium": 0.3621412447597549,
+            "dev_start_high": 0.5801354401805869
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.22034146585195902,
+            "dev_A": 0.7453825857519789,
+            "dev_C": 0.40052770448548813,
+            "dev_H": 0.7349398848518184,
+            "dev_G": 0.010442700900160529,
+            "dev_start_low": 0.5593667546174143,
+            "dev_start_medium": 0.37994722955145116,
+            "dev_start_high": 0.06068601583113457
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.08407873955784512,
+            "dev_A": 0.775065963060686,
+            "dev_C": 0.5947229551451187,
+            "dev_H": 0.7759309667852501,
+            "dev_G": -0.0008650037245641062,
+            "dev_start_low": 0.20844327176781002,
+            "dev_start_medium": 0.5963060686015831,
+            "dev_start_high": 0.19525065963060687
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.7757255936675461,
+            "dev_C": 0.6897097625329814,
+            "dev_H": 0.7770448548812665,
+            "dev_G": -0.0013192612137203907,
+            "dev_start_low": 0.08179419525065963,
+            "dev_start_medium": 0.6121372031662269,
+            "dev_start_high": 0.30606860158311344
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.26716418796213626,
+            "dev_A": 0.4646376811594202,
+            "dev_C": 0.40556521739130436,
+            "dev_H": 0.4621519848771256,
+            "dev_G": 0.002485696282294614,
+            "dev_start_low": 0.49130434782608695,
+            "dev_start_medium": 0.5034782608695653,
+            "dev_start_high": 0.0052173913043478265
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.14987604271147417,
+            "dev_A": 0.5065217391304347,
+            "dev_C": 0.6236521739130434,
+            "dev_H": 0.5099644612476355,
+            "dev_G": -0.0034427221172007583,
+            "dev_start_low": 0.20347826086956522,
+            "dev_start_medium": 0.5339130434782609,
+            "dev_start_high": 0.26260869565217393
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.11779577318070593,
+            "dev_A": 0.5378260869565218,
+            "dev_C": 0.7947826086956522,
+            "dev_H": 0.5317277882797723,
+            "dev_G": 0.006098298676749492,
+            "dev_start_low": 0.07652173913043478,
+            "dev_start_medium": 0.36,
+            "dev_start_high": 0.5634782608695652
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.22034146585195902,
+            "dev_A": 0.8537881346391984,
+            "dev_C": 0.39425869638635597,
+            "dev_H": 0.8384235483059229,
+            "dev_G": 0.015364586333275532,
+            "dev_start_low": 0.5839243498817966,
+            "dev_start_medium": 0.3465045592705167,
+            "dev_start_high": 0.06957109084768659
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.12360903307825576,
+            "dev_A": 0.8888888888888888,
+            "dev_C": 0.603242147922999,
+            "dev_H": 0.8810518503462982,
+            "dev_G": 0.007837038542590657,
+            "dev_start_low": 0.35933806146572106,
+            "dev_start_medium": 0.27321850726106045,
+            "dev_start_high": 0.3674434312732185
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.04949492488108862,
+            "dev_A": 0.9069008217944389,
+            "dev_C": 0.8060114826072272,
+            "dev_H": 0.9020580960114054,
+            "dev_G": 0.004842725783033464,
+            "dev_start_low": 0.08308004052684904,
+            "dev_start_medium": 0.3188112124282337,
+            "dev_start_high": 0.5981087470449172
+          }
+        ]
+      }
+    },
+    "mf": {
+      "selected_setting": "epochs=3",
+      "selected_setting_07b": "epochs=5",
+      "changed_from_07b": true,
+      "kind": "per_tier",
+      "dev_mean_G": 0.006240606631477075,
+      "settings_tried": 2,
+      "scores_file": "common/mf/epochs=3/scores.parquet",
+      "scores_sha256": "d9a29ca4012d7a20ac6dd49917ed067d59070ac6ca979d5b61565efa611244e3",
+      "calibrated_file": "calibrated/mf.parquet",
+      "calibrated_sha256": "99fc687507a7d4cff83c8f74af8e8833da4cd62f8b0a839debc6209e6042b696",
+      "max_diff_vs_07b_calibration": null,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.4762382435388603,
+            "dev_A": 0.6491454369558207,
+            "dev_C": 0.3906481780070945,
+            "dev_H": 0.6355445877223304,
+            "dev_G": 0.013600849233490364,
+            "dev_start_low": 0.5540148339245404,
+            "dev_start_medium": 0.4153498871331828,
+            "dev_start_high": 0.030635278942276686
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.4121570771415609,
+            "dev_A": 0.7342792647533054,
+            "dev_C": 0.5793614962915188,
+            "dev_H": 0.7164065102216692,
+            "dev_G": 0.01787275453163617,
+            "dev_start_low": 0.29958078039342145,
+            "dev_start_medium": 0.4524346984843599,
+            "dev_start_high": 0.24798452112221864
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.30870221735358805,
+            "dev_A": 0.8227990970654627,
+            "dev_C": 0.8096098032892615,
+            "dev_H": 0.8083908603823962,
+            "dev_G": 0.014408236683066566,
+            "dev_start_low": 0.10287004192196066,
+            "dev_start_medium": 0.2702354079329249,
+            "dev_start_high": 0.6268945501451145
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.23121538919078338,
+            "dev_A": 0.7269129287598944,
+            "dev_C": 0.40052770448548813,
+            "dev_H": 0.7349398848518184,
+            "dev_G": -0.008026956091923942,
+            "dev_start_low": 0.49868073878627966,
+            "dev_start_medium": 0.5013192612137203,
+            "dev_start_high": 0.0
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.05450064896286243,
+            "dev_A": 0.7407651715039578,
+            "dev_C": 0.6010554089709762,
+            "dev_H": 0.7770448548812665,
+            "dev_G": -0.03627968337730869,
+            "dev_start_low": 0.20844327176781002,
+            "dev_start_medium": 0.5804749340369393,
+            "dev_start_high": 0.21108179419525067
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.7447229551451188,
+            "dev_C": 0.6823218997361477,
+            "dev_H": 0.7770448548812665,
+            "dev_G": -0.03232189973614774,
+            "dev_start_low": 0.12401055408970976,
+            "dev_start_medium": 0.5461741424802111,
+            "dev_start_high": 0.32981530343007914
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.25459961382653484,
+            "dev_A": 0.4608695652173913,
+            "dev_C": 0.3986086956521739,
+            "dev_H": 0.46054896030245646,
+            "dev_G": 0.0003206049149348522,
+            "dev_start_low": 0.5278260869565218,
+            "dev_start_medium": 0.44782608695652176,
+            "dev_start_high": 0.02434782608695652
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.2001037512041927,
+            "dev_A": 0.5020289855072463,
+            "dev_C": 0.5958260869565217,
+            "dev_H": 0.505994706994326,
+            "dev_G": -0.003965721487079743,
+            "dev_start_low": 0.1408695652173913,
+            "dev_start_medium": 0.7286956521739131,
+            "dev_start_high": 0.13043478260869565
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.015576454802025866,
+            "dev_A": 0.5411594202898551,
+            "dev_C": 0.7986086956521737,
+            "dev_H": 0.5322143667296778,
+            "dev_G": 0.008945053560177274,
+            "dev_start_low": 0.0017391304347826088,
+            "dev_start_medium": 0.5,
+            "dev_start_high": 0.49826086956521737
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.22034146585195902,
+            "dev_A": 0.8727231791061578,
+            "dev_C": 0.4037149611617697,
+            "dev_H": 0.8403673892920658,
+            "dev_G": 0.03235578981409204,
+            "dev_start_low": 0.5748058088483621,
+            "dev_start_medium": 0.34110097939885176,
+            "dev_start_high": 0.08409321175278622
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.04949492488108862,
+            "dev_A": 0.901485984464708,
+            "dev_C": 0.6,
+            "dev_H": 0.8807159743329986,
+            "dev_G": 0.020770010131709316,
+            "dev_start_low": 0.36507936507936506,
+            "dev_start_medium": 0.2698412698412698,
+            "dev_start_high": 0.36507936507936506
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.003334360498400048,
+            "dev_A": 0.9110323089046493,
+            "dev_C": 0.7988517392772713,
+            "dev_H": 0.901316369815369,
+            "dev_G": 0.009715939089280257,
+            "dev_start_low": 0.12968591691995948,
+            "dev_start_medium": 0.24349881796690306,
+            "dev_start_high": 0.6268152651131375
+          }
+        ]
+      }
+    },
+    "mlp": {
+      "selected_setting": "hidden_layer_sizes=100-100-100",
+      "selected_setting_07b": "hidden_layer_sizes=100-100",
+      "changed_from_07b": true,
+      "kind": "per_tier",
+      "dev_mean_G": 0.01020697119065403,
+      "settings_tried": 3,
+      "scores_file": "common/mlp/hidden_layer_sizes=100-100-100/scores.parquet",
+      "scores_sha256": "ddaf4ac83e0c3567d2ab51f00afc3c00d9deb94f80d4c287e8b95b5b87a43466",
+      "calibrated_file": "calibrated/mlp.parquet",
+      "calibrated_sha256": "f6ed8ee90b87355b5c8d973c9552bc4ab049ed2c709cceeb426e5bc3c348ecdd",
+      "max_diff_vs_07b_calibration": null,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.49974075647365795,
+            "dev_A": 0.6651080296678491,
+            "dev_C": 0.43708481135117705,
+            "dev_H": 0.6554422583305067,
+            "dev_G": 0.009665771337342366,
+            "dev_start_low": 0.4975814253466624,
+            "dev_start_medium": 0.41212512092873266,
+            "dev_start_high": 0.09029345372460497
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.4324971635754168,
+            "dev_A": 0.745565946468881,
+            "dev_C": 0.6116091583360206,
+            "dev_H": 0.7298546484209428,
+            "dev_G": 0.015711298047938138,
+            "dev_start_low": 0.27571751048049015,
+            "dev_start_medium": 0.4195420831989681,
+            "dev_start_high": 0.3047404063205418
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.2941841342027374,
+            "dev_A": 0.8161883263463399,
+            "dev_C": 0.7783940664301837,
+            "dev_H": 0.796009255630167,
+            "dev_G": 0.020179070716172864,
+            "dev_start_low": 0.0780393421476943,
+            "dev_start_medium": 0.3979361496291519,
+            "dev_start_high": 0.5240245082231538
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.25459961382653484,
+            "dev_A": 0.7401055408970977,
+            "dev_C": 0.407915567282322,
+            "dev_H": 0.7364993281862424,
+            "dev_G": 0.003606212710855261,
+            "dev_start_low": 0.5567282321899736,
+            "dev_start_medium": 0.36675461741424803,
+            "dev_start_high": 0.07651715039577836
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.05450064896286243,
+            "dev_A": 0.7506596306068601,
+            "dev_C": 0.6010554089709763,
+            "dev_H": 0.7770448548812665,
+            "dev_G": -0.02638522427440637,
+            "dev_start_low": 0.23746701846965698,
+            "dev_start_medium": 0.5224274406332454,
+            "dev_start_high": 0.24010554089709762
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.7572559366754618,
+            "dev_C": 0.7467018469656992,
+            "dev_H": 0.7770448548812665,
+            "dev_G": -0.01978891820580475,
+            "dev_start_low": 0.11873350923482849,
+            "dev_start_medium": 0.39577836411609496,
+            "dev_start_high": 0.48548812664907653
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.3566984771646407,
+            "dev_A": 0.4555072463768115,
+            "dev_C": 0.40869565217391307,
+            "dev_H": 0.4628733459357267,
+            "dev_G": -0.007366099558915207,
+            "dev_start_low": 0.5695652173913044,
+            "dev_start_medium": 0.3391304347826087,
+            "dev_start_high": 0.09130434782608696
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.19069298984431537,
+            "dev_A": 0.4926086956521739,
+            "dev_C": 0.6038260869565217,
+            "dev_H": 0.5074431001890343,
+            "dev_G": -0.014834404536860357,
+            "dev_start_low": 0.29043478260869565,
+            "dev_start_medium": 0.40956521739130436,
+            "dev_start_high": 0.3
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.0,
+            "dev_A": 0.532608695652174,
+            "dev_C": 0.7958260869565217,
+            "dev_H": 0.5318604914933829,
+            "dev_G": 0.0007482041587910659,
+            "dev_start_low": 0.10956521739130434,
+            "dev_start_medium": 0.29130434782608694,
+            "dev_start_high": 0.5991304347826087
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.2001037512041927,
+            "dev_A": 0.875199819880671,
+            "dev_C": 0.4000675447483958,
+            "dev_H": 0.8396176220545535,
+            "dev_G": 0.03558219782611749,
+            "dev_start_low": 0.640999662276258,
+            "dev_start_medium": 0.21783181357649442,
+            "dev_start_high": 0.14116852414724756
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.04494896181243458,
+            "dev_A": 0.889913317572892,
+            "dev_C": 0.5974332995609591,
+            "dev_H": 0.8801883603510486,
+            "dev_G": 0.009724957221843411,
+            "dev_start_low": 0.2890915231340763,
+            "dev_start_medium": 0.4282337048294495,
+            "dev_start_high": 0.2826747720364742
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.004902036820592464,
+            "dev_A": 0.9057750759878419,
+            "dev_C": 0.8000675447483958,
+            "dev_H": 0.9014423233203562,
+            "dev_G": 0.004332752667485673,
+            "dev_start_low": 0.05032083755488011,
+            "dev_start_medium": 0.39918946301925023,
+            "dev_start_high": 0.5504896994258697
+          }
+        ]
+      }
+    },
+    "r0_group": {
+      "selected_setting": "default",
+      "selected_setting_07b": "default",
+      "changed_from_07b": false,
+      "kind": "class_probs",
+      "dev_mean_G": 0.019785941932183387,
+      "settings_tried": 1,
+      "scores_file": "scores-modernbert/r0_group/scores.parquet",
+      "scores_sha256": "c256214b0a14e4291672b415aa1f29836aa1f547d6c6f28d3a9a1456aa544f6c",
+      "calibrated_file": "calibrated/r0_group.parquet",
+      "calibrated_sha256": "84a5f045885a1180d1897e6a4a25a19d76f5d4dda9005e3566cec49955d16215",
+      "max_diff_vs_07b_calibration": 0.0,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.5244031261014964,
+            "dev_A": 0.6560786842953886,
+            "dev_C": 0.39039019671073844,
+            "dev_H": 0.6354340451078404,
+            "dev_G": 0.02064463918754822,
+            "dev_start_low": 0.6127055788455337,
+            "dev_start_medium": 0.29861335053208643,
+            "dev_start_high": 0.08868107062237987
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.4121570771415609,
+            "dev_A": 0.7483069977426636,
+            "dev_C": 0.5930345049983875,
+            "dev_H": 0.7222652687896322,
+            "dev_G": 0.026041728953031473,
+            "dev_start_low": 0.2944211544663012,
+            "dev_start_medium": 0.42857142857142855,
+            "dev_start_high": 0.2770074169622702
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.28034882793694427,
+            "dev_A": 0.8244114801676878,
+            "dev_C": 0.7995485327313768,
+            "dev_H": 0.8044000952143222,
+            "dev_G": 0.02001138495336563,
+            "dev_start_low": 0.07158980973879393,
+            "dev_start_medium": 0.3579490486939697,
+            "dev_start_high": 0.5704611415672364
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.2001037512041927,
+            "dev_A": 0.7559366754617414,
+            "dev_C": 0.4068601583113457,
+            "dev_H": 0.736276550567039,
+            "dev_G": 0.01966012489470237,
+            "dev_start_low": 0.5224274406332454,
+            "dev_start_medium": 0.43799472295514513,
+            "dev_start_high": 0.0395778364116095
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.047167207765452586,
+            "dev_A": 0.7849604221635884,
+            "dev_C": 0.6010554089709761,
+            "dev_H": 0.7770448548812665,
+            "dev_G": 0.0079155672823219,
+            "dev_start_low": 0.12137203166226913,
+            "dev_start_medium": 0.7546174142480211,
+            "dev_start_high": 0.12401055408970976
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.7810026385224275,
+            "dev_C": 0.7519788918205804,
+            "dev_H": 0.7770448548812665,
+            "dev_G": 0.00395778364116095,
+            "dev_start_low": 0.05013192612137203,
+            "dev_start_medium": 0.5197889182058048,
+            "dev_start_high": 0.43007915567282323
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.3566984771646407,
+            "dev_A": 0.47159420289855064,
+            "dev_C": 0.39617391304347827,
+            "dev_H": 0.4599879017013223,
+            "dev_G": 0.01160630119722833,
+            "dev_start_low": 0.5095652173913043,
+            "dev_start_medium": 0.49043478260869566,
+            "dev_start_high": 0.0
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.14987604271147417,
+            "dev_A": 0.5124637681159421,
+            "dev_C": 0.5947826086956521,
+            "dev_H": 0.5057542533081256,
+            "dev_G": 0.006709514807816452,
+            "dev_start_low": 0.19130434782608696,
+            "dev_start_medium": 0.6304347826086957,
+            "dev_start_high": 0.1782608695652174
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.001,
+            "dev_A": 0.5378260869565218,
+            "dev_C": 0.8024347826086956,
+            "dev_H": 0.5327009451795833,
+            "dev_G": 0.005125141776938458,
+            "dev_start_low": 0.06782608695652174,
+            "dev_start_medium": 0.3582608695652174,
+            "dev_start_high": 0.5739130434782609
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.30870221735358805,
+            "dev_A": 0.8795789710683328,
+            "dev_C": 0.40087808172914563,
+            "dev_H": 0.839784236996223,
+            "dev_G": 0.03979473407210987,
+            "dev_start_low": 0.6389733198243837,
+            "dev_start_medium": 0.2198581560283688,
+            "dev_start_high": 0.14116852414724756
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.032083087122537164,
+            "dev_A": 0.9077451311493864,
+            "dev_C": 0.6002701789935833,
+            "dev_H": 0.8807439640007736,
+            "dev_G": 0.02700116714861278,
+            "dev_start_low": 0.3789260385005066,
+            "dev_start_medium": 0.2414724755150287,
+            "dev_start_high": 0.3796014859844647
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.005943723218279725,
+            "dev_A": 0.9139930203759992,
+            "dev_C": 0.8007429922323539,
+            "dev_H": 0.9015122974897937,
+            "dev_G": 0.012480722886205498,
+            "dev_start_low": 0.16548463356973994,
+            "dev_start_medium": 0.16717325227963525,
+            "dev_start_high": 0.6673421141506248
+          }
+        ]
+      }
+    },
+    "r1_bge": {
+      "selected_setting": "hidden=1024,epochs=5,source_weight=off",
+      "selected_setting_07b": "hidden=1024,epochs=20,source_weight=on",
+      "changed_from_07b": true,
+      "kind": "per_tier",
+      "dev_mean_G": 0.018013399513537198,
+      "settings_tried": 8,
+      "scores_file": "common/r1_bge/hidden=1024,epochs=5,source_weight=off/scores.parquet",
+      "scores_sha256": "8908849ec0d141c73296608a765351c502438e1456e634caab981911f69a1166",
+      "calibrated_file": "calibrated/r1_bge.parquet",
+      "calibrated_sha256": "521e491cc51b52ae54b105859c72bec81a437be16868834e316279927bb9f763",
+      "max_diff_vs_07b_calibration": null,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.5244031261014964,
+            "dev_A": 0.663818123186069,
+            "dev_C": 0.38535956143179617,
+            "dev_H": 0.633278464125288,
+            "dev_G": 0.030539659060781044,
+            "dev_start_low": 0.653982586262496,
+            "dev_start_medium": 0.22863592389551757,
+            "dev_start_high": 0.11738148984198646
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.4324971635754168,
+            "dev_A": 0.7612060625604644,
+            "dev_C": 0.599613028055466,
+            "dev_H": 0.7250841054591239,
+            "dev_G": 0.036121957101340474,
+            "dev_start_low": 0.3150596581747823,
+            "dev_start_medium": 0.3708481135117704,
+            "dev_start_high": 0.3140922283134473
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.30870221735358805,
+            "dev_A": 0.8366655917445985,
+            "dev_C": 0.7950338600451466,
+            "dev_H": 0.8026093672542891,
+            "dev_G": 0.03405622449030943,
+            "dev_start_low": 0.06385037084811351,
+            "dev_start_medium": 0.38471460819090614,
+            "dev_start_high": 0.5514350209609803
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.19069298984431537,
+            "dev_A": 0.7387862796833773,
+            "dev_C": 0.3963060686015831,
+            "dev_H": 0.7340487743750046,
+            "dev_G": 0.0047375053083726915,
+            "dev_start_low": 0.5857519788918206,
+            "dev_start_medium": 0.33773087071240104,
+            "dev_start_high": 0.07651715039577836
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.10194553300259765,
+            "dev_A": 0.775065963060686,
+            "dev_C": 0.6021108179419524,
+            "dev_H": 0.7770448548812665,
+            "dev_G": -0.0019788918205805306,
+            "dev_start_low": 0.12928759894459102,
+            "dev_start_medium": 0.7361477572559367,
+            "dev_start_high": 0.1345646437994723
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.7790237467018469,
+            "dev_C": 0.7361477572559367,
+            "dev_H": 0.7770448548812665,
+            "dev_G": 0.0019788918205804196,
+            "dev_start_low": 0.06596306068601583,
+            "dev_start_medium": 0.5277044854881267,
+            "dev_start_high": 0.40633245382585753
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.28034882793694427,
+            "dev_A": 0.44507246376811593,
+            "dev_C": 0.38747826086956527,
+            "dev_H": 0.4579841209829859,
+            "dev_G": -0.012911657214869976,
+            "dev_start_low": 0.6339130434782608,
+            "dev_start_medium": 0.2634782608695652,
+            "dev_start_high": 0.10260869565217391
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.2001037512041927,
+            "dev_A": 0.4928985507246376,
+            "dev_C": 0.6219130434782609,
+            "dev_H": 0.5097432892249512,
+            "dev_G": -0.01684473850031354,
+            "dev_start_low": 0.1991304347826087,
+            "dev_start_medium": 0.5469565217391305,
+            "dev_start_high": 0.2539130434782609
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.0925821360652859,
+            "dev_A": 0.5373913043478261,
+            "dev_C": 0.8,
+            "dev_H": 0.5323913043478252,
+            "dev_G": 0.005000000000000893,
+            "dev_start_low": 0.028695652173913042,
+            "dev_start_medium": 0.4426086956521739,
+            "dev_start_high": 0.528695652173913
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.24262594419955466,
+            "dev_A": 0.8718788697512101,
+            "dev_C": 0.40547112462006085,
+            "dev_H": 0.8407283883323494,
+            "dev_G": 0.031150481418860676,
+            "dev_start_low": 0.6318811212428234,
+            "dev_start_medium": 0.22255994596420128,
+            "dev_start_high": 0.14555893279297535
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.08407873955784512,
+            "dev_A": 0.903996397613419,
+            "dev_C": 0.5987841945288754,
+            "dev_H": 0.8804660519204976,
+            "dev_G": 0.02353034569292134,
+            "dev_start_low": 0.4181019925700777,
+            "dev_start_medium": 0.1668355285376562,
+            "dev_start_high": 0.4150624788922661
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.012242387132886877,
+            "dev_A": 0.9154002026342452,
+            "dev_C": 0.8015535292131037,
+            "dev_H": 0.9015962664931185,
+            "dev_G": 0.013803936141126627,
+            "dev_start_low": 0.18541033434650456,
+            "dev_start_medium": 0.12529550827423167,
+            "dev_start_high": 0.6892941573792638
+          }
+        ]
+      }
+    },
+    "r1_group": {
+      "selected_setting": "default",
+      "selected_setting_07b": "default",
+      "changed_from_07b": false,
+      "kind": "per_tier",
+      "dev_mean_G": 0.02240539496737548,
+      "settings_tried": 1,
+      "scores_file": "scores-modernbert/r1_group/scores.parquet",
+      "scores_sha256": "032da174d469e0fb903e924ae7ddc1ac63fdbf024fa281cf849d1361d17949bf",
+      "calibrated_file": "calibrated/r1_group.parquet",
+      "calibrated_sha256": "f0f63d638fbecdaaa3307e1dc035ca2cca283dbce41d6a7b08d0788c56e16d22",
+      "max_diff_vs_07b_calibration": 0.0,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.550282591729173,
+            "dev_A": 0.6697839406643018,
+            "dev_C": 0.38742341180264434,
+            "dev_H": 0.634162805041207,
+            "dev_G": 0.03562113562309477,
+            "dev_start_low": 0.6572073524669462,
+            "dev_start_medium": 0.21702676555949693,
+            "dev_start_high": 0.12576588197355693
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.4121570771415609,
+            "dev_A": 0.7612060625604644,
+            "dev_C": 0.5963882618510158,
+            "dev_H": 0.7237023227780005,
+            "dev_G": 0.03750373978246391,
+            "dev_start_low": 0.2950661077071912,
+            "dev_start_medium": 0.41889712995807804,
+            "dev_start_high": 0.28603676233473074
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.2941841342027374,
+            "dev_A": 0.8347307320219284,
+            "dev_C": 0.7896162528216703,
+            "dev_H": 0.8004604937022494,
+            "dev_G": 0.034270238319679014,
+            "dev_start_low": 0.06643018381167365,
+            "dev_start_medium": 0.39309900032247663,
+            "dev_start_high": 0.5404708158658498
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.19069298984431537,
+            "dev_A": 0.7486807387862797,
+            "dev_C": 0.41424802110817943,
+            "dev_H": 0.737835993901463,
+            "dev_G": 0.010844744884816682,
+            "dev_start_low": 0.5171503957783641,
+            "dev_start_medium": 0.43007915567282323,
+            "dev_start_high": 0.052770448548812667
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.06934324866844159,
+            "dev_A": 0.7717678100263852,
+            "dev_C": 0.59155672823219,
+            "dev_H": 0.7752626339276398,
+            "dev_G": -0.0034948239012546622,
+            "dev_start_low": 0.18469656992084432,
+            "dev_start_medium": 0.6517150395778364,
+            "dev_start_high": 0.16358839050131926
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.7823218997361477,
+            "dev_C": 0.7498680738786277,
+            "dev_H": 0.7770448548812665,
+            "dev_G": 0.00527704485488123,
+            "dev_start_low": 0.06860158311345646,
+            "dev_start_medium": 0.48812664907651715,
+            "dev_start_high": 0.44327176781002636
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.30870221735358805,
+            "dev_A": 0.472463768115942,
+            "dev_C": 0.40626086956521745,
+            "dev_H": 0.4623122873345925,
+            "dev_G": 0.010151480781349476,
+            "dev_start_low": 0.5852173913043478,
+            "dev_start_medium": 0.3139130434782609,
+            "dev_start_high": 0.10086956521739131
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.19069298984431537,
+            "dev_A": 0.5063768115942029,
+            "dev_C": 0.599304347826087,
+            "dev_H": 0.5067962192816606,
+            "dev_G": -0.00041940768745774015,
+            "dev_start_low": 0.3191304347826087,
+            "dev_start_medium": 0.3634782608695652,
+            "dev_start_high": 0.3173913043478261
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.06297427552090026,
+            "dev_A": 0.5428985507246377,
+            "dev_C": 0.7954782608695652,
+            "dev_H": 0.5318162570888461,
+            "dev_G": 0.011082293635791607,
+            "dev_start_low": 0.08782608695652173,
+            "dev_start_medium": 0.3356521739130435,
+            "dev_start_high": 0.5765217391304348
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.25459961382653484,
+            "dev_A": 0.8832376449397725,
+            "dev_C": 0.4002026342451874,
+            "dev_H": 0.8396453912114984,
+            "dev_G": 0.04359225372827413,
+            "dev_start_low": 0.6386355960824046,
+            "dev_start_medium": 0.2222222222222222,
+            "dev_start_high": 0.13914218169537318
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.06297427552090026,
+            "dev_A": 0.9093887200270179,
+            "dev_C": 0.6035123269165822,
+            "dev_H": 0.8810798400140731,
+            "dev_G": 0.028308880012944737,
+            "dev_start_low": 0.3880445795339412,
+            "dev_start_medium": 0.21513002364066194,
+            "dev_start_high": 0.3968253968253968
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.0046714969210737796,
+            "dev_A": 0.9192277383766746,
+            "dev_C": 0.7965552178318136,
+            "dev_H": 0.9010784576392818,
+            "dev_G": 0.018149280737392748,
+            "dev_start_low": 0.198919284025667,
+            "dev_start_medium": 0.11077338736913205,
+            "dev_start_high": 0.6903073286052009
+          }
+        ]
+      }
+    },
+    "r1_group_a": {
+      "selected_setting": "default",
+      "selected_setting_07b": "default",
+      "changed_from_07b": false,
+      "kind": "per_tier",
+      "dev_mean_G": 0.015218245208034248,
+      "settings_tried": 1,
+      "scores_file": "scores-modernbert/r1_group_a/scores.parquet",
+      "scores_sha256": "1b2d48d35295ad7537f93c729715868397d43e33cac24dfcf1be598b7be4aa83",
+      "calibrated_file": "calibrated/r1_group_a.parquet",
+      "calibrated_sha256": "763062da6a46ef24a9bf639503f13914dfed17dd59d5393b2cf25c832346ab75",
+      "max_diff_vs_07b_calibration": 0.0,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.550282591729173,
+            "dev_A": 0.6765559496936472,
+            "dev_C": 0.4044501773621413,
+            "dev_H": 0.6414586175975383,
+            "dev_G": 0.03509733209610888,
+            "dev_start_low": 0.6233473073202193,
+            "dev_start_medium": 0.24217994195420833,
+            "dev_start_high": 0.1344727507255724
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.4121570771415609,
+            "dev_A": 0.7702354079329249,
+            "dev_C": 0.6049016446307642,
+            "dev_H": 0.7271941383088937,
+            "dev_G": 0.04304126962403121,
+            "dev_start_low": 0.29345372460496616,
+            "dev_start_medium": 0.40083843921315704,
+            "dev_start_high": 0.3057078361818768
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.28034882793694427,
+            "dev_A": 0.8382779748468236,
+            "dev_C": 0.800709448564979,
+            "dev_H": 0.8048605681183308,
+            "dev_G": 0.033417406728492804,
+            "dev_start_low": 0.06610770719122863,
+            "dev_start_medium": 0.36601096420509516,
+            "dev_start_high": 0.5678813286036762
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.2001037512041927,
+            "dev_A": 0.7526385224274407,
+            "dev_C": 0.3994722955145119,
+            "dev_H": 0.734717107232615,
+            "dev_G": 0.017921415194825707,
+            "dev_start_low": 0.554089709762533,
+            "dev_start_medium": 0.39313984168865435,
+            "dev_start_high": 0.052770448548812667
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.06934324866844159,
+            "dev_A": 0.7737467018469657,
+            "dev_C": 0.604221635883905,
+            "dev_H": 0.7770448548812665,
+            "dev_G": -0.0032981530343008103,
+            "dev_start_low": 0.1820580474934037,
+            "dev_start_medium": 0.6253298153034301,
+            "dev_start_high": 0.19261213720316622
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.7783641160949868,
+            "dev_C": 0.7393139841688653,
+            "dev_H": 0.7770448548812665,
+            "dev_G": 0.0013192612137202797,
+            "dev_start_low": 0.07387862796833773,
+            "dev_start_medium": 0.503957783641161,
+            "dev_start_high": 0.42216358839050133
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.24262594419955466,
+            "dev_A": 0.45956521739130435,
+            "dev_C": 0.415304347826087,
+            "dev_H": 0.46439621928166236,
+            "dev_G": -0.004831001890358011,
+            "dev_start_low": 0.49826086956521737,
+            "dev_start_medium": 0.4652173913043478,
+            "dev_start_high": 0.036521739130434785
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.14987604271147417,
+            "dev_A": 0.5013043478260869,
+            "dev_C": 0.5986086956521738,
+            "dev_H": 0.5066359168241936,
+            "dev_G": -0.005331568998106717,
+            "dev_start_low": 0.11739130434782609,
+            "dev_start_medium": 0.768695652173913,
+            "dev_start_high": 0.11391304347826087
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.11225590746637126,
+            "dev_A": 0.513623188405797,
+            "dev_C": 0.7968695652173913,
+            "dev_H": 0.5319931947069935,
+            "dev_G": -0.01837000630119645,
+            "dev_start_low": 0.05217391304347826,
+            "dev_start_medium": 0.40347826086956523,
+            "dev_start_high": 0.5443478260869565
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.22034146585195902,
+            "dev_A": 0.8600247664077452,
+            "dev_C": 0.4093887200270179,
+            "dev_H": 0.8415336938837514,
+            "dev_G": 0.018491072523993735,
+            "dev_start_low": 0.5987841945288754,
+            "dev_start_medium": 0.2789598108747045,
+            "dev_start_high": 0.12225599459642013
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.11225590746637126,
+            "dev_A": 0.8880220646178093,
+            "dev_C": 0.595677136102668,
+            "dev_H": 0.879827361310765,
+            "dev_G": 0.008194703307044304,
+            "dev_start_low": 0.337048294495103,
+            "dev_start_medium": 0.33671057075312394,
+            "dev_start_high": 0.3262411347517731
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.04949492488108862,
+            "dev_A": 0.9100303951367781,
+            "dev_C": 0.7979061127997298,
+            "dev_H": 0.9012184059781566,
+            "dev_G": 0.00881198915862147,
+            "dev_start_low": 0.06957109084768659,
+            "dev_start_medium": 0.36609253630530225,
+            "dev_start_high": 0.5643363728470111
+          }
+        ]
+      }
+    },
+    "routellm_released": {
+      "selected_setting": "default",
+      "selected_setting_07b": "default",
+      "changed_from_07b": false,
+      "kind": "single",
+      "dev_mean_G": 0.009780451429569514,
+      "settings_tried": 1,
+      "scores_file": "finetune/routellm_released/default/scores.parquet",
+      "scores_sha256": "2369203cb04f967ba5ff7647da668040ce56b36223e0cb62b9d1fb05deb26fcd",
+      "calibrated_file": "calibrated/routellm_released.parquet",
+      "calibrated_sha256": "891d8aa5d70c9353e9e9063e0ce4448d1229dba0edd043264f05036cd2337541",
+      "max_diff_vs_07b_calibration": 0.0,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.4762382435388603,
+            "dev_A": 0.6302805546597872,
+            "dev_C": 0.37594324411480173,
+            "dev_H": 0.6292436586964079,
+            "dev_G": 0.001036895963379303,
+            "dev_start_low": 0.6881651080296678,
+            "dev_start_medium": 0.1838116736536601,
+            "dev_start_high": 0.12802321831667204
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.45384103992113345,
+            "dev_A": 0.7291196388261851,
+            "dev_C": 0.5882618510158014,
+            "dev_H": 0.7202202304215697,
+            "dev_G": 0.00889940840461545,
+            "dev_start_low": 0.364076104482425,
+            "dev_start_medium": 0.30119316349564657,
+            "dev_start_high": 0.33473073202192843
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.39277357297223764,
+            "dev_A": 0.8232828119961303,
+            "dev_C": 0.7860045146726861,
+            "dev_H": 0.7990279113342228,
+            "dev_G": 0.024254900661907497,
+            "dev_start_low": 0.03966462431473718,
+            "dev_start_medium": 0.4556594646888101,
+            "dev_start_high": 0.5046759109964527
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.20997893671225115,
+            "dev_A": 0.7361477572559367,
+            "dev_C": 0.40263852242744064,
+            "dev_H": 0.7353854400902252,
+            "dev_G": 0.0007623171657115124,
+            "dev_start_low": 0.49340369393139843,
+            "dev_start_medium": 0.5065963060686016,
+            "dev_start_high": 0.0
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.07635635497382513,
+            "dev_A": 0.7763852242744064,
+            "dev_C": 0.6042216358839049,
+            "dev_H": 0.7770448548812665,
+            "dev_G": -0.0006596306068601399,
+            "dev_start_low": 0.021108179419525065,
+            "dev_start_medium": 0.9472295514511874,
+            "dev_start_high": 0.0316622691292876
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.7790237467018469,
+            "dev_C": 0.7129287598944589,
+            "dev_H": 0.7770448548812665,
+            "dev_G": 0.0019788918205804196,
+            "dev_start_low": 0.010554089709762533,
+            "dev_start_medium": 0.6965699208443272,
+            "dev_start_high": 0.2928759894459103
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.25459961382653484,
+            "dev_A": 0.46159420289855063,
+            "dev_C": 0.39617391304347827,
+            "dev_H": 0.4599879017013223,
+            "dev_G": 0.0016063011972283214,
+            "dev_start_low": 0.5121739130434783,
+            "dev_start_medium": 0.4852173913043478,
+            "dev_start_high": 0.0026086956521739132
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.16503392239477968,
+            "dev_A": 0.5046376811594203,
+            "dev_C": 0.6010434782608695,
+            "dev_H": 0.5070892249527393,
+            "dev_G": -0.002451543793319022,
+            "dev_start_low": 0.10608695652173913,
+            "dev_start_medium": 0.7852173913043479,
+            "dev_start_high": 0.10869565217391304
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.12360903307825576,
+            "dev_A": 0.5194202898550724,
+            "dev_C": 0.7888695652173914,
+            "dev_H": 0.5309758034026456,
+            "dev_G": -0.011555513547573226,
+            "dev_start_low": 0.051304347826086956,
+            "dev_start_medium": 0.4252173913043478,
+            "dev_start_high": 0.5234782608695652
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.24262594419955466,
+            "dev_A": 0.8664415175053471,
+            "dev_C": 0.40033772374197907,
+            "dev_H": 0.8396731603684433,
+            "dev_G": 0.026768357136903842,
+            "dev_start_low": 0.508274231678487,
+            "dev_start_medium": 0.48260722728807837,
+            "dev_start_high": 0.00911854103343465
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.12970917925129716,
+            "dev_A": 0.901373409884048,
+            "dev_C": 0.6031070584262074,
+            "dev_H": 0.8810378555124108,
+            "dev_G": 0.020335554371637254,
+            "dev_start_low": 0.4093211752786221,
+            "dev_start_medium": 0.17359000337723743,
+            "dev_start_high": 0.4170888213441405
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.04494896181243458,
+            "dev_A": 0.9163007992795228,
+            "dev_C": 0.8041202296521446,
+            "dev_H": 0.9018621683369806,
+            "dev_G": 0.014438630942542163,
+            "dev_start_low": 0.17966903073286053,
+            "dev_start_medium": 0.1303613644039176,
+            "dev_start_high": 0.6899696048632219
+          }
+        ]
+      }
+    },
+    "routellm_retrained": {
+      "selected_setting": "checkpoint=best_dev_loss",
+      "selected_setting_07b": "checkpoint=best_dev_loss",
+      "changed_from_07b": false,
+      "kind": "single",
+      "dev_mean_G": 0.017366261784761083,
+      "settings_tried": 1,
+      "scores_file": "finetune/routellm_retrained/checkpoint=best_dev_loss/scores.parquet",
+      "scores_sha256": "3887fdd032861f7155f4aaea72bee88d017d04adae7dfa3a71eb51ffc0b889f1",
+      "calibrated_file": "calibrated/routellm_retrained.parquet",
+      "calibrated_sha256": "30745723d73fd4401c5297823da8698dcc80763c6e601fdb1089452afb922a8a",
+      "max_diff_vs_07b_calibration": 0.0,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.4762382435388603,
+            "dev_A": 0.6675266043211867,
+            "dev_C": 0.4152853918090939,
+            "dev_H": 0.6461014074061128,
+            "dev_G": 0.02142519691507394,
+            "dev_start_low": 0.6710738471460819,
+            "dev_start_medium": 0.11963882618510158,
+            "dev_start_high": 0.2092873266688165
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.45384103992113345,
+            "dev_A": 0.7507255723960012,
+            "dev_C": 0.6094163173169945,
+            "dev_H": 0.7289848662689268,
+            "dev_G": 0.02174070612707446,
+            "dev_start_low": 0.37504030957755563,
+            "dev_start_medium": 0.22637858755240245,
+            "dev_start_high": 0.39858110287004195
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.3566984771646407,
+            "dev_A": 0.8369880683650436,
+            "dev_C": 0.8074169622702353,
+            "dev_H": 0.80752107823038,
+            "dev_G": 0.029466990134663584,
+            "dev_start_low": 0.03966462431473718,
+            "dev_start_medium": 0.4021283456949371,
+            "dev_start_high": 0.5582070299903257
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.19069298984431537,
+            "dev_A": 0.7447229551451188,
+            "dev_C": 0.40474934036939314,
+            "dev_H": 0.735830995328632,
+            "dev_G": 0.008891959816486716,
+            "dev_start_low": 0.5303430079155673,
+            "dev_start_medium": 0.42744063324538256,
+            "dev_start_high": 0.04221635883905013
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.0801245660420736,
+            "dev_A": 0.7724274406332454,
+            "dev_C": 0.5947229551451186,
+            "dev_H": 0.7759309667852501,
+            "dev_G": -0.0035035261520046657,
+            "dev_start_low": 0.13720316622691292,
+            "dev_start_medium": 0.7387862796833773,
+            "dev_start_high": 0.12401055408970976
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.7843007915567283,
+            "dev_C": 0.6728232189973614,
+            "dev_H": 0.7770448548812665,
+            "dev_G": 0.0072559366754617605,
+            "dev_start_low": 0.0,
+            "dev_start_medium": 0.8179419525065963,
+            "dev_start_high": 0.1820580474934037
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.26716418796213626,
+            "dev_A": 0.4482608695652174,
+            "dev_C": 0.3572173913043479,
+            "dev_H": 0.4510109640831752,
+            "dev_G": -0.002750094517957824,
+            "dev_start_low": 0.6139130434782609,
+            "dev_start_medium": 0.3791304347826087,
+            "dev_start_high": 0.006956521739130435
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.1572724743929531,
+            "dev_A": 0.51,
+            "dev_C": 0.5916521739130435,
+            "dev_H": 0.5050328922495245,
+            "dev_G": 0.004967107750475486,
+            "dev_start_low": 0.11826086956521739,
+            "dev_start_medium": 0.7843478260869565,
+            "dev_start_high": 0.09739130434782609
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.12360903307825576,
+            "dev_A": 0.5291304347826087,
+            "dev_C": 0.8299130434782608,
+            "dev_H": 0.5361954631379955,
+            "dev_G": -0.007065028355386804,
+            "dev_start_low": 0.11391304347826087,
+            "dev_start_medium": 0.1973913043478261,
+            "dev_start_high": 0.688695652173913
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.24262594419955466,
+            "dev_A": 0.8760553866936845,
+            "dev_C": 0.3908814589665654,
+            "dev_H": 0.8377293193823006,
+            "dev_G": 0.03832606731138399,
+            "dev_start_low": 0.6285038838230328,
+            "dev_start_medium": 0.2657885849375211,
+            "dev_start_high": 0.10570753123944614
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.07276536064890872,
+            "dev_A": 0.9120567375886526,
+            "dev_C": 0.6,
+            "dev_H": 0.8807159743329986,
+            "dev_G": 0.031340763255653936,
+            "dev_start_low": 0.4181019925700777,
+            "dev_start_medium": 0.16379601485984466,
+            "dev_start_high": 0.4181019925700777
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.009169445978784383,
+            "dev_A": 0.9210852189575595,
+            "dev_C": 0.8003377237419791,
+            "dev_H": 0.9014703129881313,
+            "dev_G": 0.019614905969428165,
+            "dev_start_low": 0.23471800067544749,
+            "dev_start_medium": 0.02971968929415738,
+            "dev_start_high": 0.7355623100303952
+          }
+        ]
+      }
+    },
+    "routerdc": {
+      "selected_setting": "config=official_routerbench,checkpoint=final",
+      "selected_setting_07b": "config=llmrouter,checkpoint=final",
+      "changed_from_07b": true,
+      "kind": "per_tier",
+      "dev_mean_G": 0.013849842081942731,
+      "settings_tried": 4,
+      "scores_file": "finetune/routerdc/config=official_routerbench,checkpoint=final/scores.parquet",
+      "scores_sha256": "d22ebd5c048b677eb7de1c4ad38934c18d6408af330ec07d834f3a29824c8b07",
+      "calibrated_file": "calibrated/routerdc.parquet",
+      "calibrated_sha256": "62845864fdb542dd112d88c4afaae899bcc1625fd7a277bb8b4adeb3d9e408f1",
+      "max_diff_vs_07b_calibration": null,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.49974075647365795,
+            "dev_A": 0.6314092228313447,
+            "dev_C": 0.3736214124475975,
+            "dev_H": 0.628248775165999,
+            "dev_G": 0.0031604476653457336,
+            "dev_start_low": 0.5969042244437278,
+            "dev_start_medium": 0.37213801999355045,
+            "dev_start_high": 0.030957755562721703
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.4324971635754168,
+            "dev_A": 0.7520154788777813,
+            "dev_C": 0.6058045791680103,
+            "dev_H": 0.7275522839009003,
+            "dev_G": 0.024463194976880986,
+            "dev_start_low": 0.2615285391809094,
+            "dev_start_medium": 0.46243147371815546,
+            "dev_start_high": 0.2760399871009352
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.33992315823220004,
+            "dev_A": 0.8390841663979361,
+            "dev_C": 0.800580457916801,
+            "dev_H": 0.8048094044623298,
+            "dev_G": 0.0342747619356063,
+            "dev_start_low": 0.0006449532408900354,
+            "dev_start_medium": 0.49725894872621734,
+            "dev_start_high": 0.5020960980328926
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.19069298984431537,
+            "dev_A": 0.7216358839050132,
+            "dev_C": 0.3551451187335093,
+            "dev_H": 0.7253604472260707,
+            "dev_G": -0.003724563321057528,
+            "dev_start_low": 0.6464379947229552,
+            "dev_start_medium": 0.31926121372031663,
+            "dev_start_high": 0.03430079155672823
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.0925821360652859,
+            "dev_A": 0.7717678100263852,
+            "dev_C": 0.604221635883905,
+            "dev_H": 0.7770448548812665,
+            "dev_G": -0.005277044854881341,
+            "dev_start_low": 0.06596306068601583,
+            "dev_start_medium": 0.8575197889182058,
+            "dev_start_high": 0.07651715039577836
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.7651715039577837,
+            "dev_C": 0.7424802110817942,
+            "dev_H": 0.7770448548812665,
+            "dev_G": -0.01187335092348285,
+            "dev_start_low": 0.0158311345646438,
+            "dev_start_medium": 0.6121372031662269,
+            "dev_start_high": 0.3720316622691293
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.32393677265187837,
+            "dev_A": 0.4646376811594202,
+            "dev_C": 0.4,
+            "dev_H": 0.4608695652173903,
+            "dev_G": 0.003768115942029915,
+            "dev_start_low": 0.5478260869565217,
+            "dev_start_medium": 0.4043478260869565,
+            "dev_start_high": 0.04782608695652174
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.2001037512041927,
+            "dev_A": 0.5092753623188405,
+            "dev_C": 0.6041739130434782,
+            "dev_H": 0.5074873345935712,
+            "dev_G": 0.0017880277252693144,
+            "dev_start_low": 0.24782608695652175,
+            "dev_start_medium": 0.49391304347826087,
+            "dev_start_high": 0.2582608695652174
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.08407873955784512,
+            "dev_A": 0.5488405797101449,
+            "dev_C": 0.8,
+            "dev_H": 0.5323913043478252,
+            "dev_G": 0.01644927536231966,
+            "dev_start_low": 0.05478260869565217,
+            "dev_start_medium": 0.39043478260869563,
+            "dev_start_high": 0.5547826086956522
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.28034882793694427,
+            "dev_A": 0.8646515816728582,
+            "dev_C": 0.39263762242485645,
+            "dev_H": 0.8380903184225842,
+            "dev_G": 0.02656126325027397,
+            "dev_start_low": 0.5886524822695035,
+            "dev_start_medium": 0.34110097939885176,
+            "dev_start_high": 0.07024653833164471
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.05450064896286243,
+            "dev_A": 0.8975796465158168,
+            "dev_C": 0.607159743329956,
+            "dev_H": 0.8814577005290352,
+            "dev_G": 0.016121945986781627,
+            "dev_start_low": 0.35832489023978387,
+            "dev_start_medium": 0.26545086119554206,
+            "dev_start_high": 0.3762242485646741
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.0,
+            "dev_A": 0.9044579533941236,
+            "dev_C": 0.7958797703478553,
+            "dev_H": 0.9010084834698444,
+            "dev_G": 0.0034494699242791915,
+            "dev_start_low": 0.13137453562985477,
+            "dev_start_medium": 0.2475515028706518,
+            "dev_start_high": 0.6210739614994935
+          }
+        ]
+      }
+    },
+    "svm": {
+      "selected_setting": "default",
+      "selected_setting_07b": "default",
+      "changed_from_07b": false,
+      "kind": "per_tier",
+      "dev_mean_G": 0.0175225431012912,
+      "settings_tried": 1,
+      "scores_file": "common/svm/default/scores.parquet",
+      "scores_sha256": "5ea643898c5c67bb60092142b097510b61d94ebbfb10bee4cad1d9b7bf55e7cd",
+      "calibrated_file": "calibrated/svm.parquet",
+      "calibrated_sha256": "532fb037b6e1af3213c5d42f71a441c43c0ee5974714214e7439800e1efbaeb3",
+      "max_diff_vs_07b_calibration": 0.0,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.550282591729173,
+            "dev_A": 0.6612383102225089,
+            "dev_C": 0.41399548532731384,
+            "dev_H": 0.6455486943336635,
+            "dev_G": 0.015689615888845432,
+            "dev_start_low": 0.5991615607868429,
+            "dev_start_medium": 0.2666881651080297,
+            "dev_start_high": 0.13415027410512737
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.45384103992113345,
+            "dev_A": 0.7476620445017736,
+            "dev_C": 0.581683327958723,
+            "dev_H": 0.717401393752078,
+            "dev_G": 0.03026065074969564,
+            "dev_start_low": 0.3315059658174782,
+            "dev_start_medium": 0.38277974846823604,
+            "dev_start_high": 0.2857142857142857
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.25459961382653484,
+            "dev_A": 0.8366655917445985,
+            "dev_C": 0.801741373750403,
+            "dev_H": 0.8052698773663384,
+            "dev_G": 0.031395714378260164,
+            "dev_start_low": 0.06127055788455337,
+            "dev_start_medium": 0.37310544985488553,
+            "dev_start_high": 0.5656239922605611
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.26716418796213626,
+            "dev_A": 0.7321899736147758,
+            "dev_C": 0.3952506596306069,
+            "dev_H": 0.7338259967558012,
+            "dev_G": -0.0016360231410254,
+            "dev_start_low": 0.6385224274406333,
+            "dev_start_medium": 0.23482849604221637,
+            "dev_start_high": 0.1266490765171504
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.08822805282869021,
+            "dev_A": 0.7612137203166227,
+            "dev_C": 0.6052770448548813,
+            "dev_H": 0.7770448548812665,
+            "dev_G": -0.0158311345646438,
+            "dev_start_low": 0.1424802110817942,
+            "dev_start_medium": 0.7018469656992085,
+            "dev_start_high": 0.15567282321899736
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.7691292875989446,
+            "dev_C": 0.6749340369393139,
+            "dev_H": 0.7770448548812665,
+            "dev_G": -0.0079155672823219,
+            "dev_start_low": 0.06860158311345646,
+            "dev_start_medium": 0.6754617414248021,
+            "dev_start_high": 0.2559366754617414
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.2941841342027374,
+            "dev_A": 0.45449275362318836,
+            "dev_C": 0.3850434782608696,
+            "dev_H": 0.4574230623818517,
+            "dev_G": -0.002930308758663347,
+            "dev_start_low": 0.697391304347826,
+            "dev_start_medium": 0.1426086956521739,
+            "dev_start_high": 0.16
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.20997893671225115,
+            "dev_A": 0.49811594202898546,
+            "dev_C": 0.592,
+            "dev_H": 0.505113043478258,
+            "dev_G": -0.006997101449272569,
+            "dev_start_low": 0.3217391304347826,
+            "dev_start_medium": 0.3765217391304348,
+            "dev_start_high": 0.3017391304347826
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.0240299649904443,
+            "dev_A": 0.5453623188405797,
+            "dev_C": 0.8034782608695651,
+            "dev_H": 0.5328336483931939,
+            "dev_G": 0.012528670447385815,
+            "dev_start_low": 0.01217391304347826,
+            "dev_start_medium": 0.46695652173913044,
+            "dev_start_high": 0.5208695652173913
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.30870221735358805,
+            "dev_A": 0.877698975571316,
+            "dev_C": 0.4083080040526849,
+            "dev_H": 0.8413115406281922,
+            "dev_G": 0.0363874349431238,
+            "dev_start_low": 0.662613981762918,
+            "dev_start_medium": 0.1540020263424519,
+            "dev_start_high": 0.1833839918946302
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.04494896181243458,
+            "dev_A": 0.9049532815490263,
+            "dev_C": 0.6012158054711246,
+            "dev_H": 0.880841927837986,
+            "dev_G": 0.02411135371104034,
+            "dev_start_low": 0.41236068895643363,
+            "dev_start_medium": 0.17223910840932116,
+            "dev_start_high": 0.4154002026342452
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.0,
+            "dev_A": 0.9087245300011259,
+            "dev_C": 0.6994258696386356,
+            "dev_H": 0.8910161720741838,
+            "dev_G": 0.01770835792694203,
+            "dev_start_low": 0.198919284025667,
+            "dev_start_medium": 0.353596757852077,
+            "dev_start_high": 0.447483958122256
+          }
+        ]
+      }
+    },
+    "r2_group": {
+      "selected_setting": "default",
+      "selected_setting_07b": null,
+      "changed_from_07b": false,
+      "new_extension_method": true,
+      "settings_tried": 1,
+      "kind": "per_tier",
+      "dev_mean_G": 0.018364530649074645,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.550282591729173,
+            "dev_A": 0.6681715575620768,
+            "dev_C": 0.39180909384069657,
+            "dev_H": 0.6360420294875347,
+            "dev_G": 0.03212952807454206,
+            "dev_start_low": 0.6485004837149306,
+            "dev_start_medium": 0.2234762979683973,
+            "dev_start_high": 0.12802321831667204
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.39277357297223764,
+            "dev_A": 0.7615285391809093,
+            "dev_C": 0.6027088036117381,
+            "dev_H": 0.7263243561568775,
+            "dev_G": 0.03520418302403183,
+            "dev_start_low": 0.27926475330538536,
+            "dev_start_medium": 0.4346984843598839,
+            "dev_start_high": 0.28603676233473074
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.30870221735358805,
+            "dev_A": 0.8305385359561431,
+            "dev_C": 0.7950338600451466,
+            "dev_H": 0.8026093672542891,
+            "dev_G": 0.027929168701854024,
+            "dev_start_low": 0.0819090615930345,
+            "dev_start_medium": 0.3485972267010642,
+            "dev_start_high": 0.5694937117059014
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.26716418796213626,
+            "dev_A": 0.737467018469657,
+            "dev_C": 0.40474934036939314,
+            "dev_H": 0.735830995328632,
+            "dev_G": 0.001636023141024956,
+            "dev_start_low": 0.5277044854881267,
+            "dev_start_medium": 0.43271767810026385,
+            "dev_start_high": 0.0395778364116095
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.047167207765452586,
+            "dev_A": 0.7763852242744064,
+            "dev_C": 0.6,
+            "dev_H": 0.7770448548812665,
+            "dev_G": -0.0006596306068601399,
+            "dev_start_low": 0.17150395778364116,
+            "dev_start_medium": 0.6569920844327177,
+            "dev_start_high": 0.17150395778364116
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.7783641160949868,
+            "dev_C": 0.6390501319261214,
+            "dev_H": 0.7770448548812665,
+            "dev_G": 0.0013192612137202797,
+            "dev_start_low": 0.1424802110817942,
+            "dev_start_medium": 0.6174142480211082,
+            "dev_start_high": 0.24010554089709762
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.24262594419955466,
+            "dev_A": 0.4678260869565217,
+            "dev_C": 0.407304347826087,
+            "dev_H": 0.46255274102079286,
+            "dev_G": 0.005273345935728868,
+            "dev_start_low": 0.5243478260869565,
+            "dev_start_medium": 0.4330434782608696,
+            "dev_start_high": 0.042608695652173914
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.17317840039163607,
+            "dev_A": 0.5097101449275362,
+            "dev_C": 0.6062608695652174,
+            "dev_H": 0.5077527410207924,
+            "dev_G": 0.0019574039067438154,
+            "dev_start_low": 0.2608695652173913,
+            "dev_start_medium": 0.46260869565217394,
+            "dev_start_high": 0.27652173913043476
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.08407873955784512,
+            "dev_A": 0.548840579710145,
+            "dev_C": 0.7972173913043478,
+            "dev_H": 0.5320374291115303,
+            "dev_G": 0.016803150598614702,
+            "dev_start_low": 0.03826086956521739,
+            "dev_start_medium": 0.43043478260869567,
+            "dev_start_high": 0.5313043478260869
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.19069298984431537,
+            "dev_A": 0.874062816616008,
+            "dev_C": 0.40168861870989536,
+            "dev_H": 0.8399508519378923,
+            "dev_G": 0.034111964678115725,
+            "dev_start_low": 0.5460992907801419,
+            "dev_start_medium": 0.40357987166497805,
+            "dev_start_high": 0.05032083755488011
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.02913635006741758,
+            "dev_A": 0.8902285263987392,
+            "dev_C": 0.5958122255994596,
+            "dev_H": 0.8798551304677098,
+            "dev_G": 0.010373395931029372,
+            "dev_start_low": 0.3816278284363391,
+            "dev_start_medium": 0.24721377912867273,
+            "dev_start_high": 0.37115839243498816
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.0,
+            "dev_A": 0.8969830012383205,
+            "dev_C": 0.7415737926376225,
+            "dev_H": 0.8953825602470775,
+            "dev_G": 0.0016004409912430129,
+            "dev_start_low": 0.22897669706180346,
+            "dev_start_medium": 0.18811212428233706,
+            "dev_start_high": 0.5829111786558595
+          }
+        ]
+      },
+      "scores_file": "r23-extension/scores/r2_group/scores.parquet",
+      "scores_sha256": "e50a7420ce4bdb1751fd31bc2c5a06ab8d8087eb67202f3775637dfeafacf834",
+      "calibrated_file": "calibrated/r2_group.parquet",
+      "calibrated_sha256": "80e43eebd00362c7b5e2e890180ca10a522864f37287d0e4ec3112ca9bfd2bf2"
+    },
+    "r3_group": {
+      "selected_setting": "default",
+      "selected_setting_07b": null,
+      "changed_from_07b": false,
+      "new_extension_method": true,
+      "settings_tried": 1,
+      "kind": "per_tier",
+      "dev_mean_G": 0.009745195380503585,
+      "lambda": {
+        "routerbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.40000000000000097,
+            "lambda": 0.5244031261014964,
+            "dev_A": 0.6483392454047081,
+            "dev_C": 0.38819735569171243,
+            "dev_H": 0.6344944328846767,
+            "dev_G": 0.013844812520031446,
+            "dev_start_low": 0.5707836181876814,
+            "dev_start_medium": 0.38793937439535636,
+            "dev_start_high": 0.04127700741696227
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000006,
+            "lambda": 0.39277357297223764,
+            "dev_A": 0.7428248951950983,
+            "dev_C": 0.5909706546275395,
+            "dev_H": 0.7213809278737133,
+            "dev_G": 0.021443967321384982,
+            "dev_start_low": 0.2692679780715898,
+            "dev_start_medium": 0.4840374072879716,
+            "dev_start_high": 0.24669461464043857
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000003,
+            "lambda": 0.28034882793694427,
+            "dev_A": 0.8219929055143502,
+            "dev_C": 0.8099967752337954,
+            "dev_H": 0.8085443513503989,
+            "dev_G": 0.013448554163951298,
+            "dev_start_low": 0.13318284424379231,
+            "dev_start_medium": 0.20864237342792646,
+            "dev_start_high": 0.6581747823282812
+          }
+        ],
+        "xroutebench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.4000000000000011,
+            "lambda": 0.30870221735358805,
+            "dev_A": 0.728891820580475,
+            "dev_C": 0.38575197889182056,
+            "dev_H": 0.7318209981829703,
+            "dev_G": -0.0029291776024953364,
+            "dev_start_low": 0.5725593667546174,
+            "dev_start_medium": 0.39050131926121373,
+            "dev_start_high": 0.036939313984168866
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.6000000000000008,
+            "lambda": 0.038900766522856935,
+            "dev_A": 0.7717678100263852,
+            "dev_C": 0.6,
+            "dev_H": 0.7770448548812665,
+            "dev_G": -0.005277044854881341,
+            "dev_start_low": 0.20052770448548812,
+            "dev_start_medium": 0.5989445910290238,
+            "dev_start_high": 0.20052770448548812
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.8000000000000004,
+            "lambda": 0.0,
+            "dev_A": 0.775065963060686,
+            "dev_C": 0.6612137203166226,
+            "dev_H": 0.7770448548812665,
+            "dev_G": -0.0019788918205805306,
+            "dev_start_low": 0.13192612137203166,
+            "dev_start_medium": 0.58311345646438,
+            "dev_start_high": 0.2849604221635884
+          }
+        ],
+        "llmrouterbench": [
+          {
+            "level": 0.25,
+            "target_cost": 0.399999999999997,
+            "lambda": 0.4121570771415609,
+            "dev_A": 0.47768115942028977,
+            "dev_C": 0.3982608695652174,
+            "dev_H": 0.460468809073723,
+            "dev_G": 0.017212350346566763,
+            "dev_start_low": 0.54,
+            "dev_start_medium": 0.42434782608695654,
+            "dev_start_high": 0.035652173913043476
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999981,
+            "lambda": 0.20997893671225115,
+            "dev_A": 0.5113043478260869,
+            "dev_C": 0.5996521739130435,
+            "dev_H": 0.506876370510394,
+            "dev_G": 0.004427977315692888,
+            "dev_start_low": 0.2791304347826087,
+            "dev_start_medium": 0.4426086956521739,
+            "dev_start_high": 0.2782608695652174
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.799999999999999,
+            "lambda": 0.0,
+            "dev_A": 0.5355072463768116,
+            "dev_C": 0.7502608695652173,
+            "dev_H": 0.5260657844990537,
+            "dev_G": 0.00944146187775785,
+            "dev_start_low": 0.09913043478260869,
+            "dev_start_medium": 0.4260869565217391,
+            "dev_start_high": 0.4747826086956522
+          }
+        ],
+        "sprout": [
+          {
+            "level": 0.25,
+            "target_cost": 0.3999999999999994,
+            "lambda": 0.14282746084815284,
+            "dev_A": 0.8718000675447485,
+            "dev_C": 0.39952718676122934,
+            "dev_H": 0.8395065454267739,
+            "dev_G": 0.03229352211797454,
+            "dev_start_low": 0.55758189800743,
+            "dev_start_medium": 0.3860182370820669,
+            "dev_start_high": 0.05639986491050321
+          },
+          {
+            "level": 0.5,
+            "target_cost": 0.5999999999999996,
+            "lambda": 0.02521585161478167,
+            "dev_A": 0.8891027805921422,
+            "dev_C": 0.5966227625802094,
+            "dev_H": 0.8800217454093793,
+            "dev_G": 0.009081035182762931,
+            "dev_start_low": 0.3465045592705167,
+            "dev_start_medium": 0.3154339750084431,
+            "dev_start_high": 0.3380614657210402
+          },
+          {
+            "level": 0.75,
+            "target_cost": 0.7999999999999998,
+            "lambda": 0.0012125007289442108,
+            "dev_A": 0.8920184622312283,
+            "dev_C": 0.8083080040526848,
+            "dev_H": 0.9022960081874926,
+            "dev_G": -0.010277545956264289,
+            "dev_start_low": 0.09591354272205337,
+            "dev_start_medium": 0.28740290442418104,
+            "dev_start_high": 0.6166835528537656
+          }
+        ]
+      },
+      "scores_file": "r23-extension/scores/r3_group/scores.parquet",
+      "scores_sha256": "ea35c7c570ffacb1aba7bf3018514c084040d45c728821fcfc64d3ae87e4af5a",
+      "calibrated_file": "calibrated/r3_group.parquet",
+      "calibrated_sha256": "36f5e24327807c28f73ffea68cbf416e6f33d44cdc572b33819beaa3958db26b"
+    }
+  },
+  "references": {
+    "r0_operational": {
+      "calibrated_file": "lock/calibrated/r0_operational-group.parquet",
+      "calibrated_sha256": "dabaa2183bac891ff96b83ad91bda7e816baf333d4d24c2d7ff8c777b98711d6"
+    },
+    "rt08": {
+      "calibrated_file": "lock/calibrated/rt08-group.parquet",
+      "calibrated_sha256": "6145a39d8e7d7d79d3105142fdaa671a65b10d5f52d52441f33cbc632d2f61da"
+    }
+  },
+  "seeds": {
+    "r1_group_s17": {
+      "calibrated_file": "seeds/calibrated/r1_group_s17.parquet",
+      "calibrated_sha256": "84ad333647e6aba29f1af3cdcea7ee8807aac03654ec163ac80bbf76cb372105"
+    },
+    "r1_group_s73": {
+      "calibrated_file": "seeds/calibrated/r1_group_s73.parquet",
+      "calibrated_sha256": "c2fcbf69bc7fa49023155945c83a743e4860b71f0c3da7cd3e2fce4ffb16bbec"
+    },
+    "r1_group_a_s17": {
+      "calibrated_file": "seeds/calibrated/r1_group_a_s17.parquet",
+      "calibrated_sha256": "c4397479985d77ad74f9a4a5a9202e9b41877475639c170e1e051db56bae5765"
+    },
+    "r1_group_a_s73": {
+      "calibrated_file": "seeds/calibrated/r1_group_a_s73.parquet",
+      "calibrated_sha256": "35229e9ea61a2a968970aac0033363960fb100e2916454bffdc302235dbd1289"
+    }
+  },
+  "selection_table_sha256": "460743c798a2580147a85e050de6b63855f388e7719f60ee9e9169e3f073161c",
+  "extension": {
+    "base_gain_lock_sha256": "488fe58c3a7d2f285f6b35db992dbb2a01c284b356e059e5745d45fb68aac41e",
+    "groups_sha256": "2ecc3a093d9427d5a76caa70ce5b869124c6c8f752a570fe7fb178262836fbcd",
+    "training_config_sha256": "45e31296a82cded0fe82a8eaa003326e40e851f40745c793b2eb167f5c226d69",
+    "training_data_sha256": "e91705b1a9d8117fdb193b2fc49e1990737d69d6d89c10c842a80783f0f8ed85",
+    "validation_data_sha256": "9f66f08cdac14b0e18ba534753a9af930c7712e599c7d7f4cafbcf34e367f751",
+    "rows": {
+      "train": {
+        "llmrouterbench": 4164,
+        "routerbench": 18606,
+        "sprout": 9606,
+        "xroutebench": 2641
+      },
+      "validation": {
+        "llmrouterbench": 1286,
+        "routerbench": 3101,
+        "sprout": 2961,
+        "xroutebench": 459
+      }
+    },
+    "seed": 42,
+    "test_outcomes_read": false,
+    "target": "group success probability; quality_* = success_*",
+    "cost": [
+      0.2,
+      0.6,
+      1.0
+    ],
+    "methods": {
+      "r2_group": "pairwise",
+      "r3_group": "regret"
+    },
+    "original_methods_unchanged": [
+      "avengers_pro",
+      "graphrouter",
+      "hybrid_llm",
+      "irt_router",
+      "knn",
+      "knn_a",
+      "mf",
+      "mlp",
+      "r0_group",
+      "r1_bge",
+      "r1_group",
+      "r1_group_a",
+      "routellm_released",
+      "routellm_retrained",
+      "routerdc",
+      "svm"
+    ],
+    "selection": "one fixed final checkpoint per new method; only adapters and lambda fitted on dev",
+    "test_reuse": "follow-up comparison on the existing test; not a new unseen test",
+    "dev_table_sha256": "c5f6ff68427544d24e7bc99f97d3af7f169815d5bbc7878139c8527b5677cfa0"
+  }
+}

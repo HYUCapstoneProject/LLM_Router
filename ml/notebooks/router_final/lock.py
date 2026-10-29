@@ -45,6 +45,7 @@ RULES = ("escalation", "one_shot")
 KIND = {"knn": "per_tier", "knn_a": "per_tier", "mlp": "per_tier", "svm": "per_tier", "mf": "per_tier",
         "graphrouter": "per_tier", "irt_router": "per_tier", "avengers_pro": "per_tier", "r1_bge": "per_tier",
         "routerdc": "per_tier", "r1_group": "per_tier", "r1_group_a": "per_tier",
+        "r2_group": "per_tier", "r3_group": "per_tier",
         "hybrid_llm": "single", "routellm_retrained": "single", "routellm_released": "single",
         "r0_group": "class_probs", "rt08": "class_probs", "r0_operational": "class_probs"}
 OURS_03 = ("r0_group", "r1_group", "r1_group_a")

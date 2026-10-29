@@ -239,8 +239,8 @@ def lock_markdown(record: dict, table: pd.DataFrame) -> str:
 # test
 # ---------------------------------------------------------------------------------------------
 
-def load_gain_lock(run_dir: Path, repo: Path) -> dict:
-    lock_dir = run_dir / "gain-lock"
+def load_gain_lock(run_dir: Path, repo: Path, lock_dir: Path | None = None) -> dict:
+    lock_dir = lock_dir if lock_dir is not None else run_dir / "gain-lock"
     record = json.loads((lock_dir / "gain-lock.json").read_text())
     if record.get("missing_scores"):
         raise SystemExit(f"the gain lock was a dry run (missing scores: {record['missing_scores']})")
@@ -271,11 +271,12 @@ def decision_sets(name: str, Phat: np.ndarray, needed: np.ndarray, lam: dict | N
     return sets
 
 
-def evaluate(run_dir: Path, repo: Path, data_root: Path, output_dir: Path, rehearse: bool, iterations: int) -> dict:
+def evaluate(run_dir: Path, repo: Path, data_root: Path, output_dir: Path, rehearse: bool, iterations: int,
+             gain_lock_dir: Path | None = None) -> dict:
     if output_dir.exists():
         raise SystemExit(f"{output_dir} exists: the test is opened once (move it away only to redo a failed run)")
     t0 = time.time()
-    glock = load_gain_lock(run_dir, repo)
+    glock = load_gain_lock(run_dir, repo, gain_lock_dir)
     rec = glock["record"]
     old = json.loads((run_dir / "lock" / "selection-lock.json").read_text())
     if C.sha256_file(run_dir / "lock" / "selection-lock.json") != rec["base_lock_sha256"]:

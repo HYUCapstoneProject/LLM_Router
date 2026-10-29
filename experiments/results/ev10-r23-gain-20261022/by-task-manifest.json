@@ -1,0 +1,117 @@
+{
+ "experiment": "EV-10 11b_gain_tasks",
+ "rehearsal_on_dev": false,
+ "role_evaluated": "test",
+ "gain_lock_sha256": "9c5608a4e7371b1e3b857a2af55ba50c2bc8b0d7cf705520d5e4a567ce607b5d",
+ "outcomes_sha256": "f7a428c44a9f9c6620189d8a33d15875a20ef91538aed900de3a0878a31cf61d",
+ "counts": {
+  "rows": {
+   "llmrouterbench": 4260,
+   "routerbench": 3473,
+   "sprout": 6891,
+   "xroutebench": 3729
+  },
+  "after_v2_exclusions": {
+   "llmrouterbench": 4260,
+   "routerbench": 3445,
+   "sprout": 6891,
+   "xroutebench": 3729
+  },
+  "after_evaluation_exclusions": {
+   "llmrouterbench": 4014,
+   "routerbench": 3445,
+   "sprout": 6891,
+   "xroutebench": 3629
+  },
+  "evaluated": {
+   "llmrouterbench": 3697,
+   "routerbench": 3445,
+   "sprout": 6891,
+   "xroutebench": 3629
+  },
+  "a_rows_with_v1": {
+   "routerbench": 3445,
+   "xroutebench": 3629
+  },
+  "strata": {
+   "llmrouterbench": {
+    "solvable": 2461,
+    "beyond_partial": 563,
+    "beyond_zero": 673
+   },
+   "routerbench": {
+    "solvable": 3135,
+    "beyond_partial": 139,
+    "beyond_zero": 171
+   },
+   "sprout": {
+    "solvable": 6347,
+    "beyond_partial": 497,
+    "beyond_zero": 47
+   },
+   "xroutebench": {
+    "solvable": 2724,
+    "beyond_partial": 621,
+    "beyond_zero": 284
+   }
+  },
+  "needed_tier_share": {
+   "llmrouterbench": {
+    "low": 0.5458,
+    "medium": 0.3013,
+    "high": 0.1528
+   },
+   "routerbench": {
+    "low": 0.4374,
+    "medium": 0.3033,
+    "high": 0.2592
+   },
+   "sprout": {
+    "low": 0.7044,
+    "medium": 0.2068,
+    "high": 0.0888
+   },
+   "xroutebench": {
+    "low": 0.6996,
+    "medium": 0.1824,
+    "high": 0.1179
+   }
+  }
+ },
+ "minimum_rows": 30,
+ "bootstrap": {
+  "iterations": 10000,
+  "seed": 42,
+  "confidence": 0.95,
+  "unit": "duplicate_group_id (A split) / split_group_id (LLMRouterBench, SPROUT)",
+  "pairing": "same group draws for every router, rule, kappa and level of a source; sources resampled independently",
+  "streams": "1000 + 10 x source + task"
+ },
+ "methods": [
+  "avengers_pro",
+  "graphrouter",
+  "hybrid_llm",
+  "irt_router",
+  "knn",
+  "knn_a",
+  "mf",
+  "mlp",
+  "r0_group",
+  "r1_group",
+  "r1_group_a",
+  "r2_group",
+  "r3_group",
+  "routellm_released",
+  "routellm_retrained",
+  "routerdc",
+  "svm"
+ ],
+ "omitted": [
+  "r1_bge"
+ ],
+ "outputs": {
+  "by-task-pairs.parquet": "a837a16870d10187ad7dd936549b2c3ae0a75d858237b4433b69c2e17961dca3",
+  "by-task.parquet": "aaec55b83a46066d702630ebeb6e62627c9377e70ff12494768b7752ef2aa392"
+ },
+ "seconds": 190.0
+}
