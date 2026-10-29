@@ -1,0 +1,17 @@
+body,source,variant,rows,mean_gain,gain_k0.00,gain_k0.30,gain_k0.50,gain_k1.00,cal_err_low,cal_err_med,cal_err_high
+r1_group_a,llmrouterbench,frozen_A_boundary,1150,-0.0798,-0.0112,-0.0144,-0.0767,-0.2099,0.1473,0.1576,0.1924
+r1_group_a,llmrouterbench,new_source_boundary_crossfit,1150,-0.0028,-0.0509,-0.0147,0.0043,0.0025,0.0002,-0.0,0.0003
+r1_group_a,sprout,frozen_A_boundary,2961,0.0146,-0.005,-0.0001,0.0133,0.0426,-0.1705,-0.1302,-0.0432
+r1_group_a,sprout,new_source_boundary_crossfit,2961,0.0145,-0.0,0.0017,0.0118,0.041,0.0001,-0.0002,0.0002
+knn_a,llmrouterbench,frozen_A_boundary,1150,-0.0694,-0.0103,-0.0142,-0.0618,-0.1827,0.1238,0.1583,0.2352
+knn_a,llmrouterbench,new_source_boundary_crossfit,1150,-0.0242,-0.0212,-0.0157,-0.0227,-0.0483,-0.0002,-0.0009,0.0002
+knn_a,sprout,frozen_A_boundary,2961,0.0106,-0.0022,0.0007,0.0095,0.0299,-0.2257,-0.1459,-0.0745
+knn_a,sprout,new_source_boundary_crossfit,2961,0.0089,0.0,0.0005,0.007,0.0252,-0.0001,0.0004,-0.0002
+r1_group,llmrouterbench,frozen_A_boundary,1150,0.0663,0.0,0.1228,0.1319,0.0026,-0.0093,0.0275,0.0283
+r1_group,llmrouterbench,new_source_boundary_crossfit,1150,0.0887,0.0,0.1155,0.1392,0.0787,0.0002,-0.0006,0.0021
+r1_group,sprout,frozen_A_boundary,2961,0.0286,-0.0046,0.0054,0.0245,0.0754,-0.0191,-0.021,0.0061
+r1_group,sprout,new_source_boundary_crossfit,2961,0.0273,-0.0003,0.0064,0.0237,0.0708,0.0003,-0.0001,-0.0002
+knn,llmrouterbench,frozen_A_boundary,1150,0.0067,0.0,0.0061,-0.0051,0.01,0.0414,0.0838,0.0885
+knn,llmrouterbench,new_source_boundary_crossfit,1150,-0.0013,-0.0004,0.0033,0.0013,-0.0281,0.0012,0.0003,-0.0008
+knn,sprout,frozen_A_boundary,2961,0.0297,-0.0001,0.0074,0.025,0.0762,-0.0358,-0.0231,-0.0212
+knn,sprout,new_source_boundary_crossfit,2961,0.0249,0.0,0.0041,0.0213,0.0661,0.0,0.0001,0.0003
