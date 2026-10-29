@@ -12,6 +12,7 @@
 | ML 설치·CLI·코드 탐색 | [ML 실행 진입점](../ml/README.md) |
 | Spring·React·DB 배포 절차 | [배포 안내](../infra/DEPLOY.md) |
 | 실험 코드·실험별 상태·결과 위치 | [실험 목록](../experiments/REGISTRY.md) |
+| 학습한 모델 가중치를 받는 곳과 이용 조건 | [보관 범위](../experiments/results/ARTIFACT_STORAGE.md#학습-모델-가중치-2026-10-29) |
 | 남은 라우터 실험의 최종 계획(RT-08·EV-10) | [라우터 최종 실험 계획서](ml/ROUTER_FINAL_EXPERIMENT_PLAN.md) |
 | 기존 서비스·라우터 실측과 원본 결과 | [과거 평가 색인](../experiments/results/README.md) |
 | Serving 설치·운영·GCS·Vertex 연결 | [Serving 실행 안내](../../LLM_Router-serving/README.md) |
