@@ -1,0 +1,25 @@
+{
+  "source": "/Users/yoocheolmin/Google Drive/내 드라이브/LLM_Router/retraining-gain-f6-dataprice-20261022",
+  "source_manifest_sha256": "2aed67c0380f08ae760a0d422261d84ff6b68947c46dad31dfaf75cd5b64f77d",
+  "price_basis": "data",
+  "prices": {
+    "routerbench": [
+      0.017626825544863292,
+      0.07091860297778167,
+      1.0
+    ],
+    "xroutebench": [
+      0.03281369226684617,
+      0.1110887375795193,
+      1.0
+    ]
+  },
+  "outputs": {
+    "fig6-11-feedback-gain-dataprice.png": "577568263529ecc901de402c24d98f152ba5d9b70445a17fb63a8c78bbab89bd",
+    "fig6-11-feedback-gain-dataprice.svg": "969b09f839606117cf1740a970282e3055c1d04ce8cd0252133322498609e64e",
+    "fig6-13-bidirectional-gain-dataprice.png": "c8056dac22243b94c283adb60c55cf3a447ec2b847f8053d83c0bc72d473e7d1",
+    "fig6-13-bidirectional-gain-dataprice.svg": "a9eb5d5190fcf82cb8d48cb1eb46c9e0a283650539c0b9b18a581c816c271bfe",
+    "fig6-14-all-retraining-gain-dataprice.png": "e2611890b15e09ecb480f8d111005b41d5ea65d393a058f0478a42c7b1b1549b",
+    "fig6-14-all-retraining-gain-dataprice.svg": "8fc25a0b1fcf4db4fdae94d123861c126e7124754ea117ae198d942118aee877"
+  }
+}
