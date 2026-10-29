@@ -30,6 +30,8 @@ RUNS = {  # notebook name -> (data variant, method)
     "r0_group": ("blended", "ordinal"),
     "r1_group": ("blended", "pointwise"),
     "r1_group_a": ("a_only", "pointwise"),
+    "r2_group": ("blended", "pairwise"),
+    "r3_group": ("blended", "regret"),
 }
 
 

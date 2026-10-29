@@ -17,6 +17,8 @@
 | `08_test` | 구현 | 봉인한 test를 한 번 열어 두 갈래 평가와 가설 판정. Colab CPU. 아래 참고 |
 | `09_seeds` | 구현 | H5만 seed 17·73 추가(R1-집단·R1-집단-A 재학습). Colab T4. 아래 참고 |
 | `10_report` | 구현 | 08·09·08a 출력으로 표·그림·결과 정리. CPU. 아래 참고 |
+| `11_gain` | 구현 | 효용 U 대신 첫 시도 이득 G로 재평가(학습 없음). CPU. 아래 참고 |
+| `11b_gain_tasks` | 구현 | 11_gain의 G를 과제 유형별로(08의 U 과제 유형 표와 같은 방식, 기술 통계). CPU |
 
 ## 00_prepare
 
@@ -196,3 +198,27 @@ python ml/notebooks/router_final/length_inputs.py --run-dir <run001> --repo . --
 
 `report.py`가 08(필수)·09·08a(있으면) 출력을 읽어 `results.md`, `tables/*.csv`, `figures/*.png`, `manifest.json`(입력·출력 SHA)을 만든다. 결과를 다시 계산하지 않는다. 그림 글자는 영어다(Colab에 한글 글꼴이 없다). 저장소에는 `experiments/results/ev10-router-final-20261018/report/`와 사람이 쓴 [REPORT.md](../../../experiments/results/ev10-router-final-20261018/REPORT.md)를 둔다.
 
+## 11_gain (첫 시도 이득 G로 재평가)
+
+`gain_eval.py`가 본체다. 지표만 바꾸고 학습은 다시 하지 않는다. 04~07a가 저장한 모든 설정의 점수와 09의 seed 보정을 그대로 쓴다.
+
+- **지표:** G = A − H(C). A는 시작 단계의 첫 시도 성공(집단 풀 확률), C는 첫 시도 비용(1:3:5), H(C)는 첫 시도 비용 C 이하에서 고정 시작 단계(혼합 포함)가 낼 수 있는 가장 좋은 첫 시도 성공이다(07b envelope에서 κ = 0, 첫 시도만). λ·κ와 상향은 G에 들어가지 않는다.
+- **`lock` (dev만):** 모든 설정을 07b와 같은 어댑터·5분할 교차 보정으로 다시 보정하고, τ = .8 규칙의 dev G(원천 4개 평균)로 방법마다 설정을 고른다. 07b와 같은 설정이면 07b 보정을 정확히 재현하는지 확인한다(차이 > 1e-9면 멈춤). 한 번에 고르기 규칙의 λ는 원천·비용 수준마다 dev 첫 시도 비용이 고정 시작 범위의 25·50·75%(1:3:5에서 .4/.6/.8)에 가장 가까운 값이다. 출력 `<run>/gain-lock/`: `gain-lock.json`, `calibrated/<방법>.parquet`, `selection-table.parquet`, `gain-lock-summary.md`. 여기서 멈추고 요약을 보고한다.
+- **`test`:** gain lock만 쓰고 아무것도 고르지 않는다. 08과 같은 평가 행·제외 목록·bootstrap 표본(질문 묶음, 10,000회, seed 42). 범위는 원천 4개 평균, A 분할, 외부 두 원천. τ 곡선(.5~.95)과 한 번에 고르기 세 수준, 비용 민감도(집단 가격·길이 반영, τ = .8), 라우터 쌍 차이, 풀리는 정도별 층(기술 통계), H5 seed 3개(기술 통계, τ = .8). 운영 R0·RT-08(07b 보정)과 `needed_tier`는 참고 행이다. R1-BGE는 lock에는 남지만 결과 표에서 뺀다(2026-10-21 사용자 결정). 출력 `<run>/gain-test/`: `gain.parquet`, `gain-macro.parquet`, `pairs.parquet`, `by-stratum.parquet`, `fixed-starts.parquet`, `seeds.parquet`, `manifest.json`, `gain-summary.md`.
+- **해석 주의:** 가망 없는 문항(어느 집단도 못 푸는 문항)은 G에서는 싼 단계가 최선이고 U(08)에서는 처음부터 high가 이득이다. G는 U 결과를 대체하지 않고 "첫 시도에서 단계를 잘 고르는가"를 보는 두 번째 관점이며, 층별 표를 함께 본다.
+- **소스:** 새 파일은 `gain_eval.py` 하나뿐이다. 노트북은 Drive `code/router-final-source-seeds.zip`(09 소스 묶음, 이 폴더 코드의 마지막 수정 뒤에 만든 것)을 풀고, `lock.py`·`test_eval.py` 등 불러 쓰는 모듈이 저장소 판과 같은지 SHA-256으로 확인한 뒤, Drive `code/gain_eval.py`(SHA-256 확인)를 더한다. `gain_eval.py`를 고치면 노트북의 SHA 값도 바꾼다.
+
+로컬 실행:
+
+```bash
+python ml/notebooks/router_final/gain_eval.py lock --run-dir <run001> --repo . --output-dir <run001>/gain-lock
+python ml/notebooks/router_final/gain_eval.py test --run-dir <run001> --repo . --data-root <원본 데이터 checkout> --output-dir <run001>/gain-test
+```
+
+## 11b_gain_tasks (과제 유형별 G)
+
+`gain_tasks.py`가 본체다. 11_gain의 gain lock만 쓰고 아무것도 고르지 않는다(τ = .8 규칙과 한 번에 고르기 세 수준, 기본 가격 1:3:5). 08의 `by_category`처럼 원천 × 과제 유형 칸마다 고정 시작 기준선을 다시 만들고 30문항 미만 칸은 빼며, 원천을 합칠 때는 행 수로 가중 평균한다. 구간은 칸 안 질문 묶음 bootstrap(10,000회, stream 1000 + 10 × 원천 + 과제)을 같은 가중치로 합친 것이고, 주요 라우터 쌍 차이도 낸다. 기술 통계로만 쓴다. 노트북은 11_gain과 같은 기반 소스 묶음에 Drive `code/gain_eval.py`와 `code/gain_tasks.py`(둘 다 SHA-256 확인)를 더한다. 출력 `<run>/gain-test-tasks/`: `by-task.parquet`, `by-task-pairs.parquet`, `by-task-summary.md`, `manifest.json`.
+
+## 12a_r2_group · 12b_r3_group · 13_r23_gain (R2·R3 모델 집단 확장)
+
+EV-10에서 빠졌던 R2(pairwise)와 R3(utility-gap-weighted CE)를 R0·R1 집단판과 같은 데이터·분할·학습 설정으로 학습하고, 11_gain의 gain lock을 그대로 둔 채 G로 비교한다. 본체는 `r23_extension.py`이고, `ours.py`·`lock.py`에 `r2_group`·`r3_group`을 등록했으며 `gain_eval.evaluate`는 다른 gain lock 폴더를 받을 수 있다. 12a·12b는 Colab T4, 13은 CPU에서 돈다. 실행 순서와 고정 조건은 [R23_COLAB.md](R23_COLAB.md)에 있고, 배포 묶음은 `build_r23_notebooks.py`로 만든다. 출력은 `<run>/r23-extension/`이며 집계 결과는 `experiments/results/ev10-r23-gain-20261022/`에 옮겼다. test는 11_gain에서 이미 본 데이터이므로 독립 검증이 아니라 후속 비교다.

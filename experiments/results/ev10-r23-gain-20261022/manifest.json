@@ -1,0 +1,149 @@
+{
+  "experiment": "EV-10 R2/R3 group extension G",
+  "rehearsal_on_dev": false,
+  "test_outcomes_read": true,
+  "role_evaluated": "test",
+  "gain_lock_sha256": "9c5608a4e7371b1e3b857a2af55ba50c2bc8b0d7cf705520d5e4a567ce607b5d",
+  "outcomes_sha256": "f7a428c44a9f9c6620189d8a33d15875a20ef91538aed900de3a0878a31cf61d",
+  "input_sha256": {
+    "a_test_routerbench": "0a3e0d5c417fe87e2473d2b56172b447a4efc989622fe3ed26fe9d13113abc18",
+    "a_test_xroutebench": "d6fde0899a5ed06950ecec4d958832e0de8a5e9f32c09f7ead37cd9c25e71cef",
+    "llmrouterbench": "3c55d579dc1bff84f2d1efc76018a25ffd5376804bd198bd5b1e07ed825565d9",
+    "sprout": "2f80461e07c5199cdb740436466f6ca7e08d956c46bb5485725dba6c45bb3f5c",
+    "v1_data_config": "45e31296a82cded0fe82a8eaa003326e40e851f40745c793b2eb167f5c226d69",
+    "v1_routerbench_labeled_path": "33fb6a8fd198d79b8adb86e644dfae0d7569c4b36df7b104f023f5ba8be50748",
+    "v1_routerbench_metadata_path": "1777423a3864844eb08f3e0862abceb80fcf560ab1e9927c3a7a5ce02c725410",
+    "v1_routerbench_model_tiers_path": "a88ce8a77e6ea14901601809a9cf2bc936d13addacd476185089fdb7a2d2e11e",
+    "v1_xroutebench_train_file": "6ae53d6b619396271e345a242bd32c253fc9796a45a75d3c122ad74843f8a7ef",
+    "v1_xroutebench_test_file": "cc7f33f03298c734c1f4b3c380d8d9b84dc8723eb0d08f850de033d2645778f4",
+    "v1_xroutebench_candidates_file": "ba72146533ae68641e382759c90ff5bc53eb903956d4e748b7f3c0111907541f",
+    "groups.json": "2ecc3a093d9427d5a76caa70ce5b869124c6c8f752a570fe7fb178262836fbcd"
+  },
+  "counts": {
+    "rows": {
+      "llmrouterbench": 4260,
+      "routerbench": 3473,
+      "sprout": 6891,
+      "xroutebench": 3729
+    },
+    "after_v2_exclusions": {
+      "llmrouterbench": 4260,
+      "routerbench": 3445,
+      "sprout": 6891,
+      "xroutebench": 3729
+    },
+    "after_evaluation_exclusions": {
+      "llmrouterbench": 4014,
+      "routerbench": 3445,
+      "sprout": 6891,
+      "xroutebench": 3629
+    },
+    "evaluated": {
+      "llmrouterbench": 3697,
+      "routerbench": 3445,
+      "sprout": 6891,
+      "xroutebench": 3629
+    },
+    "a_rows_with_v1": {
+      "routerbench": 3445,
+      "xroutebench": 3629
+    },
+    "strata": {
+      "llmrouterbench": {
+        "solvable": 2461,
+        "beyond_partial": 563,
+        "beyond_zero": 673
+      },
+      "routerbench": {
+        "solvable": 3135,
+        "beyond_partial": 139,
+        "beyond_zero": 171
+      },
+      "sprout": {
+        "solvable": 6347,
+        "beyond_partial": 497,
+        "beyond_zero": 47
+      },
+      "xroutebench": {
+        "solvable": 2724,
+        "beyond_partial": 621,
+        "beyond_zero": 284
+      }
+    },
+    "needed_tier_share": {
+      "llmrouterbench": {
+        "low": 0.5458,
+        "medium": 0.3013,
+        "high": 0.1528
+      },
+      "routerbench": {
+        "low": 0.4374,
+        "medium": 0.3033,
+        "high": 0.2592
+      },
+      "sprout": {
+        "low": 0.7044,
+        "medium": 0.2068,
+        "high": 0.0888
+      },
+      "xroutebench": {
+        "low": 0.6996,
+        "medium": 0.1824,
+        "high": 0.1179
+      }
+    }
+  },
+  "bootstrap": {
+    "iterations": 10000,
+    "seed": 42,
+    "confidence": 0.95,
+    "unit": "duplicate_group_id (A split) / split_group_id (LLMRouterBench, SPROUT)",
+    "pairing": "same group draws for every router, rule, kappa and level of a source; sources resampled independently"
+  },
+  "methods": [
+    "avengers_pro",
+    "graphrouter",
+    "hybrid_llm",
+    "irt_router",
+    "knn",
+    "knn_a",
+    "mf",
+    "mlp",
+    "r0_group",
+    "r1_group",
+    "r1_group_a",
+    "r2_group",
+    "r3_group",
+    "routellm_released",
+    "routellm_retrained",
+    "routerdc",
+    "svm"
+  ],
+  "references": [
+    "needed_tier",
+    "r0_operational",
+    "rt08"
+  ],
+  "omitted": [
+    "r1_bge"
+  ],
+  "outputs": {
+    "by-stratum.parquet": "edbcfa32597543e0d07588ca4db20d3cc422b9353b63a53ebb48dedbc06811e8",
+    "fixed-starts.parquet": "9edd43e14ab3e6c9a63a6d595d062fd047d9c2f0f46ec41ddd68492f1f69b93e",
+    "gain-macro.parquet": "f61b3098339af3fe5ef8184680f5bb59a85520fb05f2cbb685e10a01a70199bd",
+    "gain.parquet": "8b290998b275f548f3f8f9edb8cb675a432e08df5d6d49adb65813db90e6f8c1",
+    "pairs.parquet": "f6e5419c02c384a851236e41d5656bd84c474e060ade281bf7e70ae2a61ad857",
+    "seeds.parquet": "7936ee09e26c214f1375e99e00efa22e96669f9ee693696b067f97eb72d78756"
+  },
+  "seconds": 126.2,
+  "newly_trained_methods": [
+    "r2_group",
+    "r3_group"
+  ],
+  "test_is_reused_followup": true,
+  "baseline_point_and_interval_reproduced": false,
+  "baseline_point_reproduced_exactly": true,
+  "baseline_point_max_abs_diff": 0.0,
+  "baseline_interval_max_abs_diff": 4.523992538453536e-06,
+  "runtime_note": "Run locally on macOS CPU (Python 3.12.1, scikit-learn 1.6.1, numpy 2.1.2, pandas 2.3.3, pyarrow 21.0.0) with the Drive source bundle sha d5dac9c4...; the built-in check (rtol 1e-8) failed only on bootstrap interval bounds. Not the official Colab output; gain-test is left empty for that run."
+}
