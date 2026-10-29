@@ -1,0 +1,84 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+:root{--cache:#127a73;--cache-bg:#e7f4f2;--router:#4a46b8;--router-bg:#eeedfb;--ops:#b4621a;--ops-bg:#fcf0e3;--ink:#24262b;}
+html,body{margin:0;background:#fff;}
+body{width:984px;height:1110px;position:relative;font-family:"Apple SD Gothic Neo","Pretendard","Noto Sans KR",sans-serif;color:var(--ink);word-break:keep-all;}
+.abs{position:absolute;box-sizing:border-box;}
+.head{top:14px;height:50px;border-radius:9px;color:#fff;padding:0 14px;font-size:21px;font-weight:800;line-height:50px;}
+.node{border:2.2px solid;border-radius:10px;padding:9px 12px 10px;}
+.node h3{margin:0;font-size:19px;line-height:24px;}
+.node p{margin:4px 0 0;font-size:16.5px;line-height:22px;}
+.c{left:16px;width:230px;border-color:var(--cache);background:var(--cache-bg);} .c h3{color:var(--cache);}
+.r{left:282px;width:290px;border-color:var(--router);background:var(--router-bg);} .r h3{color:var(--router);}
+.o{left:722px;width:226px;border-color:var(--ops);background:var(--ops-bg);} .o h3{color:var(--ops);}
+.support{border-style:dashed;background:#fff !important;}
+.key{border-width:3.6px;}
+.cd{display:inline-block;font-size:15px;line-height:20px;padding:0 7px;margin-right:7px;border-radius:6px;color:#fff;vertical-align:2px;}
+.c .cd{background:var(--cache);} .r .cd{background:var(--router);} .o .cd{background:var(--ops);}
+.pill{position:absolute;box-sizing:border-box;background:#fff;border:1.6px solid;border-radius:14px;padding:4px 10px;font-size:16px;line-height:21px;text-align:center;font-weight:600;color:#2b2e35;}
+.pill i{font-style:normal;font-weight:800;margin-right:4px;}
+svg{position:absolute;left:0;top:0;}
+</style></head><body data-w="984" data-h="1110">
+
+<div class="abs head" style="left:16px;width:230px;background:var(--cache)">캐시</div>
+<div class="abs head" style="left:282px;width:290px;background:var(--router)">라우터</div>
+<div class="abs head" style="left:722px;width:230px;background:var(--ops)">재학습</div>
+
+<div class="abs node c" id="n01" style="top:96px"><h3><b class="cd">E1</b>의미 캐시 기준 (8월)</h3><p>코사인만으로는 함정을 못 가름 → 리랭커 도입</p></div>
+<div class="abs node c" id="n13" style="top:456px"><h3><b class="cd">E2</b>캐시 방식 비교</h3><p>운영 구성이 함정의 72%에 답을 재사용</p></div>
+<div class="abs node c" id="n15" style="top:816px"><h3><b class="cd">E3</b>캐시 판정 교체 (NLI)</h3><p>함정 통과 59.5% → 4.6%, 운영 배포</p></div>
+
+<div class="abs node r" id="n03" style="top:96px"><h3>첫 운영 라우터</h3><p>난이도 분류기 배포 (실험 아님)</p></div>
+<div class="abs node r support" id="n02" style="top:276px"><h3><b class="cd">E4</b>첫 라우터 점검</h3><p>기준선 대비 이득이 작음</p></div>
+<div class="abs node r" id="n05" style="top:456px"><h3><b class="cd">E5</b>학습 목표 비교</h3><p>R0 · R1 · R2 비교. 지표는 R1 승, 대신 비용 증가</p></div>
+<div class="abs node r" id="n12" style="top:636px"><h3><b class="cd">E6</b>같은 문항 재비교</h3><p>R0가 해결률 · 비용 1위 → 유지</p></div>
+<div class="abs node r key" id="nEV" style="top:816px"><h3><b class="cd">E7</b>라우팅 천장 분석</h3><p>정답 라벨을 줘도 이득은 +0.036에서 멈춤</p></div>
+<div class="abs node r" id="n16" style="top:996px"><h3><b class="cd">E8</b>논문 라우터 12종 비교</h3><p>상위 3개 공동 1위 (+0.04)</p></div>
+
+<div class="abs node o support" id="n10x" style="top:276px"><h3><b class="cd">E10</b>R1 → R0 전이</h3><p>easy 예측 61% → 14%</p></div>
+<div class="abs node o" id="n08" style="top:456px"><h3><b class="cd">E9</b>재학습 파이프라인</h3><p>재학습 · 승격 · 롤백 동작 확인</p></div>
+<div class="abs node o" id="n10" style="top:636px"><h3><b class="cd">E11</b>피드백 재학습</h3><p>F0~F3. easy 소멸, 비용 +63~77%</p></div>
+<div class="abs node o support" id="nF" style="top:816px"><h3><b class="cd">E12</b>양방향 교정</h3><p>F4 · F5. 운영 R0를 넘지 못함</p></div>
+
+<svg id="sv" width="984" height="1110"></svg>
+<script>
+const E=[
+ ["n01","n13","v","큰 데이터에서도 안전한가?","cache"],
+ ["n13","n15","v","판정 모델을 바꾸면?","cache"],
+ ["n03","n02","v","기존 기법보다 나은가?","router"],
+ ["n02","n05","v","다른 목표를 배우면?","router"],
+ ["n05","n12","v","같은 문항이면 순위는?","router"],
+ ["n12","nEV","v","차이는 왜 작은가?","router"],
+ ["nEV","n16","v","논문 라우터도 같은 벽인가?","router"],
+ ["n05","n08","h","피드백으로 고칠 수 있나?","ops","lo"],
+ ["n05","n10x","h","R1을 R0에 옮기면?","ops","hi"],
+ ["n08","n10","v","실제로 개선되나?","ops"],
+ ["n10","nF","v","양방향 정답을 주면?","ops"],
+ ["nF","nEV","h","벽은 어디인가?","ops"]
+];
+const col={cache:"#127a73",router:"#4a46b8",ops:"#b4621a"};
+const sv=document.getElementById('sv');
+let d='<defs>';for(const k in col)d+=`<marker id="m${k}" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="${col[k]}"/></marker>`;sv.innerHTML=d+'</defs>';
+const R=id=>{const e=document.getElementById(id);return{l:e.offsetLeft,t:e.offsetTop,w:e.offsetWidth,h:e.offsetHeight};};
+for(const [a,b,dir,txt,k,mode] of E){
+  const A=R(a),B=R(b);let path,mx,my,maxw;
+  if(mode){const x1=A.l+A.w,x2=B.l-3,y1=mode==='hi'?A.t+20:A.t+A.h-24,y2=B.t+B.h/2;
+    path=`M${x1} ${y1} C${(x1+x2)/2} ${y1} ${(x1+x2)/2} ${y2} ${x2} ${y2}`;
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',path);p.setAttribute('fill','none');p.setAttribute('stroke',col[k]);p.setAttribute('stroke-width','2.6');p.setAttribute('marker-end',`url(#m${k})`);sv.appendChild(p);
+    const pl=document.createElement('div');pl.className='pill';pl.style.borderColor=col[k];pl.style.maxWidth=(x2-x1-6)+'px';pl.innerHTML='<i style="color:'+col[k]+'">Q</i>'+txt;document.body.appendChild(pl);
+    pl.style.left=((x1+x2)/2-pl.offsetWidth/2)+'px';
+    pl.style.top=(mode==='hi'?(y2-pl.offsetHeight-12):(y1+10))+'px';continue;}
+  if(dir==="v"){const x=A.l+A.w/2;path=`M${x} ${A.t+A.h} V${B.t-3}`;mx=x;my=(A.t+A.h+B.t)/2;maxw=Math.max(A.w,B.w)+20;}
+  else if(B.l>A.l){const y=A.t+A.h/2,x1=A.l+A.w,x2=B.l-3;path=`M${x1} ${y} H${x2}`;mx=(x1+x2)/2;my=y;maxw=x2-x1-6;}
+  else{const y=A.t+A.h/2,x1=A.l,x2=B.l+B.w+3;path=`M${x1} ${y} H${x2}`;mx=(x1+x2)/2;my=y;maxw=x1-x2-6;}
+  const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+  p.setAttribute('d',path);p.setAttribute('fill','none');p.setAttribute('stroke',col[k]);p.setAttribute('stroke-width','2.6');p.setAttribute('marker-end',`url(#m${k})`);sv.appendChild(p);
+  const pl=document.createElement('div');pl.className='pill';pl.style.borderColor=col[k];pl.style.maxWidth=maxw+'px';pl.innerHTML='<i style="color:'+col[k]+'">Q</i>'+txt;document.body.appendChild(pl);
+  pl.style.left=(mx-pl.offsetWidth/2)+'px';pl.style.top=(dir==='v'?(my-pl.offsetHeight/2):(my-pl.offsetHeight-8))+'px';
+}
+{const A=R('n10x'),B=R('n10');const x=A.l+A.w,y1=A.t+A.h/2,y2=B.t+B.h/2;const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',`M${x} ${y1} H${x+14} V${y2} H${x+4}`);p.setAttribute('fill','none');p.setAttribute('stroke','#b4621a');p.setAttribute('stroke-width','2');p.setAttribute('stroke-dasharray','5 4');p.setAttribute('marker-end','url(#mops)');sv.appendChild(p);}
+document.body.appendChild(sv);
+document.querySelectorAll('.pill').forEach(p=>document.body.appendChild(p));
+</script>
+</body></html>

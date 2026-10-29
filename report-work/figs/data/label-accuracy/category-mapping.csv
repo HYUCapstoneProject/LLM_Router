@@ -1,0 +1,19 @@
+source_dataset,source_category,task_type
+routerbench,commonsense,상식·추론
+routerbench,math,수학
+routerbench,knowledge,지식 객관식
+xroutebench,squad,독해
+xroutebench,mmlu,지식 객관식
+xroutebench,boolq,독해
+xroutebench,gsm8k,수학
+xroutebench,openbook_qa,상식·추론
+xroutebench,hellaswag,상식·추론
+xroutebench,math,수학
+routerbench,code,코드
+xroutebench,arc_challenge,상식·추론
+routerbench,conversation,열린 대화·지시
+xroutebench,commonsense_qa,상식·추론
+xroutebench,mbpp,코드
+xroutebench,human_eval,코드
+xroutebench,aime_2020_2024,수학
+xroutebench,mmlu_pro,지식 객관식

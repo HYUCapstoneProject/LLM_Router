@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1080pt" height="396pt" viewBox="0 0 1080 396" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-20T21:34:03.979346</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 396 
+L 1080 396 
+L 1080 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 302.4 356.4 
+L 1004.4 356.4 
+L 1004.4 23.76 
+L 302.4 23.76 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g clip-path="url(#pa97d5ff813)">
+    <image xlink:href="data:image/png;base64,
+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" id="image1abce23a99" transform="scale(1 -1) translate(0 -332.64)" x="302.4" y="-23.76" width="702" height="332.64"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1"/>
+     <g id="text_1">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: middle" x="352.542857" y="374.819922" transform="rotate(-0 352.542857 374.819922)">수학</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_2"/>
+     <g id="text_2">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: middle" x="452.828571" y="374.819922" transform="rotate(-0 452.828571 374.819922)">코드</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_3"/>
+     <g id="text_3">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: middle" x="553.114286" y="374.819922" transform="rotate(-0 553.114286 374.819922)">지식 객관식</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_4"/>
+     <g id="text_4">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: middle" x="653.4" y="374.819922" transform="rotate(-0 653.4 374.819922)">상식·추론</text>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_5"/>
+     <g id="text_5">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: middle" x="753.685714" y="374.819922" transform="rotate(-0 753.685714 374.819922)">전문가 과학·난제</text>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_6"/>
+     <g id="text_6">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: middle" x="853.971429" y="374.819922" transform="rotate(-0 853.971429 374.819922)">사실 회상</text>
+     </g>
+    </g>
+    <g id="xtick_7">
+     <g id="line2d_7"/>
+     <g id="text_7">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: middle" x="954.257143" y="374.819922" transform="rotate(-0 954.257143 374.819922)">열린 대화·지시</text>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_8"/>
+     <g id="text_8">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end" x="295.4" y="57.189961" transform="rotate(-0 295.4 57.189961)">GraphRouter</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_9"/>
+     <g id="text_9">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end" x="295.4" y="112.629961" transform="rotate(-0 295.4 112.629961)">후보별 성공 확률 예측 (가격대 묶음)</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_10"/>
+     <g id="text_10">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end" x="295.4" y="168.069961" transform="rotate(-0 295.4 168.069961)">난이도 분류 (가격대 묶음)</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_11"/>
+     <g id="text_11">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end" x="295.4" y="223.509961" transform="rotate(-0 295.4 223.509961)">kNN</text>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_12"/>
+     <g id="text_12">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end" x="295.4" y="278.949961" transform="rotate(-0 295.4 278.949961)">RouterDC</text>
+     </g>
+    </g>
+    <g id="ytick_6">
+     <g id="line2d_13"/>
+     <g id="text_13">
+      <text style="font-size: 12px; font-family: 'Pretendard'; text-anchor: end" x="295.4" y="334.389961" transform="rotate(-0 295.4 334.389961)">RouteLLM 공개본</text>
+     </g>
+    </g>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="352.542857" y="55.387471" transform="rotate(-0 352.542857 55.387471)">+0.024</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="452.828571" y="55.387471" transform="rotate(-0 452.828571 55.387471)">-0.004</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="553.114286" y="55.387471" transform="rotate(-0 553.114286 55.387471)">+0.042</text>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="653.4" y="55.387471" transform="rotate(-0 653.4 55.387471)">+0.012</text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="753.685714" y="55.387471" transform="rotate(-0 753.685714 55.387471)">-0.012</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="853.971429" y="55.387471" transform="rotate(-0 853.971429 55.387471)">+0.005</text>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="954.257143" y="55.387471" transform="rotate(-0 954.257143 55.387471)">+0.016</text>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #ffffff" x="352.542857" y="110.827471" transform="rotate(-0 352.542857 110.827471)">+0.060</text>
+   </g>
+   <g id="text_22">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="452.828571" y="110.827471" transform="rotate(-0 452.828571 110.827471)">+0.019</text>
+   </g>
+   <g id="text_23">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="553.114286" y="110.827471" transform="rotate(-0 553.114286 110.827471)">+0.042</text>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="653.4" y="110.827471" transform="rotate(-0 653.4 110.827471)">+0.009</text>
+   </g>
+   <g id="text_25">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="753.685714" y="110.827471" transform="rotate(-0 753.685714 110.827471)">-0.006</text>
+   </g>
+   <g id="text_26">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="853.971429" y="110.827471" transform="rotate(-0 853.971429 110.827471)">+0.015</text>
+   </g>
+   <g id="text_27">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="954.257143" y="110.827471" transform="rotate(-0 954.257143 110.827471)">+0.016</text>
+   </g>
+   <g id="text_28">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="352.542857" y="166.267471" transform="rotate(-0 352.542857 166.267471)">+0.032</text>
+   </g>
+   <g id="text_29">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="452.828571" y="166.267471" transform="rotate(-0 452.828571 166.267471)">-0.003</text>
+   </g>
+   <g id="text_30">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="553.114286" y="166.267471" transform="rotate(-0 553.114286 166.267471)">+0.027</text>
+   </g>
+   <g id="text_31">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="653.4" y="166.267471" transform="rotate(-0 653.4 166.267471)">+0.006</text>
+   </g>
+   <g id="text_32">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="753.685714" y="166.267471" transform="rotate(-0 753.685714 166.267471)">-0.011</text>
+   </g>
+   <g id="text_33">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="853.971429" y="166.267471" transform="rotate(-0 853.971429 166.267471)">+0.009</text>
+   </g>
+   <g id="text_34">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="954.257143" y="166.267471" transform="rotate(-0 954.257143 166.267471)">+0.016</text>
+   </g>
+   <g id="text_35">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="352.542857" y="221.707471" transform="rotate(-0 352.542857 221.707471)">+0.005</text>
+   </g>
+   <g id="text_36">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="452.828571" y="221.707471" transform="rotate(-0 452.828571 221.707471)">-0.002</text>
+   </g>
+   <g id="text_37">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="553.114286" y="221.707471" transform="rotate(-0 553.114286 221.707471)">+0.042</text>
+   </g>
+   <g id="text_38">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="653.4" y="221.707471" transform="rotate(-0 653.4 221.707471)">+0.015</text>
+   </g>
+   <g id="text_39">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="753.685714" y="221.707471" transform="rotate(-0 753.685714 221.707471)">-0.019</text>
+   </g>
+   <g id="text_40">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="853.971429" y="221.707471" transform="rotate(-0 853.971429 221.707471)">+0.007</text>
+   </g>
+   <g id="text_41">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="954.257143" y="221.707471" transform="rotate(-0 954.257143 221.707471)">+0.016</text>
+   </g>
+   <g id="text_42">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="352.542857" y="277.147471" transform="rotate(-0 352.542857 277.147471)">+0.019</text>
+   </g>
+   <g id="text_43">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #ffffff" x="452.828571" y="277.147471" transform="rotate(-0 452.828571 277.147471)">-0.059</text>
+   </g>
+   <g id="text_44">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="553.114286" y="277.147471" transform="rotate(-0 553.114286 277.147471)">+0.041</text>
+   </g>
+   <g id="text_45">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="653.4" y="277.147471" transform="rotate(-0 653.4 277.147471)">-0.002</text>
+   </g>
+   <g id="text_46">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="753.685714" y="277.147471" transform="rotate(-0 753.685714 277.147471)">-0.033</text>
+   </g>
+   <g id="text_47">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="853.971429" y="277.147471" transform="rotate(-0 853.971429 277.147471)">0.000</text>
+   </g>
+   <g id="text_48">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="954.257143" y="277.147471" transform="rotate(-0 954.257143 277.147471)">+0.012</text>
+   </g>
+   <g id="text_49">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="352.542857" y="332.587471" transform="rotate(-0 352.542857 332.587471)">-0.007</text>
+   </g>
+   <g id="text_50">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="452.828571" y="332.587471" transform="rotate(-0 452.828571 332.587471)">-0.016</text>
+   </g>
+   <g id="text_51">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="553.114286" y="332.587471" transform="rotate(-0 553.114286 332.587471)">+0.031</text>
+   </g>
+   <g id="text_52">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="653.4" y="332.587471" transform="rotate(-0 653.4 332.587471)">0.000</text>
+   </g>
+   <g id="text_53">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="753.685714" y="332.587471" transform="rotate(-0 753.685714 332.587471)">-0.015</text>
+   </g>
+   <g id="text_54">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="853.971429" y="332.587471" transform="rotate(-0 853.971429 332.587471)">0.000</text>
+   </g>
+   <g id="text_55">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle; fill: #222222" x="954.257143" y="332.587471" transform="rotate(-0 954.257143 332.587471)">+0.009</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_3">
+    <path d="M 1020.6 356.4 
+L 1036.8 356.4 
+L 1036.8 23.76 
+L 1020.6 23.76 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <image xlink:href="data:image/png;base64,
+iVBORw0KGgoAAAANSUhEUgAAABYAAAHOCAYAAACcrvnNAAACwElEQVR4nO2c2Y0kMQxDJdp5THib//+UNR/d6wxYwAPIAAiCoo6qPvpf/UwZoDJhr/YQy6i4XcRlgXBWyMJa8Rjt8ebFTSZimXgL6PHK2PwiVlwkbhdp6Ys0yEUa5CINAr4rdtb/C2ds047CXjiPl6lBenlEy8JaKd47HouWCvkapHENIguxcMWTsUEa57E8xM0r3qIpFq6lm+excmJx5/HiKZaFWMATS7TiCVe8ToNgn5o2MW6yEMvCWkzFwiley0Us3LUpC7EsrIX0uHmKZXtIl4VYFtZCKhZOcWcIYXO8ecWTaf3LwlrIIdQ8xcrO+yDFeyVuC6a4TIp34TZI4zZIJW7cDVIpHrZ4srBWUkGfx7IQy8JayLg1TnHZnkHEs2JZiGVhLWRLN3BsLhaxLKyVg+WduDWtpcukeE+seKF4bSGWhbWQO2+S4y8y3S4SN3Yq2kUsC7EsrMWcbsIp7ijGWjE4xQVU3BZiWVgrT03suA0ubmP5+8MyKj4mydvkRDmtKFzcxkIsC2sxPS4T8eFZMbi4lQcy8RZyg5SHeBK3LxI3/8EiC2tlg8CnW+HiNh5ieWiLeQmVh/gkbthHXtkUP6Y7VrzXCg+ueAen+Enc/B6PqUEObpk+JsmysBazpcdDLOAGObTincTti3h8sY8pxzuzgrv+hYubLKxlzPEmzuOxEMvCWsgt/UTxF7HiInG7SCouYsULDfKbeYwdQjsHC7d4srAWVPGxEAvY0odWvF+c4ieKsR7vFO+FL24cWksfnOKx/aTg0Kw4OMWD++x/cO82j2uDDDBuYyGWhbWQL/8H5/G4GuTwrBic4uMhloe2kKk42SAfZB6D4ybgiTU0KybFe8Hjx0IsnOINtOLBKT5R/EE8vkhLX+yTBvkiDeIf9Dvz+D8St4s9uM/+J0cheIM8OMUnij+IFRe2uP0BU0hpPlL8Uf0AAAAASUVORK5CYII=" id="image50623ad268" transform="scale(1 -1) translate(0 -332.64)" x="1020.96" y="-23.76" width="15.84" height="332.64"/>
+   <g id="matplotlib.axis_3"/>
+   <g id="matplotlib.axis_4">
+    <g id="ytick_7">
+     <g id="line2d_14"/>
+     <g id="text_56">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: start" x="1041.8" y="361.634131" transform="rotate(-0 1041.8 361.634131)">-0.06</text>
+     </g>
+    </g>
+    <g id="ytick_8">
+     <g id="line2d_15"/>
+     <g id="text_57">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: start" x="1041.8" y="306.194131" transform="rotate(-0 1041.8 306.194131)">-0.04</text>
+     </g>
+    </g>
+    <g id="ytick_9">
+     <g id="line2d_16"/>
+     <g id="text_58">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: start" x="1041.8" y="250.754131" transform="rotate(-0 1041.8 250.754131)">-0.02</text>
+     </g>
+    </g>
+    <g id="ytick_10">
+     <g id="line2d_17"/>
+     <g id="text_59">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: start" x="1041.8" y="195.314131" transform="rotate(-0 1041.8 195.314131)">0.00</text>
+     </g>
+    </g>
+    <g id="ytick_11">
+     <g id="line2d_18"/>
+     <g id="text_60">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: start" x="1041.8" y="139.874131" transform="rotate(-0 1041.8 139.874131)">0.02</text>
+     </g>
+    </g>
+    <g id="ytick_12">
+     <g id="line2d_19"/>
+     <g id="text_61">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: start" x="1041.8" y="84.434131" transform="rotate(-0 1041.8 84.434131)">0.04</text>
+     </g>
+    </g>
+    <g id="ytick_13">
+     <g id="line2d_20"/>
+     <g id="text_62">
+      <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: start" x="1041.8" y="28.994131" transform="rotate(-0 1041.8 28.994131)">0.06</text>
+     </g>
+    </g>
+   </g>
+   <g id="LineCollection_1"/>
+   <g id="text_63">
+    <text style="font-size: 11px; font-family: 'Pretendard'; text-anchor: middle" x="1028.7" y="16.76" transform="rotate(-0 1028.7 16.76)">평균 이득</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pa97d5ff813">
+   <rect x="302.4" y="23.76" width="702" height="332.64"/>
+  </clipPath>
+ </defs>
+</svg>

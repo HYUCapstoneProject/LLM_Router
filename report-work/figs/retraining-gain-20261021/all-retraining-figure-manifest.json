@@ -1,0 +1,23 @@
+{
+  "source": "/Users/yoocheolmin/Google Drive/내 드라이브/LLM_Router/retraining-gain-f6-20261021",
+  "source_manifest_sha256": "4bdd2bbf747e80a720955a543c1ccd0640f9c2193c52e5aaaba6315e114bc8b5",
+  "panels": {
+    "prequential": [
+      "F1",
+      "F2",
+      "F3",
+      "F6",
+      "F6-esc"
+    ],
+    "test": [
+      "F4",
+      "F5",
+      "F6",
+      "F6-esc"
+    ]
+  },
+  "outputs": {
+    "fig5-13-all-retraining-gain.png": "242e4d7d374c5bfd24e84fb704a7cfc688056215e7136083f18929d21c5332d1",
+    "fig5-13-all-retraining-gain.svg": "bd6d56c6cd5da3eeb3a8dc13e120d99599a043fbeff9565fcfebd30231e15376"
+  }
+}

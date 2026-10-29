@@ -1,0 +1,110 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+:root{--cache:#127a73;--cache-bg:#e7f4f2;--router:#4a46b8;--router-bg:#eeedfb;--ops:#b4621a;--ops-bg:#fcf0e3;--ink:#24262b;--mute:#62666f;}
+html,body{margin:0;background:#fff;}
+body{width:1800px;height:1470px;position:relative;font-family:"Apple SD Gothic Neo","Pretendard","Noto Sans KR",sans-serif;color:var(--ink);}
+.abs{position:absolute;box-sizing:border-box;}
+.goal{left:40px;top:28px;width:1720px;height:74px;border:2.4px solid #2f3340;border-radius:10px;background:#f6f7f9;padding:12px 22px;}
+.goal b{font-size:23px;display:block;}
+.goal span{font-size:14.5px;color:#3d414b;}
+.head{top:122px;height:52px;border-radius:8px;color:#fff;padding:7px 16px;}
+.head b{font-size:18px;display:block;line-height:22px;} .head span{font-size:13px;opacity:.95;}
+.h-cache{left:40px;width:400px;background:var(--cache);}
+.h-router{left:640px;width:500px;background:var(--router);}
+.h-ops{left:1380px;width:380px;background:var(--ops);}
+.node{border:2px solid;border-radius:9px;padding:9px 14px 10px;}
+.node h3{margin:0;font-size:16.5px;line-height:21px;}
+.node p{margin:4px 0 0;font-size:13.5px;line-height:19px;}
+.node .tag{position:absolute;right:10px;top:9px;font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:10px;background:#fff;border:1.2px solid;}
+.c{border-color:var(--cache);background:var(--cache-bg);} .c h3{color:var(--cache);} .c .tag{color:var(--cache);border-color:var(--cache);}
+.r{border-color:var(--router);background:var(--router-bg);} .r h3{color:var(--router);} .r .tag{color:var(--router);border-color:var(--router);}
+.o{border-color:var(--ops);background:var(--ops-bg);} .o h3{color:var(--ops);} .o .tag{color:var(--ops);border-color:var(--ops);}
+.support{border-style:dashed;background:#fff !important;}
+.key{box-shadow:0 0 0 4px rgba(74,70,184,.15);}
+.pill{position:absolute;box-sizing:border-box;background:#fff;border:1.4px solid;border-radius:14px;padding:5px 11px;font-size:13px;line-height:18px;text-align:center;font-weight:600;color:#2b2e35;}
+.pill i{font-style:normal;font-weight:800;margin-right:4px;}
+.concl{top:1328px;height:84px;border-radius:9px;border:2px solid;padding:10px 16px;font-size:14px;line-height:20px;}
+.concl b{display:block;font-size:15px;margin-bottom:2px;}
+.k-cache{left:40px;width:400px;border-color:var(--cache);} .k-cache b{color:var(--cache);}
+.k-router{left:640px;width:500px;border-color:var(--router);} .k-router b{color:var(--router);}
+.k-ops{left:1380px;width:380px;border-color:var(--ops);} .k-ops b{color:var(--ops);}
+.legend{left:40px;top:1432px;font-size:13px;color:#3d414b;display:flex;gap:28px;}
+svg{position:absolute;left:0;top:0;}
+</style></head><body data-w="1800" data-h="1470">
+
+<div class="abs goal"><b>핵심 목적: 답의 품질은 지키면서 LLM 호출 비용을 줄인다</b>
+<span>화살표 위 문장은 앞 실험이 남긴 의문이다. 그 의문 때문에 다음 실험이 생겼다.</span></div>
+<div class="abs head h-cache"><b>캐시 · 다시 묻지 않기</b><span>틀린 답은 재사용하지 않는다</span></div>
+<div class="abs head h-router"><b>라우터 · 싼 모델부터</b><span>질문마다 충분한 가장 싼 모델을 고른다</span></div>
+<div class="abs head h-ops"><b>재학습 · 운영하며 고치기</b><span>에스컬레이션 피드백으로 라우터를 갱신한다</span></div>
+
+<!-- cache -->
+<div class="abs node c" id="n01" style="left:40px;top:205px;width:400px;height:104px">
+<h3>의미 캐시 기준 찾기 (8월)</h3><p>코사인 임계값만으로는 함정 질문을 못 가른다 → 리랭커 확인 · exact 캐시 도입</p></div>
+<div class="abs node c" id="n13" style="left:40px;top:560px;width:400px;height:104px">
+<h3>캐시 방식 비교 실험</h3><p>exact는 잘못된 재사용 0. 운영 구성은 함정 질문의 72%에 저장된 답을 돌려줬다</p></div>
+<div class="abs node c" id="n15" style="left:40px;top:915px;width:400px;height:104px">
+<h3>캐시 판정 교체 실험 (NLI)</h3><p>달라진 문장만 비교하는 NLI로 함정 통과 59.5% → 4.6%. 운영에 배포</p></div>
+
+<!-- router -->
+<div class="abs node r" id="n03" style="left:640px;top:205px;width:500px;height:86px"><span class="tag">시스템</span>
+<h3>첫 운영 라우터</h3><p>난이도 분류기를 배포했지만, 단순한 기준선과 차이가 작았다</p></div>
+<div class="abs node r support" id="n02" style="left:640px;top:395px;width:500px;height:86px"><span class="tag">동기</span>
+<h3>첫 라우터 점검</h3><p>분류를 잘해도 이득이 작다. 병목은 모델이 아니라 난이도 라벨의 정의</p></div>
+<div class="abs node r" id="n05" style="left:640px;top:585px;width:500px;height:86px">
+<h3>학습 목표 비교 실험 (R0 · R1 · R2)</h3><p>선정 지표로는 R1이 이겼지만 비용이 늘었고, 라벨 일치는 R0가 최고</p></div>
+<div class="abs node r" id="n12" style="left:640px;top:775px;width:500px;height:86px">
+<h3>같은 문항 재비교</h3><p>R0가 최종 해결률 · 비용 · 라벨 정답률 모두 1위 → 운영은 R0 유지</p></div>
+<div class="abs node r key" id="nEV" style="left:640px;top:965px;width:500px;height:106px"><span class="tag">핵심</span>
+<h3>라우팅 천장 분석</h3><p>정답 난이도 라벨을 알려 줘도 이득은 +.036에서 멈춘다. 틀리면 올리는 구조에서는 low부터 시작이 이미 oracle 수준</p></div>
+<div class="abs node r" id="n16" style="left:640px;top:1180px;width:500px;height:106px">
+<h3>논문 라우터 12종 비교</h3><p>상위 3개 공동 1위(+.04). 실패를 무겁게 볼 때만 이득이고, 이득은 대부분 "아무도 못 풀 문항" 알아보기에서 나온다</p></div>
+
+<!-- ops -->
+<div class="abs node o" id="n08" style="left:1380px;top:585px;width:380px;height:104px"><span class="tag">시스템</span>
+<h3>운영 등록 · 재학습 파이프라인 시험</h3><p>피드백 → 재학습 → 승격 → 서빙 → 롤백이 실제로 동작. 버전 정책으로 누적·사고 방지</p></div>
+<div class="abs node o" id="n10" style="left:1380px;top:775px;width:380px;height:104px">
+<h3>피드백 재학습 실험 (F0 ~ F3)</h3><p>재학습할수록 easy가 사라지고 비용 +63~77%. 채택 없음 (R1→R0 전이 실험에서 처음 봄)</p></div>
+<div class="abs node o support" id="nF" style="left:1380px;top:965px;width:380px;height:106px"><span class="tag">보조</span>
+<h3>양방향 오류 교정 실험 (F4 · F5)</h3><p>F4는 반대쪽(medium)으로 쏠렸고, 라벨 비율을 맞춘 F5도 운영 R0를 넘지 못했다</p></div>
+
+<div class="abs concl k-cache"><b>캐시 결론</b>문제는 판정 단계였다. NLI 판정으로 바꿔 함정 재사용을 크게 줄이고 운영에 배포했다.</div>
+<div class="abs concl k-router"><b>라우터 결론</b>단순한 난이도 분류(R0)가 가장 낫다. 하지만 라우팅으로 줄일 수 있는 몫 자체가 작고, 그 가치는 서비스가 실패를 얼마나 무겁게 보느냐에 달렸다.</div>
+<div class="abs concl k-ops"><b>재학습 결론</b>같은 분포에서는 나아질 여지가 거의 없다. 재학습의 목적을 "성능 향상"에서 "변화를 따라가되 망가지지 않기"로 바꾼다.</div>
+
+<div class="abs legend"><span>실선 카드 = 본문 실험</span><span>점선 카드 = 동기·보조로 짧게 다룸</span><span>R0~R3 = 학습 목표가 다른 라우터, F0~F5 = 피드백 재학습 비교군 (4.2절)</span><span>갈래를 넘는 화살표 = 한 갈래의 결과가 다른 갈래의 의문을 만든 곳</span></div>
+
+<svg id="sv" width="1800" height="1470"></svg>
+<script>
+const E=[
+ ["n01","n13","v","8월 판단은 작은 표본이었다. 운영 구성은 큰 데이터에서도 안전한가?","cache"],
+ ["n13","n15","v","문제는 \"찾기\"가 아니라 \"재사용해도 되나\" 판정이다. 판정 모델을 바꾸면?","cache"],
+ ["n03","n02","v","우리 라우터가 기존 기법보다 나은가?","router"],
+ ["n02","n05","v","라벨 정의가 천장이라면, 다른 것을 배우게 하면?","router"],
+ ["n05","n12","v","방식마다 다른 데이터로 평가했다. 같은 문항이면 순위는?","router"],
+ ["n12","nEV","v","방식끼리 차이가 몇 %p뿐이다. 왜 이렇게 작은가?","router"],
+ ["nEV","n16","v","라우터는 언제 이득인가? 논문 라우터도 같은 벽 아래인가?","router"],
+ ["n05","n08","h","R0를 운영 기준으로 올렸다. 피드백으로 계속 고칠 수 있나?","ops"],
+ ["n08","n10","v","파이프라인은 돈다. 재학습이 라우팅을 실제로 개선하나?","ops"],
+ ["n10","nF","v","피드백이 한쪽 방향뿐이라서라면, 양방향 정답을 주면?","ops"],
+ ["nF","nEV","h","가장 유리한 조건에서도 못 넘는다. 벽은 어디인가?","ops"]
+];
+const col={cache:"#127a73",router:"#4a46b8",ops:"#b4621a"};
+const sv=document.getElementById('sv');
+let d='<defs>';for(const k in col)d+=`<marker id="m${k}" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto"><path d="M0,0 L11,5.5 L0,11 z" fill="${col[k]}"/></marker>`;sv.innerHTML=d+'</defs>';
+const R=id=>{const e=document.getElementById(id);return{l:e.offsetLeft,t:e.offsetTop,w:e.offsetWidth,h:e.offsetHeight};};
+for(const [a,b,dir,txt,k] of E){
+  const A=R(a),B=R(b);let path,mx,my,maxw;
+  if(dir==="v"){const x=A.l+A.w/2;path=`M${x} ${A.t+A.h} V${B.t-3}`;mx=x;my=(A.t+A.h+B.t)/2;maxw=Math.min(A.w,B.w)-30;}
+  else if(B.l>A.l){const y1=A.t+A.h/2,y2=B.t+B.h/2,x1=A.l+A.w,x2=B.l-3;path=`M${x1} ${y1} C${(x1+x2)/2} ${y1} ${(x1+x2)/2} ${y2} ${x2} ${y2}`;mx=(x1+x2)/2;my=(y1+y2)/2;maxw=x2-x1-14;}
+  else{const y1=A.t+A.h/2,y2=B.t+B.h/2,x1=A.l,x2=B.l+B.w+3;path=`M${x1} ${y1} C${(x1+x2)/2} ${y1} ${(x1+x2)/2} ${y2} ${x2} ${y2}`;mx=(x1+x2)/2;my=(y1+y2)/2;maxw=x1-x2-14;}
+  const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+  p.setAttribute('d',path);p.setAttribute('fill','none');p.setAttribute('stroke',col[k]);p.setAttribute('stroke-width','2.4');p.setAttribute('marker-end',`url(#m${k})`);sv.appendChild(p);
+  const pl=document.createElement('div');pl.className='pill';pl.style.borderColor=col[k];pl.style.maxWidth=maxw+'px';pl.innerHTML='<i style="color:'+col[k]+'">Q</i>'+txt;document.body.appendChild(pl);
+  pl.style.left=(mx-pl.offsetWidth/2)+'px';pl.style.top=(dir==='v'?(my-pl.offsetHeight/2):(Math.min(A.t+A.h/2,B.t+B.h/2)-pl.offsetHeight-10))+'px';
+}
+document.body.appendChild(sv); // keep svg under pills? move pills above
+document.querySelectorAll('.pill').forEach(p=>document.body.appendChild(p));
+</script>
+</body></html>

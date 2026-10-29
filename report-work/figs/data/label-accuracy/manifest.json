@@ -1,0 +1,54 @@
+{
+  "population": "stream windows 2–6, audited RouterBench exclusions removed",
+  "n_before_exclusions": 4473,
+  "n": 4434,
+  "label": "original difficulty_label; easy/medium/hard mapped to low/medium/high",
+  "accuracy": "fraction of selected initial tiers matching the difficulty label",
+  "retraining_aggregation": "mean of per-seed accuracy for seeds 42, 43, 44",
+  "historical_summary_percent": {
+    "R0": 60.329,
+    "R1": 26.432,
+    "R2": 35.521,
+    "R3": 34.529,
+    "F1": 25.342,
+    "F2": 26.214,
+    "F3": 39.866
+  },
+  "historical_execution": {
+    "project_session": "83a1b657-e83f-4493-9986-98cf681f8f6d",
+    "tool_id": "toolu_01LocfMshRLa1H6NvAn8aTRS",
+    "timestamp": "2026-10-01T17:14:24.527Z"
+  },
+  "sources": {
+    "/Users/yoocheolmin/Library/CloudStorage/GoogleDrive-alexyoo0506@gmail.com/내 드라이브/LLM_Router/retraining-effect-f3/runs/retraining-effect-v2-f3-run001/shared-data/stream-windows.parquet": "c921ca32d0cf416e17481ab83ddfcd9cb7b47670668a0d8c93296d4a830fae26",
+    "/Users/yoocheolmin/workspace/school/LLM_Router/ml/artifacts/benchmark-outcome-audit-v1/routerbench-exclusions.parquet": "b625b22842e30484154f8d9a0c341fb4fd296c6af903c378563f18bbe2ea386a"
+  },
+  "inference": {
+    "max_length": 8192,
+    "batch_size": 16,
+    "dtype": "float32",
+    "attention": "eager",
+    "order": "ascending character length via numpy.argsort"
+  },
+  "policies": {
+    "R0": "saved initial_tier",
+    "R1": "argmax(sigmoid(logits) - lambda * decision_cost); RB=.10, xRB=.03",
+    "R2": "argmax(logits - lambda * decision_cost); RB=1.0, xRB=.10",
+    "R3": "argmax(logits)"
+  },
+  "category_definition": {
+    "path": "/Users/yoocheolmin/workspace/school/LLM_Router/.worktrees/router-final-common/ml/notebooks/router_final/categories.py",
+    "sha256": "eb2cea4cb798fa84a3c5eec2195ed7ef7a449506390c351bc39c02152fe8a01b",
+    "empty_categories_omitted": [
+      "전문가 과학·난제",
+      "사실 회상"
+    ]
+  },
+  "derived_files": {
+    "report-work/figs/data/label-accuracy/per-question-predictions.parquet": "87b56132de08898172a24f7c2d4bdffc89c4d37bffe687467f4cf16d1a151469",
+    "report-work/figs/data/label-accuracy/overall.csv": "4973756cad909f1d18d0ca20d414eea244be1126ed352a41b9e346c1a9cff6a0",
+    "report-work/figs/data/label-accuracy/by-category.csv": "17cf505b0db5ba1019abd4a87d751f76c3582b952d7a23767a8c3b78a268b8fc",
+    "report-work/figs/data/label-accuracy/category-counts.csv": "29e488949c939f7b838604998976267af08c77cd8699ad4ffcb27b830ba31214",
+    "report-work/figs/data/label-accuracy/category-mapping.csv": "dcc82dd2b3ce1904d9b428788442c2f0ad2230d40f6bf3c486f957fbc80e73c6"
+  }
+}
