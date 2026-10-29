@@ -17,6 +17,12 @@
 | F5-0 | [00_prepare_f5.ipynb](00_prepare_f5.ipynb) | F5 계획 봉인(GPU 추론 없음), window별 선택 수와 학습 라벨 비율 확인 |
 | F5-1 | [01_f5_matched_prior.ipynb](01_f5_matched_prior.ipynb) | 오답 전부 + 비율을 맞추는 정답 문항 + 실제 비율 복습 × seed 3 |
 | F5-2 | [02_compare_f5.ipynb](02_compare_f5.ipynb) | F0·F4(참고 run)·F5를 봉인 test·RouterArena 같은 문항에서 비교 |
+| G-1 | [04_gain_metric.ipynb](04_gain_metric.ipynb) | F0~F5의 저장된 예측을 첫 시도 이득 G(단계 가격 1:3:5)로 다시 평가 |
+| F6-1 | [04_f6_training_free.ipynb](04_f6_training_free.ipynb) | 학습 없이 갱신(문턱만 다시 맞춤) 비교군을 기존 지표로 평가 |
+| F6-2 | [05_f6_gain_metric.ipynb](05_f6_gain_metric.ipynb) | G-1에 F6 비교군을 더해 G로 평가(1:3:5) |
+| F6-3 | [06_f6_gain_dataprice.ipynb](06_f6_gain_dataprice.ipynb) | F6-2와 같은 예측으로 단계 가격만 데이터 평균 가격(high = 1)으로 바꿔 평가 |
+
+G 재평가(G-1, F6-2, F6-3)의 집계 결과는 `experiments/results/retraining-gain-20261021/`, `retraining-gain-f6-20261021/`, `retraining-gain-f6-dataprice-20261022/`에 있다. 원본은 개인 Drive `MyDrive/LLM_Router/`의 같은 이름 폴더다. 05와 06의 노트북은 각각 [`build_f6_gain_notebook.py`](build_f6_gain_notebook.py), [`build_f6_dataprice_notebook.py`](build_f6_dataprice_notebook.py)로 만든다. 06이 쓰는 후보 통계 파일의 SHA는 [`dataprice_stats.sha256`](dataprice_stats.sha256)에 있다.
 
 ## 실행 흐름
 
